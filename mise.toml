@@ -17,7 +17,7 @@ bats = "1.14.0"
 "github:taiki-e/cargo-llvm-cov" = "0.9.1"
 "cargo:cargo-mutants" = "27.1.0"
 # The workspace rust-version follows this toolchain pin.
-rust = { version = "1.97.1", profile = "minimal", components = "clippy,rustfmt,llvm-tools" }
+rust = { version = "1.99.0", profile = "minimal", components = "clippy,rustfmt,llvm-tools" }
 
 [env]
 DEVTOOLS_LOCK_PLATFORMS = "linux-x64,macos-arm64"
