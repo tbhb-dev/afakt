@@ -4,7 +4,7 @@ title: Command reference
 description: Usage, options, commands, output, and exit codes for the afakt command-line tool.
 tags: [afakt, cli]
 status: stable
-generated: { by: "claude-code:claude-sonnet-5-5", at: "2026-10-18T14:29:44Z" }
+generated: { by: "claude-code:claude-sonnet-5-5", at: "2026-10-18T19:27:15Z" }
 ---
 
 # Command reference
@@ -53,4 +53,16 @@ afakt status
 
 Running `afakt` with no command prints the top-level help to standard error and exits with code `2`. For an unknown command or option, clap writes an `error:` message with the matching usage line to standard error and exits with code `2`.
 
-If `status` fails to write to standard output, the process prints `Error:` and the I/O error to standard error, then exits with code `1`. A closed pipe does this, as in `afakt status | true`, because Rust ignores the broken pipe signal. Help and version output differ. Clap discards write errors there, and the process exits with code `0`.
+If `status` fails to write to standard output, the process prints `Error:` and the I/O error to standard error, then exits with code `1`. Help and version output differ. Clap discards write errors there, and the process exits with code `0`.
+
+On Linux, every write to `/dev/full` fails, so this reproduces the failure every time:
+
+```bash
+afakt status > /dev/full
+```
+
+The command prints `Error: Os { code: 28, kind: StorageFull, message: "No space left on device" }` to standard error and exits with code `1`.
+
+A pipe whose reader has already exited fails the same way, with `Error: Os { code: 32, kind: BrokenPipe, message: "Broken pipe" }`, because Rust ignores the broken pipe signal. Whether it fails depends on timing. If the reader closes its end before `afakt` writes, the exit code is `1`. If `afakt` writes first, the output goes into the pipe buffer and the exit code is `0`. A command such as `afakt status | true` can produce either result.
+
+A shell reports the status of the last command in a pipeline, not the status of `afakt`. In bash, run `set -o pipefail` before the pipeline to make it fail when any command fails, or read `${PIPESTATUS[0]}` right after it for the status of `afakt` alone.
