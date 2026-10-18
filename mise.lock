@@ -122,9 +122,9 @@ url_api = "https://api.github.com/repos/jqlang/jq/releases/assets/453012783"
 provenance = "github-attestations"
 
 [[tools.rust]]
-version = "1.97.1"
+version = "1.99.0"
 backend = "core:rust"
-specifiers = ["1.97.1"]
+specifiers = ["1.99.0"]
 
 [tools.rust.options]
 components = "clippy,llvm-tools,rustfmt"

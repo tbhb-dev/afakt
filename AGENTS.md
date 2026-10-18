@@ -60,7 +60,7 @@ All scheduled times use Coordinated Universal Time.
 
 ## Rust toolchain
 
-The toolchain pin in `mise.toml` selects Rust 1.97.1 with `clippy`, `rustfmt`, and `llvm-tools`. Workspace crates use edition 2024 and inherit strict `clippy`, Rust, and `rustdoc` lints. Strict lints reject standard output and standard error print macros, unsafe code, `unwrap`, and `expect` in both code and tests. Keep `Cargo.lock` under version control. `nextest` runs without retries and fails on flaky tests. `cargo-deny` rejects duplicate dependency versions. Coverage floors match afakt's measured line and region coverage.
+The toolchain pin in `mise.toml` selects Rust 1.99.0 with `clippy`, `rustfmt`, and `llvm-tools`. Workspace crates use edition 2024 and inherit strict `clippy`, Rust, and `rustdoc` lints. Strict lints reject standard output and standard error print macros, unsafe code, `unwrap`, and `expect` in both code and tests. Keep `Cargo.lock` under version control. `nextest` runs without retries and fails on flaky tests. `cargo-deny` rejects duplicate dependency versions. Coverage floors match afakt's measured line and region coverage.
 
 ## Conventions
 

@@ -4,7 +4,7 @@ members = ["crates/afakt"]
 
 [workspace.package]
 edition = "2024"
-rust-version = "1.97.1"
+rust-version = "1.99.0"
 publish = false
 
 [workspace.lints.clippy]
