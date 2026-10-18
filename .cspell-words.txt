@@ -15,6 +15,7 @@ overcaptures
 pathbuf
 peekable
 pipefail
+PIPESTATUS
 preapproval
 prek
 pyyaml
