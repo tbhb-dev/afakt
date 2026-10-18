@@ -10,7 +10,7 @@ generated: { by: "codex:gpt-6.1-sol" }
 
 ## What this is
 
-`afakt-poc` is a proof of concept repository. P2 adds a Rust command-line skeleton to the shared development tools and docs. The repository uses devtools v0.12.0.
+`afakt-poc` is a proof of concept repository. It has a Rust command-line skeleton, shared development tools, docs, and CI gates. The repository uses devtools v0.12.0.
 
 ## Crate map
 
@@ -39,6 +39,24 @@ Run commands from the repository root through mise.
 | `mise run check-docs` | Check Markdown layout and OKF frontmatter |
 | `mise run test-skills` | Run the local skill tests with bats |
 | `mise run lint-commit-msg` | Check the draft in `COMMIT_AGENTMSG` |
+
+## Workflows
+
+All scheduled times use Coordinated Universal Time.
+
+`.github/workflows/ci.yml` runs on pushes to `main`, pull requests, and manual dispatch. Jobs run lint, checks on Linux and macOS, `vuln`, deny, coverage, and vendor-check. The required `test` summary fails unless every matrix slot succeeds.
+
+`.github/workflows/security.yml` scans history with `gitleaks` daily at 06:26, on pushes to `main`, on pull requests, and on manual dispatch. For pull requests, the scan ends at the commit at the head of the branch.
+
+`.github/workflows/scheduled.yml` records mutation outcomes and coverage reports daily at 04:17 or on manual dispatch.
+
+`.github/workflows/lint-codeowners.yml` checks CODEOWNERS on every pull request only.
+
+`.github/workflows/lint-workflows.yml` supports manual dispatch and checks changes to `.github/workflows/**` in pull requests or pushes to `main`.
+
+`.github/workflows/renovate-config-validator.yaml` validates Renovate configuration. It runs when a pull request or push to `main` changes `**renovate.json5`, and it also accepts manual dispatch.
+
+`.github/workflows/renovate.yaml` runs Renovate at minute 11 of every hour on weekdays and every two hours on weekends. Manual dispatch can enable debug logging.
 
 ## Rust toolchain
 
