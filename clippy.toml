@@ -1,5 +1,5 @@
 # Thresholds for the workspace lint table in Cargo.toml.
-msrv = "1.97.1"
+msrv = "1.99.0"
 avoid-breaking-exported-api = false
 check-private-items = true
 
