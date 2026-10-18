@@ -4,7 +4,7 @@ title: Command reference
 description: Usage, options, commands, output, and exit codes for the afakt command-line tool.
 tags: [afakt, cli]
 status: stable
-generated: { by: "claude-code/claude-sonnet-5-5", at: "2026-10-18T14:20:44Z" }
+generated: { by: "claude-code:claude-sonnet-5-5", at: "2026-10-18T14:29:44Z" }
 ---
 
 # Command reference
@@ -15,10 +15,11 @@ generated: { by: "claude-code/claude-sonnet-5-5", at: "2026-10-18T14:20:44Z" }
 
 ```text
 afakt <COMMAND>
-afakt [OPTIONS]
+afakt -h | --help
+afakt -V | --version
 ```
 
-You must give a command. The tool has no configuration files and doesn't read any environment variables of its own.
+You must give a command. The only exceptions are `-h`/`--help` and `-V`/`--version`, which print and exit. The tool has no configuration files and doesn't read any environment variables of its own.
 
 ## Global options
 
@@ -40,15 +41,16 @@ You must give a command. The tool has no configuration files and doesn't read an
 afakt status
 ```
 
-`status` takes no arguments and no options besides `-h` and `--help`. It writes `status is not implemented yet.` followed by a newline to standard output and exits successfully. It writes nothing to standard error.
+`status` takes no arguments and no options besides `-h` and `--help`. It writes `status is not implemented yet.` followed by a newline to standard output and exits successfully. When the write succeeds, it writes nothing to standard error.
 
 ## Exit codes
 
 | Code | Meaning |
 | --- | --- |
 | `0` | The command succeeded, or you asked for help or the version |
+| `1` | `status` couldn't write to standard output, such as when standard output is a closed pipe |
 | `2` | The command line is invalid, such as a missing command, an unknown command, or an unexpected argument |
 
 Running `afakt` with no command prints the top-level help to standard error and exits with code `2`. For an unknown command or option, clap writes an `error:` message with the matching usage line to standard error and exits with code `2`.
 
-If writing to standard output fails, the process returns the write error as a failure.
+If `status` fails to write to standard output, the process prints `Error:` and the I/O error to standard error, then exits with code `1`. A closed pipe does this, as in `afakt status | true`, because Rust ignores the broken pipe signal. Help and version output differ. Clap discards write errors there, and the process exits with code `0`.
