@@ -1,0 +1,16 @@
+[Ff]rontmatter
+[Rr]ebase
+[Rr]epos
+[Rr]uleset
+[Rr]ulesets
+[Ww]orktree
+[Ww]orktrees
+afakt
+afakt-poc
+cspell
+devtools
+mise
+prek
+shellcheck
+toolchain
+vendir
