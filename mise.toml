@@ -158,6 +158,9 @@ run = [
 [tasks.lint-prose]
 extends = "devtools:lint-prose"
 
+[tasks.fix-prose-replacements]
+extends = "devtools:fix-prose-replacements"
+
 [tasks.lint-commit-msg]
 extends = "devtools:lint-commit-msg"
 

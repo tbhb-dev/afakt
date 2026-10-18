@@ -4,7 +4,7 @@ okf_version: "0.2"
 
 # Architecture Overview
 
-* [Architecture overview](architecture.md) - What P1 adds to the project.
+* [Architecture overview](architecture.md) - Rust workspace and command structure for afakt-poc.
 
 # Command reference
 
