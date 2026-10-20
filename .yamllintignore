@@ -3,11 +3,12 @@
 .vale/
 .claude/
 apm_modules/
-target/
+bin/
 tmp/
 logs/
 spikes/
 apm.lock.yaml
 vendir.lock.yml
+vendor/
 # Generated dependency locks from mise.
 .config/mise/locks/

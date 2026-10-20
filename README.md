@@ -1,11 +1,13 @@
 ---
 type: README
-title: afakt-poc
-description: Development tooling and starter docs for afakt-poc.
+title: afakt
+description: A proof of concept Go command-line tool with shared development tools and docs.
 tags: [afakt, readme]
-generated: { by: "codex:gpt-6.1-sol" }
+generated: { by: "claude-code:claude-sonnet-5-5", at: "2026-10-20T05:55:00Z" }
 ---
 
-# afakt-poc
+# afakt
 
-`afakt-poc` is a proof of concept repository with shared development tools and starter docs. See [AGENTS.md](AGENTS.md) for repository guidance and [docs/index.md](docs/index.md) for the docs index.
+`afakt` is a proof of concept command-line tool written in Go. It has one command, `status`, which prints a placeholder line. Run it with `go run ./cmd/afakt status`, or build `bin/afakt` with `mise run build`. See [docs/cli.md](docs/cli.md) for the command reference.
+
+The repository also has shared development tools and docs. See [AGENTS.md](AGENTS.md) for repository guidance and [docs/index.md](docs/index.md) for the docs index.

@@ -1,4 +1,4 @@
-# afakt-poc toolchain and tasks.
+# afakt toolchain and tasks.
 
 [settings]
 lockfile = true
@@ -11,18 +11,12 @@ shfmt = "3.14.1"
 jq = "1.8.2"
 "go:github.com/tbhb-dev/devtools/cmd/guard-markdown" = "v0.12.0"
 bats = "1.14.0"
-"github:EmbarkStudios/cargo-deny" = "0.20.2"
-"aqua:nextest-rs/nextest/cargo-nextest" = "0.9.148"
-"github:Boshen/cargo-shear" = "1.14.0"
-"github:taiki-e/cargo-llvm-cov" = "0.9.1"
-"cargo:cargo-mutants" = "27.1.0"
-# The workspace rust-version follows this toolchain pin.
-rust = { version = "1.99.0", profile = "minimal", components = "clippy,rustfmt,llvm-tools" }
 
 [env]
 DEVTOOLS_LOCK_PLATFORMS = "linux-x64,macos-arm64"
-DEVTOOLS_GENERATED_PATHS = ".devtools/\n.config/mise/\ntarget/\ntmp/\nspikes/\n.vale/"
-DEVTOOLS_PROSE_GLOB = "*.{md,rs}"
+DEVTOOLS_GO_MODULES_MODE = "vendor"
+DEVTOOLS_GENERATED_PATHS = ".devtools/\n.config/mise/\nbin/\ncoverage/\ntmp/\nspikes/\n.vale/"
+DEVTOOLS_PROSE_GLOB = "*.{md,go}"
 
 [task_config]
 includes = [
@@ -30,6 +24,7 @@ includes = [
   ".devtools/tasks/fix.toml",
   ".devtools/tasks/format.toml",
   ".devtools/tasks/git-hooks.toml",
+  ".devtools/tasks/go.toml",
   ".devtools/tasks/leaks.toml",
   ".devtools/tasks/lint.toml",
   ".devtools/tasks/pins.toml",
@@ -58,42 +53,12 @@ run = "mise install"
 description = "Download the Vale style packages .vale.ini names"
 run = "vale sync"
 
-# This workspace has only a binary target, so Cargo has no library doc tests to run.
-[tasks.test]
-description = "Run every test under nextest (NEXTEST_PROFILE=ci selects the CI profile)"
-run = ["cargo nextest run --workspace --locked"]
-
-[tasks.lint-rust]
-description = "clippy with every group at deny and warnings denied"
-run = "cargo clippy --workspace --all-targets --locked -- -D warnings"
-
-[tasks.lint-rustdoc]
-description = "rustdoc with warnings denied, private items and intra-doc links included"
-env = { RUSTDOCFLAGS = "-D warnings" }
-run = "cargo doc --workspace --no-deps --document-private-items --locked"
-
-[tasks.lint-shear]
-description = "cargo-shear: fail on an unused or misplaced dependency"
-run = "cargo shear"
-
-[tasks.deny]
-description = "cargo-deny: advisories, bans and sources"
-run = "cargo deny check advisories bans sources"
-
-[tasks.fmt]
-description = "Format the code"
-run = "cargo fmt"
-
-[tasks.fmt-check]
-description = "Fail if rustfmt would change a file"
-run = "cargo fmt --check"
-
 [tasks.check-docs]
 shell = "bash -c"
 description = "guard-markdown on every tracked Markdown file, then the OKF check on docs/ and on every other Markdown file"
 run = """
 command -v guard-markdown >/dev/null || { echo "guard-markdown not found; install it with: go install github.com/tbhb-dev/devtools/cmd/guard-markdown@v0.12.0" >&2; exit 1; }
-git ls-files -z '*.md' ':!:.devtools/**' ':!:.claude/**' ':!:apm_modules/**' | while IFS= read -r -d '' f; do [ -e "$f" ] && printf '%s\\0' "$f"; done | xargs -0 guard-markdown
+git ls-files -z '*.md' ':!:.devtools/**' ':!:.claude/**' ':!:apm_modules/**' ':!:vendor/**' | while IFS= read -r -d '' f; do [ -e "$f" ] && printf '%s\\0' "$f"; done | xargs -0 guard-markdown
 uv run --no-project --with pyyaml python scripts/okf-check.py docs
 uv run --no-project --with pyyaml python scripts/okf-check.py --repo .
 """
@@ -103,45 +68,8 @@ description = "Run the bats suites of the repository-local agent skills"
 run = "bats .agents/skills/agent-commit/tests .agents/skills/agent-pr/tests .agents/skills/agent-merge-pr/tests"
 
 [tasks.check]
-description = "The full local gate: Rust checks, coverage, documentation and skill tests"
-depends = ["check-docs", "test-skills"]
-run = [
-  "mise run fmt-check",
-  "mise run lint-rust",
-  "mise run lint-rustdoc",
-  "mise run lint-shear",
-  "mise run deny",
-  "mise run vuln",
-  "mise run test",
-  "mise run coverage",
-]
-
-# afakt measured 14/14 lines and 15/15 regions on Linux with the pinned toolchain.
-# Both coverage floors are 100%, matching those measurements.
-# The report runs as its own step because llvm-cov crashes when nextest and the report
-# share one invocation.
-[tasks.coverage]
-description = "Run the tests under cargo-llvm-cov and fail below the line and region floors"
-run = [
-  "cargo llvm-cov nextest --workspace --locked --no-report",
-  "cargo llvm-cov report --summary-only --fail-under-lines 100 --fail-under-regions 100",
-]
-
-[tasks.coverage-report]
-description = "Write an HTML coverage report to target/llvm-cov/html"
-run = [
-  "cargo llvm-cov nextest --workspace --locked --no-report",
-  "cargo llvm-cov report --html",
-]
-
-# No score gate: cargo-mutants has no threshold flag, and the floor is the maintainer's to set.
-[tasks.mutants]
-description = "Run cargo-mutants over the workspace with nextest; writes mutants.out and gates nothing"
-run = "cargo mutants --workspace --test-tool nextest --jobs 2 --no-shuffle"
-
-[tasks.vuln]
-description = "Fail when Cargo.lock holds a dependency with a published RustSec advisory"
-run = "cargo deny check advisories"
+description = "Check documentation, local skills, and Go tests with coverage"
+depends = ["check-docs", "test-skills", "test-go", "test-go-race", "cover-go"]
 
 [tasks.lint-draft]
 extends = "devtools:lint-draft"
@@ -186,6 +114,7 @@ extends = "devtools:lint"
 run = [
   "mise run devtools:check-vendored",
   "mise run devtools:check-pins",
+  "mise run devtools:check-toolchain",
   "mise run devtools:lint-apm",
   "mise run devtools:lint-leaks",
   "mise run devtools:check-leak-hook",
@@ -202,8 +131,80 @@ run = [
   "mise run devtools:lint-shell-fmt",
   "mise run lint-skills",
   "mise run devtools:lint-curl",
-  "mise run fmt-check",
-  "mise run lint-rust",
-  "mise run lint-rustdoc",
-  "mise run lint-shear",
+  "mise run lint-go-all",
+  "mise run lint-go-fmt",
 ]
+
+[tasks.build]
+description = "Run devtools:build"
+run = "mise run devtools:build"
+
+# The operator skills commit and pr hardcode `mise run test`, so the task stays as a wrapper.
+[tasks.test]
+description = "Run devtools:test-go"
+run = "mise run devtools:test-go"
+
+[tasks.test-go]
+description = "Run devtools:test-go"
+run = "mise run devtools:test-go"
+
+[tasks.test-go-race]
+description = "Run devtools:test-go-race"
+run = "mise run devtools:test-go-race"
+
+[tasks.lint-go-all]
+description = "Run devtools:lint-go-all"
+run = "mise run devtools:lint-go-all"
+
+[tasks.lint-go-arch]
+description = "Run devtools:lint-go-arch"
+run = "mise run devtools:lint-go-arch"
+
+[tasks.lint-go-deadcode]
+description = "Run devtools:lint-go-deadcode"
+run = "mise run devtools:lint-go-deadcode"
+
+[tasks.cover-go]
+description = "Run devtools:cover-go"
+run = "mise run devtools:cover-go"
+
+[tasks.cover-go-check]
+description = "Run devtools:cover-go-check"
+run = "mise run devtools:cover-go-check"
+
+[tasks.vuln]
+description = "Run devtools:vuln"
+run = "mise run devtools:vuln"
+
+[tasks.mutate-go]
+description = "Run devtools:mutate-go"
+run = "mise run devtools:mutate-go"
+
+[tasks.vendor]
+description = "Run devtools:vendor"
+run = "mise run devtools:vendor"
+
+# Local workaround for tbhb-dev/devtools#182 and #289: detect untracked vendor files.
+# Capture them before regeneration too, since go mod vendor removes stray files.
+# Remove this task and point at devtools:vendor-check once that task does the same.
+[tasks.vendor-check]
+description = "Check that vendor/, go.mod, and go.sum are in sync"
+run = '''
+#!/usr/bin/env bash
+set -euo pipefail
+untracked_before=$(git ls-files --others --exclude-per-directory=.gitignore -- go.mod go.sum vendor/)
+go mod tidy
+go mod vendor
+untracked_after=$(git ls-files --others --exclude-per-directory=.gitignore -- go.mod go.sum vendor/)
+if [[ -n $untracked_before || -n $untracked_after ]] || ! git diff --exit-code -- go.mod go.sum vendor/; then
+  printf '%s\n' "$untracked_before" "$untracked_after" | sort -u >&2
+  echo "vendor drift detected; run 'mise run vendor' and commit" >&2
+  exit 1
+fi
+'''
+
+# Local workaround for tbhb-dev/devtools#283: the payload has no Go format check, only the
+# in-place devtools:format-go. Remove this task once devtools ships a check-only formatter task.
+[tasks.lint-go-fmt]
+description = "Check Go formatting"
+run = "golangci-lint fmt --diff ./cmd/... ./internal/..."

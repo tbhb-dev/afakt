@@ -119,4 +119,6 @@ Both skills can load in one session. The installed guard refuses any `gh pr` ver
 
 ## Tests
 
-`bats .claude/skills/agent-merge-pr/tests` runs the scripts against a scratch repository with a bare remote. The tests use stand-ins for `gh`, the reviewer, the readiness command, and the mailbox. Run them directly: `mise run test` runs `cargo test` and doesn't include them.
+`bats .claude/skills/agent-merge-pr/tests` runs the scripts against a scratch repository with a bare remote. The tests use stand-ins for `gh`, the reviewer, the readiness command, and the mailbox. Run them directly: `mise run test` runs the Go tests (`devtools:test-go`) and doesn't include them.
+
+<!-- afakt adaptation: the upstream text says `mise run test` runs `cargo test`; afakt runs the Go tests there. -->

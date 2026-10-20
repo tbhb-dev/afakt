@@ -20,12 +20,14 @@
     ".vale/**/*",
     "apm.lock.yaml",
     // Dependency lockfiles contain generated names and checksums.
-    "Cargo.lock",
-    "**/Cargo.lock",
-    "target/**/*",
+    "bin/**/*",
+    "coverage/**/*",
+    "coverage.out",
     "logs/**/*",
     "spikes/**/*",
     "vendor/**/*",
+    "go.mod",
+    "go.sum",
     "mise.lock",
     "dist/**/*",
     "coverage.xml",
@@ -42,5 +44,5 @@
       "addWords": true
     }
   ],
-  "dictionaries": ["afakt", "rust"]
+  "dictionaries": ["afakt"]
 }

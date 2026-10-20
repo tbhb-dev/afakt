@@ -17,7 +17,7 @@ exclude = [
   "vendor/**/*.toml",
   ".devtools/**/*.toml",
   ".config/mise/**/*.toml",
-  "target/**/*.toml",
+  "bin/**/*.toml",
   "spikes/**/*.toml",
   "logs/**/*.toml",
   "mise.local.toml",

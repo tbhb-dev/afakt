@@ -105,4 +105,6 @@ Both skills can load in one session. Each guard refuses a direct `git commit` an
 
 ## Tests
 
-`bats .claude/skills/agent-commit/tests` runs the scripts against a scratch repository, with a stand-in reviewer. Run it directly: `mise run test` runs `cargo test` and doesn't include it.
+`bats .claude/skills/agent-commit/tests` runs the scripts against a scratch repository, with a stand-in reviewer. Run it directly: `mise run test` runs the Go tests (`devtools:test-go`) and doesn't include it.
+
+<!-- afakt adaptation: the upstream text says `mise run test` runs `cargo test`; afakt runs the Go tests there. -->

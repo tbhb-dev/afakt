@@ -3,8 +3,10 @@ default_stages: [pre-commit, pre-push]
 
 # Hooks never touch vendored third-party code; that source is reviewed at PR
 # time as part of vendor-check, not reformatted to match this repo's style.
+# vendor/ stays out of this global exclusion so the gomodscan hook sees
+# vendored dependency changes; each hook that reads files excludes it.
 exclude: |
-  (?x)^(target/|tmp/|logs/|spikes/|apm_modules/|\.devtools/|\.config/mise/|\.claude/|\.vale/
+  (?x)^(bin/|coverage/|tmp/|logs/|spikes/|apm_modules/|\.devtools/|\.config/mise/|\.claude/|\.vale/
   |vendir\.lock\.yml$|apm\.lock\.yaml$)
 
 # Every hook that runs a project tool goes through `mise run <task>`, so
@@ -20,13 +22,21 @@ repos:
   - repo: builtin
     hooks:
       - id: check-case-conflict
+        exclude: ^vendor/
       - id: check-executables-have-shebangs
+        exclude: ^vendor/
       - id: check-merge-conflict
+        exclude: ^vendor/
       - id: check-symlinks
+        exclude: ^vendor/
       - id: end-of-file-fixer
+        exclude: ^vendor/
       - id: fix-byte-order-marker
+        exclude: ^vendor/
       - id: mixed-line-ending
+        exclude: ^vendor/
       - id: trailing-whitespace
+        exclude: ^vendor/
 
   # The shared hooks: the commit-msg gates, the post-commit hook that deletes
   # the COMMIT_AGENTMSG draft once a commit lands, guard-markdown, and the
@@ -45,63 +55,25 @@ repos:
       - id: cspell-commit-msg
       - id: clear-commit-agentmsg
       - id: guard-markdown
+        exclude: ^vendor/
       - id: leaks-staged
+        exclude: ^vendor/
       - id: leaks-commit-msg
       - id: leaks-pre-push
+      - id: gomodscan
 
   - repo: local
     hooks:
-      - id: rust-fmt
-        name: Rust format check
-        entry: mise run fmt-check
+      - id: go-fmt
+        exclude: ^vendor/
+        name: go format check
+        entry: mise run lint-go-fmt
         language: system
-        types: [rust]
+        types: [go]
         pass_filenames: false
-        stages: [pre-commit]
-
-      - id: cargo-shear
-        name: cargo-shear (unused dependencies)
-        entry: mise run lint-shear
-        language: system
-        files: (^|/)Cargo\.toml$
-        pass_filenames: false
-        stages: [pre-commit]
-
-      - id: cargo-deny
-        name: cargo-deny (advisories, bans, sources)
-        entry: mise run deny
-        language: system
-        files: ^(Cargo\.toml|Cargo\.lock|deny\.toml|crates/[^/]+/Cargo\.toml)$
-        pass_filenames: false
-        stages: [pre-commit]
-
-      # The heavy Rust gates run once per push, over the whole workspace.
-      # Coverage, mutants and fuzz stay out of every hook.
-      - id: cargo-clippy
-        name: Clippy (all targets)
-        entry: mise run lint-rust
-        language: system
-        always_run: true
-        pass_filenames: false
-        stages: [pre-push]
-
-      - id: cargo-doc
-        name: rustdoc (warnings denied)
-        entry: mise run lint-rustdoc
-        language: system
-        always_run: true
-        pass_filenames: false
-        stages: [pre-push]
-
-      - id: cargo-nextest
-        name: nextest and doc tests
-        entry: mise run test
-        language: system
-        always_run: true
-        pass_filenames: false
-        stages: [pre-push]
 
       - id: ryl
+        exclude: ^vendor/
         name: ryl
         entry: mise run devtools:lint-yaml
         language: system
@@ -136,18 +108,21 @@ repos:
         pass_filenames: false
 
       - id: lint-prose
+        exclude: ^vendor/
         name: vale (prose)
         entry: mise run lint-prose
         language: system
-        types: [markdown]
+        types_or: [markdown, go]
 
       - id: cspell
+        exclude: ^vendor/
         name: cspell
         entry: mise run devtools:lint-spelling
         language: system
         pass_filenames: false
 
       - id: rumdl
+        exclude: ^vendor/
         name: rumdl
         entry: mise run devtools:lint-markdown
         language: system
