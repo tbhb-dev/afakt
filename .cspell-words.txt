@@ -26,6 +26,7 @@ preapproval
 prek
 pyyaml
 rumdl
+Seekable
 shellcheck
 shfmt
 shopt
