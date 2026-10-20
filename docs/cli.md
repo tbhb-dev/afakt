@@ -28,7 +28,9 @@ You must give a command. The only exceptions are `-h`/`--help` and `-V`/`--versi
 | `-h`, `--help` | Print usage, commands, and options to standard output, then exit successfully |
 | `-V`, `--version` | Print `afakt <version>` to standard output, then exit successfully |
 
-`mise run build` stamps the version from `git describe`, which gives a tag or a short commit. A build without stamping, such as `go run`, prints `0.1.0`. The program doesn't print `tip:` suggestion lines.
+`mise run build` stamps the version from `git describe`, which gives a tag or a short commit. `go run` prints `0.1.0`. The program doesn't print `tip:` suggestion lines.
+
+A plain `go build` or `go install` inside a git checkout prints the module version that Go records. At a tagged commit, the version is the tag, such as `afakt v0.1.0`. A commit after a tag gets a pseudo-version that counts up from the tag, such as `afakt v0.2.1-0.20261020155836-31d12ba4f34f`. With no tag in the history, the pseudo-version looks like `afakt v0.0.0-20261020154902-939bf22e84e3`, built from the commit time and the first 12 characters of the commit hash. A working tree with uncommitted changes adds a `+dirty` suffix. `go install github.com/tbhb-dev/afakt/cmd/afakt@<version>` prints that module version. A build with no module version, such as `go run` or a build from a source tree outside a git checkout, prints `0.1.0`.
 
 ## Commands
 
