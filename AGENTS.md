@@ -10,7 +10,7 @@ generated: { by: "claude-code:claude-sonnet-5-5", at: "2026-10-20T05:55:00Z" }
 
 ## What this is
 
-`afakt` is a proof of concept command-line tool written in Go. It has one command, `status`, which prints a placeholder line. The repository also has shared development tools, docs, and CI gates. It uses devtools v0.12.0.
+`afakt` is a proof of concept command-line tool written in Go. It has one command, `status`, which prints a placeholder line. The repository also has shared development tools, docs, and CI gates. It uses devtools v0.13.0.
 
 ## Layout
 
@@ -18,9 +18,9 @@ generated: { by: "claude-code:claude-sonnet-5-5", at: "2026-10-20T05:55:00Z" }
 
 `docs/` holds the OKF docs bundle. `scripts/okf-check.py` checks its format and the Markdown frontmatter across the repository.
 
-`.devtools/` and `.config/mise/conf.d/` hold the devtools v0.12.0 payload. The `vendir` tool owns both directories. Edit repository settings in the root configuration files.
+`.devtools/` and `.config/mise/conf.d/` hold the devtools v0.13.0 payload. The `vendir` tool owns both directories. Edit repository settings in the root configuration files.
 
-`.agents/skills/agent-*` holds the local agent skills. APM deploys skills and rules to `.agents/` and `.claude/` from `apm.yml`.
+APM deploys the skills and rules from the devtools packages named in `apm.yml` to `.agents/` and `.claude/`. That includes `agent-commit`, `agent-pr`, and `agent-merge-pr`. `.agents/agent-skills.conf` holds this repository's policy for them, such as the lint commands and which changed paths go to the owner. The machine supplies the reviewer, the GitHub account, the required reviewer, and the delegation. The repository supplies none of them.
 
 ## Commands
 
@@ -30,7 +30,7 @@ Read `mise.toml` before trusting it. In each fresh worktree, run `mise trust`, t
 | --- | --- |
 | `mise run devtools:apm-sync` | Deploy agent tooling |
 | `mise run lint` | Check source gates |
-| `mise run check` | Check docs, local skills, and Go coverage |
+| `mise run check` | Check docs, Go tests, and Go coverage |
 | `mise run build` | Build `bin/afakt` with version metadata |
 | `mise run test` | Run the Go tests, as `test-go` does |
 | `mise run test-go` | Run the Go tests |
@@ -45,8 +45,7 @@ Read `mise.toml` before trusting it. In each fresh worktree, run `mise trust`, t
 | `mise run vendor` | Tidy `go.mod` and refresh `vendor/` |
 | `mise run vendor-check` | Fail when `go.mod`, `go.sum`, or `vendor/` drift from the committed tree |
 | `mise run mutate-go` | Run mutation testing |
-| `mise run test-skills` | Run the local skills' bats suites |
-| `mise run lint-skills` | Check skill prose and scripts |
+| `mise run lint-skills` | Check the prose of `.claude/rules` |
 | `mise run check-docs` | Check the docs bundle and repository Markdown |
 | `mise run lint-commit-msg` | Check the draft in `COMMIT_AGENTMSG` |
 | `mise run devtools:prek-all` | Run applicable hooks |
@@ -57,7 +56,7 @@ The shared payload pins Go 1.27.2. Use `mise exec -- go version` to inspect it. 
 
 Root configuration includes the shared Go task file and exposes local build and test tasks. Go tool directives declare the analyzer dependencies in the module. `DEVTOOLS_GO_MODULES_MODE=vendor` loads them from the tracked `vendor/` tree. Commit `go.sum` with those generated sources. Run `mise run vendor` to refresh them and `mise run vendor-check` to check for drift.
 
-`.testcoverage.yml` sets the coverage floors: 100% for each file, each package, and the total. The measured total is 100% (88 of 88 statements). The floors skip `main.go`, whose `os.Exit` glue can't run inside a test process. `mise run build` stamps the version from `git describe`, so `afakt --version` prints a tag or a short commit. A build without stamping, such as `go run`, prints `0.1.0`.
+`.testcoverage.yml` sets the coverage floors: 100% for each file, each package, and the total. The measured total is 100% (88 of 88 statements). The floors skip `main.go`, whose `os.Exit` glue can't run inside a test process. `docs/cli.md` states what `afakt --version` prints for each kind of build.
 
 ## Conventions
 
@@ -65,11 +64,11 @@ Change only the files the task needs and stage paths by name. Run the checks bef
 
 Write each Markdown paragraph on one line. The guard-markdown hook checks this rule. Use Open Knowledge Format (OKF) v0.2 for docs: `docs/index.md` declares `okf_version`, each doc declares its `type`, and draft stubs include `status: draft` and `generated.by`. Run `mise run check-docs` after changing docs.
 
-The devtools payload owns `.devtools/` and `.config/mise/conf.d/`. Edit repository policy in `mise.toml`. Keep every devtools pin on the same release and run `mise run devtools:check-pins` after a pin change.
+The devtools payload owns `.devtools/` and `.config/mise/conf.d/`. Edit repository policy in `mise.toml`. Keep every devtools pin on the same release, including the Go tool versions in `mise.toml`, and run `mise run devtools:check-pins` after a pin change.
 
 ## Identities
 
-Create commits as `tbhb-agent`. Route reviews through `gh-reviewer` as `tbhb-agent-reviewer`. The local agent skills keep these identities separate.
+Create commits as `tbhb-agent`. Route reviews through `gh-reviewer` as `tbhb-agent-reviewer`. The agent skills from the devtools packages keep these identities separate, and the accounts come from the machine configuration.
 
 ## Workflows
 

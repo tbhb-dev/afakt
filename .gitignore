@@ -11,6 +11,7 @@ SQUASH_AGENTMSG
 .claude/worktrees/
 .claude/settings.local.json
 tmp/
+__pycache__/
 .vale/*
 !.vale/project/
 !.vale/config/

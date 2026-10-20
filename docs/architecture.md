@@ -27,4 +27,4 @@ generated: { by: "claude-code:claude-sonnet-5-5", at: "2026-10-20T05:55:00Z" }
 
 Table-driven tests in `cmd/afakt` call `Run` with in-memory writers to cover help, version, usage errors, and write failures, and they test the error formatting directly. Tests in `internal/buildmeta` drive each branch of the version resolution. The coverage floors in `.testcoverage.yml` are 100% for each file, each package, and the total, with `main.go` excluded.
 
-`mise run check` runs the tests with and without the race detector and enforces the coverage floors. It also checks the docs and the local skills.
+`mise run check` runs the tests with and without the race detector and enforces the coverage floors. It also checks the docs.
