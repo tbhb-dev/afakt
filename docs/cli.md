@@ -55,7 +55,7 @@ afakt status
 
 Running `afakt` with no command prints the top-level help to standard error and exits with code `2`. For an unknown command or option, the program writes an `error:` message with the matching usage line to standard error and exits with code `2`.
 
-If `status` fails to write to standard output, the process prints `Error:` and the write error to standard error, then exits with code `1`. Help and version output differ. The program discards write errors there, and the process exits with code `0`.
+If `status` fails to write to standard output, the process prints `Error:` and the write error to standard error, then exits with code `1`. The write error prints as `Os { code: N, kind: K, message: "M" }`, where `K` is the name of the Rust `io::ErrorKind` for the error number, such as `PermissionDenied` or `StorageFull`. An error number with no such kind prints `Uncategorized`. Help and version output differ. The program discards write errors there, and the process exits with code `0`.
 
 On Linux, every write to `/dev/full` fails, so this reproduces the failure every time:
 
