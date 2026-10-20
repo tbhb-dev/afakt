@@ -840,7 +840,8 @@ hook_command() {
 
 @test "the repository's golden-file pattern matches no path, because it has no golden files" {
   unset AGENT_SKILLS_GOLDEN_PATHS
-  for path in tests/golden/a.png crates/avirt-core/src/lib.rs notes.txt docs/index.md; do
+  # afakt adaptation: the upstream fixture path was a Rust crate source file.
+  for path in tests/golden/a.png cmd/afakt/run.go notes.txt docs/index.md; do
     ! printf '%s\n' "$path" | grep -q -E -- "$(bash -c ". '$scripts/common.sh'; as_conf golden_paths")" || { echo "golden by mistake: $path"; false; }
   done
 }
@@ -888,13 +889,14 @@ hook_command() {
   [[ $output == *".pre-commit-config.yaml: removes a hook or task:       - id: spell"* ]] || false
 }
 
-@test "the loosening markers read a Rust allow and a cargo-deny ignore, and nothing ordinary" {
+@test "the loosening markers read Go suppressions and coverage floors, and nothing ordinary" {
+  # afakt adaptation: assert Go suppressions and coverage threshold edits
   unset AGENT_SKILLS_LOOSENING_MARKERS
   markers=$(bash -c ". '$scripts/common.sh'; as_conf loosening_markers")
-  for line in '#[allow(dead_code)]' '#![allow(clippy::pedantic)]' '#[expect(unused)]' 'needless_pass_by_value = "allow"' 'unwrap_used = { level = "allow" }' 'cargo clippy -- --allow clippy::all' '    "RUSTSEC-2024-0001",' '    { id = "RUSTSEC-2024-0001", reason = "x" },' '    { crate = "foo@1.0.0", reason = "x" },'; do
+  for line in '//nolint:errcheck' '//go:build ignore' '//go:build linux && ignore' 't.Skip("pending")' 't.SkipNow()' '// #nosec G104' '//lint:ignore U1000 reason' '  file: 70' '  package: 75' '  total: 80'; do
     printf '%s\n' "$line" | tr '[:upper:]' '[:lower:]' | grep -q -E -- "$markers" || { echo "not read as a suppression: $line"; false; }
   done
-  for line in 'let allowed = true;' 'use std::io;' '    "tokio",' 'pub fn expect_ok() {}'; do
+  for line in 'allowed := true' 'import "io"' '//go:build linux' 'func expectOK() {}'; do
     ! printf '%s\n' "$line" | tr '[:upper:]' '[:lower:]' | grep -q -E -- "$markers" || { echo "read as a suppression by mistake: $line"; false; }
   done
 }
@@ -1171,11 +1173,13 @@ hook_command() {
 }
 
 @test "a worktree holding only caches goes after the merge" {
-  mkdir -p "$repo/.claude/worktrees/feature/target/debug" "$repo/.claude/worktrees/feature/apm_modules/x"
-  printf 'x\n' >"$repo/.claude/worktrees/feature/target/debug/x"
+  # afakt adaptation: clean Go binaries and coverage outputs after merge
+  mkdir -p "$repo/.claude/worktrees/feature/bin" "$repo/.claude/worktrees/feature/apm_modules/x"
+  printf 'x\n' >"$repo/.claude/worktrees/feature/bin/x"
+  printf 'mode: set\n' >"$repo/.claude/worktrees/feature/coverage.out"
   printf 'x\n' >"$repo/.claude/worktrees/feature/apm_modules/x/y"
   printf 'docs: a draft already committed\n' >"$repo/.claude/worktrees/feature/COMMIT_AGENTMSG"
-  printf 'target/\napm_modules/\nCOMMIT_AGENTMSG\n' >>"$(git -C "$repo/.claude/worktrees/feature" rev-parse --git-path info/exclude)"
+  printf 'bin/\ncoverage.out\napm_modules/\nCOMMIT_AGENTMSG\n' >>"$(git -C "$repo/.claude/worktrees/feature" rev-parse --git-path info/exclude)"
   stamped
   merge
   [ "$status" -eq 0 ]

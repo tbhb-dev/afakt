@@ -3,64 +3,61 @@ type: Agent Instructions
 title: Agent instructions
 description: Guidance for coding agents working in this repository.
 tags: [afakt, agents]
-generated: { by: "codex:gpt-6.1-sol" }
+generated: { by: "claude-code:claude-sonnet-5-5", at: "2026-10-20T05:55:00Z" }
 ---
 
 # Agent instructions
 
 ## What this is
 
-`afakt-poc` is a proof of concept repository. It has a Rust command-line skeleton, shared development tools, docs, and CI gates. The repository uses devtools v0.12.0.
+`afakt` is a proof of concept command-line tool written in Go. It has one command, `status`, which prints a placeholder line. The repository also has shared development tools, docs, and CI gates. It uses devtools v0.12.0.
 
-## Crate map
+## Layout
 
-`crates/afakt` builds the `afakt` binary. It uses clap derive for argument parsing and a writer helper for command output. Unit tests cover command dispatch and output. Process tests run the built binary.
+`cmd/afakt/` holds the command-line entry point, the argument parser, the `status` command, and their tests. `internal/buildmeta/` resolves version metadata from linker flags or runtime build info.
+
+`docs/` holds the OKF docs bundle. `scripts/okf-check.py` checks its format and the Markdown frontmatter across the repository.
+
+`.devtools/` and `.config/mise/conf.d/` hold the devtools v0.12.0 payload. The `vendir` tool owns both directories. Edit repository settings in the root configuration files.
+
+`.agents/skills/agent-*` holds the local agent skills. APM deploys skills and rules to `.agents/` and `.claude/` from `apm.yml`.
 
 ## Commands
 
-Run commands from the repository root through mise.
+Read `mise.toml` before trusting it. In each fresh worktree, run `mise trust`, then `mise run bootstrap` to sync the payload and install the tools and hooks.
 
 | Command | Purpose |
 | --- | --- |
-| `mise run bootstrap` | Sync devtools, install tools, and install hooks |
-| `mise run lint` | Run the source and configuration checks |
-| `mise run check` | Run Rust checks, coverage, docs, and local skill tests |
-| `mise run test` | Run unit and integration tests with `nextest` |
-| `mise run lint-rust` | Run `clippy` with warnings denied |
-| `mise run lint-rustdoc` | Build private-item docs with warnings denied |
-| `mise run lint-shear` | Check for unused dependencies |
-| `mise run deny` | Check dependency advisories, bans, and sources |
-| `mise run vuln` | Check dependency advisories |
-| `mise run fmt` | Format Rust code |
-| `mise run fmt-check` | Check Rust formatting |
-| `mise run coverage` | Enforce measured line and region coverage floors |
-| `mise run coverage-report` | Write an HTML coverage report |
-| `mise run mutants -- --list` | List mutation candidates without running them |
-| `mise run check-docs` | Check Markdown layout and OKF frontmatter |
-| `mise run test-skills` | Run the local skill tests with bats |
+| `mise run devtools:apm-sync` | Deploy agent tooling |
+| `mise run lint` | Check source gates |
+| `mise run check` | Check docs, local skills, and Go coverage |
+| `mise run build` | Build `bin/afakt` with version metadata |
+| `mise run test` | Run the Go tests, as `test-go` does |
+| `mise run test-go` | Run the Go tests |
+| `mise run test-go-race` | Run the Go tests with the race detector |
+| `mise run cover-go` | Measure coverage and enforce its floors |
+| `mise run cover-go-check` | Check the existing coverage profile |
+| `mise run lint-go-all` | Run the Go analysis gates |
+| `mise run lint-go-fmt` | Check Go formatting |
+| `mise run lint-go-arch` | Check the layering rules in `.go-arch-lint.yml` |
+| `mise run vuln` | Scan reachable Go vulnerabilities |
+| `mise run devtools:gomodscan` | Scan module dependencies |
+| `mise run vendor` | Tidy `go.mod` and refresh `vendor/` |
+| `mise run vendor-check` | Fail when `go.mod`, `go.sum`, or `vendor/` drift from the committed tree |
+| `mise run mutate-go` | Run mutation testing |
+| `mise run test-skills` | Run the local skills' bats suites |
+| `mise run lint-skills` | Check skill prose and scripts |
+| `mise run check-docs` | Check the docs bundle and repository Markdown |
 | `mise run lint-commit-msg` | Check the draft in `COMMIT_AGENTMSG` |
+| `mise run devtools:prek-all` | Run applicable hooks |
 
-## Workflows
+## Go toolchain
 
-All scheduled times use Coordinated Universal Time.
+The shared payload pins Go 1.27.2. Use `mise exec -- go version` to inspect it. Module `github.com/tbhb-dev/afakt` declares `go 1.27` and `toolchain go1.27.2`. Its packages import only the standard library.
 
-`.github/workflows/ci.yml` runs on pushes to `main`, pull requests, and manual dispatch. Jobs run lint, checks on Linux and macOS, `vuln`, deny, coverage, and vendor-check. The required `test` summary fails unless every matrix slot succeeds.
+Root configuration includes the shared Go task file and exposes local build and test tasks. Go tool directives declare the analyzer dependencies in the module. `DEVTOOLS_GO_MODULES_MODE=vendor` loads them from the tracked `vendor/` tree. Commit `go.sum` with those generated sources. Run `mise run vendor` to refresh them and `mise run vendor-check` to check for drift.
 
-`.github/workflows/security.yml` scans history with `gitleaks` daily at 06:26, on pushes to `main`, on pull requests, and on manual dispatch. For pull requests, the scan ends at the commit at the head of the branch.
-
-`.github/workflows/scheduled.yml` records mutation outcomes and coverage reports daily at 04:17 or on manual dispatch.
-
-`.github/workflows/lint-codeowners.yml` checks CODEOWNERS on every pull request only.
-
-`.github/workflows/lint-workflows.yml` supports manual dispatch and checks changes to `.github/workflows/**` in pull requests or pushes to `main`.
-
-`.github/workflows/renovate-config-validator.yaml` validates Renovate configuration. It runs when a pull request or push to `main` changes `**renovate.json5`, and it also accepts manual dispatch.
-
-`.github/workflows/renovate.yaml` runs Renovate at minute 11 of every hour on weekdays and every two hours on weekends. Manual dispatch can enable debug logging.
-
-## Rust toolchain
-
-The toolchain pin in `mise.toml` selects Rust 1.99.0 with `clippy`, `rustfmt`, and `llvm-tools`. Workspace crates use edition 2024 and inherit strict `clippy`, Rust, and `rustdoc` lints. Strict lints reject standard output and standard error print macros, unsafe code, `unwrap`, and `expect` in both code and tests. Keep `Cargo.lock` under version control. `nextest` runs without retries and fails on flaky tests. `cargo-deny` rejects duplicate dependency versions. Coverage floors match afakt's measured line and region coverage.
+`.testcoverage.yml` sets the coverage floors: 100% for each file, each package, and the total. The measured total is 100% (88 of 88 statements). The floors skip `main.go`, whose `os.Exit` glue can't run inside a test process. `mise run build` stamps the version from `git describe`, so `afakt --version` prints a tag or a short commit. A build without stamping, such as `go run`, prints `0.1.0`.
 
 ## Conventions
 
@@ -73,3 +70,23 @@ The devtools payload owns `.devtools/` and `.config/mise/conf.d/`. Edit reposito
 ## Identities
 
 Create commits as `tbhb-agent`. Route reviews through `gh-reviewer` as `tbhb-agent-reviewer`. The local agent skills keep these identities separate.
+
+## Workflows
+
+All scheduled times use Coordinated Universal Time (UTC).
+
+`ci.yml` runs on pull requests, pushes to `main`, and manual dispatch. It checks lint on Linux and runs the full check on Linux and macOS. Separate jobs enforce the Go coverage floors, scan reachable vulnerabilities (`vuln`), and check payload and Go vendor drift (`vendor-check`). The required `test` summary fails unless every matrix slot succeeds.
+
+`security.yml` runs on pull requests and pushes to `main`. It also runs daily at 06:26 and on manual dispatch. `gitleaks` scans history through the head of the branch on pull requests. The Go scanners upload reports for reachable vulnerabilities and dependencies in `vendor/`.
+
+`scheduled.yml` runs daily at 04:17 and on manual dispatch. It runs Go mutation testing and uploads the coverage profile.
+
+`codeql.yml` analyzes Go on pull requests and pushes to `main`. It also runs on Sundays at 03:39 and on manual dispatch.
+
+`lint-codeowners.yml` checks CODEOWNERS on every pull request only.
+
+`lint-workflows.yml` runs when a pull request or a push to `main` changes a workflow. Manual dispatch runs it too.
+
+`renovate-config-validator.yaml` validates Renovate configuration. It runs when a pull request or push to `main` changes `**renovate.json5`, and it also accepts manual dispatch.
+
+`renovate.yaml` runs Renovate at minute 11 of every hour on weekdays and every two hours on weekends. Manual dispatch can enable debug logging.

@@ -1,4 +1,3 @@
-target/
 mise.local.toml
 
 # Generated tools, dependencies, and agent drafts.
@@ -16,8 +15,12 @@ tmp/
 !.vale/project/
 !.vale/config/
 .vale/config/*
+!.vale/config/views/
 !.vale/config/vocabularies/
 .vale/config/vocabularies/*
 !.vale/config/vocabularies/project/
-mutants.out*/
-*.profraw
+/bin/
+/coverage/
+coverage.out
+coverage.xml
+coverage.covdata*/

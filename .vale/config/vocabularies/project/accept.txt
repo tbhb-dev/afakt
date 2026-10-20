@@ -6,7 +6,6 @@
 [Ww]orktree
 [Ww]orktrees
 afakt
-afakt-poc
 cspell
 devtools
 mise

@@ -1,4 +1,4 @@
-# Review routing for afakt-poc. GitHub applies the last matching rule, so the
+# Review routing for afakt. GitHub applies the last matching rule, so the
 # supply-chain rules below override the default for the paths they name.
 
 # Default owner for everything.
@@ -7,8 +7,12 @@
 # Supply-chain and CI surface. The /.github/ rule already covers
 # renovate.json5 and every workflow, so neither needs its own line.
 /.github/       @tbhb
-/Cargo.toml     @tbhb
-/Cargo.lock     @tbhb
-/deny.toml      @tbhb
+/go.mod         @tbhb
+/go.sum         @tbhb
+/vendor/        @tbhb
+/.golangci.yml   @tbhb
+/.go-arch-lint.yml @tbhb
+/.testcoverage.yml @tbhb
+/.gremlins.yaml  @tbhb
 /mise.toml      @tbhb
 /mise.lock      @tbhb

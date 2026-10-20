@@ -4,7 +4,7 @@ okf_version: "0.2"
 
 # Architecture Overview
 
-* [Architecture overview](architecture.md) - Rust workspace and command structure for afakt-poc.
+* [Architecture overview](architecture.md) - Go layout and command structure for afakt.
 
 # Command reference
 

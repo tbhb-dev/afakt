@@ -1,11 +1,9 @@
 ---
-# Main quality gate. afakt-poc is a Rust workspace, so the gates are the full
-# lint bar, the check aggregate (fmt, clippy, rustdoc, shear, deny and the
-# tests, plus the docs checks) on Linux and macOS, the vendor-drift check,
-# a RustSec advisory scan, cargo-deny, and the coverage floors. Every job
-# installs the pinned toolchain through mise and runs its gate through
-# `mise run`, so the mise config stays the single definition of what each
-# gate runs.
+# Quality gates for afakt: lint, Go tests on Linux and macOS, coverage,
+# reachable vulnerabilities, and drift in the payload and Go dependencies.
+# Every job installs the pinned toolchain through mise and runs its gate
+# through `mise run`, so the mise config stays the single definition of what
+# each gate runs.
 
 name: ci
 
@@ -75,6 +73,9 @@ jobs:
         # Scan source commits rather than GitHub's synthetic merge signature.
         run: mise run devtools:lint-leaks -- --range "${BASE_SHA}..${HEAD_SHA}"
 
+      - name: Test the leak check
+        run: bats .devtools/scripts/check-leaks.bats
+
   test-matrix:
     name: "test (${{ matrix.os }})"
     runs-on: ${{ matrix.os }}
@@ -102,10 +103,8 @@ jobs:
           # renovate: datasource=github-releases depName=jdx/mise
           version: 2026.10.9
 
-      # The ci profile in .config/nextest.toml: no retries, a flaky pass fails.
+      # The docs and skill suites and the Go tests need the full pinned toolchain.
       - name: Check
-        env:
-          NEXTEST_PROFILE: ci
         run: mise run check
 
   # The matrix job reports as `test (ubuntu-24.04)` and `test (macos-15)`.
@@ -147,16 +146,16 @@ jobs:
         with:
           # renovate: datasource=github-releases depName=jdx/mise
           version: 2026.10.9
-          install_args: rust github:EmbarkStudios/cargo-deny
+          install_args: go
 
-      - name: Check RustSec advisories
+      - name: Check reachable Go vulnerabilities
         env:
           MISE_TASK_RUN_AUTO_INSTALL: "0"
         run: mise run vuln
 
-  # cargo-deny: advisories, bans and sources, under deny.toml.
-  deny:
-    name: deny
+  # The Go coverage floors in .testcoverage.yml were measured on Linux.
+  cover-go-check:
+    name: cover-go-check
     runs-on: ubuntu-24.04
     steps:
       - name: Harden the runner
@@ -174,43 +173,18 @@ jobs:
         with:
           # renovate: datasource=github-releases depName=jdx/mise
           version: 2026.10.9
-          install_args: rust github:EmbarkStudios/cargo-deny
+          install_args: go
 
-      - name: Check dependencies
+      - name: Measure Go coverage
         env:
           MISE_TASK_RUN_AUTO_INSTALL: "0"
-        run: mise run deny
-
-  # The coverage floors in the mise coverage task were measured on Linux.
-  coverage:
-    name: coverage
-    runs-on: ubuntu-24.04
-    steps:
-      - name: Harden the runner
-        uses: step-security/harden-runner@ccd8616d44fd3846e67624a50d5aad6d37bf2d25 # v2.22.1
-        with:
-          egress-policy: audit
-
-      - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-
-      - name: Set up the toolchain
-        uses: jdx/mise-action@08ae2a091c038e1e05ec6f5115dc5c69d5a2a6b8 # v5.1.2
-        with:
-          # renovate: datasource=github-releases depName=jdx/mise
-          version: 2026.10.9
-
-      - name: Measure coverage
-        env:
-          NEXTEST_PROFILE: ci
-        run: mise run coverage
+        run: mise run cover-go
 
   # Resyncs the devtools payload in place from vendir.yml and fails on any
   # difference from the committed tree. That catches a vendored file edited
   # in place, a sync nobody committed, and a manifest bump whose
-  # vendir.lock.yml is stale.
+  # vendir.lock.yml is stale. The second step does the same for go.mod,
+  # go.sum and vendor/.
   vendor-check:
     name: vendor-check
     runs-on: ubuntu-24.04
@@ -230,9 +204,14 @@ jobs:
         with:
           # renovate: datasource=github-releases depName=jdx/mise
           version: 2026.10.9
-          install_args: vendir
+          install_args: go vendir
 
       - name: Check the vendored payload
         env:
           MISE_TASK_RUN_AUTO_INSTALL: "0"
         run: mise run devtools:check-vendored
+
+      - name: Check vendor drift
+        env:
+          MISE_TASK_RUN_AUTO_INSTALL: "0"
+        run: mise run vendor-check

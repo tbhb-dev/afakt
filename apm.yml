@@ -1,7 +1,7 @@
 ---
-name: afakt-poc
+name: afakt
 version: 0.1.0
-description: Shared agent tools for afakt-poc
+description: Shared agent tools for afakt
 target: [claude, codex]
 dependencies:
   apm:
