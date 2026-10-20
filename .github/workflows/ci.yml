@@ -103,7 +103,7 @@ jobs:
           # renovate: datasource=github-releases depName=jdx/mise
           version: 2026.10.9
 
-      # The docs and skill suites and the Go tests need the full pinned toolchain.
+      # The documentation checks and the Go tests with coverage need the full pinned toolchain.
       - name: Check
         run: mise run check
 

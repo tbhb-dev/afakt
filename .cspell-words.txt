@@ -1,6 +1,7 @@
 afakt
 AGENTDESC
 AGENTMSG
+agentrepo
 buildmeta
 cspell
 deadcode
