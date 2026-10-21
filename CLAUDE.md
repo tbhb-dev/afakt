@@ -8,4 +8,4 @@ generated: { by: "codex:gpt-6.1-sol" }
 
 # Claude Code instructions
 
-Refer to @AGENTS.md.
+Refer to @AGENTS.md for instructions.
