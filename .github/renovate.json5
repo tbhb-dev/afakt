@@ -18,8 +18,8 @@
   prConcurrentLimit: 0,
   prHourlyLimit: 0,
   extends: [
-    "github>tbhb-dev/devtools//.github/renovate-config.json5#63dcdd3b141ad79f7496b9fd36d0efcf4493b9a3", // v0.14.1
-    "github>tbhb-dev/devtools//.github/renovate-go-config.json5#63dcdd3b141ad79f7496b9fd36d0efcf4493b9a3", // v0.14.1
+    "github>tbhb-dev/devtools//.github/renovate-config.json5#f815d438e4253b8e773e2786e7bc3d71f1eb8719", // v0.14.2
+    "github>tbhb-dev/devtools//.github/renovate-go-config.json5#f815d438e4253b8e773e2786e7bc3d71f1eb8719", // v0.14.2
   ],
 
   repositories: ["tbhb-dev/afakt"],

@@ -10,7 +10,7 @@ generated: { by: "claude-code:claude-sonnet-5-5", at: "2026-10-20T05:55:00Z" }
 
 ## What this is
 
-`afakt` is a proof of concept command-line tool written in Go. It has one command, `status`, which prints a placeholder line. The repository also has shared development tools, docs, and CI gates. It uses devtools v0.14.1.
+`afakt` is a proof of concept command-line tool written in Go. It has one command, `status`, which prints a placeholder line. The repository also has shared development tools, docs, and CI gates. It uses devtools v0.14.2.
 
 ## Layout
 
@@ -18,7 +18,7 @@ generated: { by: "claude-code:claude-sonnet-5-5", at: "2026-10-20T05:55:00Z" }
 
 `docs/` holds the OKF docs bundle. `scripts/okf-check.py` checks its format and the Markdown frontmatter across the repository.
 
-`.devtools/` and `.config/mise/conf.d/` hold the devtools v0.14.1 payload. The `vendir` tool owns both directories. Edit repository settings in the root configuration files.
+`.devtools/` and `.config/mise/conf.d/` hold the devtools v0.14.2 payload. The `vendir` tool owns both directories. Edit repository settings in the root configuration files.
 
 APM deploys the skills and rules from the devtools packages named in `apm.yml` to `.agents/` and `.claude/`. That includes `agent-commit`, `agent-pr`, and `agent-merge-pr`. `.agents/agent-skills.conf` holds this repository's policy for them, such as the lint commands and which changed paths go to the owner. The machine supplies the reviewer, the GitHub account, the required reviewer, and the delegation. The repository supplies none of them.
 
