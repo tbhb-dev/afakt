@@ -124,6 +124,7 @@ run = [
   "mise run devtools:lint-workflows",
   "mise run devtools:lint-shell",
   "mise run devtools:lint-shell-fmt",
+  "bash scripts/owner-paths-check.sh",
   "mise run lint-skills",
   "mise run devtools:lint-curl",
   "mise run lint-go-all",
