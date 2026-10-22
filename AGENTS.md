@@ -28,6 +28,9 @@ Read `mise.toml` before trusting it. In each fresh worktree, run `mise trust`, t
 
 | Command | Purpose |
 | --- | --- |
+| `mise run bootstrap` | Sync the payload, install the toolchain, and install git hooks |
+| `mise run install-toolchain` | Install the pinned toolchain from `mise.toml` and `.config/mise/conf.d/` |
+| `mise run install-tools` | Download the Vale style packages `.vale.ini` names |
 | `mise run devtools:apm-sync` | Deploy agent tooling |
 | `mise run lint` | Check source gates |
 | `mise run check` | Check docs, Go tests, and Go coverage |
@@ -40,14 +43,20 @@ Read `mise.toml` before trusting it. In each fresh worktree, run `mise trust`, t
 | `mise run lint-go-all` | Run the Go analysis gates |
 | `mise run lint-go-fmt` | Check Go formatting |
 | `mise run lint-go-arch` | Check the layering rules in `.go-arch-lint.yml` |
+| `mise run lint-go-deadcode` | Fail if `deadcode` finds unreachable functions from the binary entry points |
 | `mise run vuln` | Scan reachable Go vulnerabilities |
 | `mise run devtools:gomodscan` | Scan module dependencies |
 | `mise run vendor` | Tidy `go.mod` and refresh `vendor/` |
 | `mise run vendor-check` | Fail when `go.mod`, `go.sum`, or `vendor/` drift from the committed tree |
 | `mise run mutate-go` | Run mutation testing |
+| `mise run lint-prose` | Lint prose with Vale |
+| `mise run lint-draft` | Lint one drafted document through every prose gate at once |
+| `mise run fix-prose-replacements` | Apply every Vale finding that has its own replacement |
 | `mise run lint-skills` | Check the prose of `.claude/rules` |
 | `mise run check-docs` | Check the docs bundle and repository Markdown |
+| `mise run lint-pr-description` | Check the pull request draft in `PR_AGENTDESC.md` |
 | `mise run lint-commit-msg` | Check the draft in `COMMIT_AGENTMSG` |
+| `mise run lint-squash-msg` | Check the squash draft in `SQUASH_AGENTMSG` |
 | `mise run devtools:prek-all` | Run applicable hooks |
 
 ## Go toolchain
@@ -56,7 +65,7 @@ The shared payload pins Go 1.27.2. Use `mise exec -- go version` to inspect it. 
 
 Root configuration includes the shared Go task file and exposes local build and test tasks. Go tool directives declare the analyzer dependencies in the module. `DEVTOOLS_GO_MODULES_MODE=vendor` loads them from the tracked `vendor/` tree. Commit `go.sum` with those generated sources. Run `mise run vendor` to refresh them and `mise run vendor-check` to check for drift.
 
-`.testcoverage.yml` sets the coverage floors: 100% for each file, each package, and the total. The measured total is 100% (88 of 88 statements). The floors skip `main.go`, whose `os.Exit` glue can't run inside a test process. `docs/cli.md` states what `afakt --version` prints for each kind of build.
+`.testcoverage.yml` sets the coverage floors: 100% for each file, each package, and the total. The measured total is 100% (88 of 88 statements outside `main.go`). The floors skip `main.go`, whose `os.Exit` glue can't run inside a test process. `docs/cli.md` states what `afakt --version` prints for each kind of build.
 
 ## Conventions
 
