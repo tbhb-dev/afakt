@@ -9,7 +9,7 @@ generated: { by: "claude-code:claude-sonnet-5-5", at: "2026-10-20T05:55:00Z" }
 
 # afakt architecture
 
-`afakt` is one Go module, `github.com/tbhb-dev/afakt`, with two packages. `cmd/afakt` is the `main` package and `internal/buildmeta` holds build metadata. Neither package nor its tests import a third-party module, and the layering check in `.go-arch-lint.yml` lets `cmd/afakt` depend on `internal/buildmeta` but not the reverse.
+`afakt` is one Go module, `github.com/tbhb-dev/afakt`, with two packages. `cmd/afakt` is the `main` package and `internal/buildmeta` holds build metadata. The layering check in `.go-arch-lint.yml` lets `cmd/afakt` depend on `internal/buildmeta` but not the reverse.
 
 ## Command package
 
