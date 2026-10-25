@@ -1,0 +1,11 @@
+---
+description: The check passes.
+content:
+  application/json:
+    schema:
+      $ref: ../schemas/CheckResult.yaml
+      properties:
+        status:
+          const: pass
+    example:
+      status: pass

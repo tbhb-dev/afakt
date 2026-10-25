@@ -1,0 +1,16 @@
+---
+get:
+  operationId: getReadyz
+  summary: Check that the server is ready
+  description: |-
+    Passes only while every required service is running. Fails while the
+    server starts, while it drains after SIGINT or SIGTERM, and after a
+    required service fails.
+  tags:
+    - health
+  security: []
+  responses:
+    "200":
+      $ref: ../components/responses/CheckPassed.yaml
+    "503":
+      $ref: ../components/responses/CheckFailed.yaml

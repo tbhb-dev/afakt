@@ -15,12 +15,13 @@ jq = "1.8.2"
 "go:github.com/tbhb-dev/devtools/cmd/gh-post" = "v0.21.0"
 bats = "1.14.0"
 ast-grep = "0.51.0"
+vacuum = "0.33.2"
 
 [env]
 DEVTOOLS_LOCK_PLATFORMS = "linux-x64,macos-arm64"
 DEVTOOLS_GO_MODULES_MODE = "vendor"
 DEVTOOLS_GENERATED_PATHS = ".devtools/\n.config/mise/\nbin/\ncoverage/\ntmp/\nspikes/\n.vale/"
-DEVTOOLS_PROSE_GLOB = "*.{md,go}"
+DEVTOOLS_PROSE_GLOB = "{*.md,*.go,api/openapi/**/*.yaml}"
 
 [task_config]
 includes = [
@@ -132,7 +133,61 @@ run = [
   "mise run lint-go-all",
   "mise run lint-go-fmt",
   "mise run lint-ast-grep",
+  "mise run lint-openapi",
+  "mise run check-openapi-bundle",
 ]
+
+# The REST contract is the multi-file OpenAPI document under api/openapi/, and
+# api/openapi.bundle.yaml is its committed single-file bundle. OPENAPI_ROOT points
+# these tasks at another copy of api/, such as a broken copy in a temporary directory.
+[tasks.bundle-openapi]
+shell = "bash -c"
+description = "Bundle the OpenAPI document under api/openapi/ into api/openapi.bundle.yaml"
+run = '''
+set -euo pipefail
+root=${OPENAPI_ROOT:-api}
+out=${OPENAPI_BUNDLE:-$root/openapi.bundle.yaml}
+tmp=$(mktemp)
+trap 'rm -f "$tmp"' EXIT
+if ! {
+  echo "---"
+  echo "# Generated from openapi/ by 'mise run bundle-openapi'. Do not edit."
+  vacuum bundle --no-update-check --no-style --composed --stdout --base "$root/openapi" "$root/openapi/openapi.yaml"
+} >"$tmp"; then
+  # vacuum writes its reference errors to stdout, which went to the temporary file.
+  cat "$tmp" >&2
+  echo "error: vacuum could not bundle $root/openapi/openapi.yaml; fix the references it reports" >&2
+  exit 1
+fi
+cat "$tmp" >"$out"
+'''
+
+[tasks.check-openapi-bundle]
+shell = "bash -c"
+description = "Fail when api/openapi.bundle.yaml can't be produced or differs from a fresh bundle"
+run = '''
+set -euo pipefail
+root=${OPENAPI_ROOT:-api}
+dir=$(mktemp -d)
+trap 'rm -rf "$dir"' EXIT
+OPENAPI_BUNDLE=$dir/openapi.bundle.yaml mise run bundle-openapi
+if ! diff -u "$root/openapi.bundle.yaml" "$dir/openapi.bundle.yaml"; then
+  echo "error: $root/openapi.bundle.yaml is out of date with $root/openapi/; run 'mise run bundle-openapi' and commit the result" >&2
+  exit 1
+fi
+'''
+
+[tasks.lint-openapi]
+shell = "bash -c"
+description = "Lint the OpenAPI source and bundle with vacuum and .vacuum-ruleset.yaml"
+run = '''
+set -euo pipefail
+root=${OPENAPI_ROOT:-api}
+for doc in "$root/openapi/openapi.yaml" "$root/openapi.bundle.yaml"; do
+  vacuum lint --no-update-check --no-banner --no-style --details --no-clip --fail-severity hint \
+    --ruleset .vacuum-ruleset.yaml "$doc"
+done
+'''
 
 [tasks.build]
 description = "Run devtools:build"

@@ -1,0 +1,28 @@
+---
+# vacuum ruleset for the OpenAPI document under api/openapi/ and its bundle.
+# It extends the recommended and OWASP rule sets. Each rule turned off below
+# conflicts with a contract the endpoints' acceptance criteria fix.
+extends:
+  - [vacuum:oas, recommended]
+  - [vacuum:owasp, all]
+rules:
+  # The API root is `/api/v1/` with its trailing slash. This replaces the
+  # recommended rule with the same check on every other path.
+  path-keys-no-trailing-slash:
+    description: Path must not end with a slash
+    severity: warn
+    given: "$.paths[?(@property != '/api/v1/')]~"
+    then:
+      function: pattern
+      functionOptions:
+        notMatch: ".+\\/$"
+  # No operation requires authentication.
+  owasp-protection-global-safe: "off"
+  # Each operation documents exactly the status codes its endpoint returns,
+  # and none of them returns a 4xx, 429 or 500 response by contract.
+  operation-4xx-response: "off"
+  owasp-define-error-validation: "off"
+  owasp-define-error-responses-429: "off"
+  owasp-define-error-responses-500: "off"
+  # The endpoints send no rate-limit headers.
+  owasp-rate-limit: "off"

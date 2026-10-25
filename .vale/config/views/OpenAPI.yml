@@ -1,0 +1,17 @@
+---
+# Prose in the multi-file OpenAPI document. search() skips the root map, so each field also
+# has a root scope; ?. and ?? keep a file that lacks the field from failing the scope.
+engine: dasel
+scopes:
+  - name: title
+    expr: info?.title
+  - name: summary
+    expr: search(has("summary")).map(summary)
+  - name: root-summary
+    expr: summary??""
+  - name: description
+    expr: search(has("description")).map(description)
+    type: md
+  - name: root-description
+    expr: description??""
+    type: md

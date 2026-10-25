@@ -1,0 +1,11 @@
+---
+description: The check fails.
+content:
+  application/json:
+    schema:
+      $ref: ../schemas/CheckResult.yaml
+      properties:
+        status:
+          const: fail
+    example:
+      status: fail

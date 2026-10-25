@@ -97,6 +97,23 @@ checksum = "sha256:b7c872db63553ccffc7253aba3ed7d4885a27d83f1ba567b1138c6315a584
 url = "https://github.com/mvdan/sh/releases/download/v3.14.1/shfmt_v3.14.1_darwin_arm64"
 url_api = "https://api.github.com/repos/mvdan/sh/releases/assets/547320930"
 
+[[tools.vacuum]]
+version = "0.33.2"
+backend = "aqua:daveshanley/vacuum"
+specifiers = ["0.33.2"]
+
+[tools.vacuum."platforms.linux-x64"]
+checksum = "sha256:f6986baeb4d50365fb620f68b2a450e54fc1c9c2d48b7524d330bf9476c29bf9"
+url = "https://github.com/daveshanley/vacuum/releases/download/v0.33.2/vacuum_0.33.2_linux_x86_64.tar.gz"
+url_api = "https://api.github.com/repos/daveshanley/vacuum/releases/assets/657394043"
+provenance = "cosign"
+
+[tools.vacuum."platforms.macos-arm64"]
+checksum = "sha256:2638ce8f8a9e4d6ad565e6262f9d94942d05a8e63b4cffc5f3ac55f9ed59c8f7"
+url = "https://github.com/daveshanley/vacuum/releases/download/v0.33.2/vacuum_0.33.2_darwin_arm64.tar.gz"
+url_api = "https://api.github.com/repos/daveshanley/vacuum/releases/assets/657394110"
+provenance = "cosign"
+
 [[tools.vendir]]
 version = "0.46.2"
 backend = "aqua:carvel-dev/vendir"

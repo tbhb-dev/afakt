@@ -16,3 +16,4 @@ shellcheck
 toolchain
 vendir
 Temporal
+Dasel
