@@ -232,7 +232,7 @@ jobs:
   go-only:
     name: go-only
     runs-on: ubuntu-24.04
-    container: ubuntu:24.04
+    container: ubuntu:26.04
     env:
       GOMAXPROCS: "2"
       GOFLAGS: -p=2
