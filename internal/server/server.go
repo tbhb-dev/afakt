@@ -16,6 +16,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/tbhb-dev/afakt/internal/dashboard"
 	"github.com/tbhb-dev/afakt/internal/lifecycle"
 )
 
@@ -92,6 +93,8 @@ func compose(manager *lifecycle.Manager, cfg Config, logger *slog.Logger, checks
 			srv.routes = append(srv.routes, apiRoutes)
 		case TargetWebhook:
 			// The webhook target has no receivers, so it serves only the health routes.
+		case TargetDashboard:
+			srv.routes = append(srv.routes, dashboardRoutes)
 		default:
 			return fmt.Errorf("%w '%s'", ErrNotComposable, target)
 		}
@@ -107,6 +110,13 @@ func compose(manager *lifecycle.Manager, cfg Config, logger *slog.Logger, checks
 		}
 	}
 	return nil
+}
+
+// dashboardRoutes adds only the dashboard's exact root and its subtree.
+func dashboardRoutes(mux *http.ServeMux) {
+	handler := dashboard.New()
+	mux.Handle("/dashboard", handler)
+	mux.Handle("/dashboard/", handler)
 }
 
 // listener binds the TCP address of the HTTP server. On shutdown, the HTTP server closes

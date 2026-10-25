@@ -5,9 +5,11 @@ agentrepo
 buildmeta
 cmdutil
 contextcheck
+connrefused
 cspell
 dasel
 dasharray
+dashboardish
 deadcode
 devtools
 EBADF
@@ -17,6 +19,8 @@ frontmatter
 gochecknoglobals
 gochecknoinits
 golangci
+GOFLAGS
+GOMAXPROCS
 gomodscan
 healthz
 knip
@@ -29,6 +33,7 @@ mise
 mktemp
 nolint
 nosuch
+nosniff
 nullglob
 oserror
 pflag
@@ -39,6 +44,7 @@ prek
 pyyaml
 readyz
 rumdl
+SAMEORIGIN
 Seekable
 servercmd
 sgconfig
@@ -47,6 +53,7 @@ shfmt
 shopt
 Shortnames
 SIGPIPE
+standin
 synctest
 tbhb
 Temporal

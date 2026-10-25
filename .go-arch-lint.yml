@@ -61,6 +61,8 @@ components:
     in: internal/buildmeta
   server:
     in: internal/server
+  dashboard:
+    in: internal/dashboard
   lifecycle:
     in: internal/lifecycle
   lifecycletest:
@@ -127,8 +129,12 @@ deps:
   server:
     mayDependOn:
       - server
+      - dashboard
       - lifecycle
       - lifecycletest
+  dashboard:
+    mayDependOn:
+      - dashboard
   lifecycle:
     # The lifecycle package imports only the standard library. Its non-test code can't
     # import lifecycletest, because lifecycletest imports lifecycle and Go rejects the cycle.

@@ -188,6 +188,77 @@ jobs:
           TASK: ${{ matrix.task }}
         run: mise run "${TASK}"
 
+  dashboard:
+    name: "dashboard (${{ matrix.task }})"
+    runs-on: ubuntu-24.04
+    env:
+      GOMAXPROCS: "2"
+      GOFLAGS: -p=2
+      MISE_TASK_RUN_AUTO_INSTALL: "0"
+    strategy:
+      fail-fast: false
+      matrix:
+        task: [check-dashboard, check-dashboard-gates]
+    steps:
+      - name: Harden the runner
+        uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
+        with:
+          egress-policy: audit
+
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up the toolchain
+        uses: jdx/mise-action@fc42bcc7ddbf51124c30f95a877a0c5168a3bfde # v5.2.1
+        with:
+          # renovate: datasource=github-releases depName=jdx/mise
+          version: 2026.10.15
+          install_args: go node pnpm
+
+      - name: Install the workspace packages
+        run: mise run install-web
+
+      - name: Install the pinned browser
+        run: mise run install-web-browsers -- --with-deps
+
+      - name: Run the gate
+        env:
+          TASK: ${{ matrix.task }}
+        run: mise run "${TASK}"
+
+  # The container has no Node or pnpm installation. Action runtimes are outside PATH.
+  go-only:
+    name: go-only
+    runs-on: ubuntu-24.04
+    container: ubuntu:24.04
+    env:
+      GOMAXPROCS: "2"
+      GOFLAGS: -p=2
+      MISE_TASK_RUN_AUTO_INSTALL: "0"
+    steps:
+      - name: Install system tools
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends ca-certificates curl git xz-utils unzip gcc libc6-dev
+
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Go
+        uses: jdx/mise-action@fc42bcc7ddbf51124c30f95a877a0c5168a3bfde # v5.2.1
+        with:
+          # renovate: datasource=github-releases depName=jdx/mise
+          version: 2026.10.15
+          install_args: go
+
+      - name: Run every Go-only gate without web tools or output
+        shell: bash
+        run: mise run check-go-only
+
   # The matrix jobs report as `test (ubuntu-24.04)`, `test (macos-15)` and
   # `web (<task>)`. This job owns the plain name `test`, so the
   # required-check list names one check and stays stable when a matrix
@@ -197,22 +268,21 @@ jobs:
   test:
     name: test
     if: always()
-    needs: [test-matrix, web]
+    needs: [test-matrix, web, dashboard, go-only]
     runs-on: ubuntu-24.04
     steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
       - name: Require every matrix leg to pass
         env:
           GO_RESULT: ${{ needs.test-matrix.result }}
           WEB_RESULT: ${{ needs.web.result }}
-        run: |
-          if [[ "${GO_RESULT}" != "success" ]]; then
-            echo "the test matrix finished as ${GO_RESULT}" >&2
-            exit 1
-          fi
-          if [[ "${WEB_RESULT}" != "success" ]]; then
-            echo "the web matrix finished as ${WEB_RESULT}" >&2
-            exit 1
-          fi
+          DASHBOARD_RESULT: ${{ needs.dashboard.result }}
+          GO_ONLY_RESULT: ${{ needs.go-only.result }}
+        run: bash scripts/require-ci-results.sh "${GO_RESULT}" "${WEB_RESULT}" "${DASHBOARD_RESULT}" "${GO_ONLY_RESULT}"
 
   vuln:
     name: vuln

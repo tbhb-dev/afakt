@@ -198,8 +198,47 @@ done
 '''
 
 [tasks.build]
-description = "Run devtools:build"
-run = "mise run devtools:build"
+description = "Build the web project, then embed it in bin/afakt; remove any old binary first"
+run = "bash scripts/build.sh"
+
+[tasks.check-dashboard]
+description = "Build the release, test its embedded assets and server contracts, then run the pinned browser"
+run = [
+  "mise run build",
+  "go test -tags dashboard_production ./...",
+  "bash scripts/check-dashboard-binary.sh",
+  "mise run e2e-dashboard",
+]
+
+[tasks.e2e-dashboard]
+description = "Check the release binary in the pinned browser with console and accessibility assertions"
+dir = "{{config_root}}/apps/dashboard"
+run = "pnpm exec playwright test --config binary/playwright.config.ts"
+
+[tasks.check-dashboard-gates]
+description = "Prove release and browser failures and the required CI result on generated broken inputs"
+run = "bash scripts/check-dashboard-gates.sh"
+
+[tasks.check-dashboard-all]
+description = "Install web dependencies and the browser, then run dashboard checks and failure proofs in sequence"
+env = { GOMAXPROCS = "2", GOFLAGS = "-p=2" }
+run = [
+  "mise run install-web",
+  "mise run install-web-browsers",
+  "mise run check-dashboard",
+  "mise run check-dashboard-gates",
+]
+
+[tasks.check-go-only]
+description = "Run every Go-only gate without generated assets or web tools"
+run = [
+  "bash scripts/check-go-only.sh",
+  "mise run test-go",
+  "mise run test-go-race",
+  "mise run cover-go",
+  "mise run lint-go-deadcode",
+  "mise run vendor-check",
+]
 
 # The operator skills commit and pr hardcode `mise run test`, so the task stays as a wrapper.
 [tasks.test]
