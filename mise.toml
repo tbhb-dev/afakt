@@ -15,7 +15,10 @@ jq = "1.8.2"
 "go:github.com/tbhb-dev/devtools/cmd/gh-post" = "v0.21.0"
 bats = "1.14.0"
 ast-grep = "0.51.0"
-# The web project's package manager. Node comes from the devtools payload.
+# The web project's runtime and package manager. The devtools payload pins
+# the same Node release for cspell; this pin is the one Renovate tracks, and
+# it must stay equal to the payload's.
+node = "24.21.0"
 pnpm = "12.11.2"
 
 [env]

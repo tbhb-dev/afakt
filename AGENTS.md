@@ -31,7 +31,7 @@ APM deploys the skills and rules from the devtools packages named in `apm.yml` t
 
 ## Commands
 
-Read `mise.toml` before trusting it. In each fresh worktree, run `mise trust`, then `mise run bootstrap` to sync the payload and install the tools and hooks. Bootstrap installs the pinned Node (24.21.0, from the payload) and pnpm (12.11.2, from `mise.toml`). For web work, run `mise run install-web` and `mise run install-web-browsers` next. The Go tasks run without those web packages and the browser.
+Read `mise.toml` before trusting it. In each fresh worktree, run `mise trust`, then `mise run bootstrap` to sync the payload and install the tools and hooks. Bootstrap installs the Node (24.21.0) and pnpm (12.11.2) that `mise.toml` pins. The root Node pin overrides the payload's and must stay equal to it. For web work, run `mise run install-web` and `mise run install-web-browsers` next. The Go tasks run without those web packages and the browser.
 
 | Command | Purpose |
 | --- | --- |
