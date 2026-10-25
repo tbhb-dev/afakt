@@ -1,2 +1,7 @@
 [extend]
 useDefault = true
+
+# The repository owner excluded vendor/: it holds third-party sources, and any secret in them belongs to that third party, not to this repository.
+[[allowlists]]
+description = "Vendored third-party Go module sources"
+paths = ['''^vendor/''']
