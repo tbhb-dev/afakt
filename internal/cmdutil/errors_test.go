@@ -16,12 +16,15 @@ var errOther = errors.New("other failure")
 
 // newTool returns a small command tree that uses every helper, as the root, a run command,
 // and a command without flags. The root has help and version flags, and the run command
-// has a help flag.
+// has two string flags and a help flag.
 func newTool() (*cobra.Command, *cobra.Command, *cobra.Command) {
 	tool := &cobra.Command{Use: "tool <COMMAND>", Short: "A test tool"}
 	cmdutil.AddHelpFlag(tool)
 	cmdutil.AddVersionFlag(tool)
-	run := &cobra.Command{Use: "run", Short: "Run something"}
+	run := &cobra.Command{Use: "run [OPTIONS] --name <NAME>", Short: "Run something"}
+	var name, mode string
+	cmdutil.StringFlag(run, &name, "name", "<NAME>", "", "Name to use")
+	cmdutil.StringFlag(run, &mode, "mode", "<MODE>", "fast", "Mode to run in")
 	cmdutil.AddHelpFlag(run)
 	about := &cobra.Command{Use: "about [TOPIC]...", Short: "Describe a topic", DisableFlagParsing: true}
 	cmdutil.SetArguments(about, "[TOPIC]...", "Topics to describe")
@@ -79,6 +82,16 @@ func TestTranslateFlagError(t *testing.T) {
 			args:    []string{"--version="},
 			flag:    "--version",
 			message: "unexpected value '' for '--version' found; no more were expected",
+		},
+		{
+			name:    "missing value",
+			args:    []string{"--name"},
+			message: "a value is required for '--name <NAME>' but none was supplied",
+		},
+		{
+			name:    "repeated flag",
+			args:    []string{"--mode=slow", "--name", "a", "--mode", "fast"},
+			message: "the argument '--mode <MODE>' cannot be used multiple times",
 		},
 	}
 	for _, tc := range cases {
@@ -149,5 +162,29 @@ func TestNoArgs(t *testing.T) {
 	if err := cmdutil.NoArgs(nil, []string{"extra", "more"}); !errors.As(err, &flagErr) ||
 		flagErr.Message != "unexpected argument 'extra' found" {
 		t.Errorf("NoArgs() with arguments = %v, want an unexpected argument error for 'extra'", err)
+	}
+}
+
+func TestValueErrors(t *testing.T) {
+	t.Parallel()
+	_, run, _ := newTool()
+	cases := []struct {
+		err  error
+		want string
+	}{
+		{
+			err:  cmdutil.InvalidValue(run, "mode", "odd", errOther),
+			want: "invalid value 'odd' for '--mode <MODE>': other failure",
+		},
+		{
+			err:  cmdutil.MissingFlag(run, "name"),
+			want: "the following required arguments were not provided:\n  --name <NAME>",
+		},
+	}
+	for _, tc := range cases {
+		var flagErr *cmdutil.FlagError
+		if !errors.As(tc.err, &flagErr) || flagErr.Message != tc.want || flagErr.Flag != "" {
+			t.Errorf("error = %v, want a FlagError with message %q", tc.err, tc.want)
+		}
 	}
 }

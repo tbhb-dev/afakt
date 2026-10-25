@@ -14,6 +14,10 @@ import (
 func TestHelpText(t *testing.T) {
 	t.Parallel()
 	tool, run, about := newTool()
+	// Without any short form, the long forms start at the left edge.
+	plain := &cobra.Command{Use: "plain", Short: "No short flags"}
+	var level string
+	cmdutil.StringFlag(plain, &level, "level", "<LEVEL>", "", "Level to use")
 	cases := []struct {
 		name string
 		cmd  *cobra.Command
@@ -36,9 +40,22 @@ Options:
 `,
 		},
 		{
-			name: "command with a help flag",
+			name: "flags without a short form line up with the long forms",
 			cmd:  run,
-			want: "Run something\n\nUsage: tool run\n\nOptions:\n  -h, --help  Print help\n",
+			want: `Run something
+
+Usage: tool run [OPTIONS] --name <NAME>
+
+Options:
+      --name <NAME>  Name to use
+      --mode <MODE>  Mode to run in [default: fast]
+  -h, --help         Print help
+`,
+		},
+		{
+			name: "flags without any short form",
+			cmd:  plain,
+			want: "No short flags\n\nUsage: plain\n\nOptions:\n  --level <LEVEL>  Level to use\n",
 		},
 		{
 			name: "command without flags lists its arguments",
@@ -72,7 +89,7 @@ func TestUsageText(t *testing.T) {
 			name:   "failed command",
 			failed: run,
 			err:    &cmdutil.FlagError{Message: "bad"},
-			want:   "error: bad\n\nUsage: tool run\n\nFor more information, try '--help'.\n",
+			want:   "error: bad\n\nUsage: tool run [OPTIONS] --name <NAME>\n\nFor more information, try '--help'.\n",
 		},
 		{
 			name:   "cited flag joins the usage line",
@@ -84,7 +101,7 @@ func TestUsageText(t *testing.T) {
 			name:   "named command",
 			failed: about,
 			err:    &cmdutil.FlagError{Cmd: run, Message: "bad"},
-			want:   "error: bad\n\nUsage: tool run\n\nFor more information, try '--help'.\n",
+			want:   "error: bad\n\nUsage: tool run [OPTIONS] --name <NAME>\n\nFor more information, try '--help'.\n",
 		},
 		{
 			name:   "command without flags has no hint",

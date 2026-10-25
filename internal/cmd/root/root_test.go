@@ -26,6 +26,7 @@ Usage: afakt <COMMAND>
 
 Commands:
   status  Show the placeholder status
+  server  Run the selected targets until a signal stops them
   help    ` + helpAbout + `
 
 Options:
@@ -39,6 +40,17 @@ Usage: afakt status
 
 Options:
   -h, --help  Print help
+`
+
+	wantServerHelp = `Run the selected targets until a signal stops them
+
+Usage: afakt server [OPTIONS] --target <TARGET>
+
+Options:
+      --target <TARGET>              Comma-separated targets: api, webhook, dashboard, worker, or all; only api can run
+      --listen <ADDR>                Host and port the API listens on [default: 127.0.0.1:8080]
+      --shutdown-timeout <DURATION>  Time limit for the whole shutdown, as a Go duration [default: 30s]
+  -h, --help                         Print help
 `
 
 	wantHelpHelp = helpAbout + `
@@ -118,6 +130,11 @@ func TestRun(t *testing.T) {
 		{name: "help command", args: []string{"help"}, stdout: wantRootHelp},
 		{name: "help status", args: []string{"help", "status"}, stdout: wantStatusHelp},
 		{name: "help of help", args: []string{"help", "help"}, stdout: wantHelpHelp},
+		{name: "help server", args: []string{"help", "server"}, stdout: wantServerHelp},
+		{name: "server help", args: []string{"server", "--help"}, stdout: wantServerHelp},
+		{name: "server short help", args: []string{"server", "-h"}, stdout: wantServerHelp},
+		{name: "server help after flag", args: []string{"server", "--target=api", "-h"}, stdout: wantServerHelp},
+		{name: "server help with bundled value", args: []string{"server", "-h=1"}, stdout: wantServerHelp},
 		{
 			name:   "help unknown command",
 			args:   []string{"help", "nosuch"},
@@ -392,7 +409,7 @@ func TestExecuteHelpListsCommandsAndFlags(t *testing.T) {
 	if got := execute(t, []string{"--help"}, &stdout, &stderr); got != 0 {
 		t.Errorf("exit code = %d, want 0", got)
 	}
-	for _, want := range []string{"status", "--help", "--version"} {
+	for _, want := range []string{"status", "server", "--help", "--version"} {
 		if !strings.Contains(stdout.String(), want) {
 			t.Errorf("help lacks %q: %q", want, stdout.String())
 		}

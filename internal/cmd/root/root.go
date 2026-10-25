@@ -13,6 +13,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/tbhb-dev/afakt/internal/cmd/help"
+	servercmd "github.com/tbhb-dev/afakt/internal/cmd/server"
 	"github.com/tbhb-dev/afakt/internal/cmd/status"
 	"github.com/tbhb-dev/afakt/internal/cmdutil"
 )
@@ -65,7 +66,7 @@ func NewCmdRoot(f *cmdutil.Factory) *cobra.Command {
 	cmdutil.AddHelpFlag(cmd)
 	cmdutil.AddVersionFlag(cmd)
 	helpCmd := help.NewCmdHelp(f, nil)
-	cmdutil.AddCommands(cmd, status.NewCmdStatus(f, nil), helpCmd)
+	cmdutil.AddCommands(cmd, status.NewCmdStatus(f, nil), servercmd.NewCmdServer(f, nil), helpCmd)
 	cmd.SetHelpCommand(helpCmd)
 	return cmd
 }
@@ -92,7 +93,7 @@ func isCompletion(cmd *cobra.Command) bool {
 
 // Execute runs the command line in `args` and returns the process exit code.
 func Execute(ctx context.Context, f *cmdutil.Factory, args []string) int {
-	cmd := NewCmdRoot(f)
+	cmd := NewCmdRoot(f) //nolint:contextcheck // ExecuteContextC hands ctx to each RunE through cmd.Context().
 	// Cobra reads the process arguments when the arguments are nil.
 	if args == nil {
 		args = []string{}

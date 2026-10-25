@@ -107,11 +107,27 @@ func optionRows(cmd *cobra.Command) [][2]string {
 	if cmd.DisableFlagParsing {
 		return nil
 	}
-	// Each flag here is an action flag, which stores its short form in an annotation.
-	var rows [][2]string
+	var flags []*pflag.Flag
+	indent := ""
 	cmd.Flags().VisitAll(func(flag *pflag.Flag) {
-		rows = append(rows, [2]string{"-" + flag.Annotations[shortKey][0] + ", --" + flag.Name, flag.Usage})
+		flags = append(flags, flag)
+		if len(flag.Annotations[shortKey]) > 0 {
+			indent = "    "
+		}
 	})
+	rows := make([][2]string, 0, len(flags))
+	for _, flag := range flags {
+		// An action flag stores its short form in an annotation. When any flag has a short
+		// form, the long forms of the others line up under it.
+		name := indent + flagDisplay(flag)
+		usage := flag.Usage
+		if short := flag.Annotations[shortKey]; len(short) > 0 {
+			name = "-" + short[0] + ", " + flagDisplay(flag)
+		} else if flag.DefValue != "" {
+			usage += " [default: " + flag.DefValue + "]"
+		}
+		rows = append(rows, [2]string{name, usage})
+	}
 	return rows
 }
 

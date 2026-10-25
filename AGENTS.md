@@ -10,11 +10,11 @@ generated: { by: "claude-code:claude-sonnet-5-5", at: "2026-10-20T05:55:00Z" }
 
 ## What this is
 
-`afakt` is a proof of concept command-line tool written in Go. It has one command, `status`, which prints a placeholder line. The repository also has shared development tools, docs, and CI gates. It uses devtools v0.19.0.
+`afakt` is a proof of concept command-line tool written in Go. It has two commands: `status` prints a placeholder line, and `server` runs an HTTP API with health endpoints. The repository also has shared development tools, docs, and CI gates. It uses devtools v0.19.0.
 
 ## Layout
 
-`cmd/afakt/` holds the command-line entry point and its process tests. `internal/cmd/` holds the Cobra command tree, one package per command: `internal/cmd/root/` has the root command and the one place that maps errors to exit codes, and `internal/cmd/status/` and `internal/cmd/help/` have the `status` and `help` commands. `internal/cmdutil/` has what the commands share, from the factory and the flag types to the help layout. `internal/buildmeta/` resolves version metadata from linker flags or runtime build info.
+`cmd/afakt/` holds only `main.go`, which sets up signals and the exit code, and `main_test.go`, which runs the program as a child process. `internal/cmd/` holds the Cobra command tree, one package per command, in the structure of the GitHub command-line tool (`cli/cli`): `internal/cmd/root/` has the root command and the one place that maps errors to exit codes, and `internal/cmd/status/`, `internal/cmd/server/`, and `internal/cmd/help/` have the `status`, `server`, and `help` commands. `internal/cmdutil/` has what the commands share, from the factory and the flag types to the help layout. `internal/buildmeta/` resolves version metadata from linker flags or runtime build info. `internal/server/` composes the services of the selected server targets, and `internal/lifecycle/` starts and stops them. `internal/lifecycle/lifecycletest/` holds fake services for tests.
 
 `docs/` holds the OKF docs bundle. `scripts/okf-check.py` checks its format and the Markdown frontmatter across the repository.
 
@@ -66,7 +66,7 @@ The shared payload pins Go 1.27.3. Use `mise exec -- go version` to inspect it. 
 
 Root configuration includes the shared Go task file and exposes local build and test tasks. Go tool directives declare the analyzer dependencies in the module. `DEVTOOLS_GO_MODULES_MODE=vendor` loads them from the tracked `vendor/` tree. Commit `go.sum` with those generated sources. Run `mise run vendor` to refresh them and `mise run vendor-check` to check for drift.
 
-`.testcoverage.yml` sets the coverage floors: 100% for each file, each package, and the total. The measured total is 100% (177 of 177 statements outside `main.go`). The floors skip `main.go`, whose `os.Exit` glue can't run inside a test process.
+`.testcoverage.yml` sets the coverage floors: 100% for each file, each package, and the total. The measured total is 100% (563 of 563 statements outside `main.go`). The floors skip `main.go`, whose `os.Exit` glue can't run inside a test process.
 
 ## Conventions
 
