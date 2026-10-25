@@ -61,7 +61,7 @@ run = "vale sync"
 shell = "bash -c"
 description = "guard-markdown on every tracked Markdown file, then the OKF check on docs/ and on every other Markdown file"
 run = """
-command -v guard-markdown >/dev/null || { echo "guard-markdown not found; install it with: go install github.com/tbhb-dev/devtools/cmd/guard-markdown@v0.19.0" >&2; exit 1; }
+command -v guard-markdown >/dev/null || { echo "guard-markdown not found; install it with: mise run install-toolchain" >&2; exit 1; }
 git ls-files -z '*.md' ':!:.devtools/**' ':!:.claude/**' ':!:apm_modules/**' ':!:vendor/**' | while IFS= read -r -d '' f; do [ -e "$f" ] && printf '%s\\0' "$f"; done | xargs -0 guard-markdown
 uv run --no-project --with pyyaml python scripts/okf-check.py docs
 uv run --no-project --with pyyaml python scripts/okf-check.py --repo .
