@@ -57,6 +57,12 @@ func TestTranslateFlagError(t *testing.T) {
 			args:    []string{"-xh"},
 			message: "unexpected argument '-x' found",
 		},
+		{
+			name:    "unknown short flag outside ASCII",
+			root:    true,
+			args:    []string{"-éh"},
+			message: "unexpected argument '-é' found",
+		},
 		{name: "version on a command without it", args: []string{"-V"}, message: "unexpected argument '-V' found"},
 		{name: "three dashes", root: true, args: []string{"---x"}, message: "unexpected argument '---x' found"},
 		{name: "no flag name", root: true, args: []string{"--=x"}, message: "unexpected argument '--' found"},

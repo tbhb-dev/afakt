@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -63,10 +64,13 @@ func TranslateFlagError(cmd *cobra.Command, err error) error {
 		// shorthand, as with the help flag here.
 		return ErrHelp
 	case errors.As(err, &notExist) && notExist.GetSpecifiedShortnames() != "":
-		if action := shortAction(cmd, notExist.GetSpecifiedName()); action != nil {
+		// Pflag names the first byte of the group, which cuts a letter of two or more bytes
+		// in half. Clap names the first character.
+		first, _ := utf8.DecodeRuneInString(notExist.GetSpecifiedShortnames())
+		if action := shortAction(cmd, string(first)); action != nil {
 			return action
 		}
-		return UnexpectedArgument("-" + notExist.GetSpecifiedName())
+		return UnexpectedArgument("-" + string(first))
 	case errors.As(err, &notExist):
 		return UnexpectedArgument("--" + notExist.GetSpecifiedName())
 	case errors.As(err, &invalid) && errors.Is(err, errUnexpectedValue):

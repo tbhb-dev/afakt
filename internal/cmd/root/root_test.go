@@ -205,6 +205,24 @@ func TestRun(t *testing.T) {
 			stderr: clapError("unexpected argument '-x' found", "afakt <COMMAND>"),
 		},
 		{
+			name:   "unknown short option outside ASCII",
+			args:   []string{"-é"},
+			code:   2,
+			stderr: clapError("unexpected argument '-é' found", "afakt <COMMAND>"),
+		},
+		{
+			name:   "unknown short option outside ASCII before help",
+			args:   []string{"-éh", "status"},
+			code:   2,
+			stderr: clapError("unexpected argument '-é' found", "afakt <COMMAND>"),
+		},
+		{
+			name:   "status unknown short option outside ASCII",
+			args:   []string{"status", "-é"},
+			code:   2,
+			stderr: clapError("unexpected argument '-é' found", "afakt status"),
+		},
+		{
 			name:   "unknown command",
 			args:   []string{"bogus"},
 			code:   2,
