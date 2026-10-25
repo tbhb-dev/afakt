@@ -1,4 +1,5 @@
 [Ff]rontmatter
+[Gg]oroutine
 [Rr]ebase
 [Rr]epos
 [Rr]uleset

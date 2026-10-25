@@ -49,6 +49,8 @@ components:
     in: cmd/afakt
   cmdroot:
     in: internal/cmd/root
+  cmdserver:
+    in: internal/cmd/server
   cmdstatus:
     in: internal/cmd/status
   cmdhelp:
@@ -57,6 +59,12 @@ components:
     in: internal/cmdutil
   buildmeta:
     in: internal/buildmeta
+  server:
+    in: internal/server
+  lifecycle:
+    in: internal/lifecycle
+  lifecycletest:
+    in: internal/lifecycle/lifecycletest
 
 deps:
   # Only main, the command packages, and cmdutil may use Cobra and pflag. cmdutil depends on
@@ -69,11 +77,14 @@ deps:
     canUse:
       - cobra
       - pflag
-  # go-arch-lint reads test files too, so each package's external tests importing the package
-  # itself needs a self-reference.
+  # go-arch-lint reads test files too, so the rules below include the edges that only tests
+  # use: each package's external tests import the package itself, the tests of the server
+  # command run it through the root, and the tests of server and lifecycle import the fakes
+  # in lifecycletest.
   cmdroot:
     mayDependOn:
       - cmdroot
+      - cmdserver
       - cmdstatus
       - cmdhelp
       - cmdutil
@@ -91,6 +102,15 @@ deps:
     mayDependOn:
       - cmdstatus
       - cmdutil
+    canUse:
+      - cobra
+      - pflag
+  cmdserver:
+    mayDependOn:
+      - cmdserver
+      - cmdroot
+      - cmdutil
+      - server
     canUse:
       - cobra
       - pflag
@@ -104,3 +124,18 @@ deps:
     # The schema requires a reference; self-reference forbids other components.
     mayDependOn:
       - buildmeta
+  server:
+    mayDependOn:
+      - server
+      - lifecycle
+      - lifecycletest
+  lifecycle:
+    # The lifecycle package imports only the standard library. Its non-test code can't
+    # import lifecycletest, because lifecycletest imports lifecycle and Go rejects the cycle.
+    mayDependOn:
+      - lifecycle
+      - lifecycletest
+  lifecycletest:
+    mayDependOn:
+      - lifecycletest
+      - lifecycle

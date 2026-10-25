@@ -12,6 +12,10 @@ const (
 	// shortKey is the flag annotation that holds the letter of the flag's short form.
 	shortKey = "afakt_short"
 
+	// valueNameKey is the flag annotation for the placeholder that the help and the errors
+	// show after the flag's name.
+	valueNameKey = "afakt_value_name"
+
 	// noValue is what the flag parser passes to an action flag written without a value.
 	// Arguments can't contain a zero byte, so any other value came after an equals sign.
 	noValue = "\x00"
@@ -37,6 +41,33 @@ func (a actionFlag) Set(value string) error {
 		return errUnexpectedValue
 	}
 	return a.action
+}
+
+// onceFlag is a string flag that may appear once. Its Set fails on the second use.
+type onceFlag struct {
+	value *string
+	set   bool
+}
+
+func (o *onceFlag) String() string {
+	return *o.value
+}
+
+// Type reports the string type, so pflag reads a value after an equals sign or as the next
+// argument.
+func (o *onceFlag) Type() string {
+	return "string"
+}
+
+// Set stores value on the first use. A later use returns the repeated-flag error, which
+// TranslateFlagError turns into the repeated-argument message.
+func (o *onceFlag) Set(value string) error {
+	if o.set {
+		return errRepeated
+	}
+	o.set = true
+	*o.value = value
+	return nil
 }
 
 // AddHelpFlag adds the short and long help flags. It also sets two parsing rules that
@@ -73,4 +104,22 @@ func shortAction(cmd *cobra.Command, letter string) error {
 		}
 	})
 	return action
+}
+
+// StringFlag adds a long-only string flag that starts with `value`. Repeating the flag
+// fails, as clap rejects a repeated argument. The help and the errors show `valueName`
+// after the flag's name.
+func StringFlag(cmd *cobra.Command, p *string, name, valueName, value, usage string) {
+	*p = value
+	flag := cmd.Flags().VarPF(&onceFlag{value: p}, name, "", usage)
+	flag.Annotations = map[string][]string{valueNameKey: {valueName}}
+}
+
+// flagDisplay names a flag as clap does, with two dashes, the name, and any placeholder.
+func flagDisplay(flag *pflag.Flag) string {
+	display := "--" + flag.Name
+	if valueName := flag.Annotations[valueNameKey]; len(valueName) > 0 {
+		display += " " + valueName[0]
+	}
+	return display
 }

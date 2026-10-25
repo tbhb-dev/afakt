@@ -10,6 +10,33 @@ import (
 	"github.com/tbhb-dev/afakt/internal/cmdutil"
 )
 
+func TestStringFlagForms(t *testing.T) {
+	t.Parallel()
+	cases := []struct {
+		name string
+		args []string
+		want string
+	}{
+		{name: "default", want: "fast"},
+		{name: "equals form", args: []string{"--mode=slow"}, want: "slow"},
+		{name: "separate form", args: []string{"--mode", "slow"}, want: "slow"},
+		{name: "empty value", args: []string{"--mode="}, want: ""},
+	}
+	for _, tc := range cases {
+		_, run, _ := newTool()
+		if err := cmdutil.TranslateFlagError(run, run.Flags().Parse(tc.args)); err != nil {
+			t.Fatalf("parse(%q) error = %v", tc.args, err)
+		}
+		value := run.Flags().Lookup("mode").Value
+		if value.String() != tc.want {
+			t.Errorf("%s: mode = %q, want %q", tc.name, value.String(), tc.want)
+		}
+		if value.Type() != "string" {
+			t.Errorf("Type() = %q, want string", value.Type())
+		}
+	}
+}
+
 // TestHelpFlagReadsAsBool checks that Cobra can read the help flag as a Boolean. Cobra fails
 // a command whose help flag isn't one.
 func TestHelpFlagReadsAsBool(t *testing.T) {
@@ -29,7 +56,7 @@ func TestHelpFlagReadsAsBool(t *testing.T) {
 func TestFirstPositionalEndsFlags(t *testing.T) {
 	t.Parallel()
 	_, run, _ := newTool()
-	if err := cmdutil.TranslateFlagError(run, run.Flags().Parse([]string{"extra", "--help"})); err != nil {
+	if err := cmdutil.TranslateFlagError(run, run.Flags().Parse([]string{"--name=a", "extra", "--help"})); err != nil {
 		t.Fatalf("parse() error = %v", err)
 	}
 	if args := run.Flags().Args(); !slices.Equal(args, []string{"extra", "--help"}) {

@@ -7,9 +7,14 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"io"
+	"net/http"
 	"os"
 	"os/exec"
 	"runtime"
+	"strings"
+	"sync"
+	"syscall"
 	"testing"
 	"time"
 
@@ -157,5 +162,134 @@ func TestStatusOnFullDevice(t *testing.T) {
 	want := "Error: Os { code: 28, kind: StorageFull, message: \"No space left on device\" }\n"
 	if got.stderr != want {
 		t.Errorf("stderr = %q, want %q", got.stderr, want)
+	}
+}
+
+// logBuffer guards a buffer with a lock, because the child logs into it while the test
+// reads it.
+type logBuffer struct {
+	mu  sync.Mutex
+	buf bytes.Buffer
+}
+
+func (b *logBuffer) Write(p []byte) (int, error) {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	b.buf.Write(p)
+	return len(p), nil
+}
+
+func (b *logBuffer) String() string {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	return b.buf.String()
+}
+
+// waitAddress waits until the log shows the address that the server listens on, and reports
+// false if the wait times out. Listening on port 0 keeps parallel tests from colliding on a
+// port.
+func waitAddress(logs *logBuffer) (string, bool) {
+	deadline := time.Now().Add(childTimeout)
+	for time.Now().Before(deadline) {
+		if _, rest, found := strings.Cut(logs.String(), "msg=listening address="); found {
+			address, _, _ := strings.Cut(rest, "\n")
+			return address, true
+		}
+		time.Sleep(10 * time.Millisecond)
+	}
+	return "", false
+}
+
+// waitServing polls the API root at address until it answers 200, and reports false if the
+// wait times out.
+func waitServing(t *testing.T, address string) bool {
+	t.Helper()
+	deadline := time.Now().Add(childTimeout)
+	for time.Now().Before(deadline) {
+		ctx, cancel := context.WithTimeout(t.Context(), time.Second)
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://"+address+"/api/v1/", http.NoBody)
+		if err != nil {
+			cancel()
+			t.Fatalf("NewRequest() error = %v", err)
+		}
+		resp, err := http.DefaultClient.Do(req)
+		if err == nil {
+			_, err = io.Copy(io.Discard, resp.Body)
+			if closeErr := resp.Body.Close(); err == nil {
+				err = closeErr
+			}
+		}
+		cancel()
+		if err == nil && resp.StatusCode == http.StatusOK {
+			return true
+		}
+		time.Sleep(20 * time.Millisecond)
+	}
+	return false
+}
+
+// runServerChild starts the server command as a child process with the given arguments.
+// Once the logged address answers /api/v1/, it sends the signal and returns after the child
+// is reaped.
+func runServerChild(t *testing.T, sig syscall.Signal, args ...string) childResult {
+	t.Helper()
+	ctx, cancel := context.WithTimeout(t.Context(), childTimeout)
+	defer cancel()
+	cmd := newChild(ctx, t, append([]string{"server"}, args...)...)
+	var stderr logBuffer
+	cmd.Stderr = &stderr
+	if err := cmd.Start(); err != nil {
+		t.Fatalf("starting the child: %v", err)
+	}
+	address, ok := waitAddress(&stderr)
+	if !ok || !strings.HasPrefix(address, "127.0.0.1:") || !waitServing(t, address) {
+		killErr := cmd.Process.Kill()
+		t.Fatalf("the child never answered /api/v1/ on %q (kill: %v, wait: %v); stderr:\n%s",
+			address, killErr, cmd.Wait(), stderr.String())
+	}
+	if err := cmd.Process.Signal(sig); err != nil {
+		t.Fatalf("signaling the child: %v", err)
+	}
+	waitErr := cmd.Wait()
+	return result(ctx, t, cmd, "", stderr.String(), waitErr)
+}
+
+func TestServerStopsOnSignal(t *testing.T) {
+	t.Parallel()
+	skipUnlessUnix(t)
+	// Each flag form starts the server, and the signal shuts it down cleanly with exit status 0.
+	cases := []struct {
+		name string
+		sig  syscall.Signal
+		args []string
+	}{
+		{
+			name: "SIGTERM with equals form",
+			sig:  syscall.SIGTERM,
+			args: []string{"--target=api", "--listen=127.0.0.1:0", "--shutdown-timeout=10s"},
+		},
+		{
+			name: "SIGINT with separate form",
+			sig:  syscall.SIGINT,
+			args: []string{"--target", "api", "--listen", "127.0.0.1:0", "--shutdown-timeout", "10s"},
+		},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			got := runServerChild(t, tc.sig, tc.args...)
+			if got.exitCode != 0 {
+				t.Errorf("exit code = %d (%s), want 0; stderr:\n%s", got.exitCode, got.state, got.stderr)
+			}
+			for _, want := range []string{
+				`msg="shutting down"`,
+				`msg="service terminated" service=api`,
+				`msg="service terminated" service=api-listener`,
+			} {
+				if !strings.Contains(got.stderr, want) {
+					t.Errorf("stderr lacks %q:\n%s", want, got.stderr)
+				}
+			}
+		})
 	}
 }

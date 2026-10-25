@@ -20,6 +20,7 @@ var (
 	ErrVersion = errors.New("version requested")
 
 	errUnexpectedValue = errors.New("the flag takes no value")
+	errRepeated        = errors.New("the flag was given more than once")
 )
 
 // FlagError is a command line that a command can't accept, and it exits with code 2. It
@@ -49,12 +50,25 @@ func UnexpectedArgument(arg string) *FlagError {
 	return &FlagError{Message: fmt.Sprintf("unexpected argument '%s' found", arg)}
 }
 
+// InvalidValue reports a value that failed the check of its flag.
+func InvalidValue(cmd *cobra.Command, name, value string, reason error) *FlagError {
+	display := flagDisplay(cmd.Flags().Lookup(name))
+	return &FlagError{Message: fmt.Sprintf("invalid value '%s' for '%s': %s", value, display, reason)}
+}
+
+// MissingFlag reports a required flag that the command line left out.
+func MissingFlag(cmd *cobra.Command, name string) *FlagError {
+	display := flagDisplay(cmd.Flags().Lookup(name))
+	return &FlagError{Message: "the following required arguments were not provided:\n  " + display}
+}
+
 // TranslateFlagError turns an error from parsing the flags of `cmd` into what clap reports
 // for the same command line. Any other error comes back unchanged. It fits Cobra's
 // SetFlagErrorFunc.
 func TranslateFlagError(cmd *cobra.Command, err error) error {
 	var (
 		notExist *pflag.NotExistError
+		required *pflag.ValueRequiredError
 		invalid  *pflag.InvalidValueError
 		syntax   *pflag.InvalidSyntaxError
 	)
@@ -73,6 +87,12 @@ func TranslateFlagError(cmd *cobra.Command, err error) error {
 		return UnexpectedArgument("-" + string(first))
 	case errors.As(err, &notExist):
 		return UnexpectedArgument("--" + notExist.GetSpecifiedName())
+	case errors.As(err, &required):
+		display := flagDisplay(required.GetFlag())
+		return &FlagError{Message: fmt.Sprintf("a value is required for '%s' but none was supplied", display)}
+	case errors.As(err, &invalid) && errors.Is(err, errRepeated):
+		display := flagDisplay(invalid.GetFlag())
+		return &FlagError{Message: fmt.Sprintf("the argument '%s' cannot be used multiple times", display)}
 	case errors.As(err, &invalid) && errors.Is(err, errUnexpectedValue):
 		name := "--" + invalid.GetFlag().Name
 		return &FlagError{
