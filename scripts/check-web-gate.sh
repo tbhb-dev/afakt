@@ -218,7 +218,7 @@ e2e-console)
   finding 'forced console error'
   ;;
 e2e-axe)
-  # Check missing image text and duplicate main landmarks, a best-practice violation.
+  # Check missing image text and content outside landmarks, a best-practice violation.
   cat >"$app/src/app.tsx" <<-'EOF'
 		import type { JSX } from "react";
 
@@ -226,7 +226,7 @@ e2e-axe)
 		  return (
 		    <>
 		      <main><img src="data:," /></main>
-		      <main />
+		      <p>Outside the main landmark</p>
 		    </>
 		  );
 		}
@@ -234,7 +234,7 @@ e2e-axe)
   run "$app" sh -c 'pnpm exec vite build && pnpm exec playwright test'
   finding 'the blank page passes the accessibility scan'
   finding 'image-alt'
-  finding 'landmark-no-duplicate-main'
+  finding 'region'
   ;;
 e2e-browser)
   # The pinned browser version names a build the run does not use.
