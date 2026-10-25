@@ -381,13 +381,15 @@ for gate in biome types eslint cover property dup deadcode audit mutate e2e-cons
 done
 """
 
+# One gate at a time: mutate-web mutates the sources in place, so a gate
+# running beside it would read mutated files and Stryker's setup files.
 [tasks.check-web]
 description = "Run every web gate"
-depends = [
-  "lint-web-all",
-  "cover-web",
-  "e2e-web",
-  "mutate-web",
-  "audit-web",
-  "check-web-gates",
+run = [
+  { task = "lint-web-all" },
+  { task = "cover-web" },
+  { task = "e2e-web" },
+  { task = "mutate-web" },
+  { task = "audit-web" },
+  { task = "check-web-gates" },
 ]
