@@ -10,8 +10,13 @@ import (
 	"strings"
 )
 
-// TargetAPI selects the HTTP API.
-const TargetAPI = "api"
+const (
+	// TargetAPI selects the HTTP API.
+	TargetAPI = "api"
+	// TargetWebhook selects the webhook target. It has no receivers yet, so it adds only
+	// the health endpoints.
+	TargetWebhook = "webhook"
+)
 
 var (
 	// ErrNoTarget reports an empty target list.
@@ -27,9 +32,14 @@ var (
 )
 
 // targetNames returns every target name in the order the help text lists them. Every name
-// except TargetAPI is reserved for later changes, and all stands for every target.
+// that `availableTargets` lacks is reserved for later changes, and all stands for every target.
 func targetNames() []string {
-	return []string{TargetAPI, "webhook", "dashboard", "worker", "all"}
+	return []string{TargetAPI, TargetWebhook, "dashboard", "worker", "all"}
+}
+
+// availableTargets returns the targets that this build can run.
+func availableTargets() []string {
+	return []string{TargetAPI, TargetWebhook}
 }
 
 // ParseTargets checks a comma-separated target list and returns its names. Every name must
@@ -51,8 +61,9 @@ func ParseTargets(value string) ([]string, error) {
 		}
 	}
 	for _, name := range names {
-		if name != TargetAPI {
-			return nil, fmt.Errorf("%w: '%s'; only '%s' can run in this build", ErrUnavailableTarget, name, TargetAPI)
+		if !slices.Contains(availableTargets(), name) {
+			return nil, fmt.Errorf("%w: '%s'; only '%s' and '%s' can run in this build",
+				ErrUnavailableTarget, name, TargetAPI, TargetWebhook)
 		}
 	}
 	return names, nil

@@ -57,8 +57,9 @@ func (h addressHandler) Handle(_ context.Context, record slog.Record) error {
 	return nil
 }
 
-// probe is a required service that starts after the API and stops before it. Its start
-// closes up, at which point the API serves.
+// probe is a required service that starts after the HTTP server and every target and stops
+// before them, because the hooks register it last. Its start closes up, at which point the
+// HTTP server serves.
 type probe struct {
 	fake *lifecycletest.Fake
 	up   chan struct{}
@@ -74,9 +75,9 @@ func newProbe() *probe {
 	return p
 }
 
-// reg returns the registration that makes the probe depend on the API.
+// reg returns the registration that makes the probe depend on the HTTP server.
 func (p *probe) reg() lifecycle.Registration {
-	return lifecycle.Registration{Name: "probe", Service: p.fake, DependsOn: []string{"api"}}
+	return lifecycle.Registration{Name: "probe", Service: p.fake, DependsOn: []string{httpService}}
 }
 
 // harness is a server that run serves in the background. cancel ends it like a signal, done
@@ -282,7 +283,7 @@ func TestListenFailure(t *testing.T) {
 	cfg.Listen = taken.Addr().String()
 	s := startServer(t, cfg, hooks{})
 	err = s.wait(t)
-	if !errors.Is(err, syscall.EADDRINUSE) || !strings.HasPrefix(err.Error(), `start "api-listener": listen: `) {
+	if !errors.Is(err, syscall.EADDRINUSE) || !strings.HasPrefix(err.Error(), `start "http-listener": listen: `) {
 		t.Errorf("run() error = %v, want a listen failure with EADDRINUSE", err)
 	}
 }
@@ -375,30 +376,36 @@ func TestShutdownDrainsRequests(t *testing.T) {
 
 func TestShutdownTimeout(t *testing.T) {
 	t.Parallel()
-	entered := make(chan struct{})
-	p := newProbe()
-	cfg := testConfig()
-	cfg.ShutdownTimeout = 200 * time.Millisecond
-	s := startServer(t, cfg, hooks{
-		services: []lifecycle.Registration{p.reg()},
-		routes:   slowRoute(entered, make(chan struct{})),
-	})
-	receive(t, p.up, "the probe to start")
-	result := getAsync(t, s.addr(t), "/slow")
-	receive(t, entered, "the slow request")
-	// The slow request never finishes on its own. The shutdown has to end at its deadline.
-	start := time.Now()
-	s.cancel()
-	err := s.wait(t)
-	if elapsed := time.Since(start); elapsed < cfg.ShutdownTimeout {
-		t.Errorf("shutdown took %s, want at least %s", elapsed, cfg.ShutdownTimeout)
-	}
-	want := `shutdown deadline exceeded while stopping "api"; not confirmed stopped: api, api-listener`
-	if !errors.Is(err, lifecycle.ErrShutdownTimeout) || err.Error() != want {
-		t.Errorf("run() error = %q, want %q", err, want)
-	}
-	if got := <-result; got.err == nil {
-		t.Errorf("slow request = %d %q, want a closed connection", got.code, got.body)
+	for _, targets := range [][]string{{TargetAPI}, {TargetWebhook}} {
+		t.Run(targets[0], func(t *testing.T) {
+			t.Parallel()
+			entered := make(chan struct{})
+			p := newProbe()
+			cfg := testConfig()
+			cfg.Targets = targets
+			cfg.ShutdownTimeout = 200 * time.Millisecond
+			s := startServer(t, cfg, hooks{
+				services: []lifecycle.Registration{p.reg()},
+				routes:   slowRoute(entered, make(chan struct{})),
+			})
+			receive(t, p.up, "the probe to start")
+			result := getAsync(t, s.addr(t), "/slow")
+			receive(t, entered, "the slow request")
+			// The slow request never finishes on its own. The shutdown has to end at its deadline.
+			start := time.Now()
+			s.cancel()
+			err := s.wait(t)
+			if elapsed := time.Since(start); elapsed < cfg.ShutdownTimeout {
+				t.Errorf("shutdown took %s, want at least %s", elapsed, cfg.ShutdownTimeout)
+			}
+			want := `shutdown deadline exceeded while stopping "http"; not confirmed stopped: http, http-listener`
+			if !errors.Is(err, lifecycle.ErrShutdownTimeout) || err.Error() != want {
+				t.Errorf("run() error = %q, want %q", err, want)
+			}
+			if got := <-result; got.err == nil {
+				t.Errorf("slow request = %d %q, want a closed connection", got.code, got.body)
+			}
+		})
 	}
 }
 
@@ -409,8 +416,13 @@ func TestRunRejectsComposition(t *testing.T) {
 		targets []string
 		want    error
 	}{
-		{name: "unavailable target", targets: []string{"webhook"}, want: ErrNotComposable},
+		{name: "unavailable target", targets: []string{"dashboard"}, want: ErrNotComposable},
 		{name: "repeated target", targets: []string{TargetAPI, TargetAPI}, want: lifecycle.ErrDuplicateService},
+		{
+			name:    "repeated webhook",
+			targets: []string{TargetWebhook, TargetAPI, TargetWebhook},
+			want:    lifecycle.ErrDuplicateService,
+		},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -451,7 +463,7 @@ func TestAPIRunReportsServeError(t *testing.T) {
 	if err := l.ln.Close(); err != nil {
 		t.Fatalf("Close() error = %v", err)
 	}
-	a := &api{listener: l}
+	a := &httpServer{listener: l}
 	if err := a.Start(t.Context()); err != nil {
 		t.Fatalf("Start() error = %v", err)
 	}

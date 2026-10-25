@@ -13,12 +13,26 @@ import (
 
 func TestParseTargetsAccepts(t *testing.T) {
 	t.Parallel()
-	got, err := server.ParseTargets("api")
-	if err != nil {
-		t.Fatalf("ParseTargets(api) error = %v", err)
+	cases := []struct {
+		value string
+		want  []string
+	}{
+		{value: "api", want: []string{"api"}},
+		{value: "webhook", want: []string{"webhook"}},
+		{value: "api,webhook", want: []string{"api", "webhook"}},
+		{value: "webhook,api", want: []string{"webhook", "api"}},
 	}
-	if want := []string{"api"}; !slices.Equal(got, want) {
-		t.Errorf("ParseTargets(api) = %q, want %q", got, want)
+	for _, tc := range cases {
+		t.Run(tc.value, func(t *testing.T) {
+			t.Parallel()
+			got, err := server.ParseTargets(tc.value)
+			if err != nil {
+				t.Fatalf("ParseTargets(%q) error = %v", tc.value, err)
+			}
+			if !slices.Equal(got, tc.want) {
+				t.Errorf("ParseTargets(%q) = %q, want %q", tc.value, got, tc.want)
+			}
+		})
 	}
 }
 
@@ -26,7 +40,7 @@ func TestParseTargetsRejects(t *testing.T) {
 	t.Parallel()
 	const choices = "choose from api, webhook, dashboard, worker, all"
 	unavailable := func(name string) string {
-		return "target is not available yet: '" + name + "'; only 'api' can run in this build"
+		return "target is not available yet: '" + name + "'; only 'api' and 'webhook' can run in this build"
 	}
 	cases := []struct {
 		value string
@@ -44,12 +58,13 @@ func TestParseTargetsRejects(t *testing.T) {
 		{value: "webhook,bogus", want: server.ErrUnknownTarget, text: "unknown target 'bogus'; " + choices},
 		{value: "api,api", want: server.ErrDuplicateTarget, text: "duplicate target 'api'"},
 		{value: "worker,api,worker", want: server.ErrDuplicateTarget, text: "duplicate target 'worker'"},
-		{value: "webhook", want: server.ErrUnavailableTarget, text: unavailable("webhook")},
+		{value: "webhook,webhook", want: server.ErrDuplicateTarget, text: "duplicate target 'webhook'"},
 		{value: "dashboard", want: server.ErrUnavailableTarget, text: unavailable("dashboard")},
 		{value: "worker", want: server.ErrUnavailableTarget, text: unavailable("worker")},
 		{value: "all", want: server.ErrUnavailableTarget, text: unavailable("all")},
 		{value: "api,all", want: server.ErrUnavailableTarget, text: unavailable("all")},
-		{value: "api,webhook", want: server.ErrUnavailableTarget, text: unavailable("webhook")},
+		{value: "webhook,dashboard", want: server.ErrUnavailableTarget, text: unavailable("dashboard")},
+		{value: "api,webhook,worker", want: server.ErrUnavailableTarget, text: unavailable("worker")},
 	}
 	for _, tc := range cases {
 		t.Run(tc.value, func(t *testing.T) {

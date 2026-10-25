@@ -8,6 +8,7 @@ import (
 	"context"
 	"errors"
 	"io"
+	"net"
 	"net/http"
 	"os"
 	"os/exec"
@@ -200,14 +201,14 @@ func waitAddress(logs *logBuffer) (string, bool) {
 	return "", false
 }
 
-// waitServing polls the API root at address until it answers 200, and reports false if the
-// wait times out.
-func waitServing(t *testing.T, address string) bool {
+// waitServing polls path at address until it answers 200, and reports false if the wait
+// times out.
+func waitServing(t *testing.T, address, path string) bool {
 	t.Helper()
 	deadline := time.Now().Add(childTimeout)
 	for time.Now().Before(deadline) {
 		ctx, cancel := context.WithTimeout(t.Context(), time.Second)
-		req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://"+address+"/api/v1/", http.NoBody)
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://"+address+path, http.NoBody)
 		if err != nil {
 			cancel()
 			t.Fatalf("NewRequest() error = %v", err)
@@ -229,9 +230,12 @@ func waitServing(t *testing.T, address string) bool {
 }
 
 // runServerChild starts the server command as a child process with the given arguments.
-// Once the logged address answers /api/v1/, it sends the signal and returns after the child
-// is reaped.
-func runServerChild(t *testing.T, sig syscall.Signal, args ...string) childResult {
+// Once the logged address answers path, it calls before with that address. Then it sends
+// the signal and returns after the child is reaped. The duration is the time from the
+// signal to the exit.
+func runServerChild(
+	t *testing.T, sig syscall.Signal, path string, before func(address string), args ...string,
+) (childResult, time.Duration) {
 	t.Helper()
 	ctx, cancel := context.WithTimeout(t.Context(), childTimeout)
 	defer cancel()
@@ -242,54 +246,150 @@ func runServerChild(t *testing.T, sig syscall.Signal, args ...string) childResul
 		t.Fatalf("starting the child: %v", err)
 	}
 	address, ok := waitAddress(&stderr)
-	if !ok || !strings.HasPrefix(address, "127.0.0.1:") || !waitServing(t, address) {
+	if !ok || !strings.HasPrefix(address, "127.0.0.1:") || !waitServing(t, address, path) {
 		killErr := cmd.Process.Kill()
-		t.Fatalf("the child never answered /api/v1/ on %q (kill: %v, wait: %v); stderr:\n%s",
-			address, killErr, cmd.Wait(), stderr.String())
+		t.Fatalf("the child never answered %s on %q (kill: %v, wait: %v); stderr:\n%s",
+			path, address, killErr, cmd.Wait(), stderr.String())
 	}
+	if before != nil {
+		before(address)
+	}
+	start := time.Now()
 	if err := cmd.Process.Signal(sig); err != nil {
 		t.Fatalf("signaling the child: %v", err)
 	}
 	waitErr := cmd.Wait()
-	return result(ctx, t, cmd, "", stderr.String(), waitErr)
+	elapsed := time.Since(start)
+	return result(ctx, t, cmd, "", stderr.String(), waitErr), elapsed
 }
 
 func TestServerStopsOnSignal(t *testing.T) {
 	t.Parallel()
 	skipUnlessUnix(t)
-	// Each flag form starts the server, and the signal shuts it down cleanly with exit status 0.
+	// Each flag form starts the server, and the signal shuts it down cleanly with exit status 0
+	// within the shutdown timeout.
+	const timeout = 10 * time.Second
 	cases := []struct {
-		name string
-		sig  syscall.Signal
-		args []string
+		name    string
+		sig     syscall.Signal
+		path    string
+		targets []string
+		args    []string
 	}{
 		{
-			name: "SIGTERM with equals form",
-			sig:  syscall.SIGTERM,
-			args: []string{"--target=api", "--listen=127.0.0.1:0", "--shutdown-timeout=10s"},
+			name:    "SIGTERM with equals form",
+			sig:     syscall.SIGTERM,
+			path:    "/api/v1/",
+			targets: []string{"api"},
+			args:    []string{"--target=api", "--listen=127.0.0.1:0", "--shutdown-timeout=10s"},
 		},
 		{
-			name: "SIGINT with separate form",
-			sig:  syscall.SIGINT,
-			args: []string{"--target", "api", "--listen", "127.0.0.1:0", "--shutdown-timeout", "10s"},
+			name:    "SIGINT with separate form",
+			sig:     syscall.SIGINT,
+			path:    "/api/v1/",
+			targets: []string{"api"},
+			args:    []string{"--target", "api", "--listen", "127.0.0.1:0", "--shutdown-timeout", "10s"},
+		},
+		{
+			name:    "webhook SIGTERM with equals form",
+			sig:     syscall.SIGTERM,
+			path:    "/readyz",
+			targets: []string{"webhook"},
+			args:    []string{"--target=webhook", "--listen=127.0.0.1:0", "--shutdown-timeout=10s"},
+		},
+		{
+			name:    "webhook SIGINT with separate form",
+			sig:     syscall.SIGINT,
+			path:    "/readyz",
+			targets: []string{"webhook"},
+			args:    []string{"--target", "webhook", "--listen", "127.0.0.1:0", "--shutdown-timeout", "10s"},
+		},
+		{
+			name:    "api and webhook SIGTERM",
+			sig:     syscall.SIGTERM,
+			path:    "/readyz",
+			targets: []string{"api", "webhook"},
+			args:    []string{"--target=api,webhook", "--listen=127.0.0.1:0", "--shutdown-timeout=10s"},
 		},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
-			got := runServerChild(t, tc.sig, tc.args...)
+			got, elapsed := runServerChild(t, tc.sig, tc.path, nil, tc.args...)
 			if got.exitCode != 0 {
 				t.Errorf("exit code = %d (%s), want 0; stderr:\n%s", got.exitCode, got.state, got.stderr)
 			}
-			for _, want := range []string{
-				`msg="shutting down"`,
-				`msg="service terminated" service=api`,
-				`msg="service terminated" service=api-listener`,
-			} {
-				if !strings.Contains(got.stderr, want) {
-					t.Errorf("stderr lacks %q:\n%s", want, got.stderr)
-				}
+			if elapsed >= timeout {
+				t.Errorf("the child exited %s after the signal, want less than %s", elapsed, timeout)
 			}
+			wantTerminated(t, got.stderr, tc.targets)
 		})
+	}
+}
+
+// wantTerminated checks that the child's error output logs the shutdown and the end of the shared HTTP
+// services and of each target's service.
+func wantTerminated(t *testing.T, stderr string, targets []string) {
+	t.Helper()
+	wants := make([]string, 0, 3+len(targets))
+	wants = append(wants,
+		`msg="shutting down"`,
+		`msg="service terminated" service=http`,
+		`msg="service terminated" service=http-listener`,
+	)
+	for _, target := range targets {
+		wants = append(wants, `msg="service terminated" service=`+target)
+	}
+	for _, want := range wants {
+		if !strings.Contains(stderr, want) {
+			t.Errorf("stderr lacks %q:\n%s", want, stderr)
+		}
+	}
+}
+
+// TestServerShutdownTimeoutExit holds a connection open that never sends a request. The HTTP
+// server waits a few seconds for such a connection before it counts it as idle, so a
+// shorter shutdown timeout runs out first and the child exits with the runtime failure code.
+func TestServerShutdownTimeoutExit(t *testing.T) {
+	t.Parallel()
+	skipUnlessUnix(t)
+	const timeout = 500 * time.Millisecond
+	var stalled net.Conn
+	holdConnection := func(address string) {
+		var dialer net.Dialer
+		conn, err := dialer.DialContext(t.Context(), "tcp", address)
+		if err != nil {
+			t.Fatalf("dialing %s: %v", address, err)
+		}
+		stalled = conn
+		// The server accepts connections in order, so an answer on a new connection shows that
+		// it has accepted and tracks the stalled one. A transport of its own has no idle
+		// connection to reuse.
+		client := &http.Client{Transport: &http.Transport{}}
+		req, err := http.NewRequestWithContext(t.Context(), http.MethodGet, "http://"+address+"/livez", http.NoBody)
+		if err != nil {
+			t.Fatalf("NewRequest() error = %v", err)
+		}
+		req.Close = true
+		resp, err := client.Do(req)
+		if err != nil {
+			t.Fatalf("GET /livez error = %v", err)
+		}
+		_ = resp.Body.Close()
+	}
+	got, elapsed := runServerChild(t, syscall.SIGTERM, "/readyz", holdConnection,
+		"--target=webhook", "--listen=127.0.0.1:0", "--shutdown-timeout=500ms")
+	if stalled != nil {
+		_ = stalled.Close()
+	}
+	if got.exitCode != 1 {
+		t.Errorf("exit code = %d (%s), want 1; stderr:\n%s", got.exitCode, got.state, got.stderr)
+	}
+	if elapsed < timeout {
+		t.Errorf("the child exited %s after the signal, want at least %s", elapsed, timeout)
+	}
+	want := `Error: shutdown deadline exceeded while stopping "http"; not confirmed stopped: http, http-listener`
+	if !strings.Contains(got.stderr, want) {
+		t.Errorf("stderr lacks %q:\n%s", want, got.stderr)
 	}
 }
