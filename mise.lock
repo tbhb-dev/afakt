@@ -9,13 +9,11 @@ specifiers = ["0.34.0"]
 
 [tools.apm."platforms.linux-x64"]
 checksum = "sha256:4487af55604b4fa6f4587f3ee6e833b44ce99c491f11069790e4e13e297cde8c"
-checksum_source = "mise-versions"
 url = "https://github.com/microsoft/apm/releases/download/v0.34.0/apm-linux-x86_64.tar.gz"
 url_api = "https://api.github.com/repos/microsoft/apm/releases/assets/656151923"
 
 [tools.apm."platforms.macos-arm64"]
 checksum = "sha256:030b381825799333ac60a369aaf021ffc9f9e92558b375feec656c42e50e8e5a"
-checksum_source = "mise-versions"
 url = "https://github.com/microsoft/apm/releases/download/v0.34.0/apm-darwin-arm64.tar.gz"
 url_api = "https://api.github.com/repos/microsoft/apm/releases/assets/656151919"
 
@@ -48,24 +46,24 @@ url = "https://github.com/bats-core/bats-core/archive/refs/tags/v1.14.0.tar.gz"
 url_api = "https://api.github.com/repos/bats-core/bats-core/tarball/v1.14.0"
 
 [[tools."go:github.com/tbhb-dev/devtools/cmd/agentrepo"]]
-version = "0.19.0"
+version = "0.21.0"
 backend = "go:github.com/tbhb-dev/devtools/cmd/agentrepo"
-specifiers = ["v0.19.0"]
+specifiers = ["v0.21.0"]
 
 [[tools."go:github.com/tbhb-dev/devtools/cmd/commit-lint"]]
-version = "0.19.0"
+version = "0.21.0"
 backend = "go:github.com/tbhb-dev/devtools/cmd/commit-lint"
-specifiers = ["v0.19.0"]
+specifiers = ["v0.21.0"]
 
 [[tools."go:github.com/tbhb-dev/devtools/cmd/gh-post"]]
-version = "v0.19.0"
+version = "0.21.0"
 backend = "go:github.com/tbhb-dev/devtools/cmd/gh-post"
-specifiers = ["v0.19.0"]
+specifiers = ["v0.21.0"]
 
 [[tools."go:github.com/tbhb-dev/devtools/cmd/guard-markdown"]]
-version = "0.19.0"
+version = "0.21.0"
 backend = "go:github.com/tbhb-dev/devtools/cmd/guard-markdown"
-specifiers = ["v0.19.0"]
+specifiers = ["v0.21.0"]
 
 [[tools.jq]]
 version = "1.8.2"
