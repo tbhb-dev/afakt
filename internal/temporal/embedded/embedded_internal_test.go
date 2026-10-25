@@ -15,14 +15,16 @@ import (
 	"testing"
 
 	"github.com/prometheus/client_golang/prometheus"
+	"go.temporal.io/server/common/config"
 	"go.temporal.io/server/common/log/tag"
 	"go.temporal.io/server/temporal"
 )
 
 var (
-	errBuild = errors.New("build failed")
-	errStart = errors.New("start failed")
-	errStop  = errors.New("stop failed")
+	errBuild  = errors.New("build failed")
+	errSchema = errors.New("schema failed")
+	errStart  = errors.New("start failed")
+	errStop   = errors.New("stop failed")
 )
 
 // fakeServer is a Temporal server whose Start and Stop return the errors in its fields.
@@ -136,17 +138,13 @@ func TestServerStartFailures(t *testing.T) {
 	if err := os.WriteFile(file, nil, 0o600); err != nil {
 		t.Fatal(err)
 	}
-	readOnly := filepath.Join(t.TempDir(), "read-only")
-	if err := os.Mkdir(readOnly, 0o500); err != nil {
-		t.Fatal(err)
-	}
 	notDatabase := t.TempDir()
 	if err := os.Mkdir(filepath.Join(notDatabase, DatabaseFile), 0o700); err != nil {
 		t.Fatal(err)
 	}
 	for _, tc := range []startFailure{
 		{name: "directory", dir: filepath.Join(file, "dir"), want: "create embedded Temporal directory: "},
-		{name: "schema", dir: readOnly, want: "set up embedded Temporal schema: "},
+		{name: "schema", dir: t.TempDir(), schema: errSchema, want: "set up embedded Temporal schema: schema failed"},
 		{name: "namespace", dir: notDatabase, want: `create embedded Temporal namespace "default": `},
 		{name: "ports", host: "256.0.0.1", want: "pick an embedded Temporal port: "},
 		{name: "build", build: errBuild, want: "build embedded Temporal server: build failed"},
@@ -167,11 +165,12 @@ func TestServerStartFailures(t *testing.T) {
 }
 
 // startFailure is a case of `TestServerStartFailures`. A set server or build error replaces
-// the server library's constructor.
+// the server library's constructor. A schema error replaces setup without relying on file permissions.
 type startFailure struct {
 	name, dir, host string
 	server          temporal.Server
 	build           error
+	schema          error
 	want            string
 	stopped         bool
 }
@@ -182,6 +181,9 @@ func (tc startFailure) check(t *testing.T) {
 	t.Helper()
 	var buf bytes.Buffer
 	s := newTestServer(tc.dir, &buf)
+	if tc.schema != nil {
+		s.setupSchema = func(*config.SQL) error { return tc.schema }
+	}
 	if tc.host != "" {
 		s.host = tc.host
 	}
@@ -191,6 +193,9 @@ func (tc startFailure) check(t *testing.T) {
 	err := s.Start(t.Context())
 	if err == nil || !strings.HasPrefix(err.Error(), tc.want) {
 		t.Errorf("Start() error = %v, want prefix %q", err, tc.want)
+	}
+	if tc.schema != nil && !errors.Is(err, tc.schema) {
+		t.Errorf("Start() error = %v, want wrapped schema error %v", err, tc.schema)
 	}
 	if fake, ok := tc.server.(*fakeServer); ok && fake.stopped != tc.stopped {
 		t.Errorf("stopped = %v, want %v", fake.stopped, tc.stopped)

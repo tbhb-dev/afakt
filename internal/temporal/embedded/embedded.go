@@ -54,19 +54,23 @@ type newServerFunc func(opts ...temporal.ServerOption) (temporal.Server, error)
 // Server is the service that runs the embedded Temporal server. Start builds and starts it,
 // Address returns the address of its frontend, and Stop stops it.
 type Server struct {
-	dir       string
-	namespace string
-	logger    *slog.Logger
-	host      string
-	newServer newServerFunc
-	server    temporal.Server
-	address   string
+	dir         string
+	namespace   string
+	logger      *slog.Logger
+	host        string
+	newServer   newServerFunc
+	setupSchema func(*config.SQL) error
+	server      temporal.Server
+	address     string
 }
 
 // New returns a server for namespace. With an empty dir it keeps its data in memory, and
 // otherwise in DatabaseFile inside dir, which Start creates if it's missing.
 func New(dir, namespace string, logger *slog.Logger) *Server {
-	return &Server{dir: dir, namespace: namespace, logger: logger, host: loopback, newServer: temporal.NewServer}
+	return &Server{
+		dir: dir, namespace: namespace, logger: logger, host: loopback,
+		newServer: temporal.NewServer, setupSchema: sqliteschema.SetupSchema,
+	}
 }
 
 // Address returns the host and port of the frontend. Call it only after Start succeeded.
@@ -150,7 +154,7 @@ func (s *Server) database() (*config.SQL, error) {
 		fresh = errors.Is(err, os.ErrNotExist)
 	}
 	if fresh {
-		if err := sqliteschema.SetupSchema(conf); err != nil {
+		if err := s.setupSchema(conf); err != nil {
 			return nil, fmt.Errorf("set up embedded Temporal schema: %w", err)
 		}
 	}
