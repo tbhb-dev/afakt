@@ -6,6 +6,8 @@ package cmdutil_test
 import (
 	"slices"
 	"testing"
+
+	"github.com/tbhb-dev/afakt/internal/cmdutil"
 )
 
 // TestHelpFlagReadsAsBool checks that Cobra can read the help flag as a Boolean. Cobra fails
@@ -27,7 +29,7 @@ func TestHelpFlagReadsAsBool(t *testing.T) {
 func TestFirstPositionalEndsFlags(t *testing.T) {
 	t.Parallel()
 	_, run, _ := newTool()
-	if err := parse(run, "extra", "--help"); err != nil {
+	if err := cmdutil.TranslateFlagError(run, run.Flags().Parse([]string{"extra", "--help"})); err != nil {
 		t.Fatalf("parse() error = %v", err)
 	}
 	if args := run.Flags().Args(); !slices.Equal(args, []string{"extra", "--help"}) {

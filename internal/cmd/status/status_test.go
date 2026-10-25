@@ -34,8 +34,8 @@ func newFactory(out, errOut io.Writer) *cmdutil.Factory {
 func TestNewCmdStatus(t *testing.T) {
 	t.Parallel()
 	var stdout bytes.Buffer
-	var got *status.StatusOptions
-	cmd := status.NewCmdStatus(newFactory(&stdout, &bytes.Buffer{}), func(opts *status.StatusOptions) error {
+	var got *status.Options
+	cmd := status.NewCmdStatus(newFactory(&stdout, &bytes.Buffer{}), func(opts *status.Options) error {
 		got = opts
 		return nil
 	})
@@ -53,7 +53,7 @@ func TestNewCmdStatus(t *testing.T) {
 
 func TestNewCmdStatusRejectsArguments(t *testing.T) {
 	t.Parallel()
-	cmd := status.NewCmdStatus(newFactory(&bytes.Buffer{}, &bytes.Buffer{}), func(*status.StatusOptions) error {
+	cmd := status.NewCmdStatus(newFactory(&bytes.Buffer{}, &bytes.Buffer{}), func(*status.Options) error {
 		t.Error("the run function ran")
 		return nil
 	})

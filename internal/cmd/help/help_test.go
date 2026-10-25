@@ -38,8 +38,8 @@ func newTool(out io.Writer) (*cobra.Command, *cobra.Command) {
 func TestNewCmdHelp(t *testing.T) {
 	t.Parallel()
 	var stdout bytes.Buffer
-	var got *help.HelpOptions
-	cmd := help.NewCmdHelp(&cmdutil.Factory{Out: &stdout}, func(opts *help.HelpOptions) error {
+	var got *help.Options
+	cmd := help.NewCmdHelp(&cmdutil.Factory{Out: &stdout}, func(opts *help.Options) error {
 		got = opts
 		return nil
 	})

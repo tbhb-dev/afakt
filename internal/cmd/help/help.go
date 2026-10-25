@@ -14,10 +14,8 @@ import (
 	"github.com/tbhb-dev/afakt/internal/cmdutil"
 )
 
-// HelpOptions holds what the help command needs.
-//
-//nolint:revive // Every command names its options after itself, as the GitHub CLI does.
-type HelpOptions struct {
+// Options holds what the help command needs.
+type Options struct {
 	Out   io.Writer
 	Root  *cobra.Command
 	Names []string
@@ -25,8 +23,8 @@ type HelpOptions struct {
 
 // NewCmdHelp returns the help command, which prints the help of the root or of the named
 // command. A nil `runF` runs `helpRun`.
-func NewCmdHelp(f *cmdutil.Factory, runF func(*HelpOptions) error) *cobra.Command {
-	opts := &HelpOptions{Out: f.Out}
+func NewCmdHelp(f *cmdutil.Factory, runF func(*Options) error) *cobra.Command {
+	opts := &Options{Out: f.Out}
 	cmd := &cobra.Command{
 		Use:   "help [COMMAND]...",
 		Short: "Print this message or the help of the given subcommand(s)",
@@ -47,7 +45,7 @@ func NewCmdHelp(f *cmdutil.Factory, runF func(*HelpOptions) error) *cobra.Comman
 
 // helpRun looks up the command in its first argument and prints that help. No command
 // has children of its own, so a second name is always unrecognized.
-func helpRun(opts *HelpOptions) error {
+func helpRun(opts *Options) error {
 	current := opts.Root
 	for i, name := range opts.Names {
 		next := cmdutil.Subcommand(opts.Root, name)

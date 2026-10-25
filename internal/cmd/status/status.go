@@ -15,16 +15,14 @@ import (
 
 const statusLine = "status is not implemented yet."
 
-// StatusOptions holds what the status command needs.
-//
-//nolint:revive // Every command names its options after itself, as the GitHub CLI does.
-type StatusOptions struct {
+// Options holds what the status command needs.
+type Options struct {
 	Out io.Writer
 }
 
 // NewCmdStatus returns the status command. A nil `runF` runs `statusRun`.
-func NewCmdStatus(f *cmdutil.Factory, runF func(*StatusOptions) error) *cobra.Command {
-	opts := &StatusOptions{Out: f.Out}
+func NewCmdStatus(f *cmdutil.Factory, runF func(*Options) error) *cobra.Command {
+	opts := &Options{Out: f.Out}
 	cmd := &cobra.Command{
 		Use:   "status",
 		Short: "Show the placeholder status",
@@ -40,7 +38,7 @@ func NewCmdStatus(f *cmdutil.Factory, runF func(*StatusOptions) error) *cobra.Co
 	return cmd
 }
 
-func statusRun(opts *StatusOptions) error {
+func statusRun(opts *Options) error {
 	if _, err := fmt.Fprintln(opts.Out, statusLine); err != nil {
 		return &cmdutil.WriteError{Err: err}
 	}

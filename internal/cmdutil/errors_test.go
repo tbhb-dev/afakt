@@ -29,11 +29,6 @@ func newTool() (*cobra.Command, *cobra.Command, *cobra.Command) {
 	return tool, run, about
 }
 
-func parse(cmd *cobra.Command, args ...string) error {
-	//nolint:wrapcheck // The tests assert on the translated error itself.
-	return cmdutil.TranslateFlagError(cmd, cmd.Flags().Parse(args))
-}
-
 func TestTranslateFlagError(t *testing.T) {
 	t.Parallel()
 	cases := []struct {
@@ -89,7 +84,7 @@ func TestTranslateFlagError(t *testing.T) {
 				cmd = tool
 			}
 			var flagErr *cmdutil.FlagError
-			if err := parse(cmd, tc.args...); !errors.As(err, &flagErr) {
+			if err := cmdutil.TranslateFlagError(cmd, cmd.Flags().Parse(tc.args)); !errors.As(err, &flagErr) {
 				t.Fatalf("parse(%q) error = %v, want a FlagError", tc.args, err)
 			}
 			if flagErr.Message != tc.message || flagErr.Flag != tc.flag || flagErr.Cmd != nil {
@@ -133,7 +128,7 @@ func TestActionFlagsEndParsing(t *testing.T) {
 	}
 	for _, tc := range cases {
 		tool, _, _ := newTool()
-		if err := parse(tool, tc.args...); !errors.Is(err, tc.want) {
+		if err := cmdutil.TranslateFlagError(tool, tool.Flags().Parse(tc.args)); !errors.Is(err, tc.want) {
 			t.Errorf("parse(%q) error = %v, want %v", tc.args, err, tc.want)
 		}
 	}
