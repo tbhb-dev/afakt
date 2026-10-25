@@ -1,1 +1,3 @@
 # Paths allowed to contain private identifier patterns, one expression per line.
+# Synthetic networking examples in upstream Go dependencies.
+^vendor/
