@@ -6,8 +6,16 @@ extends:
   - [vacuum:oas, recommended]
   - [vacuum:owasp, all]
 rules:
-  # The API root is `/api/v1/` with its trailing slash.
-  path-keys-no-trailing-slash: "off"
+  # The API root is `/api/v1/` with its trailing slash. This replaces the
+  # recommended rule with the same check on every other path.
+  path-keys-no-trailing-slash:
+    description: Path must not end with a slash
+    severity: warn
+    given: "$.paths[?(@property != '/api/v1/')]~"
+    then:
+      function: pattern
+      functionOptions:
+        notMatch: ".+\\/$"
   # No operation requires authentication.
   owasp-protection-global-safe: "off"
   # Each operation documents exactly the status codes its endpoint returns,
