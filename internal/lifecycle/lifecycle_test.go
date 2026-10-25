@@ -556,6 +556,43 @@ func TestWaitAfterContextEnds(t *testing.T) {
 	})
 }
 
+// TestRequiredFailureWhileStopping checks that Stop reports a required failure that Wait
+// never returned: a fails while Stop waits on its dependent b, after Wait returned nil.
+func TestRequiredFailureWhileStopping(t *testing.T) {
+	t.Parallel()
+	synctest.Test(t, func(t *testing.T) {
+		rec := &lifecycletest.Recorder{}
+		m := newManager()
+		a := lifecycletest.NewFake("a", rec)
+		b := lifecycletest.NewFake("b", rec)
+		stopEntered, stopRelease := make(chan struct{}), make(chan struct{})
+		b.StopFunc = lifecycletest.Block(stopEntered, stopRelease)
+		mustRegister(t, m,
+			lifecycle.Registration{Name: "a", Service: a},
+			lifecycle.Registration{Name: "b", Service: b, DependsOn: []string{"a"}},
+		)
+		if err := m.Start(t.Context()); err != nil {
+			t.Fatalf("Start() error = %v", err)
+		}
+		ctx, cancel := context.WithCancel(t.Context())
+		cancel()
+		if err := m.Wait(ctx); err != nil {
+			t.Fatalf("Wait() error = %v, want nil", err)
+		}
+		stopped := make(chan error)
+		go func() { stopped <- m.Stop(stopCtx(t)) }()
+		<-stopEntered
+		a.Fail(errBoom)
+		synctest.Wait()
+		close(stopRelease)
+		if err := <-stopped; !errors.Is(err, errBoom) || err.Error() != `run "a": boom` {
+			t.Errorf("Stop() error = %v, want run \"a\": boom", err)
+		}
+		wantCalls(t, rec, "a start", "b start", "b stop", "a stop")
+		wantStates(t, m, map[string]lifecycle.State{"a": lifecycle.StateFailed, "b": lifecycle.StateTerminated})
+	})
+}
+
 func TestPanicsBecomeErrors(t *testing.T) {
 	t.Parallel()
 	boom := func(context.Context) error { panic("boom") }

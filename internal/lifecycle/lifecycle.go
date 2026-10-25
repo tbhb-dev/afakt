@@ -131,6 +131,8 @@ type Manager struct {
 	order    []*service
 	failed   chan struct{}
 	failure  error
+	// reported records that Start or Wait returned failure, so Stop doesn't return it again.
+	reported bool
 }
 
 // New returns a manager that logs through logger.
@@ -255,6 +257,7 @@ func (m *Manager) interrupted(ctx context.Context) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	if m.failure != nil {
+		m.reported = true
 		return m.failure
 	}
 	if err := ctx.Err(); err != nil {
@@ -336,16 +339,19 @@ func (m *Manager) Wait(ctx context.Context) error {
 }
 
 // failureErr returns the first failure of a required service, which is set before m.failed
-// closes.
+// closes, and marks it reported.
 func (m *Manager) failureErr() error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
+	m.reported = true
 	return m.failure
 }
 
 // Stop stops the started services in reverse start order. The deadline of the context bounds
 // the whole sequence. Once it passes, Stop gives up waiting and returns ErrShutdownTimeout
-// with the services it couldn't confirm stopped. A second call returns nil at once.
+// with the services it couldn't confirm stopped. The result also includes a failure of a
+// required service that neither Start nor Wait returned, such as one during the stop
+// sequence. A second call returns nil at once.
 func (m *Manager) Stop(ctx context.Context) error {
 	m.mu.Lock()
 	if m.phase == phaseStopping {
@@ -380,6 +386,12 @@ func (m *Manager) Stop(ctx context.Context) error {
 			errs = append(errs, err)
 		}
 	}
+	m.mu.Lock()
+	if m.failure != nil && !m.reported {
+		m.reported = true
+		errs = append(errs, m.failure)
+	}
+	m.mu.Unlock()
 	return errors.Join(errs...)
 }
 
