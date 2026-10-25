@@ -257,7 +257,9 @@ jobs:
 
       - name: Run every Go-only gate without web tools or output
         shell: bash
-        run: mise run check-go-only
+        run: |
+          git config --global --add safe.directory "${GITHUB_WORKSPACE}"
+          mise run check-go-only
 
   # The matrix jobs report as `test (ubuntu-24.04)`, `test (macos-15)` and
   # `web (<task>)`. This job owns the plain name `test`, so the
