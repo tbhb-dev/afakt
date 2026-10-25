@@ -97,6 +97,12 @@ func Execute(ctx context.Context, f *cmdutil.Factory, args []string) int {
 	if args == nil {
 		args = []string{}
 	}
+	// Traversal reads a leading terminator as a flag that takes a value and would dispatch
+	// past it. The root parses the whole command line instead, so every argument after the
+	// terminator counts as positional.
+	if len(args) > 0 && args[0] == "--" {
+		cmd.TraverseChildren = false
+	}
 	cmd.SetArgs(args)
 	failed, err := cmd.ExecuteContextC(ctx)
 	return exitCode(f, failed, err)

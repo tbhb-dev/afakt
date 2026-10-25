@@ -66,7 +66,7 @@ The shared payload pins Go 1.27.3. Use `mise exec -- go version` to inspect it. 
 
 Root configuration includes the shared Go task file and exposes local build and test tasks. Go tool directives declare the analyzer dependencies in the module. `DEVTOOLS_GO_MODULES_MODE=vendor` loads them from the tracked `vendor/` tree. Commit `go.sum` with those generated sources. Run `mise run vendor` to refresh them and `mise run vendor-check` to check for drift.
 
-`.testcoverage.yml` sets the coverage floors: 100% for each file, each package, and the total. The measured total is 100% (174 of 174 statements outside `main.go`). The floors skip `main.go`, whose `os.Exit` glue can't run inside a test process.
+`.testcoverage.yml` sets the coverage floors: 100% for each file, each package, and the total. The measured total is 100% (176 of 176 statements outside `main.go`). The floors skip `main.go`, whose `os.Exit` glue can't run inside a test process.
 
 ## Conventions
 
