@@ -310,6 +310,37 @@ fi
 description = "Check Go formatting"
 run = "golangci-lint fmt --diff ./cmd/... ./internal/..."
 
+# Local workaround for tbhb-dev/devtools#551: the payload's devtools:gitleaks walks every local ref,
+# so one worktree's local commit fails the scan in every other worktree. This copy of the payload
+# task adds only --log-opts=HEAD, which limits the walk to the history reachable from HEAD.
+# Remove it once that issue closes and the payload task scopes the walk itself.
+[tasks."devtools:gitleaks"]
+description = "Scan the Git history reachable from HEAD for committed secrets"
+run = '''
+#!/usr/bin/env bash
+set -eu
+log=$(mktemp)
+trap 'rm -f "$log"' EXIT
+
+status=0
+gitleaks git --verbose --redact --log-opts=HEAD . >"$log" 2>&1 || status=$?
+cat "$log"
+
+if ! grep -qE '[1-9][0-9]* commits scanned' "$log"; then
+    if git rev-parse --verify HEAD >/dev/null 2>&1 &&
+        git log -p --format= HEAD >"$log" &&
+        ! grep -qE '^[+-]' "$log"; then
+        echo "Git history has no content to scan."
+        exit "$status"
+    fi
+    echo "gitleaks walked 0 commits, so this scan proves nothing." >&2
+    # shellcheck disable=SC2312 # pwd only supplies context for an already failed scan
+    echo "Check that the repository resolves from $(pwd)." >&2
+    exit 1
+fi
+exit "$status"
+'''
+
 # Local task until devtools ships an ast-grep gate. The rules live in .ast-grep/rules, each
 # naming its own language, so the scan covers the whole tree except vendored and generated paths.
 [tasks.lint-ast-grep]
