@@ -21,7 +21,7 @@ generated: { by: "claude-code:claude-sonnet-5-5", at: "2026-10-20T05:55:00Z" }
 - `internal/server/`: composes the services of the selected server targets.
 - `internal/lifecycle/`: starts and stops services. `internal/lifecycle/lifecycletest/` has fakes for tests.
 
-A pnpm workspace at the repository root has one lockfile and keeps the configuration that every web package shares. In `apps/dashboard/`, a React and Vite app renders the blank dashboard page, with its unit tests in `src/` and its Playwright tests in `e2e/`. For each web gate, `scripts/check-web-gate.sh` writes broken input into a temporary copy of the workspace and shows that the gate fails.
+A pnpm workspace at the repository root has one dependency lock and keeps the configuration that every web package shares. In `apps/dashboard/`, a React and Vite app renders the blank dashboard page, with its unit tests in `src/` and its Playwright tests in `e2e/`. For each web gate, `scripts/check-web-gate.sh` writes broken input into a temporary copy of the workspace and shows that the gate fails.
 
 `docs/` holds the OKF docs bundle. `scripts/okf-check.py` checks its format and the Markdown frontmatter across the repository.
 
