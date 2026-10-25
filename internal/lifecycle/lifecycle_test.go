@@ -485,13 +485,18 @@ func TestStartStopsOnEarlierFailure(t *testing.T) {
 	synctest.Test(t, func(t *testing.T) {
 		rec := &lifecycletest.Recorder{}
 		m := newManager()
+		// a fails only once b has entered Start, and b returns only once the manager has
+		// recorded that failure, so c never starts.
+		bEntered := make(chan struct{})
 		a := lifecycletest.NewFake("a", rec)
-		a.RunFunc = func(context.Context) error { return errBoom }
+		a.RunFunc = func(context.Context) error {
+			<-bEntered
+			return errBoom
+		}
 		b := lifecycletest.NewFake("b", rec)
 		b.StartFunc = func(context.Context) error {
-			// In the bubble, the sleep ends only when everything else is blocked. By then the
-			// manager has recorded the failure of a, so c never starts.
-			time.Sleep(time.Millisecond)
+			close(bEntered)
+			synctest.Wait()
 			return nil
 		}
 		mustRegister(t, m,
