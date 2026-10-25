@@ -124,6 +124,9 @@ jobs:
           - audit-web
           - check-web-gates
     steps:
+      - name: Force a web failure for the throwaway proof
+        run: exit 1
+
       - name: Harden the runner
         uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
         with:
