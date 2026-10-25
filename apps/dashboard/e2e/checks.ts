@@ -1,9 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, type Page } from "@playwright/test";
 
-// The accessibility scan runs the WCAG 2.2 level A and AA rules.
-const wcagTags = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
-
 export function recordErrors(page: Page): string[] {
   const errors: string[] = [];
   page.on("console", (message) => {
@@ -26,6 +23,6 @@ export function recordRequests(page: Page): string[] {
 }
 
 export async function expectAccessible(page: Page): Promise<void> {
-  const results = await new AxeBuilder({ page }).withTags(wcagTags).analyze();
+  const results = await new AxeBuilder({ page }).analyze();
   expect(results.violations.map((violation) => violation.id)).toStrictEqual([]);
 }

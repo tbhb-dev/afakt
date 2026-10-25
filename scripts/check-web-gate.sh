@@ -14,7 +14,7 @@
 set -euo pipefail
 
 gate=${1:?usage: check-web-gate.sh GATE}
-root=$(git rev-parse --show-toplevel)
+root=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 export NO_COLOR=1 FORCE_COLOR=0
 # pnpm exec would otherwise install into the copy before each run, and the
 # copy's linked node_modules is not a real install.
@@ -218,21 +218,23 @@ e2e-console)
   finding 'forced console error'
   ;;
 e2e-axe)
-  # The page shows an image with no text alternative and logs nothing.
+  # Check missing image text and duplicate main landmarks, a best-practice violation.
   cat >"$app/src/app.tsx" <<-'EOF'
 		import type { JSX } from "react";
 
 		export function App(): JSX.Element {
 		  return (
-		    <main>
-		      <img src="data:," />
-		    </main>
+		    <>
+		      <main><img src="data:," /></main>
+		      <main />
+		    </>
 		  );
 		}
 	EOF
   run "$app" sh -c 'pnpm exec vite build && pnpm exec playwright test'
   finding 'the blank page passes the accessibility scan'
   finding 'image-alt'
+  finding 'landmark-no-duplicate-main'
   ;;
 e2e-browser)
   # The pinned browser version names a build the run does not use.
