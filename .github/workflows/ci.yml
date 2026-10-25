@@ -63,6 +63,11 @@ jobs:
           MISE_LOCKED: "0"
         run: mise run bootstrap
 
+      # Throwaway proof for #71: edit a tracked file after bootstrap so the
+      # next check fails and names it.
+      - name: Edit a tracked file
+        run: echo "AC4 proof" >> README.md
+
       - name: Check that bootstrap left the tree clean
         run: |
           changes="$(git status --porcelain)"
