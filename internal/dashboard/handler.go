@@ -63,7 +63,7 @@ func newHandler(files fs.ReadFileFS, index []byte) http.Handler {
 		if name != "index.html" && hashed.MatchString(path.Base(name)) {
 			w.Header().Set("Cache-Control", "public, max-age=31536000, immutable")
 		}
-		w.Header().Set("Etag", fmt.Sprintf(`"%x"`, sha256.Sum256(body)))
+		w.Header().Set("ETag", fmt.Sprintf(`"%x"`, sha256.Sum256(body)))
 		http.ServeContent(w, r, name, time.Time{}, bytes.NewReader(body))
 	}))
 }

@@ -47,10 +47,14 @@ Options:
 Usage: afakt server [OPTIONS] --target <TARGET>
 
 Options:
-      --target <TARGET>              Comma-separated targets: api, webhook, dashboard, worker, or all; only api, webhook and dashboard can run, and webhook has no receivers yet, only health endpoints
-      --listen <ADDR>                Host and port the HTTP server listens on [default: 127.0.0.1:8080]
-      --shutdown-timeout <DURATION>  Time limit for the whole shutdown, as a Go duration [default: 30s]
-  -h, --help                         Print help
+      --target <TARGET>                 Comma-separated targets: api, webhook, dashboard, worker, or all; api, webhook, dashboard and worker can run, and webhook has no receivers yet, only health endpoints
+      --listen <ADDR>                   Host and port the HTTP server listens on [default: 127.0.0.1:8080]
+      --shutdown-timeout <DURATION>     Time limit for the whole shutdown, as a Go duration [default: 30s]
+      --temporal-mode <MODE>            How the worker reaches Temporal: embedded runs a server in the process, external connects to one
+      --temporal-address <ADDR>         Host and port of the Temporal frontend, in external mode
+      --temporal-namespace <NAMESPACE>  Temporal namespace the worker uses [default: default]
+      --temporal-embedded-dir <DIR>     Directory for the data of the embedded server; without it, the data stays in memory
+  -h, --help                            Print help
 `
 
 	wantHelpHelp = helpAbout + `

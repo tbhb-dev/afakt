@@ -11,13 +11,16 @@ import (
 	"log/slog"
 	"net"
 	"net/http"
+	"slices"
 	"strings"
+	"sync"
 	"syscall"
 	"testing"
 	"time"
 
 	"github.com/tbhb-dev/afakt/internal/lifecycle"
 	"github.com/tbhb-dev/afakt/internal/lifecycle/lifecycletest"
+	"github.com/tbhb-dev/afakt/internal/temporal"
 )
 
 const (
@@ -35,31 +38,57 @@ func testConfig() Config {
 	return Config{Targets: []string{TargetAPI}, Listen: "127.0.0.1:0", ShutdownTimeout: testTimeout}
 }
 
-// addressHandler drops log records, except that it reports the address of the listening
-// record.
-type addressHandler struct {
+// recordHandler drops log records, except that it reports the address of the listening
+// record and records each service transition as the service name, a space and the state.
+type recordHandler struct {
 	addresses chan<- string
+	events    *events
 }
 
-func (addressHandler) Enabled(context.Context, slog.Level) bool { return true }
-func (h addressHandler) WithAttrs([]slog.Attr) slog.Handler     { return h }
-func (h addressHandler) WithGroup(string) slog.Handler          { return h }
+func (recordHandler) Enabled(context.Context, slog.Level) bool { return true }
+func (h recordHandler) WithAttrs([]slog.Attr) slog.Handler     { return h }
+func (h recordHandler) WithGroup(string) slog.Handler          { return h }
 
-func (h addressHandler) Handle(_ context.Context, record slog.Record) error {
-	if record.Message == "listening" {
-		record.Attrs(func(attr slog.Attr) bool {
-			if attr.Key == "address" {
-				h.addresses <- attr.Value.String()
-			}
-			return true
-		})
-	}
+func (h recordHandler) Handle(_ context.Context, record slog.Record) error {
+	record.Attrs(func(attr slog.Attr) bool {
+		switch {
+		case record.Message == "listening" && attr.Key == "address":
+			h.addresses <- attr.Value.String()
+		case strings.HasPrefix(record.Message, "service ") && attr.Key == "service":
+			h.events.add(attr.Value.String() + " " + strings.TrimPrefix(record.Message, "service "))
+		}
+		return true
+	})
 	return nil
 }
 
-// probe is a required service that starts after the HTTP server and every target and stops
-// before them, because the hooks register it last. Its start closes up, at which point the
-// HTTP server serves.
+// events is the list of service transitions a server logged.
+type events struct {
+	mu   sync.Mutex
+	list []string
+}
+
+func (e *events) add(event string) {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	e.list = append(e.list, event)
+}
+
+// matching returns the recorded transitions that end in state, in order.
+func (e *events) matching(state string) []string {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	var names []string
+	for _, event := range e.list {
+		if name, ok := strings.CutSuffix(event, " "+state); ok {
+			names = append(names, name)
+		}
+	}
+	return names
+}
+
+// probe is a required service that starts after the service it depends on and stops before
+// it. Its start closes up.
 type probe struct {
 	fake *lifecycletest.Fake
 	up   chan struct{}
@@ -77,16 +106,23 @@ func newProbe() *probe {
 
 // reg returns the registration that makes the probe depend on the HTTP server.
 func (p *probe) reg() lifecycle.Registration {
-	return lifecycle.Registration{Name: "probe", Service: p.fake, DependsOn: []string{httpService}}
+	return p.regOn("http")
+}
+
+// regOn returns the registration that makes the probe depend on service.
+func (p *probe) regOn(service string) lifecycle.Registration {
+	return lifecycle.Registration{Name: "probe", Service: p.fake, DependsOn: []string{service}}
 }
 
 // harness is a server that run serves in the background. cancel ends it like a signal, done
-// receives what run returned, and address caches the first address the listener logged.
+// receives what run returned, address caches the first address the listener logged, and
+// events records the service transitions.
 type harness struct {
 	cancel    context.CancelFunc
 	done      chan error
 	addresses chan string
 	address   string
+	events    *events
 }
 
 // startServer starts run in the background and returns at once. The test's
@@ -96,13 +132,12 @@ func startServer(t *testing.T, cfg Config, h hooks) *harness {
 	return startServerContext(t.Context(), t, cfg, h)
 }
 
-// startServerContext is `startServer` under parent, whose end stops the server as a signal
-// does.
+// startServerContext is startServer under parent, whose end stops the server as a signal does.
 func startServerContext(parent context.Context, t *testing.T, cfg Config, h hooks) *harness {
 	t.Helper()
 	ctx, cancel := context.WithCancel(parent)
-	s := &harness{cancel: cancel, done: make(chan error, 1), addresses: make(chan string, 1)}
-	logger := slog.New(addressHandler{addresses: s.addresses})
+	s := &harness{cancel: cancel, done: make(chan error, 1), addresses: make(chan string, 1), events: &events{}}
+	logger := slog.New(recordHandler{addresses: s.addresses, events: s.events})
 	go func() { s.done <- run(ctx, cfg, logger, h) }()
 	t.Cleanup(cancel)
 	return s
@@ -198,8 +233,8 @@ func TestAPIRoutes(t *testing.T) {
 	s := startServer(t, testConfig(), hooks{services: []lifecycle.Registration{p.reg()}})
 	receive(t, p.up, "the probe to start")
 	wantAPIRoot(t, s.addr(t))
-	// The API serves its root and the health endpoints at the server root. Every other path
-	// gets 404, including the health paths under the API prefix.
+	wantHealth(t, s.addr(t), true)
+	// The API serves its root and nothing else beside the health routes.
 	for _, path := range []string{
 		"/", "/api", "/api/v1", "/api/v2/",
 		"/api/v1/livez", "/api/v1/readyz", "/api/v1/healthz", "/livez/", "/readyz/", "/healthz/",
@@ -219,10 +254,25 @@ func TestAPIRoutes(t *testing.T) {
 	if err := s.wait(t); err != nil {
 		t.Fatalf("run() error = %v", err)
 	}
+	// The API target alone doesn't start a Temporal service.
+	if got, want := s.events.matching(
+		"starting",
+	), []string{
+		"http-listener",
+		"http",
+		"api",
+		"probe",
+	}; !slices.Equal(
+		got,
+		want,
+	) {
+		t.Errorf("started %q, want %q", got, want)
+	}
 }
 
-// TestAPIServesWhileStopping holds the probe in Stop. The API stops after the probe, so its
-// root still answers until the probe has stopped.
+// TestAPIServesWhileStopping holds the probe in Stop. The HTTP server stops after the probe,
+// so the API root and liveness still answer until the probe has stopped, and readiness fails
+// from the start of the shutdown.
 func TestAPIServesWhileStopping(t *testing.T) {
 	t.Parallel()
 	p := newProbe()
@@ -233,6 +283,7 @@ func TestAPIServesWhileStopping(t *testing.T) {
 	s.cancel()
 	receive(t, stopEntered, "the probe to stop")
 	wantAPIRoot(t, s.addr(t))
+	wantHealth(t, s.addr(t), false)
 	close(stopRelease)
 	if err := s.wait(t); err != nil {
 		t.Fatalf("run() error = %v", err)
@@ -427,18 +478,23 @@ func TestRunRejectsComposition(t *testing.T) {
 		targets []string
 		want    error
 	}{
-		{name: "unavailable target", targets: []string{"worker"}, want: ErrNotComposable},
+		{name: "unknown target", targets: []string{"unknown"}, want: ErrNotComposable},
 		{name: "repeated target", targets: []string{TargetAPI, TargetAPI}, want: lifecycle.ErrDuplicateService},
 		{
 			name:    "repeated webhook",
 			targets: []string{TargetWebhook, TargetAPI, TargetWebhook},
 			want:    lifecycle.ErrDuplicateService,
 		},
+		{name: "all", targets: []string{TargetWorker, "all"}, want: ErrNotComposable},
+		{name: "repeated worker", targets: []string{TargetWorker, TargetWorker}, want: lifecycle.ErrDuplicateService},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
-			cfg := Config{Targets: tc.targets, Listen: "127.0.0.1:0", ShutdownTimeout: time.Second}
+			cfg := Config{
+				Targets: tc.targets, Listen: "127.0.0.1:0", ShutdownTimeout: time.Second,
+				Temporal: temporal.Config{Mode: temporal.ModeEmbedded, Namespace: temporal.DefaultNamespace},
+			}
 			if err := Run(t.Context(), cfg, slog.New(slog.DiscardHandler)); !errors.Is(err, tc.want) {
 				t.Errorf("Run() error = %v, want %v", err, tc.want)
 			}

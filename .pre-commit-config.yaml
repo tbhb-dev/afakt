@@ -61,6 +61,8 @@ repos:
       - id: leaks-commit-msg
       - id: leaks-pre-push
       - id: gomodscan
+        entry: mise run gomodscan
+        files: ^(go\.(mod|sum)|vendor/|\.gomodscan-accepted\.json$|scripts/gomodscan|mise\.toml$)
 
   - repo: local
     hooks:

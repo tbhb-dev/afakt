@@ -13,6 +13,7 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
+	"slices"
 	"strings"
 	"sync"
 	"syscall"
@@ -326,6 +327,23 @@ func TestServerStopsOnSignal(t *testing.T) {
 			targets: []string{"api", "dashboard"},
 			args:    []string{"--target=api,dashboard", "--listen=127.0.0.1:0", "--shutdown-timeout=10s"},
 		},
+		{
+			name:    "SIGTERM with an embedded worker",
+			sig:     syscall.SIGTERM,
+			path:    "/readyz",
+			targets: []string{"temporal-client", "temporal-server"},
+			args:    []string{"--target=worker", "--temporal-mode=embedded", "--listen=127.0.0.1:0"},
+		},
+		{
+			name:    "SIGINT with an embedded worker and the API",
+			sig:     syscall.SIGINT,
+			path:    "/readyz",
+			targets: []string{"api", "temporal-client", "temporal-server"},
+			args: []string{
+				"--target=worker,api", "--temporal-mode=embedded", "--listen=127.0.0.1:0",
+				"--temporal-embedded-dir=" + t.TempDir(),
+			},
+		},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -334,8 +352,12 @@ func TestServerStopsOnSignal(t *testing.T) {
 			if got.exitCode != 0 {
 				t.Errorf("exit code = %d (%s), want 0; stderr:\n%s", got.exitCode, got.state, got.stderr)
 			}
-			if elapsed >= timeout {
-				t.Errorf("the child exited %s after the signal, want less than %s", elapsed, timeout)
+			bound := timeout
+			if slices.Contains(tc.args, "--temporal-mode=embedded") {
+				bound = 30 * time.Second // The worker cases use the default shutdown timeout.
+			}
+			if elapsed >= bound {
+				t.Errorf("the child exited %s after the signal, want less than %s", elapsed, bound)
 			}
 			wantTerminated(t, got.stderr, tc.targets)
 		})
@@ -358,6 +380,12 @@ func wantTerminated(t *testing.T, stderr string, targets []string) {
 	for _, want := range wants {
 		if !strings.Contains(stderr, want) {
 			t.Errorf("stderr lacks %q:\n%s", want, stderr)
+		}
+	}
+	if slices.Contains(targets, "temporal-client") {
+		want := append(slices.Clone(targets), "http", "http-listener")
+		if got := stopped(stderr); !slices.Equal(got, want) {
+			t.Errorf("services stopped in order %q, want %q; stderr:\n%s", got, want, stderr)
 		}
 	}
 }
@@ -407,4 +435,35 @@ func TestServerShutdownTimeoutExit(t *testing.T) {
 	if !strings.Contains(got.stderr, want) {
 		t.Errorf("stderr lacks %q:\n%s", want, got.stderr)
 	}
+}
+
+// TestServerShutdownTimeout checks that the process reports an expired shutdown deadline
+// with a runtime failure, even though its embedded server may still be stopping.
+func TestServerShutdownTimeout(t *testing.T) {
+	t.Parallel()
+	skipUnlessUnix(t)
+	for _, sig := range []syscall.Signal{syscall.SIGINT, syscall.SIGTERM} {
+		t.Run(sig.String(), func(t *testing.T) {
+			t.Parallel()
+			got, _ := runServerChild(t, sig, "/readyz", nil,
+				"--target=worker", "--temporal-mode=embedded", "--listen=127.0.0.1:0", "--shutdown-timeout=1ns")
+			if got.exitCode != 1 {
+				t.Errorf("exit code = %d (%s), want 1; stderr:\n%s", got.exitCode, got.state, got.stderr)
+			}
+			if !strings.Contains(got.stderr, "Error: shutdown deadline exceeded") {
+				t.Errorf("stderr lacks the timeout error:\n%s", got.stderr)
+			}
+		})
+	}
+}
+
+// stopped returns the services whose final log line says they stopped, in log order.
+func stopped(logs string) []string {
+	var names []string
+	for line := range strings.Lines(logs) {
+		if _, rest, found := strings.Cut(line, `msg="service terminated" service=`); found {
+			names = append(names, strings.TrimSpace(rest))
+		}
+	}
+	return names
 }

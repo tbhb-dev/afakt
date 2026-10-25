@@ -133,10 +133,10 @@ func TestSecurityAndRevalidation(t *testing.T) {
 	}
 	w := get(t, h, "/dashboard/")
 	req := httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/dashboard/route", http.NoBody)
-	req.Header.Set("If-None-Match", w.Header().Get("Etag"))
+	req.Header.Set("If-None-Match", w.Header().Get("ETag"))
 	conditional := httptest.NewRecorder()
 	h.ServeHTTP(conditional, req)
-	if conditional.Code != http.StatusNotModified || w.Header().Get("Etag") == "" {
+	if conditional.Code != http.StatusNotModified || w.Header().Get("ETag") == "" {
 		t.Errorf("entry revalidation = %d, headers %q", conditional.Code, w.Header())
 	}
 	post := httptest.NewRecorder()

@@ -24,3 +24,6 @@ Temporal
 Dasel
 Vite
 Vitest
+[Nn]amespaces?
+[Ll]oopback
+[Ll]iveness

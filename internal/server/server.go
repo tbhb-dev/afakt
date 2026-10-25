@@ -13,11 +13,14 @@ import (
 	"net"
 	"net/http"
 	"path"
+	"slices"
 	"strings"
 	"time"
 
 	"github.com/tbhb-dev/afakt/internal/dashboard"
 	"github.com/tbhb-dev/afakt/internal/lifecycle"
+	"github.com/tbhb-dev/afakt/internal/temporal"
+	"github.com/tbhb-dev/afakt/internal/temporal/embedded"
 )
 
 // readHeaderTimeout bounds how long a client may take to send request headers.
@@ -33,11 +36,13 @@ const (
 // ErrNotComposable reports a target that Run has no services for.
 var ErrNotComposable = errors.New("no services for target")
 
-// Config is a checked server configuration. Targets comes from ParseTargets.
+// Config is a checked server configuration. Targets comes from ParseTargets. Temporal applies
+// only to the worker target.
 type Config struct {
 	Targets         []string
 	Listen          string
 	ShutdownTimeout time.Duration
+	Temporal        temporal.Config
 }
 
 // hooks adds services and routes to the composition. Tests use it to hold a service in a
@@ -62,7 +67,7 @@ func Run(ctx context.Context, cfg Config, logger *slog.Logger) error {
 // context starts the shutdown and the services still need time to stop.
 func run(ctx context.Context, cfg Config, logger *slog.Logger, h hooks) error {
 	manager := lifecycle.New(logger)
-	if err := compose(manager, cfg, logger, newHealth(ctx, manager), h); err != nil {
+	if err := compose(ctx, manager, cfg, logger, h); err != nil {
 		return err
 	}
 	err := manager.Start(ctx)
@@ -76,33 +81,44 @@ func run(ctx context.Context, cfg Config, logger *slog.Logger, h hooks) error {
 	return errors.Join(err, manager.Stop(stopCtx))
 }
 
-// compose registers the services of the selected targets with manager. Every target serves
-// its routes through one listener and one HTTP server. The health checks cover the whole
-// composition. A target without services returns ErrNotComposable.
-func compose(manager *lifecycle.Manager, cfg Config, logger *slog.Logger, checks health, h hooks) error {
+// compose registers the services of the selected targets with manager. Every target shares
+// one listener and one HTTP server, which serves the health routes, and the HTTP server
+// starts first so that readiness answers while the other services start. A target without
+// services returns ErrNotComposable.
+func compose(ctx context.Context, manager *lifecycle.Manager, cfg Config, logger *slog.Logger, h hooks) error {
 	ln := &listener{address: cfg.Listen, logger: logger}
-	srv := &httpServer{listener: ln, routes: []func(*http.ServeMux){checks.probeRoutes}}
+	web := &httpServer{listener: ln, routes: []func(*http.ServeMux){nil}}
+	var checks []func(context.Context) error
 	regs := []lifecycle.Registration{
 		{Name: listenerService, Service: ln},
-		{Name: httpService, Service: srv, DependsOn: []string{listenerService}},
+		{Name: httpService, Service: web, DependsOn: []string{listenerService}},
 	}
 	for _, target := range cfg.Targets {
 		switch target {
 		case TargetAPI:
-			srv.routes[0] = checks.routes
-			srv.routes = append(srv.routes, apiRoutes)
+			web.routes = append(web.routes, apiRoutes)
 		case TargetWebhook:
-			// The webhook target has no receivers, so it serves only the health routes.
+			// The webhook target has no receivers yet.
 		case TargetDashboard:
-			srv.dashboard = true
-			srv.routes = append(srv.routes, dashboardRoutes)
+			web.dashboard = true
+			web.routes = append(web.routes, dashboardRoutes)
+		case TargetWorker:
+			services, check := workerServices(cfg.Temporal, logger)
+			regs = append(regs, services...)
+			checks = append(checks, check)
+			continue
 		default:
 			return fmt.Errorf("%w '%s'", ErrNotComposable, target)
 		}
 		regs = append(regs, lifecycle.Registration{Name: target, Service: idle{}, DependsOn: []string{httpService}})
 	}
 	if h.routes != nil {
-		srv.routes = append(srv.routes, h.routes)
+		web.routes = append(web.routes, h.routes)
+	}
+	probes := newHealth(ctx, manager, checks...)
+	web.routes[0] = probes.probeRoutes
+	if slices.Contains(cfg.Targets, TargetAPI) || slices.Contains(cfg.Targets, TargetWorker) {
+		web.routes[0] = probes.routes
 	}
 	// Services from the hooks come last, after the services of every target.
 	for _, reg := range append(regs, h.services...) {
@@ -120,9 +136,29 @@ func dashboardRoutes(mux *http.ServeMux) {
 	mux.Handle("/dashboard/", handler)
 }
 
-// listener binds the TCP address of the HTTP server. On shutdown, the HTTP server closes
-// the listener. Stop closes it too, for the case where the HTTP server never served. It
-// has no work of its own while it runs, so it takes Run from idle.
+// workerServices returns the Temporal services of the worker target and adds the client's
+// check to readiness. In embedded mode the client depends on the embedded server, so the
+// server starts first and stops last, and the client connects to the address the server
+// bound.
+func workerServices(cfg temporal.Config, logger *slog.Logger) ([]lifecycle.Registration, func(context.Context) error) {
+	var regs []lifecycle.Registration
+	var dependsOn []string
+	address := func() string { return cfg.Address }
+	if cfg.Mode == temporal.ModeEmbedded {
+		server := embedded.New(cfg.EmbeddedDir, cfg.Namespace, logger)
+		regs = append(regs, lifecycle.Registration{Name: "temporal-server", Service: server})
+		dependsOn = []string{"temporal-server"}
+		address = server.Address
+	}
+	client := temporal.NewClient(address, cfg.Namespace, logger)
+	return append(
+		regs,
+		lifecycle.Registration{Name: "temporal-client", Service: client, DependsOn: dependsOn},
+	), client.Check
+}
+
+// listener binds the TCP address of the HTTP server. On shutdown, the HTTP server closes the
+// listener. Stop closes it too, for the case where the HTTP server never served.
 type listener struct {
 	idle
 

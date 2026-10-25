@@ -135,6 +135,8 @@ run = [
   "mise run devtools:lint-workflows",
   "mise run devtools:lint-shell",
   "mise run devtools:lint-shell-fmt",
+  "mise run test-gomodscan",
+  "mise run gomodscan",
   "bash scripts/owner-paths-check.sh",
   "mise run lint-skills",
   "mise run devtools:lint-curl",
@@ -284,6 +286,20 @@ run = "mise run devtools:mutate-go"
 [tasks.vendor]
 description = "Run devtools:vendor"
 run = "mise run devtools:vendor"
+
+# Interim exact-match waivers; remove when tbhb-dev/devtools#732 ships.
+[tasks.gomodscan]
+description = "Scan modules with exact accepted findings and reject stale entries"
+run = "bash scripts/gomodscan.sh text"
+
+[tasks.gomodscan-sarif]
+description = "Scan modules with exact accepted findings and retain SARIF output"
+usage = 'arg "<file>"'
+run = 'bash scripts/gomodscan.sh sarif "$usage_file"'
+
+[tasks.test-gomodscan]
+description = "Test the module scanner wrapper in temporary repositories"
+run = "bats scripts/gomodscan.bats"
 
 # Local workaround for tbhb-dev/devtools#289: detect untracked vendor files.
 # Capture them before regeneration too, since go mod vendor removes stray files.

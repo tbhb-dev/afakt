@@ -20,6 +20,7 @@ import (
 	servercmd "github.com/tbhb-dev/afakt/internal/cmd/server"
 	"github.com/tbhb-dev/afakt/internal/cmdutil"
 	"github.com/tbhb-dev/afakt/internal/server"
+	"github.com/tbhb-dev/afakt/internal/temporal"
 )
 
 const (
@@ -67,6 +68,7 @@ func TestNewCmdServerAccepts(t *testing.T) {
 	api := []string{server.TargetAPI}
 	webhook := []string{server.TargetWebhook}
 	combined := []string{server.TargetAPI, server.TargetWebhook}
+	worker := []string{server.TargetWorker}
 	cases := []struct {
 		name string
 		args []string
@@ -149,6 +151,36 @@ func TestNewCmdServerAccepts(t *testing.T) {
 				ShutdownTimeout: 30 * time.Second,
 			},
 		},
+		{
+			name: "embedded worker",
+			args: []string{"--target=worker", "--temporal-mode=embedded"},
+			want: server.Config{
+				Targets: worker, Listen: "127.0.0.1:8080", ShutdownTimeout: 30 * time.Second,
+				Temporal: temporal.Config{Mode: temporal.ModeEmbedded, Namespace: temporal.DefaultNamespace},
+			},
+		},
+		{
+			name: "embedded worker with a directory and the API",
+			args: []string{
+				"--target", "worker,api", "--temporal-mode", "embedded", "--temporal-embedded-dir", "data",
+				"--temporal-namespace", "orders",
+			},
+			want: server.Config{
+				Targets: []string{server.TargetWorker, server.TargetAPI}, Listen: "127.0.0.1:8080",
+				ShutdownTimeout: 30 * time.Second,
+				Temporal:        temporal.Config{Mode: temporal.ModeEmbedded, Namespace: "orders", EmbeddedDir: "data"},
+			},
+		},
+		{
+			name: "external worker",
+			args: []string{"--target=worker", "--temporal-mode=external", "--temporal-address=temporal:7233"},
+			want: server.Config{
+				Targets: worker, Listen: "127.0.0.1:8080", ShutdownTimeout: 30 * time.Second,
+				Temporal: temporal.Config{
+					Mode: temporal.ModeExternal, Address: "temporal:7233", Namespace: temporal.DefaultNamespace,
+				},
+			},
+		},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -159,7 +191,7 @@ func TestNewCmdServerAccepts(t *testing.T) {
 			}
 			got := opts.Config
 			if !slices.Equal(got.Targets, tc.want.Targets) || got.Listen != tc.want.Listen ||
-				got.ShutdownTimeout != tc.want.ShutdownTimeout {
+				got.ShutdownTimeout != tc.want.ShutdownTimeout || got.Temporal != tc.want.Temporal {
 				t.Errorf("config = %+v, want %+v", got, tc.want)
 			}
 			if opts.ErrOut != io.Discard {
@@ -182,7 +214,7 @@ func TestServerRejects(t *testing.T) {
 	unavailableIn := func(value, name string) string {
 		return target(
 			value,
-			"target is not available yet: '"+name+"'; only 'api', 'webhook' and 'dashboard' can run in this build",
+			"target is not available yet: '"+name+"'; only 'api', 'webhook', 'dashboard' and 'worker' can run in this build",
 		)
 	}
 	unavailable := func(name string) string { return unavailableIn(name, name) }
@@ -200,6 +232,20 @@ func TestServerRejects(t *testing.T) {
 	missingValue := func(flag string) string {
 		return clapError("a value is required for '"+flag+"' but none was supplied", serverUsageLine)
 	}
+	missing := func(flag string) string {
+		return clapError("the following required arguments were not provided:\n  "+flag, serverUsageLine)
+	}
+	mode := func(value string) string {
+		return invalid(value, "--temporal-mode <MODE>", "expected embedded or external")
+	}
+	address := func(value, reason string) string { return invalid(value, "--temporal-address <ADDR>", reason) }
+	dir := func(value, reason string) string { return invalid(value, "--temporal-embedded-dir <DIR>", reason) }
+	const (
+		temporalAddressForm = "expected HOST:PORT of the Temporal frontend, such as 127.0.0.1:7233"
+		temporalAddressSet  = "only external mode connects to an address; embedded mode runs its own server, " +
+			"so leave this flag out"
+		noWorker = "only the worker target uses Temporal; add worker to --target or leave this flag out"
+	)
 	cases := []struct {
 		name   string
 		args   []string
@@ -325,9 +371,96 @@ func TestServerRejects(t *testing.T) {
 			args:   []string{"--target=dashboard", "--shutdown-timeout=later"},
 			stderr: timeout("later", durationForm),
 		},
-		{name: "worker", args: []string{"--target=worker"}, stderr: unavailable("worker")},
 		{name: "all", args: []string{"--target=all"}, stderr: unavailable("all")},
 		{name: "api and all", args: []string{"--target=api,all"}, stderr: unavailableIn("api,all", "all")},
+		{
+			name:   "worker and all",
+			args:   []string{"--target=worker,all", "--temporal-mode=embedded"},
+			stderr: unavailableIn("worker,all", "all"),
+		},
+		{name: "worker without mode", args: []string{"--target=worker"}, stderr: missing("--temporal-mode <MODE>")},
+		{
+			name:   "worker and API without mode",
+			args:   []string{"--target=api,worker", "--temporal-embedded-dir=data"},
+			stderr: missing("--temporal-mode <MODE>"),
+		},
+		{
+			name:   "unknown mode",
+			args:   []string{"--target=worker", "--temporal-mode=remote"},
+			stderr: mode("remote"),
+		},
+		{name: "empty mode", args: []string{"--target=worker", "--temporal-mode="}, stderr: mode("")},
+		{
+			name:   "mode in capitals",
+			args:   []string{"--target=worker", "--temporal-mode=Embedded"},
+			stderr: mode("Embedded"),
+		},
+		{
+			name:   "external without address",
+			args:   []string{"--target=worker", "--temporal-mode=external"},
+			stderr: missing("--temporal-address <ADDR>"),
+		},
+		{
+			name:   "external with a malformed address",
+			args:   []string{"--target=worker", "--temporal-mode=external", "--temporal-address=temporal"},
+			stderr: address("temporal", temporalAddressForm),
+		},
+		{
+			name:   "external with an empty address",
+			args:   []string{"--target=worker", "--temporal-mode=external", "--temporal-address="},
+			stderr: address("", temporalAddressForm),
+		},
+		{
+			name: "external with a directory",
+			args: []string{
+				"--target=worker", "--temporal-mode=external", "--temporal-address=127.0.0.1:7233",
+				"--temporal-embedded-dir=data",
+			},
+			stderr: dir("data", "only embedded mode keeps data in a directory; external mode stores nothing, "+
+				"so leave this flag out"),
+		},
+		{
+			name:   "embedded with an address",
+			args:   []string{"--target=worker", "--temporal-mode=embedded", "--temporal-address=127.0.0.1:7233"},
+			stderr: address("127.0.0.1:7233", temporalAddressSet),
+		},
+		{
+			name:   "embedded with an empty directory",
+			args:   []string{"--target=worker", "--temporal-mode=embedded", "--temporal-embedded-dir="},
+			stderr: dir("", "the directory is empty; leave the flag out to keep the data in memory"),
+		},
+		{
+			name:   "empty namespace",
+			args:   []string{"--target=worker", "--temporal-mode=embedded", "--temporal-namespace="},
+			stderr: invalid("", "--temporal-namespace <NAMESPACE>", "the namespace must not be empty"),
+		},
+		{
+			name:   "mode without worker",
+			args:   []string{"--target=api", "--temporal-mode=embedded"},
+			stderr: invalid("embedded", "--temporal-mode <MODE>", noWorker),
+		},
+		{
+			name:   "address without worker",
+			args:   []string{"--target=api", "--temporal-address=127.0.0.1:7233"},
+			stderr: address("127.0.0.1:7233", noWorker),
+		},
+		{
+			name:   "namespace without worker",
+			args:   []string{"--target=api", "--temporal-namespace=default"},
+			stderr: invalid("default", "--temporal-namespace <NAMESPACE>", noWorker),
+		},
+		{
+			name:   "directory without worker",
+			args:   []string{"--target=api", "--temporal-embedded-dir=data"},
+			stderr: dir("data", noWorker),
+		},
+		{
+			name: "repeated mode",
+			args: []string{"--temporal-mode=embedded", "--target=worker", "--temporal-mode=external"},
+			stderr: clapError(
+				"the argument '--temporal-mode <MODE>' cannot be used multiple times", serverUsageLine,
+			),
+		},
 		{
 			name:   "no port",
 			args:   []string{"--target=api", "--listen=127.0.0.1"},

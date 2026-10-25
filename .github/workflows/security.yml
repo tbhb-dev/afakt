@@ -12,9 +12,10 @@
 # Code Scanning baseline that pull-request diffs compare against -- plus a
 # daily cron that catches rules added to gitleaks, and advisories published
 # against already-merged dependencies, after the pull request that added
-# them. The SARIF jobs surface findings in the Security tab rather than
-# failing the run, so a warning-level deprecation does not gate a pull
-# request. The blocking gates are gitleaks here and `vuln` in `ci.yml`.
+# them. The module scan rejects findings outside the repository's exact accepted
+# entries, stale entries, and incomplete scans while retaining SARIF findings
+# in the Security tab. The vulnerability SARIF job reports findings there;
+# the blocking reachable-vulnerability gate is `vuln` in `ci.yml`.
 #
 # The gitleaks gate is the shared `devtools:gitleaks` task, which pins the
 # binary through the vendored payload and asserts the walk reached a commit
@@ -144,9 +145,10 @@ jobs:
       - name: Run gomodscan (SARIF)
         env:
           MISE_TASK_RUN_AUTO_INSTALL: "0"
-        run: mise run devtools:gomodscan-sarif gomodscan.sarif
+        run: mise run gomodscan-sarif gomodscan.sarif
 
       - name: Upload gomodscan SARIF
+        if: always()
         uses: github/codeql-action/upload-sarif@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4.39.0
         with:
           sarif_file: gomodscan.sarif
