@@ -340,6 +340,81 @@ func TestStatesWhileStartingAndStopping(t *testing.T) {
 	})
 }
 
+// TestReady checks that the manager is ready only between a finished start and the stop,
+// and that a failed optional service doesn't change that.
+func TestReady(t *testing.T) {
+	t.Parallel()
+	synctest.Test(t, func(t *testing.T) {
+		rec := &lifecycletest.Recorder{}
+		m := newManager()
+		opt := lifecycletest.NewFake("opt", rec)
+		opt.StartFunc = func(context.Context) error { return errBoom }
+		slow := lifecycletest.NewFake("slow", rec)
+		startEntered, startRelease := make(chan struct{}), make(chan struct{})
+		slow.StartFunc = lifecycletest.Block(startEntered, startRelease)
+		stopEntered, stopRelease := make(chan struct{}), make(chan struct{})
+		slow.StopFunc = lifecycletest.Block(stopEntered, stopRelease)
+		mustRegister(t, m,
+			lifecycle.Registration{Name: "opt", Service: opt, Optional: true},
+			lifecycle.Registration{Name: "a", Service: lifecycletest.NewFake("a", rec)},
+			lifecycle.Registration{Name: "slow", Service: slow, DependsOn: []string{"a"}},
+		)
+		if m.Ready() {
+			t.Error("Ready() before Start = true, want false")
+		}
+		started := make(chan error)
+		go func() { started <- m.Start(t.Context()) }()
+		<-startEntered
+		if m.Ready() {
+			t.Error("Ready() while slow starts = true, want false")
+		}
+		close(startRelease)
+		if err := <-started; err != nil {
+			t.Fatalf("Start() error = %v", err)
+		}
+		if !m.Ready() {
+			t.Error("Ready() after Start with a failed optional service = false, want true")
+		}
+		stopped := make(chan error)
+		go func() { stopped <- m.Stop(stopCtx(t)) }()
+		<-stopEntered
+		// a is still running, but the stop sequence has begun.
+		if m.Ready() {
+			t.Error("Ready() while stopping = true, want false")
+		}
+		close(stopRelease)
+		if err := <-stopped; err != nil {
+			t.Fatalf("Stop() error = %v", err)
+		}
+		if m.Ready() {
+			t.Error("Ready() after Stop = true, want false")
+		}
+	})
+}
+
+func TestReadyAfterRequiredFailure(t *testing.T) {
+	t.Parallel()
+	synctest.Test(t, func(t *testing.T) {
+		m := newManager()
+		a := lifecycletest.NewFake("a", &lifecycletest.Recorder{})
+		mustRegister(t, m, lifecycle.Registration{Name: "a", Service: a})
+		if err := m.Start(t.Context()); err != nil {
+			t.Fatalf("Start() error = %v", err)
+		}
+		a.Fail(errBoom)
+		if err := m.Wait(t.Context()); !errors.Is(err, errBoom) {
+			t.Errorf("Wait() error = %v, want %v", err, errBoom)
+		}
+		// The failure alone makes the manager unready, before any stop begins.
+		if m.Ready() {
+			t.Error("Ready() after a required failure = true, want false")
+		}
+		if err := m.Stop(stopCtx(t)); err != nil {
+			t.Fatalf("Stop() error = %v", err)
+		}
+	})
+}
+
 // TestRequiredStartFailure checks that the shutdown after a failed start stops the started
 // services in reverse dependency order, and that c, which comes after the failure, never
 // starts.
