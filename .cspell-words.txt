@@ -4,6 +4,7 @@ AGENTMSG
 agentrepo
 buildmeta
 cspell
+dasharray
 deadcode
 devtools
 EBADF
