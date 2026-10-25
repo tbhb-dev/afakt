@@ -4,7 +4,7 @@ title: Components
 description: The parts of afakt and what each one does.
 tags: [afakt, components]
 status: draft
-generated: { by: "claude-code:claude-fable-5-1", at: "2026-10-24T20:00:00Z" }
+generated: { by: "claude-code:claude-opus-5-5", at: "2026-10-25T11:06:00Z" }
 ---
 
 # Components
@@ -12,6 +12,14 @@ generated: { by: "claude-code:claude-fable-5-1", at: "2026-10-24T20:00:00Z" }
 ## API server
 
 The API server serves afakt's REST API, which clients like the CLI and dashboard consume, as well as its coordination workflows.
+
+### Health endpoints
+
+The server answers `GET /livez`, `GET /readyz`, and `GET /healthz` at its root, outside `/api/v1/`, without authentication. Each returns `application/json`, and none reports on databases, workflows, or agents.
+
+- `/livez` returns 200 with `{"status":"pass"}` whenever the server can answer. That includes startup and draining.
+- `/readyz` returns 200 with `{"status":"pass"}` only while every required service runs. It returns 503 with `{"status":"fail"}` while the server starts, while it drains after SIGINT or SIGTERM, and after a required service fails.
+- `/healthz` returns `{"status":S,"checks":{"livez":{"status":L},"readyz":{"status":R}}}`, where `L` and `R` match what `/livez` and `/readyz` report at that moment. `S` and the status code are `"pass"` and 200 when both pass, and `"fail"` and 503 otherwise.
 
 ## Command-line interface (CLI)
 

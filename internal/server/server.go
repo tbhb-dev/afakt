@@ -52,7 +52,7 @@ func Run(ctx context.Context, cfg Config, logger *slog.Logger) error {
 // starts the shutdown and the services still need time to stop.
 func run(ctx context.Context, cfg Config, logger *slog.Logger, h hooks) error {
 	manager := lifecycle.New(logger)
-	if err := compose(manager, cfg, logger, h); err != nil {
+	if err := compose(manager, cfg, logger, newHealth(ctx, manager), h); err != nil {
 		return err
 	}
 	err := manager.Start(ctx)
@@ -66,9 +66,10 @@ func run(ctx context.Context, cfg Config, logger *slog.Logger, h hooks) error {
 	return errors.Join(err, manager.Stop(stopCtx))
 }
 
-// compose registers the services of each target with manager. A target without services
-// returns ErrNotComposable.
-func compose(manager *lifecycle.Manager, cfg Config, logger *slog.Logger, h hooks) error {
+// compose registers the services of each target with manager. The HTTP server serves the
+// health checks of the whole composition. A target without services returns
+// ErrNotComposable.
+func compose(manager *lifecycle.Manager, cfg Config, logger *slog.Logger, checks health, h hooks) error {
 	var regs []lifecycle.Registration
 	for _, target := range cfg.Targets {
 		if target != TargetAPI {
@@ -79,7 +80,7 @@ func compose(manager *lifecycle.Manager, cfg Config, logger *slog.Logger, h hook
 			lifecycle.Registration{Name: "api-listener", Service: ln},
 			lifecycle.Registration{
 				Name:      "api",
-				Service:   &api{listener: ln, routes: h.routes},
+				Service:   &api{listener: ln, health: checks, routes: h.routes},
 				DependsOn: []string{"api-listener"},
 			},
 		)
@@ -129,9 +130,10 @@ func (l *listener) Stop(context.Context) error {
 	return nil
 }
 
-// api serves the API routes on the listener.
+// api serves the API routes and the health endpoints on the listener.
 type api struct {
 	listener *listener
+	health   health
 	routes   func(mux *http.ServeMux)
 	server   *http.Server
 }
@@ -144,6 +146,7 @@ func (a *api) Start(context.Context) error {
 	// Without this route, a request for the root's path without the slash gets a redirect
 	// to the root instead of 404.
 	mux.Handle("/api/v1", http.NotFoundHandler())
+	a.health.routes(mux)
 	if a.routes != nil {
 		a.routes(mux)
 	}

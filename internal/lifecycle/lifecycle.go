@@ -338,6 +338,23 @@ func (m *Manager) Wait(ctx context.Context) error {
 	}
 }
 
+// Ready reports whether every required service is running. It reports false before Start,
+// while a required service hasn't started or has failed, and from the moment Stop begins.
+// An optional service doesn't affect the result.
+func (m *Manager) Ready() bool {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	if m.phase != phaseStarted {
+		return false
+	}
+	for _, s := range m.services {
+		if !s.reg.Optional && s.state != StateRunning {
+			return false
+		}
+	}
+	return true
+}
+
 // failureErr returns the first failure of a required service, which is set before m.failed
 // closes, and marks it reported.
 func (m *Manager) failureErr() error {

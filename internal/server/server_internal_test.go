@@ -92,7 +92,14 @@ type harness struct {
 // cleanup cancels the server.
 func startServer(t *testing.T, cfg Config, h hooks) *harness {
 	t.Helper()
-	ctx, cancel := context.WithCancel(t.Context())
+	return startServerContext(t.Context(), t, cfg, h)
+}
+
+// startServerContext is `startServer` under parent, whose end stops the server as a signal
+// does.
+func startServerContext(parent context.Context, t *testing.T, cfg Config, h hooks) *harness {
+	t.Helper()
+	ctx, cancel := context.WithCancel(parent)
 	s := &harness{cancel: cancel, done: make(chan error, 1), addresses: make(chan string, 1)}
 	logger := slog.New(addressHandler{addresses: s.addresses})
 	go func() { s.done <- run(ctx, cfg, logger, h) }()
@@ -190,9 +197,11 @@ func TestAPIRoutes(t *testing.T) {
 	s := startServer(t, testConfig(), hooks{services: []lifecycle.Registration{p.reg()}})
 	receive(t, p.up, "the probe to start")
 	wantAPIRoot(t, s.addr(t))
-	// The API serves its root and nothing else.
+	// The API serves its root and the health endpoints at the server root. Every other path
+	// gets 404, including the health paths under the API prefix.
 	for _, path := range []string{
-		"/", "/livez", "/readyz", "/healthz", "/api", "/api/v1", "/api/v1/livez", "/api/v2/",
+		"/", "/api", "/api/v1", "/api/v2/",
+		"/api/v1/livez", "/api/v1/readyz", "/api/v1/healthz", "/livez/", "/readyz/", "/healthz/",
 		// Paths that clean to the root get 404, not a redirect to it.
 		"/api//v1/", "/api/v1/./", "/api/v1//", "/api/v2/../v1/",
 	} {
@@ -200,8 +209,10 @@ func TestAPIRoutes(t *testing.T) {
 			t.Errorf("GET %s = %d, want 404", path, code)
 		}
 	}
-	if code, _, _ := request(t, http.MethodPost, s.addr(t), apiRootPath); code != http.StatusMethodNotAllowed {
-		t.Errorf("POST %s = %d, want 405", apiRootPath, code)
+	for _, path := range []string{apiRootPath, "/livez", "/readyz", "/healthz"} {
+		if code, _, _ := request(t, http.MethodPost, s.addr(t), path); code != http.StatusMethodNotAllowed {
+			t.Errorf("POST %s = %d, want 405", path, code)
+		}
 	}
 	s.cancel()
 	if err := s.wait(t); err != nil {
