@@ -1,0 +1,15 @@
+---
+id: no-docs-references
+language: go
+severity: error
+message: Go code must not reference docs/ pages.
+note: >-
+  The docs describe afakt's destination state and move independently of the
+  code, so a path into docs/ goes stale. Describe the behavior in the comment
+  itself instead.
+rule:
+  regex: '\bdocs/'
+  any:
+    - kind: comment
+    - kind: interpreted_string_literal
+    - kind: raw_string_literal

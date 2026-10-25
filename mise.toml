@@ -14,6 +14,7 @@ jq = "1.8.2"
 "go:github.com/tbhb-dev/devtools/cmd/agentrepo" = "v0.19.0"
 "go:github.com/tbhb-dev/devtools/cmd/gh-post" = "v0.19.0"
 bats = "1.14.0"
+ast-grep = "0.51.0"
 
 [env]
 DEVTOOLS_LOCK_PLATFORMS = "linux-x64,macos-arm64"
@@ -130,6 +131,7 @@ run = [
   "mise run devtools:lint-curl",
   "mise run lint-go-all",
   "mise run lint-go-fmt",
+  "mise run lint-ast-grep",
 ]
 
 [tasks.build]
@@ -205,3 +207,13 @@ fi
 [tasks.lint-go-fmt]
 description = "Check Go formatting"
 run = "golangci-lint fmt --diff ./cmd/... ./internal/..."
+
+# Local task until devtools ships an ast-grep gate. The rules live in .ast-grep/rules, each
+# naming its own language, so the scan covers the whole tree except vendored and generated paths.
+[tasks.lint-ast-grep]
+description = "Run the ast-grep rules in .ast-grep/rules against the repository"
+run = """
+ast-grep scan --config sgconfig.yml \
+  --globs '!vendor/**' --globs '!apm_modules/**' --globs '!.devtools/**' --globs '!.config/mise/**' \
+  --globs '!bin/**' --globs '!coverage/**' --globs '!tmp/**' --globs '!spikes/**' --globs '!.vale/**' .
+"""

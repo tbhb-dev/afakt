@@ -10,8 +10,8 @@ import (
 	"testing"
 )
 
-// TestStatusOnFullDevice checks the failure that docs/cli.md reproduces with
-// `afakt status > /dev/full`: exit status 1 and the storage full error on standard error.
+// TestStatusOnFullDevice checks the failure that
+// `afakt status > /dev/full` reproduces: exit status 1 and the storage full error on standard error.
 func TestStatusOnFullDevice(t *testing.T) {
 	t.Parallel()
 	full, err := os.OpenFile("/dev/full", os.O_WRONLY, 0)

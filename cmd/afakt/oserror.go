@@ -10,7 +10,7 @@ import (
 	"syscall"
 )
 
-// describeWriteError renders a write error as the text docs/cli.md documents after the
+// describeWriteError renders a write error as the text that follows the
 // Error label. An error from the operating system prints its code, an error kind name
 // and the platform message with a capital first letter. Any other error prints as a
 // custom error of kind Other.

@@ -28,6 +28,7 @@ prek
 pyyaml
 rumdl
 Seekable
+sgconfig
 shellcheck
 shfmt
 shopt
