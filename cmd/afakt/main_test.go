@@ -101,6 +101,9 @@ func runChild(t *testing.T, output *os.File, args ...string) childResult {
 func TestVersionComesFromBuildMetadata(t *testing.T) {
 	t.Parallel()
 	// The version comes from the build metadata that main reads.
+	if buildmeta.Get().Version == "" {
+		t.Error("buildmeta.Get().Version is empty")
+	}
 	got := runChild(t, nil, "--version")
 	if want := "afakt " + buildmeta.Get().Version + "\n"; got.exitCode != 0 || got.stdout != want {
 		t.Errorf("exit code %d, stdout %q; want 0 and %q", got.exitCode, got.stdout, want)
