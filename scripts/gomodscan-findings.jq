@@ -2,9 +2,9 @@
 def nonempty: type == "string" and test("\\S");
 def key: [.module, .version, .finding];
 
-if ($accepted | length != 1) or ($accepted[0] | type != "array") then
+(if ($accepted | length != 1) or ($accepted[0] | type != "array") then
   error("gomodscan: expected one accepted-findings array")
-else $accepted[0] end as $waivers
+else $accepted[0] end) as $waivers
 | if all($waivers[];
     type == "object" and (keys == ["finding", "module", "reason", "version"]) and
     (.module | nonempty) and (.version | nonempty) and
