@@ -33,6 +33,7 @@ shfmt
 shopt
 SIGPIPE
 tbhb
+Temporal
 testcoverage
 tmpl
 tombi
