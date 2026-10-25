@@ -69,7 +69,7 @@ func TestWebhookRoutes(t *testing.T) {
 	// whatever the method, so it doesn't accept a delivery.
 	for _, method := range methods {
 		for _, path := range []string{
-			"/", "/api/v1/", "/api/v1", "/healthz/", "/livez/", "/readyz/", "/livez/x",
+			"/", "/api/v1/", "/api/v1", "/healthz", "/healthz/", "/livez/", "/readyz/", "/livez/x",
 			"/webhook", "/webhooks", "/webhooks/github", "/github", "/api/v1/livez",
 			"//livez", "/./readyz", "/x/../livez",
 		} {
@@ -80,7 +80,7 @@ func TestWebhookRoutes(t *testing.T) {
 	}
 	// The health checks answer 405 to the methods a delivery would use.
 	for _, method := range []string{http.MethodPost, http.MethodPut, http.MethodPatch, http.MethodDelete} {
-		for _, path := range []string{"/livez", "/readyz", "/healthz"} {
+		for _, path := range []string{"/livez", "/readyz"} {
 			if code, _, _ := request(t, method, s.addr(t), path); code != http.StatusMethodNotAllowed {
 				t.Errorf("%s %s = %d, want 405", method, path, code)
 			}

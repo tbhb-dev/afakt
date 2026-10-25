@@ -80,7 +80,7 @@ func run(ctx context.Context, cfg Config, logger *slog.Logger, h hooks) error {
 // composition. A target without services returns ErrNotComposable.
 func compose(manager *lifecycle.Manager, cfg Config, logger *slog.Logger, checks health, h hooks) error {
 	ln := &listener{address: cfg.Listen, logger: logger}
-	srv := &httpServer{listener: ln, routes: []func(*http.ServeMux){checks.routes}}
+	srv := &httpServer{listener: ln, routes: []func(*http.ServeMux){checks.probeRoutes}}
 	regs := []lifecycle.Registration{
 		{Name: listenerService, Service: ln},
 		{Name: httpService, Service: srv, DependsOn: []string{listenerService}},
@@ -88,6 +88,7 @@ func compose(manager *lifecycle.Manager, cfg Config, logger *slog.Logger, checks
 	for _, target := range cfg.Targets {
 		switch target {
 		case TargetAPI:
+			srv.routes[0] = checks.routes
 			srv.routes = append(srv.routes, apiRoutes)
 		case TargetWebhook:
 			// The webhook target has no receivers, so it serves only the health routes.
