@@ -45,6 +45,23 @@ get:
             properties:
               status:
                 const: fail
+              checks:
+                anyOf:
+                  - properties:
+                      livez:
+                        properties:
+                          status:
+                            const: fail
+                  - properties:
+                      readyz:
+                        properties:
+                          status:
+                            const: fail
+                example:
+                  livez:
+                    status: pass
+                  readyz:
+                    status: fail
           examples:
             notReady:
               summary: The server is live but not ready.
