@@ -6,6 +6,7 @@ package server_test
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"io"
 	"net"
 	"net/http"
@@ -49,9 +50,10 @@ func parseServer(args []string) (*servercmd.Options, error) {
 	cmd.SetErr(io.Discard)
 	cmd.SilenceErrors = true
 	cmd.SilenceUsage = true
-	err := cmd.Execute()
-	//nolint:wrapcheck // The tests assert on the command's own error.
-	return got, err
+	if err := cmd.Execute(); err != nil {
+		return got, fmt.Errorf("server %q: %w", args, err)
+	}
+	return got, nil
 }
 
 // clapError is the error text clap prints: the message, the usage line and the hint.
