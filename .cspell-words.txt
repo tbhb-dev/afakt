@@ -17,6 +17,7 @@ gochecknoglobals
 gochecknoinits
 golangci
 gomodscan
+healthz
 ldflags
 lifecycletest
 livez

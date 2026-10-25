@@ -74,13 +74,6 @@ func (s State) String() string {
 	}
 }
 
-// Status reports the state of one service.
-type Status struct {
-	Name     string
-	State    State
-	Required bool
-}
-
 var (
 	// ErrInvalidSpec reports a spec that lacks a name or a service.
 	ErrInvalidSpec = errors.New("invalid service spec")
@@ -108,8 +101,7 @@ type phase int
 
 const (
 	phaseIdle phase = iota
-	phaseStarting
-	phaseRunning
+	phaseStarted
 	phaseStopping
 )
 
@@ -124,7 +116,7 @@ type service struct {
 }
 
 // Manager runs registered services. Call Register for each service, then Start, then Wait,
-// then Stop. Ready and Statuses are safe to call concurrently at any time.
+// then Stop.
 type Manager struct {
 	logger *slog.Logger
 
@@ -231,7 +223,7 @@ func (m *Manager) Start(ctx context.Context) error {
 		m.mu.Unlock()
 		return err
 	}
-	m.phase = phaseStarting
+	m.phase = phaseStarted
 	m.order = order
 	m.mu.Unlock()
 
@@ -243,9 +235,6 @@ func (m *Manager) Start(ctx context.Context) error {
 			return err
 		}
 	}
-	m.mu.Lock()
-	m.phase = phaseRunning
-	m.mu.Unlock()
 	return nil
 }
 
@@ -440,33 +429,6 @@ func (m *Manager) timeout(ctx context.Context, pending []*service) error {
 		ErrShutdownTimeout, pending[0].spec.Name, strings.Join(names, ", "))
 	m.logger.ErrorContext(ctx, "shutdown deadline exceeded", "service", pending[0].spec.Name, "pending", names)
 	return err
-}
-
-// Ready reports whether startup finished, no stop has begun, and every required service is
-// running.
-func (m *Manager) Ready() bool {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	if m.phase != phaseRunning {
-		return false
-	}
-	for _, s := range m.services {
-		if !s.spec.Optional && s.state != StateRunning {
-			return false
-		}
-	}
-	return true
-}
-
-// Statuses returns the state of each service in registration order.
-func (m *Manager) Statuses() []Status {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	statuses := make([]Status, 0, len(m.services))
-	for _, s := range m.services {
-		statuses = append(statuses, Status{Name: s.spec.Name, State: s.state, Required: !s.spec.Optional})
-	}
-	return statuses
 }
 
 // setState records a transition and logs it. The caller holds m.mu.

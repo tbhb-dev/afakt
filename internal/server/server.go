@@ -30,8 +30,8 @@ type Config struct {
 	ShutdownTimeout time.Duration
 }
 
-// hooks adds services and routes to the composition. Tests use it to hold the manager in
-// a chosen state and to keep a request in flight.
+// hooks adds services and routes to the composition. Tests use it to hold a service in a
+// chosen state and to keep a request in flight.
 type hooks struct {
 	services []lifecycle.Spec
 	routes   func(mux *http.ServeMux)
@@ -72,7 +72,7 @@ func compose(manager *lifecycle.Manager, cfg Config, logger *slog.Logger, h hook
 			lifecycle.Spec{Name: "api-listener", Service: ln},
 			lifecycle.Spec{
 				Name:      "api",
-				Service:   &api{listener: ln, manager: manager, routes: h.routes},
+				Service:   &api{listener: ln, routes: h.routes},
 				DependsOn: []string{"api-listener"},
 			},
 		)
@@ -119,18 +119,20 @@ func (l *listener) Stop(context.Context) error {
 	return nil
 }
 
-// api serves the health endpoints on the listener.
+// api serves the API routes on the listener.
 type api struct {
 	listener *listener
-	manager  *lifecycle.Manager
 	routes   func(mux *http.ServeMux)
 	server   *http.Server
 }
 
 func (a *api) Start(context.Context) error {
 	mux := http.NewServeMux()
-	mux.HandleFunc("GET /livez", livez)
-	mux.HandleFunc("GET /readyz", a.readyz)
+	// The {$} anchor limits the route to the root itself. Every other path gets 404.
+	mux.HandleFunc("GET /api/v1/{$}", apiRoot)
+	// Without this route, a request for the root's path without the slash gets a redirect
+	// to the root instead of 404.
+	mux.Handle("/api/v1", http.NotFoundHandler())
 	if a.routes != nil {
 		a.routes(mux)
 	}
@@ -157,23 +159,8 @@ func (a *api) Stop(ctx context.Context) error {
 	return nil
 }
 
-func livez(w http.ResponseWriter, _ *http.Request) {
-	_, _ = fmt.Fprintln(w, "ok")
-}
-
-// readyz answers 200 when every required service runs and 503 otherwise. Its body lists
-// the state of each service. The other health endpoint answers 200 whenever the HTTP server
-// can serve a request.
-func (a *api) readyz(w http.ResponseWriter, _ *http.Request) {
-	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-	if a.manager.Ready() {
-		w.WriteHeader(http.StatusOK)
-		_, _ = fmt.Fprintln(w, "ready")
-	} else {
-		w.WriteHeader(http.StatusServiceUnavailable)
-		_, _ = fmt.Fprintln(w, "not ready")
-	}
-	for _, status := range a.manager.Statuses() {
-		_, _ = fmt.Fprintf(w, "%s %s\n", status.Name, status.State)
-	}
+// apiRoot answers the API root with an empty JSON object.
+func apiRoot(w http.ResponseWriter, _ *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	_, _ = fmt.Fprint(w, "{}")
 }

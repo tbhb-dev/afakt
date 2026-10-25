@@ -366,7 +366,7 @@ func waitLive(t *testing.T, address string) bool {
 	deadline := time.Now().Add(serveTimeout)
 	for time.Now().Before(deadline) {
 		ctx, cancel := context.WithTimeout(t.Context(), time.Second)
-		req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://"+address+"/livez", http.NoBody)
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://"+address+"/api/v1/", http.NoBody)
 		if err != nil {
 			cancel()
 			t.Fatalf("NewRequest() error = %v", err)
@@ -400,7 +400,7 @@ func TestServerRunShutsDownCleanly(t *testing.T) {
 	address, ok := waitAddress(&stderr)
 	if !ok || !strings.HasPrefix(address, "127.0.0.1:") || !waitLive(t, address) {
 		cancel()
-		t.Fatalf("the server never answered /livez on %q; error %v, stderr:\n%s", address, <-done, stderr.String())
+		t.Fatalf("the server never answered /api/v1/ on %q; error %v, stderr:\n%s", address, <-done, stderr.String())
 	}
 	cancel()
 	select {

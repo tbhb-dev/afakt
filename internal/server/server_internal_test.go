@@ -24,7 +24,7 @@ const (
 	// testTimeout bounds each wait in these tests. It only matters when something hangs.
 	testTimeout = 30 * time.Second
 
-	notReadyBody = "not ready\napi-listener running\napi running\n"
+	apiRootPath = "/api/v1/"
 )
 
 var errBoom = errors.New("boom")
@@ -56,8 +56,8 @@ func (h addressHandler) Handle(_ context.Context, record slog.Record) error {
 	return nil
 }
 
-// probe is a required service that starts after the API, so its state is the last word on
-// readiness. Its start closes up, at which point the API serves.
+// probe is a required service that starts after the API and stops before it. Its start
+// closes up, at which point the API serves.
 type probe struct {
 	fake *lifecycletest.Fake
 	up   chan struct{}
@@ -126,44 +126,38 @@ func receive(t *testing.T, ch <-chan struct{}, what string) {
 	}
 }
 
-func get(t *testing.T, address, path string) (int, string) {
+// request sends a request without credentials and returns the status, the media type,
+// and the body.
+func request(t *testing.T, method, address, path string) (int, string, string) {
 	t.Helper()
 	ctx, cancel := context.WithTimeout(t.Context(), testTimeout)
 	defer cancel()
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://"+address+path, http.NoBody)
+	req, err := http.NewRequestWithContext(ctx, method, "http://"+address+path, http.NoBody)
 	if err != nil {
 		t.Fatalf("NewRequest() error = %v", err)
 	}
-	resp, err := http.DefaultClient.Do(req)
+	// The client doesn't follow redirects. A test sees the redirect status itself, not the
+	// status of the page it points to.
+	client := &http.Client{CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }}
+	resp, err := client.Do(req)
 	if err != nil {
-		t.Fatalf("GET %s error = %v", path, err)
+		t.Fatalf("%s %s error = %v", method, path, err)
 	}
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Fatalf("reading %s: %v", path, err)
 	}
-	return resp.StatusCode, string(body)
+	return resp.StatusCode, resp.Header.Get("Content-Type"), string(body)
 }
 
-func wantGet(t *testing.T, address, path string, code int, body string) {
+// wantAPIRoot checks that the API root answers 200 with an empty JSON object.
+func wantAPIRoot(t *testing.T, address string) {
 	t.Helper()
-	gotCode, gotBody := get(t, address, path)
-	if gotCode != code || gotBody != body {
-		t.Errorf("GET %s = %d %q, want %d %q", path, gotCode, gotBody, code, body)
+	code, contentType, body := request(t, http.MethodGet, address, apiRootPath)
+	if code != http.StatusOK || contentType != "application/json" || body != "{}" {
+		t.Errorf("GET %s = %d %q %q, want 200 \"application/json\" \"{}\"", apiRootPath, code, contentType, body)
 	}
-}
-
-func waitReady(t *testing.T, address string) {
-	t.Helper()
-	deadline := time.Now().Add(testTimeout)
-	for time.Now().Before(deadline) {
-		if code, _ := get(t, address, "/readyz"); code == http.StatusOK {
-			return
-		}
-		time.Sleep(10 * time.Millisecond)
-	}
-	t.Fatalf("%s never became ready", address)
 }
 
 func wantClosed(t *testing.T, address string) {
@@ -178,27 +172,41 @@ func wantClosed(t *testing.T, address string) {
 	}
 }
 
-// TestHealthThroughLifecycle holds the probe in Start and then in Stop. The API serves the
-// whole time, so both endpoints answer in every phase, and readiness follows the phase.
-func TestHealthThroughLifecycle(t *testing.T) {
+func TestAPIRoutes(t *testing.T) {
 	t.Parallel()
 	p := newProbe()
-	startEntered, startRelease := make(chan struct{}), make(chan struct{})
-	p.fake.StartFunc = lifecycletest.Block(startEntered, startRelease)
+	s := startServer(t, testConfig(), hooks{services: []lifecycle.Spec{p.spec()}})
+	receive(t, p.up, "the probe to start")
+	wantAPIRoot(t, s.addr(t))
+	// The API serves its root and nothing else.
+	for _, path := range []string{
+		"/", "/livez", "/readyz", "/healthz", "/api", "/api/v1", "/api/v1/livez", "/api/v2/",
+	} {
+		if code, _, _ := request(t, http.MethodGet, s.addr(t), path); code != http.StatusNotFound {
+			t.Errorf("GET %s = %d, want 404", path, code)
+		}
+	}
+	if code, _, _ := request(t, http.MethodPost, s.addr(t), apiRootPath); code != http.StatusMethodNotAllowed {
+		t.Errorf("POST %s = %d, want 405", apiRootPath, code)
+	}
+	s.cancel()
+	if err := s.wait(t); err != nil {
+		t.Fatalf("run() error = %v", err)
+	}
+}
+
+// TestAPIServesWhileStopping holds the probe in Stop. The API stops after the probe, so its
+// root still answers until the probe has stopped.
+func TestAPIServesWhileStopping(t *testing.T) {
+	t.Parallel()
+	p := newProbe()
 	stopEntered, stopRelease := make(chan struct{}), make(chan struct{})
 	p.fake.StopFunc = lifecycletest.Block(stopEntered, stopRelease)
 	s := startServer(t, testConfig(), hooks{services: []lifecycle.Spec{p.spec()}})
-	receive(t, startEntered, "the probe to start")
-	wantGet(t, s.addr(t), "/livez", http.StatusOK, "ok\n")
-	wantGet(t, s.addr(t), "/readyz", http.StatusServiceUnavailable, notReadyBody+"probe starting\n")
-	close(startRelease)
-	// Readiness has to come first, or the cancel below could interrupt the start.
-	waitReady(t, s.addr(t))
-	wantGet(t, s.addr(t), "/readyz", http.StatusOK, "ready\napi-listener running\napi running\nprobe running\n")
+	receive(t, p.up, "the probe to start")
 	s.cancel()
 	receive(t, stopEntered, "the probe to stop")
-	wantGet(t, s.addr(t), "/livez", http.StatusOK, "ok\n")
-	wantGet(t, s.addr(t), "/readyz", http.StatusServiceUnavailable, notReadyBody+"probe stopping\n")
+	wantAPIRoot(t, s.addr(t))
 	close(stopRelease)
 	if err := s.wait(t); err != nil {
 		t.Fatalf("run() error = %v", err)
@@ -213,10 +221,9 @@ func TestRequiredFailureAfterStartup(t *testing.T) {
 	p.fake.StopFunc = lifecycletest.Block(entered, release)
 	s := startServer(t, testConfig(), hooks{services: []lifecycle.Spec{p.spec()}})
 	receive(t, p.up, "the probe to start")
-	// The failure withdraws readiness and starts the same shutdown that a signal starts.
+	// The failure starts the same shutdown that a signal starts.
 	p.fake.Fail(errBoom)
 	receive(t, entered, "the probe to stop")
-	wantGet(t, s.addr(t), "/readyz", http.StatusServiceUnavailable, notReadyBody+"probe failed\n")
 	close(release)
 	err := s.wait(t)
 	if !errors.Is(err, errBoom) || err.Error() != `run "probe": boom` {
@@ -413,7 +420,7 @@ func TestAPIRunReportsServeError(t *testing.T) {
 	if err := l.ln.Close(); err != nil {
 		t.Fatalf("Close() error = %v", err)
 	}
-	a := &api{listener: l, manager: lifecycle.New(slog.New(slog.DiscardHandler))}
+	a := &api{listener: l}
 	if err := a.Start(t.Context()); err != nil {
 		t.Fatalf("Start() error = %v", err)
 	}

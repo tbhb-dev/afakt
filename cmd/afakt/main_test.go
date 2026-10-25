@@ -200,12 +200,12 @@ func waitAddress(logs *logBuffer) (string, bool) {
 	return "", false
 }
 
-func waitLive(t *testing.T, address string) bool {
+func waitServing(t *testing.T, address string) bool {
 	t.Helper()
 	deadline := time.Now().Add(childTimeout)
 	for time.Now().Before(deadline) {
 		ctx, cancel := context.WithTimeout(t.Context(), time.Second)
-		req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://"+address+"/livez", http.NoBody)
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://"+address+"/api/v1/", http.NoBody)
 		if err != nil {
 			cancel()
 			t.Fatalf("NewRequest() error = %v", err)
@@ -227,7 +227,7 @@ func waitLive(t *testing.T, address string) bool {
 }
 
 // runServerChild starts the server command as a child process with the given arguments.
-// Once the logged address answers /livez, it sends the signal and returns after the child
+// Once the logged address answers /api/v1/, it sends the signal and returns after the child
 // is reaped.
 func runServerChild(t *testing.T, sig syscall.Signal, args ...string) childResult {
 	t.Helper()
@@ -240,9 +240,9 @@ func runServerChild(t *testing.T, sig syscall.Signal, args ...string) childResul
 		t.Fatalf("starting the child: %v", err)
 	}
 	address, ok := waitAddress(&stderr)
-	if !ok || !strings.HasPrefix(address, "127.0.0.1:") || !waitLive(t, address) {
+	if !ok || !strings.HasPrefix(address, "127.0.0.1:") || !waitServing(t, address) {
 		killErr := cmd.Process.Kill()
-		t.Fatalf("the child never answered /livez on %q (kill: %v, wait: %v); stderr:\n%s",
+		t.Fatalf("the child never answered /api/v1/ on %q (kill: %v, wait: %v); stderr:\n%s",
 			address, killErr, cmd.Wait(), stderr.String())
 	}
 	if err := cmd.Process.Signal(sig); err != nil {

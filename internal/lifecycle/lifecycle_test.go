@@ -61,6 +61,38 @@ func wantCalls(t *testing.T, rec *lifecycletest.Recorder, want ...string) {
 	}
 }
 
+// checkedFake returns a fake that checks the ordering rules when they apply. Its Start
+// reports an error unless every service in prerequisites is running. Its Stop reports an error
+// while a service in dependents hasn't finished.
+func checkedFake(t *testing.T, m *lifecycle.Manager, rec *lifecycletest.Recorder, name string,
+	prerequisites, dependents []string,
+) *lifecycletest.Fake {
+	t.Helper()
+	f := lifecycletest.NewFake(name, rec)
+	f.StartFunc = func(context.Context) error {
+		got := states(m)
+		for _, dep := range prerequisites {
+			if got[dep] != lifecycle.StateRunning {
+				t.Errorf("%s started while its dependency %s was %s", name, dep, got[dep])
+			}
+		}
+		return nil
+	}
+	f.StopFunc = func(context.Context) error {
+		got := states(m)
+		for _, dependent := range dependents {
+			switch got[dependent] {
+			case lifecycle.StateStarting, lifecycle.StateRunning, lifecycle.StateStopping:
+				t.Errorf("%s stopped while its dependent %s was %s", name, dependent, got[dependent])
+			case lifecycle.StateNew, lifecycle.StateTerminated, lifecycle.StateFailed:
+				// A dependent that never started or has finished doesn't hold the service.
+			}
+		}
+		return nil
+	}
+	return f
+}
+
 // stopCtx returns a context for Stop. Its deadline only matters if a service hangs.
 func stopCtx(t *testing.T) context.Context {
 	t.Helper()
@@ -96,18 +128,18 @@ func TestDependencyOrder(t *testing.T) {
 		m := newManager()
 		mustRegister(t, m,
 			lifecycle.Spec{Name: "d", Service: lifecycletest.NewFake("d", rec)},
-			lifecycle.Spec{Name: "c", Service: lifecycletest.NewFake("c", rec), DependsOn: []string{"b", "a"}},
-			lifecycle.Spec{Name: "b", Service: lifecycletest.NewFake("b", rec), DependsOn: []string{"a"}},
-			lifecycle.Spec{Name: "a", Service: lifecycletest.NewFake("a", rec)},
+			lifecycle.Spec{
+				Name: "c", Service: checkedFake(t, m, rec, "c", []string{"b", "a"}, nil),
+				DependsOn: []string{"b", "a"},
+			},
+			lifecycle.Spec{
+				Name: "b", Service: checkedFake(t, m, rec, "b", []string{"a"}, []string{"c"}),
+				DependsOn: []string{"a"},
+			},
+			lifecycle.Spec{Name: "a", Service: checkedFake(t, m, rec, "a", nil, []string{"b", "c"})},
 		)
-		if m.Ready() {
-			t.Error("Ready() = true before Start")
-		}
 		if err := m.Start(t.Context()); err != nil {
 			t.Fatalf("Start() error = %v", err)
-		}
-		if !m.Ready() {
-			t.Error("Ready() = false after Start")
 		}
 		wantStates(t, m, map[string]lifecycle.State{
 			"a": lifecycle.StateRunning, "b": lifecycle.StateRunning,
@@ -116,32 +148,12 @@ func TestDependencyOrder(t *testing.T) {
 		if err := m.Stop(stopCtx(t)); err != nil {
 			t.Fatalf("Stop() error = %v", err)
 		}
-		if m.Ready() {
-			t.Error("Ready() = true after Stop")
-		}
 		wantCalls(t, rec, "d start", "a start", "b start", "c start", "c stop", "b stop", "a stop", "d stop")
 		wantStates(t, m, map[string]lifecycle.State{
 			"a": lifecycle.StateTerminated, "b": lifecycle.StateTerminated,
 			"c": lifecycle.StateTerminated, "d": lifecycle.StateTerminated,
 		})
 	})
-}
-
-func TestStatusesReportRequired(t *testing.T) {
-	t.Parallel()
-	rec := &lifecycletest.Recorder{}
-	m := newManager()
-	mustRegister(t, m,
-		lifecycle.Spec{Name: "r", Service: lifecycletest.NewFake("r", rec)},
-		lifecycle.Spec{Name: "o", Service: lifecycletest.NewFake("o", rec), Optional: true},
-	)
-	want := []lifecycle.Status{
-		{Name: "r", State: lifecycle.StateNew, Required: true},
-		{Name: "o", State: lifecycle.StateNew, Required: false},
-	}
-	if got := m.Statuses(); !slices.Equal(got, want) {
-		t.Errorf("Statuses() = %+v, want %+v", got, want)
-	}
 }
 
 func TestRegisterRejects(t *testing.T) {
@@ -287,13 +299,13 @@ func TestStartRejectsGraph(t *testing.T) {
 	}
 }
 
-func TestReadinessFollowsStates(t *testing.T) {
+func TestStatesWhileStartingAndStopping(t *testing.T) {
 	t.Parallel()
 	synctest.Test(t, func(t *testing.T) {
 		rec := &lifecycletest.Recorder{}
 		m := newManager()
-		// The slow service blocks first in Start and later in Stop. The test checks readiness
-		// at both points and while everything runs.
+		// The slow service blocks first in Start and later in Stop. The test checks the states
+		// at both points.
 		slow := lifecycletest.NewFake("slow", rec)
 		startEntered, startRelease := make(chan struct{}), make(chan struct{})
 		slow.StartFunc = lifecycletest.Block(startEntered, startRelease)
@@ -306,23 +318,14 @@ func TestReadinessFollowsStates(t *testing.T) {
 		started := make(chan error)
 		go func() { started <- m.Start(t.Context()) }()
 		<-startEntered
-		if m.Ready() {
-			t.Error("Ready() = true while starting")
-		}
 		wantStates(t, m, map[string]lifecycle.State{"a": lifecycle.StateRunning, "slow": lifecycle.StateStarting})
 		close(startRelease)
 		if err := <-started; err != nil {
 			t.Fatalf("Start() error = %v", err)
 		}
-		if !m.Ready() {
-			t.Error("Ready() = false while running")
-		}
 		stopped := make(chan error)
 		go func() { stopped <- m.Stop(stopCtx(t)) }()
 		<-stopEntered
-		if m.Ready() {
-			t.Error("Ready() = true while stopping")
-		}
 		wantStates(t, m, map[string]lifecycle.State{"a": lifecycle.StateRunning, "slow": lifecycle.StateStopping})
 		close(stopRelease)
 		if err := <-stopped; err != nil {
@@ -331,6 +334,9 @@ func TestReadinessFollowsStates(t *testing.T) {
 	})
 }
 
+// TestRequiredStartFailure checks that the shutdown after a failed start stops the started
+// services in reverse dependency order, and that c, which comes after the failure, never
+// starts.
 func TestRequiredStartFailure(t *testing.T) {
 	t.Parallel()
 	synctest.Test(t, func(t *testing.T) {
@@ -339,23 +345,25 @@ func TestRequiredStartFailure(t *testing.T) {
 		bad := lifecycletest.NewFake("bad", rec)
 		bad.StartFunc = func(context.Context) error { return errBoom }
 		mustRegister(t, m,
-			lifecycle.Spec{Name: "a", Service: lifecycletest.NewFake("a", rec)},
-			lifecycle.Spec{Name: "bad", Service: bad},
-			lifecycle.Spec{Name: "c", Service: lifecycletest.NewFake("c", rec)},
+			lifecycle.Spec{Name: "a", Service: checkedFake(t, m, rec, "a", nil, []string{"b", "c"})},
+			lifecycle.Spec{
+				Name: "b", Service: checkedFake(t, m, rec, "b", []string{"a"}, []string{"bad"}),
+				DependsOn: []string{"a"},
+			},
+			lifecycle.Spec{Name: "bad", Service: bad, DependsOn: []string{"b"}},
+			lifecycle.Spec{Name: "c", Service: lifecycletest.NewFake("c", rec), DependsOn: []string{"a"}},
 		)
 		err := m.Start(t.Context())
 		if !errors.Is(err, errBoom) || err.Error() != `start "bad": boom` {
 			t.Errorf("Start() error = %v, want start \"bad\": boom", err)
 		}
-		if m.Ready() {
-			t.Error("Ready() = true after a failed start")
-		}
 		if err = m.Stop(stopCtx(t)); err != nil {
 			t.Fatalf("Stop() error = %v", err)
 		}
-		wantCalls(t, rec, "a start", "bad start", "a stop")
+		wantCalls(t, rec, "a start", "b start", "bad start", "b stop", "a stop")
 		wantStates(t, m, map[string]lifecycle.State{
-			"a": lifecycle.StateTerminated, "bad": lifecycle.StateFailed, "c": lifecycle.StateTerminated,
+			"a": lifecycle.StateTerminated, "b": lifecycle.StateTerminated,
+			"bad": lifecycle.StateFailed, "c": lifecycle.StateTerminated,
 		})
 	})
 }
@@ -376,9 +384,6 @@ func TestOptionalStartFailure(t *testing.T) {
 		)
 		if err := m.Start(t.Context()); err != nil {
 			t.Fatalf("Start() error = %v", err)
-		}
-		if !m.Ready() {
-			t.Error("Ready() = false with only optional failures")
 		}
 		wantStates(t, m, map[string]lifecycle.State{
 			"bad": lifecycle.StateFailed, "dependent": lifecycle.StateFailed, "r": lifecycle.StateRunning,
@@ -408,9 +413,6 @@ func TestRequiredRunFailure(t *testing.T) {
 		err := m.Wait(t.Context())
 		if !errors.Is(err, errBoom) || err.Error() != `run "a": boom` {
 			t.Errorf("Wait() error = %v, want run \"a\": boom", err)
-		}
-		if m.Ready() {
-			t.Error("Ready() = true after a required failure")
 		}
 		if err = m.Wait(t.Context()); !errors.Is(err, errBoom) {
 			t.Errorf("second Wait() error = %v, want %v", err, errBoom)
@@ -459,9 +461,6 @@ func TestOptionalRunFailure(t *testing.T) {
 		}
 		o.Fail(errBoom)
 		synctest.Wait()
-		if !m.Ready() {
-			t.Error("Ready() = false after an optional failure")
-		}
 		wantStates(t, m, map[string]lifecycle.State{"o": lifecycle.StateFailed, "r": lifecycle.StateRunning})
 		ctx, cancel := context.WithTimeout(t.Context(), time.Second)
 		defer cancel()
@@ -490,8 +489,8 @@ func TestStartStopsOnEarlierFailure(t *testing.T) {
 		}
 		mustRegister(t, m,
 			lifecycle.Spec{Name: "a", Service: a},
-			lifecycle.Spec{Name: "b", Service: b},
-			lifecycle.Spec{Name: "c", Service: lifecycletest.NewFake("c", rec)},
+			lifecycle.Spec{Name: "b", Service: b, DependsOn: []string{"a"}},
+			lifecycle.Spec{Name: "c", Service: lifecycletest.NewFake("c", rec), DependsOn: []string{"b"}},
 		)
 		if err := m.Start(t.Context()); !errors.Is(err, errBoom) {
 			t.Errorf("Start() error = %v, want %v", err, errBoom)
