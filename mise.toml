@@ -9,10 +9,10 @@ vendir = "0.46.2"
 apm = "0.33.0"
 shfmt = "3.14.1"
 jq = "1.8.2"
-"go:github.com/tbhb-dev/devtools/cmd/guard-markdown" = "v0.18.0"
-"go:github.com/tbhb-dev/devtools/cmd/commit-lint" = "v0.18.0"
-"go:github.com/tbhb-dev/devtools/cmd/agentrepo" = "v0.18.0"
-"go:github.com/tbhb-dev/devtools/cmd/gh-post" = "v0.18.0"
+"go:github.com/tbhb-dev/devtools/cmd/guard-markdown" = "v0.19.0"
+"go:github.com/tbhb-dev/devtools/cmd/commit-lint" = "v0.19.0"
+"go:github.com/tbhb-dev/devtools/cmd/agentrepo" = "v0.19.0"
+"go:github.com/tbhb-dev/devtools/cmd/gh-post" = "v0.19.0"
 bats = "1.14.0"
 
 [env]
@@ -60,7 +60,7 @@ run = "vale sync"
 shell = "bash -c"
 description = "guard-markdown on every tracked Markdown file, then the OKF check on docs/ and on every other Markdown file"
 run = """
-command -v guard-markdown >/dev/null || { echo "guard-markdown not found; install it with: go install github.com/tbhb-dev/devtools/cmd/guard-markdown@v0.18.0" >&2; exit 1; }
+command -v guard-markdown >/dev/null || { echo "guard-markdown not found; install it with: go install github.com/tbhb-dev/devtools/cmd/guard-markdown@v0.19.0" >&2; exit 1; }
 git ls-files -z '*.md' ':!:.devtools/**' ':!:.claude/**' ':!:apm_modules/**' ':!:vendor/**' | while IFS= read -r -d '' f; do [ -e "$f" ] && printf '%s\\0' "$f"; done | xargs -0 guard-markdown
 uv run --no-project --with pyyaml python scripts/okf-check.py docs
 uv run --no-project --with pyyaml python scripts/okf-check.py --repo .
