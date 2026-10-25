@@ -4,7 +4,7 @@ import { expectAccessible, recordErrors, recordRequests } from "./checks.ts";
 test("the blank page loads without errors", async ({ page }) => {
   const errors = recordErrors(page);
   const requests = recordRequests(page);
-  await page.goto("/");
+  await page.goto("./");
   await expect(page).toHaveTitle("afakt");
   await expect(page.locator("#root > main")).toBeEmpty();
   expect(errors).toStrictEqual([]);
@@ -16,7 +16,7 @@ test("the blank page loads without errors", async ({ page }) => {
 });
 
 test("the blank page passes the accessibility scan", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("./");
   await expect(page.locator("#root > main")).toBeAttached();
   await expectAccessible(page);
 });

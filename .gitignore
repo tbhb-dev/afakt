@@ -27,6 +27,7 @@ coverage.xml
 coverage.covdata*/
 node_modules/
 /apps/*/dist/
+/internal/dashboard/assets/
 /apps/*/coverage/
 /apps/*/reports/
 /apps/*/test-results/

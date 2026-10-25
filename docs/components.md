@@ -4,7 +4,7 @@ title: Components
 description: The parts of afakt and what each one does.
 tags: [afakt, components]
 status: draft
-generated: { by: "claude-code:claude-opus-5-5", at: "2026-10-25T11:06:00Z" }
+generated: { by: "codex:gpt-6", at: "2026-10-25T17:30:00Z" }
 ---
 
 # Components
@@ -32,6 +32,10 @@ The GitHub webhook receiver accepts webhook deliveries from GitHub.
 ## Web dashboard
 
 The web dashboard provides afakt's web UI.
+
+`afakt` embeds the dashboard's production assets and serves the entry page at `/dashboard` and `/dashboard/`. Assets load below `/dashboard/`. An unknown path whose last segment has no dot returns the entry page for client-side routing. A missing asset whose last segment contains a dot returns 404. Only the dashboard prefix belongs to this target. Combined API and dashboard targets share one listener. Readiness requires the selected services to run and fails during startup and shutdown.
+
+Entry pages and client-side routes require cache revalidation before reuse. Assets with content hashes in their names allow one year of immutable caching. Dashboard responses forbid framing from other origins, prevent content-type sniffing, and restrict scripts and styles to the same origin through a content security policy.
 
 ## Workflow orchestrator
 

@@ -47,7 +47,7 @@ Options:
 Usage: afakt server [OPTIONS] --target <TARGET>
 
 Options:
-      --target <TARGET>              Comma-separated targets: api, webhook, dashboard, worker, or all; only api and webhook can run, and webhook has no receivers yet, only health endpoints
+      --target <TARGET>              Comma-separated targets: api, webhook, dashboard, worker, or all; only api, webhook and dashboard can run, and webhook has no receivers yet, only health endpoints
       --listen <ADDR>                Host and port the HTTP server listens on [default: 127.0.0.1:8080]
       --shutdown-timeout <DURATION>  Time limit for the whole shutdown, as a Go duration [default: 30s]
   -h, --help                         Print help

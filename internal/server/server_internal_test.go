@@ -352,9 +352,20 @@ func waitRefused(t *testing.T, address string) {
 
 func TestShutdownDrainsRequests(t *testing.T) {
 	t.Parallel()
+	for name, cfg := range targetConfigs() {
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			wantDrainedRequest(t, cfg)
+		})
+	}
+}
+
+// wantDrainedRequest holds a shared-listener request until shutdown has stopped accepting connections.
+func wantDrainedRequest(t *testing.T, cfg Config) {
+	t.Helper()
 	entered, release := make(chan struct{}), make(chan struct{})
 	p := newProbe()
-	s := startServer(t, testConfig(), hooks{
+	s := startServer(t, cfg, hooks{
 		services: []lifecycle.Registration{p.reg()},
 		routes:   slowRoute(entered, release),
 	})
@@ -376,7 +387,7 @@ func TestShutdownDrainsRequests(t *testing.T) {
 
 func TestShutdownTimeout(t *testing.T) {
 	t.Parallel()
-	for _, targets := range [][]string{{TargetAPI}, {TargetWebhook}} {
+	for _, targets := range [][]string{{TargetAPI}, {TargetWebhook}, {TargetDashboard}, {TargetAPI, TargetDashboard}} {
 		t.Run(targets[0], func(t *testing.T) {
 			t.Parallel()
 			entered := make(chan struct{})
@@ -416,7 +427,7 @@ func TestRunRejectsComposition(t *testing.T) {
 		targets []string
 		want    error
 	}{
-		{name: "unavailable target", targets: []string{"dashboard"}, want: ErrNotComposable},
+		{name: "unavailable target", targets: []string{"worker"}, want: ErrNotComposable},
 		{name: "repeated target", targets: []string{TargetAPI, TargetAPI}, want: lifecycle.ErrDuplicateService},
 		{
 			name:    "repeated webhook",

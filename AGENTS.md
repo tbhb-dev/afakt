@@ -19,6 +19,7 @@ generated: { by: "claude-code:claude-sonnet-5-5", at: "2026-10-20T05:55:00Z" }
 - `internal/cmdutil/`: what the commands share.
 - `internal/buildmeta/`: version metadata.
 - `internal/server/`: composes the services of the selected server targets.
+- `internal/dashboard/`: serves embedded assets under `/dashboard`. The `dashboard_production` build tag selects generated assets. Go-only builds use the committed stand-in page.
 - `internal/lifecycle/`: starts and stops services. `internal/lifecycle/lifecycletest/` has fakes for tests.
 
 A pnpm workspace at the repository root has one dependency lock and keeps the configuration that every web package shares. In `apps/dashboard/`, a React and Vite app renders the blank dashboard page, with its unit tests in `src/` and its Playwright tests in `e2e/`. For each web gate, `scripts/check-web-gate.sh` writes broken input into a temporary copy of the workspace and shows that the gate fails.
@@ -42,6 +43,11 @@ Read `mise.toml` before trusting it. In each fresh worktree, run `mise trust`, t
 | `mise run lint` | Check source gates |
 | `mise run check` | Check docs, Go tests, and Go coverage |
 | `mise run build` | Build `bin/afakt` with version metadata |
+| `mise run check-dashboard` | Build production assets, test embedded handlers and server contracts, and check the isolated binary in the pinned browser |
+| `mise run e2e-dashboard` | Check the already-built binary with the pinned browser and accessibility scan |
+| `mise run check-dashboard-gates` | Prove failed-build cleanup, entry revalidation, browser failures, and required CI result handling |
+| `mise run check-dashboard-all` | Install the web dependencies and browser, then run the dashboard checks and failure proofs sequentially |
+| `mise run check-go-only` | Run every Go-only gate in an environment without web tools, dependencies, or output |
 | `mise run test` | Run the Go tests, as `test-go` does |
 | `mise run test-go` | Run the Go tests |
 | `mise run test-go-race` | Run the Go tests with the race detector |
@@ -94,7 +100,7 @@ Create commits as `tbhb-agent`. Route reviews through `gh-reviewer` as `tbhb-age
 
 All scheduled times use Coordinated Universal Time (UTC).
 
-`ci.yml` runs on pull requests, pushes to `main`, and manual dispatch. It runs bootstrap and checks lint on Linux, and it fails when bootstrap changes a tracked file. It runs the full check on Linux and macOS. Separate jobs enforce the Go coverage floors, scan reachable vulnerabilities (`vuln`), and check payload and Go vendor drift (`vendor-check`). A `web` matrix runs each web gate in its own Linux job. The required `test` summary fails unless every slot of the Go and web matrices succeeds.
+`ci.yml` runs on pull requests, pushes to `main`, and manual dispatch. It runs bootstrap and checks lint on Linux, and it fails when bootstrap changes a tracked file. It runs the full check on Linux and macOS. Separate jobs enforce the Go coverage floors, scan reachable vulnerabilities (`vuln`), and check payload and Go vendor drift (`vendor-check`). A `web` matrix runs each web gate in its own Linux job. The `dashboard` matrix checks the release and generated failure proofs. A separate container runs Go-only gates without the web toolchain. The required `test` summary fails unless the Go, web, and dashboard matrices and the Go-only job succeed.
 
 `security.yml` runs on pull requests and pushes to `main`. It also runs daily at 06:26 and on manual dispatch. `gitleaks` scans history through the head of the branch on pull requests. The Go scanners upload reports for reachable vulnerabilities and dependencies in `vendor/`.
 

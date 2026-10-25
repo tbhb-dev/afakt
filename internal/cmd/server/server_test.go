@@ -122,6 +122,33 @@ func TestNewCmdServerAccepts(t *testing.T) {
 			args: []string{"--target=api,webhook"},
 			want: server.Config{Targets: combined, Listen: "127.0.0.1:8080", ShutdownTimeout: 30 * time.Second},
 		},
+		{
+			name: "dashboard defaults",
+			args: []string{"--target=dashboard"},
+			want: server.Config{
+				Targets:         []string{"dashboard"},
+				Listen:          "127.0.0.1:8080",
+				ShutdownTimeout: 30 * time.Second,
+			},
+		},
+		{
+			name: "dashboard separate form",
+			args: []string{"--target", "dashboard", "--listen", "[::1]:0", "--shutdown-timeout", "250ms"},
+			want: server.Config{
+				Targets:         []string{"dashboard"},
+				Listen:          "[::1]:0",
+				ShutdownTimeout: 250 * time.Millisecond,
+			},
+		},
+		{
+			name: "api and dashboard",
+			args: []string{"--target=api,dashboard"},
+			want: server.Config{
+				Targets:         []string{"api", "dashboard"},
+				Listen:          "127.0.0.1:8080",
+				ShutdownTimeout: 30 * time.Second,
+			},
+		},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -153,7 +180,10 @@ func TestServerRejects(t *testing.T) {
 	}
 	target := func(value, reason string) string { return invalid(value, "--target <TARGET>", reason) }
 	unavailableIn := func(value, name string) string {
-		return target(value, "target is not available yet: '"+name+"'; only 'api' and 'webhook' can run in this build")
+		return target(
+			value,
+			"target is not available yet: '"+name+"'; only 'api', 'webhook' and 'dashboard' can run in this build",
+		)
 	}
 	unavailable := func(name string) string { return unavailableIn(name, name) }
 	listen := func(value, reason string) string { return invalid(value, "--listen <ADDR>", reason) }
@@ -251,9 +281,9 @@ func TestServerRejects(t *testing.T) {
 			stderr: target("webhook,api,webhook", "duplicate target 'webhook'"),
 		},
 		{
-			name:   "webhook and dashboard",
-			args:   []string{"--target=webhook,dashboard"},
-			stderr: unavailableIn("webhook,dashboard", "dashboard"),
+			name:   "duplicate dashboard",
+			args:   []string{"--target=dashboard,api,dashboard"},
+			stderr: target("dashboard,api,dashboard", "duplicate target 'dashboard'"),
 		},
 		{
 			name:   "webhook without port",
@@ -275,7 +305,26 @@ func TestServerRejects(t *testing.T) {
 			args:   []string{"--target", "api,webhook", "--shutdown-timeout=later"},
 			stderr: timeout("later", durationForm),
 		},
-		{name: "dashboard", args: []string{"--target=dashboard"}, stderr: unavailable("dashboard")},
+		{
+			name:   "dashboard no host",
+			args:   []string{"--target=dashboard", "--listen=:80"},
+			stderr: listen(":80", listenHost),
+		},
+		{
+			name:   "dashboard no port",
+			args:   []string{"--target=dashboard", "--listen=localhost"},
+			stderr: listen("localhost", listenForm),
+		},
+		{
+			name:   "dashboard zero timeout",
+			args:   []string{"--target=dashboard", "--shutdown-timeout=0s"},
+			stderr: timeout("0s", durationPos),
+		},
+		{
+			name:   "dashboard invalid timeout",
+			args:   []string{"--target=dashboard", "--shutdown-timeout=later"},
+			stderr: timeout("later", durationForm),
+		},
 		{name: "worker", args: []string{"--target=worker"}, stderr: unavailable("worker")},
 		{name: "all", args: []string{"--target=all"}, stderr: unavailable("all")},
 		{name: "api and all", args: []string{"--target=api,all"}, stderr: unavailableIn("api,all", "all")},
@@ -452,6 +501,7 @@ func TestServerRunShutsDownCleanly(t *testing.T) {
 	}{
 		{target: "api", path: "/api/v1/"},
 		{target: "webhook", path: "/readyz"},
+		{target: "dashboard", path: "/dashboard/"},
 	}
 	for _, tc := range cases {
 		t.Run(tc.target, func(t *testing.T) {
@@ -508,7 +558,7 @@ func TestServerRunFailure(t *testing.T) {
 		t.Fatalf("Listen() error = %v", err)
 	}
 	defer taken.Close()
-	for _, target := range []string{"api", "webhook", "api,webhook"} {
+	for _, target := range []string{"api", "webhook", "api,webhook", "dashboard", "api,dashboard"} {
 		var stdout, stderr bytes.Buffer
 		args := []string{"server", "--target", target, "--listen", taken.Addr().String(), "--shutdown-timeout=5s"}
 		if got := root.Execute(t.Context(), newFactory(&stdout, &stderr), args); got != runtimeExit {

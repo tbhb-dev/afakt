@@ -5,6 +5,7 @@ import { shared } from "../../vitest.shared.ts";
 export default mergeConfig(
   shared,
   defineConfig({
+    base: "/dashboard/",
     plugins: [react()],
     server: { host: "127.0.0.1", port: 5173, strictPort: true },
     preview: { host: "127.0.0.1", port: 4173, strictPort: true },

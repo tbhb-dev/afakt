@@ -311,6 +311,21 @@ func TestServerStopsOnSignal(t *testing.T) {
 			targets: []string{"api", "webhook"},
 			args:    []string{"--target=api,webhook", "--listen=127.0.0.1:0", "--shutdown-timeout=10s"},
 		},
+		{
+			name: "dashboard SIGTERM with equals form", sig: syscall.SIGTERM, path: "/dashboard/",
+			targets: []string{"dashboard"},
+			args:    []string{"--target=dashboard", "--listen=127.0.0.1:0", "--shutdown-timeout=10s"},
+		},
+		{
+			name: "dashboard SIGINT with separate form", sig: syscall.SIGINT, path: "/readyz",
+			targets: []string{"dashboard"},
+			args:    []string{"--target", "dashboard", "--listen", "127.0.0.1:0", "--shutdown-timeout", "10s"},
+		},
+		{
+			name: "api and dashboard SIGTERM", sig: syscall.SIGTERM, path: "/dashboard/",
+			targets: []string{"api", "dashboard"},
+			args:    []string{"--target=api,dashboard", "--listen=127.0.0.1:0", "--shutdown-timeout=10s"},
+		},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {

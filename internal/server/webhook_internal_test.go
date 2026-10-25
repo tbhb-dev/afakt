@@ -13,13 +13,19 @@ import (
 	"github.com/tbhb-dev/afakt/internal/lifecycle/lifecycletest"
 )
 
-// webhookConfigs returns the configurations that include the webhook target, keyed by the
-// target list that selects them.
-func webhookConfigs() map[string]Config {
+// targetConfigs returns single and combined target configurations, keyed by the target list.
+func targetConfigs() map[string]Config {
 	webhook, combined := testConfig(), testConfig()
 	webhook.Targets = []string{TargetWebhook}
 	combined.Targets = []string{TargetAPI, TargetWebhook}
-	return map[string]Config{"webhook": webhook, "api,webhook": combined}
+	dashboard, apiDashboard, allHTTP := testConfig(), testConfig(), testConfig()
+	dashboard.Targets = []string{"dashboard"}
+	apiDashboard.Targets = []string{TargetAPI, "dashboard"}
+	allHTTP.Targets = []string{"dashboard", TargetWebhook, TargetAPI}
+	return map[string]Config{
+		"webhook": webhook, "api,webhook": combined, "dashboard": dashboard,
+		"api,dashboard": apiDashboard, "dashboard,webhook,api": allHTTP,
+	}
 }
 
 // wantCheck checks that a GET request for path answers code with a JSON body.
@@ -58,7 +64,7 @@ func waitReady(t *testing.T, address string) {
 func TestWebhookRoutes(t *testing.T) {
 	t.Parallel()
 	p := newProbe()
-	s := startServer(t, webhookConfigs()["webhook"], hooks{services: []lifecycle.Registration{p.reg()}})
+	s := startServer(t, targetConfigs()["webhook"], hooks{services: []lifecycle.Registration{p.reg()}})
 	receive(t, p.up, "the probe to start")
 	waitReady(t, s.addr(t))
 	methods := []string{
@@ -96,7 +102,7 @@ func TestWebhookRoutes(t *testing.T) {
 // states, /livez passes throughout, and /readyz passes only between them.
 func TestReadiness(t *testing.T) {
 	t.Parallel()
-	for name, cfg := range webhookConfigs() {
+	for name, cfg := range targetConfigs() {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			startEntered, startRelease := make(chan struct{}), make(chan struct{})
@@ -127,7 +133,7 @@ func TestReadiness(t *testing.T) {
 // still answers after the failure.
 func TestReadinessAfterFailure(t *testing.T) {
 	t.Parallel()
-	for name, cfg := range webhookConfigs() {
+	for name, cfg := range targetConfigs() {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			stopEntered, stopRelease := make(chan struct{}), make(chan struct{})
@@ -149,13 +155,23 @@ func TestReadinessAfterFailure(t *testing.T) {
 }
 
 // TestCombinedTargetsMatchAPI runs the API alone and the API with the webhook target on
-// separate listeners. Every path but the health checks answers both alike: the webhook
-// target doesn't add a path beyond them or change an API response.
+// separate listeners, then repeats with the dashboard. No API response changes.
 func TestCombinedTargetsMatchAPI(t *testing.T) {
 	t.Parallel()
+	for _, target := range []string{"api,webhook", "api,dashboard", "dashboard,webhook,api"} {
+		t.Run(target, func(t *testing.T) {
+			t.Parallel()
+			wantCombinedAPI(t, targetConfigs()[target])
+		})
+	}
+}
+
+// wantCombinedAPI compares the API's paths and methods with and without another target.
+func wantCombinedAPI(t *testing.T, cfg Config) {
+	t.Helper()
 	apiProbe, combinedProbe := newProbe(), newProbe()
 	apiOnly := startServer(t, testConfig(), hooks{services: []lifecycle.Registration{apiProbe.reg()}})
-	combined := startServer(t, webhookConfigs()["api,webhook"],
+	combined := startServer(t, cfg,
 		hooks{services: []lifecycle.Registration{combinedProbe.reg()}})
 	receive(t, apiProbe.up, "the API-only probe to start")
 	receive(t, combinedProbe.up, "the combined probe to start")
