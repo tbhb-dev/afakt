@@ -53,10 +53,26 @@ jobs:
           # renovate: datasource=github-releases depName=jdx/mise
           version: 2026.10.15
 
-      # mise installs the vale binary but does not fetch the style packages
-      # .vale.ini declares.
-      - name: Sync Vale styles
-        run: mise run install-tools
+      # Bootstrap as a fresh clone does: it syncs the payload, fetches the
+      # Vale style packages .vale.ini declares, and installs the git hooks.
+      # MISE_LOCKED is off here because a clone runs without it, and under
+      # it `mise install` never rewrites mise.lock. A lockfile the pinned
+      # mise would rewrite then shows up in the next step.
+      - name: Bootstrap
+        env:
+          MISE_LOCKED: "0"
+        run: mise run bootstrap
+
+      - name: Check that bootstrap left the tree clean
+        run: |
+          changes="$(git status --porcelain)"
+          if [[ -n "${changes}" ]]; then
+            while IFS= read -r line; do
+              echo "::error file=${line:3}::bootstrap changed ${line:3}"
+            done <<< "${changes}"
+            git --no-pager diff
+            exit 1
+          fi
 
       - name: Lint
         run: mise run lint

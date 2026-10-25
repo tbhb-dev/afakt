@@ -22,5 +22,37 @@
     "github>tbhb-dev/devtools//.github/renovate-go-config.json5#0295e6950c06b0ba64c6531b292a077ac4acfd9b", // v0.19.0
   ],
 
+  // After a tool bump, the mise manager runs `mise lock` with whatever mise
+  // containerbase installs, and with no constraint that is the newest
+  // release. mise releases write mise.lock differently, and the pinned mise
+  // rewrites a lockfile a newer one wrote on its next `mise install`, which
+  // leaves bootstrap with a dirty tree. Holding the lockfile step to the
+  // mise that `.github/workflows/ci.yml` pins keeps Renovate's output in
+  // the form CI and bootstrap write. The custom manager and the package
+  // rule below move this pin in the same github-actions pull request as
+  // the CI pins.
+  constraints: {
+    // renovate: datasource=github-releases depName=jdx/mise
+    mise: "2026.10.15",
+  },
+
+  customManagers: [
+    {
+      customType: "regex",
+      managerFilePatterns: ["/^\\.github/renovate\\.json5$/"],
+      matchStrings: [
+        "//\\s*renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)\\s+mise: \"(?<currentValue>[^\"]+)\"",
+      ],
+    },
+  ],
+
+  packageRules: [
+    {
+      matchFileNames: [".github/renovate.json5"],
+      matchPackageNames: ["jdx/mise"],
+      groupName: "github-actions",
+    },
+  ],
+
   repositories: ["tbhb-dev/afakt"],
 }
