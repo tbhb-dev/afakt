@@ -89,7 +89,7 @@ Create commits as `tbhb-agent`. Route reviews through `gh-reviewer` as `tbhb-age
 
 All scheduled times use Coordinated Universal Time (UTC).
 
-`ci.yml` runs on pull requests, pushes to `main`, and manual dispatch. It checks lint on Linux and runs the full check on Linux and macOS. Separate jobs enforce the Go coverage floors, scan reachable vulnerabilities (`vuln`), and check payload and Go vendor drift (`vendor-check`). The required `test` summary fails unless every matrix slot succeeds.
+`ci.yml` runs on pull requests, pushes to `main`, and manual dispatch. It runs bootstrap and checks lint on Linux, and it fails when bootstrap changes a tracked file. It runs the full check on Linux and macOS. Separate jobs enforce the Go coverage floors, scan reachable vulnerabilities (`vuln`), and check payload and Go vendor drift (`vendor-check`). The required `test` summary fails unless every matrix slot succeeds.
 
 `security.yml` runs on pull requests and pushes to `main`. It also runs daily at 06:26 and on manual dispatch. `gitleaks` scans history through the head of the branch on pull requests. The Go scanners upload reports for reachable vulnerabilities and dependencies in `vendor/`.
 
@@ -103,4 +103,4 @@ All scheduled times use Coordinated Universal Time (UTC).
 
 `renovate-config-validator.yaml` validates Renovate configuration. It runs when a pull request or push to `main` changes `**renovate.json5`, and it also accepts manual dispatch.
 
-`renovate.yaml` runs Renovate at minute 11 of every hour on weekdays and every two hours on weekends. Manual dispatch can enable debug logging.
+`renovate.yaml` runs Renovate at minute 11 of every hour on weekdays and every two hours on weekends. Manual dispatch can enable debug logging. `.github/renovate.json5` runs its `mise lock` step with the mise release that `ci.yml` pins.
