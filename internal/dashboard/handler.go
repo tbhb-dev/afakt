@@ -21,15 +21,24 @@ func New() http.Handler {
 	return newHandler(content, entry)
 }
 
+// SecurityHeaders applies the dashboard policy before the next handler can reject a path.
+func SecurityHeaders(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/dashboard" || strings.HasPrefix(r.URL.Path, "/dashboard/") {
+			w.Header().Set("X-Frame-Options", "SAMEORIGIN")
+			w.Header().Set("X-Content-Type-Options", "nosniff")
+			w.Header().Set("Content-Security-Policy", "default-src 'none'; script-src 'self'; style-src 'self'; "+
+				"img-src 'self'; connect-src 'self'; base-uri 'none'; frame-ancestors 'self'")
+		}
+		next.ServeHTTP(w, r)
+	})
+}
+
 // newHandler serves a fixed asset set and entry page, including in Go-only tests.
 func newHandler(files fs.ReadFileFS, index []byte) http.Handler {
 	// Vite uses an eight-character content hash in each generated asset name.
 	hashed := regexp.MustCompile(`-[A-Za-z0-9_-]{8,}\.`)
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("X-Frame-Options", "SAMEORIGIN")
-		w.Header().Set("X-Content-Type-Options", "nosniff")
-		w.Header().Set("Content-Security-Policy", "default-src 'none'; script-src 'self'; style-src 'self'; "+
-			"img-src 'self'; connect-src 'self'; base-uri 'none'; frame-ancestors 'self'")
+	return SecurityHeaders(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/dashboard" && !strings.HasPrefix(r.URL.Path, "/dashboard/") {
 			http.NotFound(w, r)
 			return
@@ -56,5 +65,5 @@ func newHandler(files fs.ReadFileFS, index []byte) http.Handler {
 		}
 		w.Header().Set("Etag", fmt.Sprintf(`"%x"`, sha256.Sum256(body)))
 		http.ServeContent(w, r, name, time.Time{}, bytes.NewReader(body))
-	})
+	}))
 }
