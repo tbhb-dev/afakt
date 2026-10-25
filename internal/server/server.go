@@ -12,6 +12,8 @@ import (
 	"log/slog"
 	"net"
 	"net/http"
+	"path"
+	"strings"
 	"time"
 
 	"github.com/tbhb-dev/afakt/internal/lifecycle"
@@ -145,8 +147,25 @@ func (a *api) Start(context.Context) error {
 	if a.routes != nil {
 		a.routes(mux)
 	}
-	a.server = &http.Server{Handler: mux, ReadHeaderTimeout: readHeaderTimeout}
+	a.server = &http.Server{Handler: canonical(mux), ReadHeaderTimeout: readHeaderTimeout}
 	return nil
+}
+
+// canonical answers 404 for a path that isn't in clean form, such as one with a doubled
+// slash or a dot segment. The router would otherwise redirect it to the clean form.
+func canonical(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		p := r.URL.EscapedPath()
+		clean := path.Clean("/" + p)
+		if strings.HasSuffix(p, "/") && clean != "/" {
+			clean += "/"
+		}
+		if p != clean {
+			http.NotFound(w, r)
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
 }
 
 // Run serves until Stop shuts the HTTP server down. Cancellation doesn't reach the HTTP

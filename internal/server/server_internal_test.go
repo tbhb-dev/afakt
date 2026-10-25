@@ -193,6 +193,8 @@ func TestAPIRoutes(t *testing.T) {
 	// The API serves its root and nothing else.
 	for _, path := range []string{
 		"/", "/livez", "/readyz", "/healthz", "/api", "/api/v1", "/api/v1/livez", "/api/v2/",
+		// Paths that clean to the root get 404, not a redirect to it.
+		"/api//v1/", "/api/v1/./", "/api/v1//", "/api/v2/../v1/",
 	} {
 		if code, _, _ := request(t, http.MethodGet, s.addr(t), path); code != http.StatusNotFound {
 			t.Errorf("GET %s = %d, want 404", path, code)
