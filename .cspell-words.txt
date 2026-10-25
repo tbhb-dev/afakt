@@ -18,10 +18,12 @@ gochecknoinits
 golangci
 gomodscan
 healthz
+knip
 ldflags
 lifecycletest
 livez
 lockfiles
+minimist
 mise
 nolint
 nosuch
@@ -50,6 +52,9 @@ testcoverage
 tmpl
 tombi
 toolchain
+toplevel
 unseparated
 vendir
+vite
+vitest
 wrapcheck

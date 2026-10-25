@@ -1,0 +1,18 @@
+{
+  // The repository root's biome.json sets every rule group to error for
+  // TypeScript and relaxes the Node-only rules for configuration files.
+  "root": false,
+  "extends": "//",
+  "overrides": [
+    {
+      // The end-to-end specs run in Node, not the browser.
+      "includes": ["e2e/**"],
+      "linter": {
+        "rules": {
+          "correctness": { "noNodejsModules": "off" },
+          "style": { "noProcessEnv": "off" }
+        }
+      }
+    }
+  ]
+}

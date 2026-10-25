@@ -1,5 +1,6 @@
 [Ff]rontmatter
 [Gg]oroutine
+[Ll]ockfile
 [Rr]ebase
 [Rr]epos
 [Rr]uleset
@@ -9,10 +10,17 @@
 afakt
 cspell
 devtools
+jscpd
+knip
 mise
 [Pp]flag
+pnpm
 prek
 shellcheck
 toolchain
 vendir
+ESLint
+Stryker
 Temporal
+Vite
+Vitest

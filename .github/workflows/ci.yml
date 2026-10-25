@@ -107,23 +107,94 @@ jobs:
       - name: Check
         run: mise run check
 
-  # The matrix job reports as `test (ubuntu-24.04)` and `test (macos-15)`.
-  # This job owns the plain name `test`, so the required-check list names
-  # one check and stays stable when the matrix changes. `if: always()` keeps
-  # it running after a failed slot, and anything but `success` -- failure,
-  # cancelled, or skipped -- fails it.
+  # The web workspace's gates, one job per mise task, apart from the Go
+  # jobs. Each installs only Node, pnpm and Biome, then the workspace from
+  # the root lockfile.
+  web:
+    name: "web (${{ matrix.task }})"
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        task:
+          - lint-web-all
+          - cover-web
+          - e2e-web
+          - mutate-web
+          - audit-web
+          - check-web-gates
+    steps:
+      - name: Harden the runner
+        uses: step-security/harden-runner@ccd8616d44fd3846e67624a50d5aad6d37bf2d25 # v2.22.1
+        with:
+          egress-policy: audit
+
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up the toolchain
+        uses: jdx/mise-action@08ae2a091c038e1e05ec6f5115dc5c69d5a2a6b8 # v5.1.2
+        with:
+          # renovate: datasource=github-releases depName=jdx/mise
+          version: 2026.10.9
+          install_args: node pnpm biome
+
+      - name: Locate the pnpm store
+        id: pnpm-store
+        run: |
+          store=$(mise exec -- pnpm store path --silent)
+          echo "path=${store}" >> "${GITHUB_OUTPUT}"
+
+      # The key is the workspace's one lockfile at the repository root.
+      - name: Cache the pnpm store
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: pnpm-store-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+
+      - name: Install the workspace packages
+        env:
+          MISE_TASK_RUN_AUTO_INSTALL: "0"
+        run: mise run install-web
+
+      # --with-deps also installs the system libraries the browser needs.
+      - name: Install the pinned browser
+        if: matrix.task == 'e2e-web' || matrix.task == 'check-web-gates'
+        env:
+          MISE_TASK_RUN_AUTO_INSTALL: "0"
+        run: mise run install-web-browsers -- --with-deps
+
+      - name: Run the gate
+        env:
+          MISE_TASK_RUN_AUTO_INSTALL: "0"
+          TASK: ${{ matrix.task }}
+        run: mise run "${TASK}"
+
+  # The matrix jobs report as `test (ubuntu-24.04)`, `test (macos-15)` and
+  # `web (<task>)`. This job owns the plain name `test`, so the
+  # required-check list names one check and stays stable when a matrix
+  # changes. `if: always()` keeps it running after a failed slot, and
+  # anything but `success` from either matrix -- failure, cancelled, or
+  # skipped -- fails it.
   test:
     name: test
     if: always()
-    needs: test-matrix
+    needs: [test-matrix, web]
     runs-on: ubuntu-24.04
     steps:
       - name: Require every matrix leg to pass
         env:
-          RESULT: ${{ needs.test-matrix.result }}
+          GO_RESULT: ${{ needs.test-matrix.result }}
+          WEB_RESULT: ${{ needs.web.result }}
         run: |
-          if [[ "${RESULT}" != "success" ]]; then
-            echo "the test matrix finished as ${RESULT}" >&2
+          if [[ "${GO_RESULT}" != "success" ]]; then
+            echo "the test matrix finished as ${GO_RESULT}" >&2
+            exit 1
+          fi
+          if [[ "${WEB_RESULT}" != "success" ]]; then
+            echo "the web matrix finished as ${WEB_RESULT}" >&2
             exit 1
           fi
 
