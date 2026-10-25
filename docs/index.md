@@ -2,10 +2,10 @@
 okf_version: "0.2"
 ---
 
-# Architecture Overview
+# Components
 
-* [Architecture overview](architecture.md) - Go layout and command structure for afakt.
+* [Components](components.md) - The parts of afakt and what each one does.
 
-# Command reference
+# Glossary
 
-* [Command reference](cli.md) - Usage, options, commands, output, and exit codes for the afakt command-line tool.
+* [Glossary](glossary.md) - Short definitions of afakt's component and workflow names, each linked to its section in the component reference.

@@ -44,6 +44,7 @@ Read `mise.toml` before trusting it. In each fresh worktree, run `mise trust`, t
 | `mise run lint-go-fmt` | Check Go formatting |
 | `mise run lint-go-arch` | Check the layering rules in `.go-arch-lint.yml` |
 | `mise run lint-go-deadcode` | Fail if `deadcode` finds unreachable functions from the binary entry points |
+| `mise run lint-ast-grep` | Run the `ast-grep` rules in `.ast-grep/rules` across the repository, such as the ban on `docs/` references in Go comments and strings |
 | `mise run vuln` | Scan reachable Go vulnerabilities |
 | `mise run devtools:gomodscan` | Scan module dependencies |
 | `mise run vendor` | Tidy `go.mod` and refresh `vendor/` |
@@ -65,7 +66,7 @@ The shared payload pins Go 1.27.3. Use `mise exec -- go version` to inspect it. 
 
 Root configuration includes the shared Go task file and exposes local build and test tasks. Go tool directives declare the analyzer dependencies in the module. `DEVTOOLS_GO_MODULES_MODE=vendor` loads them from the tracked `vendor/` tree. Commit `go.sum` with those generated sources. Run `mise run vendor` to refresh them and `mise run vendor-check` to check for drift.
 
-`.testcoverage.yml` sets the coverage floors: 100% for each file, each package, and the total. The measured total is 100% (88 of 88 statements outside `main.go`). The floors skip `main.go`, whose `os.Exit` glue can't run inside a test process. `docs/cli.md` states what `afakt --version` prints for each kind of build.
+`.testcoverage.yml` sets the coverage floors: 100% for each file, each package, and the total. The measured total is 100% (88 of 88 statements outside `main.go`). The floors skip `main.go`, whose `os.Exit` glue can't run inside a test process.
 
 ## Conventions
 

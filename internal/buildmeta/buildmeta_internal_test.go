@@ -66,7 +66,7 @@ func TestResolveVersion(t *testing.T) {
 	}
 }
 
-// TestDefaultVersion pins the no-linker-flags version to the one docs/cli.md documents.
+// TestDefaultVersion pins the no-linker-flags version.
 func TestDefaultVersion(t *testing.T) {
 	t.Parallel()
 	if devFallback != "0.1.0" {

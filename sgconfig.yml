@@ -1,0 +1,6 @@
+---
+# ast-grep project config. The tool fixes its name and walks up from the
+# working directory to find it. Each rule under ruleDirs names its own
+# language, and the lint-ast-grep task in mise.toml runs them.
+ruleDirs:
+  - .ast-grep/rules

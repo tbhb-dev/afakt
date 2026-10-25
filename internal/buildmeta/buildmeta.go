@@ -9,7 +9,7 @@ package buildmeta
 import "runtime/debug"
 
 // devFallback holds the default version stamped when no linker flags
-// and no runtime build info apply. It matches the version in docs/cli.md.
+// and no runtime build info apply.
 // The resolver treats it as a signal to consult runtime/debug rather
 // than as a pinned version.
 const devFallback = "0.1.0"

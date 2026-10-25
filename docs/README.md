@@ -9,11 +9,11 @@ generated: { by: "claude-code:claude-sonnet-5-5", at: "2026-10-25T00:40:00Z" }
 
 # Docs guide
 
-This directory contains the durable documentation for `afakt`: pages that describe the repository as it stands. [index.md](index.md) lists them, so start there to find a page.
+This directory contains the durable documentation for `afakt`: pages that describe the system in its destination state. [index.md](index.md) lists them, so start there to find a page.
 
 ## What belongs here
 
-A page belongs in `docs/` when it remains accurate for the code on `main` and a reader wants it later. Draft design work, plans, and scratch notes don't belong. Keep them outside the repository until the code does what they describe. Then write a page about what exists.
+A page belongs in `docs/` when it describes afakt as designed and a reader wants it later. Write each page as if the system it describes exists, without build status, "planned" markers, or notes about what the current code lacks. Draft design work, plans, and scratch notes don't belong. Keep them outside the repository.
 
 `AGENTS.md` and `CLAUDE.md` in this directory are entry points for agents, not topic pages. The index leaves them out.
 

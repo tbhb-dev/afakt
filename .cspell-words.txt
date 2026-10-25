@@ -28,11 +28,13 @@ prek
 pyyaml
 rumdl
 Seekable
+sgconfig
 shellcheck
 shfmt
 shopt
 SIGPIPE
 tbhb
+Temporal
 testcoverage
 tmpl
 tombi
