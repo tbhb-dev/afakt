@@ -54,7 +54,6 @@ testcoverage
 tmpl
 tombi
 toolchain
-toplevel
 unseparated
 vendir
 vite

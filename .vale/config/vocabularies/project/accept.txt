@@ -1,6 +1,5 @@
 [Ff]rontmatter
 [Gg]oroutine
-[Ll]ockfile
 [Rr]ebase
 [Rr]epos
 [Rr]uleset
