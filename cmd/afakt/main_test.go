@@ -200,6 +200,8 @@ func waitAddress(logs *logBuffer) (string, bool) {
 	return "", false
 }
 
+// waitServing polls the API root at address until it answers 200, and reports false if the
+// wait times out.
 func waitServing(t *testing.T, address string) bool {
 	t.Helper()
 	deadline := time.Now().Add(childTimeout)

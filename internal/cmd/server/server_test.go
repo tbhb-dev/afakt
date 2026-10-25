@@ -33,6 +33,7 @@ const (
 	serveTimeout = 30 * time.Second
 )
 
+// newFactory returns a factory with empty input and a fixed version.
 func newFactory(out, errOut io.Writer) *cmdutil.Factory {
 	return &cmdutil.Factory{In: strings.NewReader(""), Out: out, ErrOut: errOut, Version: "1.2.3-test"}
 }
@@ -363,6 +364,8 @@ func waitAddress(logs *logBuffer) (string, bool) {
 	return "", false
 }
 
+// waitLive polls the API root at address until it answers 200, and reports false if the
+// wait times out.
 func waitLive(t *testing.T, address string) bool {
 	t.Helper()
 	deadline := time.Now().Add(serveTimeout)

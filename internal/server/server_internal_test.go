@@ -29,8 +29,9 @@ const (
 
 var errBoom = errors.New("boom")
 
+// testConfig returns a configuration for the API on 127.0.0.1 port 0. The system chooses
+// the port, so parallel tests can't collide on one.
 func testConfig() Config {
-	// With port 0 the system chooses the port, and parallel tests can't collide on one.
 	return Config{Targets: []string{TargetAPI}, Listen: "127.0.0.1:0", ShutdownTimeout: testTimeout}
 }
 
@@ -63,6 +64,7 @@ type probe struct {
 	up   chan struct{}
 }
 
+// newProbe returns a probe whose up hasn't closed yet.
 func newProbe() *probe {
 	p := &probe{fake: lifecycletest.NewFake("probe", &lifecycletest.Recorder{}), up: make(chan struct{})}
 	p.fake.StartFunc = func(context.Context) error {
@@ -72,10 +74,13 @@ func newProbe() *probe {
 	return p
 }
 
+// reg returns the registration that makes the probe depend on the API.
 func (p *probe) reg() lifecycle.Registration {
 	return lifecycle.Registration{Name: "probe", Service: p.fake, DependsOn: []string{"api"}}
 }
 
+// harness is a server that run serves in the background. cancel ends it like a signal, done
+// receives what run returned, and address caches the first address the listener logged.
 type harness struct {
 	cancel    context.CancelFunc
 	done      chan error
@@ -83,6 +88,8 @@ type harness struct {
 	address   string
 }
 
+// startServer starts run in the background and returns at once. The test's
+// cleanup cancels the server.
 func startServer(t *testing.T, cfg Config, h hooks) *harness {
 	t.Helper()
 	ctx, cancel := context.WithCancel(t.Context())
@@ -93,9 +100,10 @@ func startServer(t *testing.T, cfg Config, h hooks) *harness {
 	return s
 }
 
+// addr returns the address the listener bound. The listener logs it once it binds, so the
+// first call waits for that line and stops the test if it never comes.
 func (s *harness) addr(t *testing.T) string {
 	t.Helper()
-	// The listener logs its address once it binds, and this waits for that line.
 	if s.address == "" {
 		select {
 		case s.address = <-s.addresses:
@@ -106,6 +114,7 @@ func (s *harness) addr(t *testing.T) string {
 	return s.address
 }
 
+// wait returns what run returned, and stops the test if run doesn't return in time.
 func (s *harness) wait(t *testing.T) error {
 	t.Helper()
 	select {
@@ -117,6 +126,8 @@ func (s *harness) wait(t *testing.T) error {
 	}
 }
 
+// receive waits for ch to close or send, and stops the test, naming what, if it doesn't in
+// time.
 func receive(t *testing.T, ch <-chan struct{}, what string) {
 	t.Helper()
 	select {
@@ -160,6 +171,7 @@ func wantAPIRoot(t *testing.T, address string) {
 	}
 }
 
+// wantClosed checks that the server released address, by binding it again.
 func wantClosed(t *testing.T, address string) {
 	t.Helper()
 	var config net.ListenConfig
@@ -277,12 +289,15 @@ func slowRoute(entered, release chan struct{}) func(mux *http.ServeMux) {
 	}
 }
 
+// response is the result of one background request.
 type response struct {
 	code int
 	body string
 	err  error
 }
 
+// getAsync sends a GET request in the background and returns a channel that receives its
+// response, so the test can act while the request is in flight.
 func getAsync(t *testing.T, address, path string) <-chan response {
 	t.Helper()
 	result := make(chan response, 1)
@@ -304,9 +319,10 @@ func getAsync(t *testing.T, address, path string) <-chan response {
 	return result
 }
 
+// waitRefused waits until address refuses connections, which shows that the HTTP server
+// has closed its listener to drain. It stops the test if that doesn't happen in time.
 func waitRefused(t *testing.T, address string) {
 	t.Helper()
-	// A refused connection shows that the HTTP server has closed its listener to drain.
 	deadline := time.Now().Add(testTimeout)
 	var dialer net.Dialer
 	for time.Now().Before(deadline) {
@@ -394,6 +410,8 @@ func TestRunRejectsComposition(t *testing.T) {
 	}
 }
 
+// closeFailsListener is a listener whose Close always fails, for the error path of
+// the listener's Stop.
 type closeFailsListener struct {
 	net.Listener
 }

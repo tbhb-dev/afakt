@@ -103,6 +103,8 @@ func commandRows(cmd *cobra.Command) [][2]string {
 	return rows
 }
 
+// optionRows returns the name and usage of each flag in definition order, for the options
+// section of the help. A flag without a short form shows any default after the usage.
 func optionRows(cmd *cobra.Command) [][2]string {
 	if cmd.DisableFlagParsing {
 		return nil

@@ -95,6 +95,8 @@ func serverConfig(cmd *cobra.Command, target, listen, timeoutText string) (serve
 	return server.Config{Targets: targets, Listen: listen, ShutdownTimeout: timeout}, nil
 }
 
+// checkListen checks that address has a host and a port from 0 to 65535. It returns one of
+// the listen address errors, which become the reason in the invalid value message.
 func checkListen(address string) error {
 	// A host name passes unresolved, because binding resolves it later.
 	host, port, err := net.SplitHostPort(address)
@@ -110,6 +112,8 @@ func checkListen(address string) error {
 	return nil
 }
 
+// parseTimeout parses a positive Go duration. It returns one of the duration errors,
+// which become the reason in the invalid value message.
 func parseTimeout(text string) (time.Duration, error) {
 	timeout, err := time.ParseDuration(text)
 	switch {

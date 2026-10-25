@@ -23,10 +23,12 @@ var (
 	errIgnore = errors.New("ignored second failure")
 )
 
+// newManager returns a manager that discards its logs.
 func newManager() *lifecycle.Manager {
 	return lifecycle.New(slog.New(slog.DiscardHandler))
 }
 
+// mustRegister registers each registration in order and stops the test at the first error.
 func mustRegister(t *testing.T, m *lifecycle.Manager, regs ...lifecycle.Registration) {
 	t.Helper()
 	for _, reg := range regs {
@@ -36,6 +38,7 @@ func mustRegister(t *testing.T, m *lifecycle.Manager, regs ...lifecycle.Registra
 	}
 }
 
+// states maps the name of each registered service to its current state.
 func states(m *lifecycle.Manager) map[string]lifecycle.State {
 	got := map[string]lifecycle.State{}
 	for _, s := range m.Statuses() {
@@ -44,6 +47,8 @@ func states(m *lifecycle.Manager) map[string]lifecycle.State {
 	return got
 }
 
+// wantStates checks the state of each service the map names. Services missing from the
+// map aren't checked.
 func wantStates(t *testing.T, m *lifecycle.Manager, want map[string]lifecycle.State) {
 	t.Helper()
 	got := states(m)
@@ -54,6 +59,7 @@ func wantStates(t *testing.T, m *lifecycle.Manager, want map[string]lifecycle.St
 	}
 }
 
+// wantCalls checks that the recorder logged exactly the expected calls, in that order.
 func wantCalls(t *testing.T, rec *lifecycletest.Recorder, want ...string) {
 	t.Helper()
 	if got := rec.Calls(); !slices.Equal(got, want) {

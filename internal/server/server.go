@@ -45,6 +45,9 @@ func Run(ctx context.Context, cfg Config, logger *slog.Logger) error {
 	return run(ctx, cfg, logger, hooks{})
 }
 
+// run is Run with hooks for tests. The shutdown context keeps the values of the caller's
+// context but not its cancellation, because a signal that cancels the caller's context
+// starts the shutdown and the services still need time to stop.
 func run(ctx context.Context, cfg Config, logger *slog.Logger, h hooks) error {
 	manager := lifecycle.New(logger)
 	if err := compose(manager, cfg, logger, h); err != nil {
@@ -61,6 +64,8 @@ func run(ctx context.Context, cfg Config, logger *slog.Logger, h hooks) error {
 	return errors.Join(err, manager.Stop(stopCtx))
 }
 
+// compose registers the services of each target with manager. A target without services
+// returns ErrNotComposable.
 func compose(manager *lifecycle.Manager, cfg Config, logger *slog.Logger, h hooks) error {
 	var regs []lifecycle.Registration
 	for _, target := range cfg.Targets {
@@ -107,11 +112,14 @@ func (l *listener) Start(ctx context.Context) error {
 	return nil
 }
 
+// Run has no work of its own. It waits until the manager cancels it, since a return
+// before then counts as a failure.
 func (l *listener) Run(ctx context.Context) error {
 	<-ctx.Done()
 	return nil
 }
 
+// Stop closes the listener. A listener that the HTTP server already closed isn't an error.
 func (l *listener) Stop(context.Context) error {
 	if err := l.ln.Close(); err != nil && !errors.Is(err, net.ErrClosed) {
 		return fmt.Errorf("close listener: %w", err)
@@ -126,6 +134,7 @@ type api struct {
 	server   *http.Server
 }
 
+// Start builds the routes and the HTTP server without serving. Serving starts in Run.
 func (a *api) Start(context.Context) error {
 	mux := http.NewServeMux()
 	// The {$} anchor limits the route to the root itself. Every other path gets 404.

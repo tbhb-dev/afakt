@@ -53,11 +53,14 @@ func (o *onceFlag) String() string {
 	return *o.value
 }
 
-// With the string type, pflag reads a value after an equals sign or as the next argument.
+// Type reports the string type, so pflag reads a value after an equals sign or as the next
+// argument.
 func (o *onceFlag) Type() string {
 	return "string"
 }
 
+// Set stores value on the first use. A later use returns the repeated-flag error, which
+// TranslateFlagError turns into the repeated-argument message.
 func (o *onceFlag) Set(value string) error {
 	if o.set {
 		return errRepeated

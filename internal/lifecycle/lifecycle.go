@@ -97,6 +97,8 @@ var (
 	ErrShutdownTimeout = errors.New("shutdown deadline exceeded")
 )
 
+// phase is where the manager is in its own lifecycle. Register and Start work only in
+// the idle phase, and once Stop moves the manager to the stopping phase it never leaves.
 type phase int
 
 const (
@@ -105,6 +107,9 @@ const (
 	phaseStopping
 )
 
+// service is the manager's record of one registered service. started reports that Start
+// succeeded, so Stop is owed. stopping tells run that a return from Run is the requested
+// stop rather than a failure. run stores Run's result before it closes the done channel.
 type service struct {
 	reg       Registration
 	state     State
@@ -151,6 +156,7 @@ func (m *Manager) Register(reg Registration) error {
 	return nil
 }
 
+// find returns the registered service named name, or nil. The caller holds m.mu.
 func (m *Manager) find(name string) *service {
 	for _, s := range m.services {
 		if s.reg.Name == name {
@@ -161,7 +167,8 @@ func (m *Manager) find(name string) *service {
 }
 
 // resolve checks the dependency graph and returns the start order. Each pass takes the
-// first service in registration order whose dependencies are all placed.
+// first service in registration order whose dependencies are all placed. The caller holds
+// m.mu.
 func (m *Manager) resolve() ([]*service, error) {
 	for _, s := range m.services {
 		for _, name := range s.reg.DependsOn {
@@ -187,6 +194,8 @@ func (m *Manager) resolve() ([]*service, error) {
 	return order, nil
 }
 
+// nextReady returns the first unplaced service in registration order whose dependencies
+// are all placed, or nil when no such service is left. The caller holds m.mu.
 func (m *Manager) nextReady(placed map[string]bool) *service {
 	for _, s := range m.services {
 		if placed[s.reg.Name] {
@@ -199,6 +208,8 @@ func (m *Manager) nextReady(placed map[string]bool) *service {
 	return nil
 }
 
+// unplacedNames lists the services that resolve couldn't place, for the cycle error. The
+// caller holds m.mu.
 func (m *Manager) unplacedNames(placed map[string]bool) string {
 	var names []string
 	for _, s := range m.services {
@@ -252,6 +263,9 @@ func (m *Manager) interrupted(ctx context.Context) error {
 	return nil
 }
 
+// startService calls Start once every dependency is running, then runs Run in its own
+// goroutine. A dependency that isn't running fails the service without a call to Start.
+// It takes m.mu itself and releases it around the call to Start.
 func (m *Manager) startService(ctx context.Context, s *service) error {
 	name := s.reg.Name
 	m.mu.Lock()
@@ -321,6 +335,8 @@ func (m *Manager) Wait(ctx context.Context) error {
 	}
 }
 
+// failureErr returns the first failure of a required service, which is set before m.failed
+// closes.
 func (m *Manager) failureErr() error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
