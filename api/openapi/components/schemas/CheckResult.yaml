@@ -1,0 +1,11 @@
+---
+description: The result of one health check.
+type: object
+required:
+  - status
+properties:
+  status:
+    $ref: CheckStatus.yaml
+additionalProperties: false
+example:
+  status: pass

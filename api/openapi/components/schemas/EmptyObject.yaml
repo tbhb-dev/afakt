@@ -1,0 +1,6 @@
+---
+description: A JSON object with no members.
+type: object
+maxProperties: 0
+additionalProperties: false
+example: {}

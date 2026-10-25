@@ -1,0 +1,220 @@
+---
+# Generated from openapi/ by 'mise run bundle-openapi'. Do not edit.
+openapi: 3.2.0
+info:
+  title: afakt REST API
+  version: 0.1.0
+  summary: The REST API that the `api` target of the afakt server serves.
+  description: |-
+    The authoritative contract for the afakt REST API. Versioned operations are
+    under the `/api/v1/` prefix, and the health endpoints are at the server root.
+    No operation requires authentication.
+  license:
+    name: Apache-2.0
+    identifier: Apache-2.0
+  contact:
+    name: afakt maintainers
+    url: https://github.com/tbhb-dev/afakt
+servers:
+  - url: /
+    description: The address where `afakt server --target=api` listens.
+tags:
+  - name: api
+    description: The versioned REST API under `/api/v1/`.
+  - name: health
+    description: Checks of whether the server is live and ready to serve.
+paths:
+  /api/v1/:
+    $ref: '#/components/pathItems/api_v1_'
+  /livez:
+    $ref: '#/components/pathItems/livez'
+  /readyz:
+    $ref: '#/components/pathItems/readyz'
+  /healthz:
+    $ref: '#/components/pathItems/healthz'
+components:
+  schemas:
+    EmptyObject:
+      description: A JSON object with no members.
+      type: object
+      maxProperties: 0
+      additionalProperties: false
+      example: {}
+    CheckResult:
+      description: The result of one health check.
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          $ref: '#/components/schemas/CheckStatus'
+      additionalProperties: false
+      example:
+        status: pass
+    CheckStatus:
+      description: The result of one check.
+      type: string
+      enum:
+        - pass
+        - fail
+    HealthReport:
+      description: |-
+        The health of the server as a whole. `status` is `pass` when both checks pass
+        and `fail` otherwise.
+      type: object
+      required:
+        - status
+        - checks
+      properties:
+        status:
+          $ref: '#/components/schemas/CheckStatus'
+        checks:
+          type: object
+          required:
+            - livez
+            - readyz
+          properties:
+            livez:
+              $ref: '#/components/schemas/CheckResult'
+            readyz:
+              $ref: '#/components/schemas/CheckResult'
+          additionalProperties: false
+          example:
+            livez:
+              status: pass
+            readyz:
+              status: pass
+      additionalProperties: false
+      example:
+        status: pass
+        checks:
+          livez:
+            status: pass
+          readyz:
+            status: pass
+  responses:
+    CheckPassed:
+      description: The check passes.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CheckResult'
+            properties:
+              status:
+                const: pass
+          example:
+            status: pass
+    CheckFailed:
+      description: The check fails.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CheckResult'
+            properties:
+              status:
+                const: fail
+          example:
+            status: fail
+  pathItems:
+    api_v1_:
+      get:
+        operationId: getAPIRoot
+        summary: Get the API root
+        description: Returns an empty JSON object.
+        tags:
+          - api
+        security: []
+        responses:
+          "200":
+            description: The API root.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/EmptyObject'
+                example: {}
+    livez:
+      get:
+        operationId: getLivez
+        summary: Check that the server is live
+        description: |-
+          Passes whenever the HTTP server can answer requests, including while the
+          server starts or drains.
+        tags:
+          - health
+        security: []
+        responses:
+          "200":
+            $ref: '#/components/responses/CheckPassed'
+    readyz:
+      get:
+        operationId: getReadyz
+        summary: Check that the server is ready
+        description: |-
+          Passes only while every required service is running. Fails while the
+          server starts, while it drains after SIGINT or SIGTERM, and after a
+          required service fails.
+        tags:
+          - health
+        security: []
+        responses:
+          "200":
+            $ref: '#/components/responses/CheckPassed'
+          "503":
+            $ref: '#/components/responses/CheckFailed'
+    healthz:
+      get:
+        operationId: getHealthz
+        summary: Check the health of the server
+        description: |-
+          Passes only when both the `/livez` and the `/readyz` checks pass, and
+          reports the result of each. Each entry in `checks` matches what its
+          endpoint reports at that moment.
+        tags:
+          - health
+        security: []
+        responses:
+          "200":
+            description: Both checks pass.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/HealthReport'
+                  properties:
+                    status:
+                      const: pass
+                    checks:
+                      properties:
+                        livez:
+                          properties:
+                            status:
+                              const: pass
+                        readyz:
+                          properties:
+                            status:
+                              const: pass
+                example:
+                  status: pass
+                  checks:
+                    livez:
+                      status: pass
+                    readyz:
+                      status: pass
+          "503":
+            description: At least one check fails, so `status` is `fail`.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/HealthReport'
+                  properties:
+                    status:
+                      const: fail
+                examples:
+                  notReady:
+                    summary: The server is live but not ready.
+                    value:
+                      status: fail
+                      checks:
+                        livez:
+                          status: pass
+                        readyz:
+                          status: fail

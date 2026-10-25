@@ -1,0 +1,33 @@
+---
+openapi: 3.2.0
+info:
+  title: afakt REST API
+  version: 0.1.0
+  summary: The REST API that the `api` target of the afakt server serves.
+  description: |-
+    The authoritative contract for the afakt REST API. Versioned operations are
+    under the `/api/v1/` prefix, and the health endpoints are at the server root.
+    No operation requires authentication.
+  license:
+    name: Apache-2.0
+    identifier: Apache-2.0
+  contact:
+    name: afakt maintainers
+    url: https://github.com/tbhb-dev/afakt
+servers:
+  - url: /
+    description: The address where `afakt server --target=api` listens.
+tags:
+  - name: api
+    description: The versioned REST API under `/api/v1/`.
+  - name: health
+    description: Checks of whether the server is live and ready to serve.
+paths:
+  /api/v1/:
+    $ref: paths/api_v1_.yaml
+  /livez:
+    $ref: paths/livez.yaml
+  /readyz:
+    $ref: paths/readyz.yaml
+  /healthz:
+    $ref: paths/healthz.yaml

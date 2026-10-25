@@ -6,6 +6,7 @@ buildmeta
 cmdutil
 contextcheck
 cspell
+dasel
 dasharray
 deadcode
 devtools
@@ -23,6 +24,7 @@ lifecycletest
 livez
 lockfiles
 mise
+mktemp
 nolint
 nosuch
 nullglob

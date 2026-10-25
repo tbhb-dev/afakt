@@ -1,0 +1,35 @@
+---
+description: |-
+  The health of the server as a whole. `status` is `pass` when both checks pass
+  and `fail` otherwise.
+type: object
+required:
+  - status
+  - checks
+properties:
+  status:
+    $ref: CheckStatus.yaml
+  checks:
+    type: object
+    required:
+      - livez
+      - readyz
+    properties:
+      livez:
+        $ref: CheckResult.yaml
+      readyz:
+        $ref: CheckResult.yaml
+    additionalProperties: false
+    example:
+      livez:
+        status: pass
+      readyz:
+        status: pass
+additionalProperties: false
+example:
+  status: pass
+  checks:
+    livez:
+      status: pass
+    readyz:
+      status: pass

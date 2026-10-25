@@ -50,6 +50,9 @@ Read `mise.toml` before trusting it. In each fresh worktree, run `mise trust`, t
 | `mise run lint-go-arch` | Check the layering rules in `.go-arch-lint.yml` |
 | `mise run lint-go-deadcode` | Fail if `deadcode` finds unreachable functions from the binary entry points |
 | `mise run lint-ast-grep` | Run the `ast-grep` rules in `.ast-grep/rules` across the repository, such as the ban on `docs/` references in Go comments and strings |
+| `mise run bundle-openapi` | Bundle the OpenAPI document into its single-file bundle |
+| `mise run check-openapi-bundle` | Fail when the committed OpenAPI bundle is out of date |
+| `mise run lint-openapi` | Lint the OpenAPI document and its bundle |
 | `mise run vuln` | Scan reachable Go vulnerabilities |
 | `mise run devtools:gomodscan` | Scan module dependencies |
 | `mise run vendor` | Tidy `go.mod` and refresh `vendor/` |

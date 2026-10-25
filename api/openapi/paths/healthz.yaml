@@ -1,0 +1,57 @@
+---
+get:
+  operationId: getHealthz
+  summary: Check the health of the server
+  description: |-
+    Passes only when both the `/livez` and the `/readyz` checks pass, and
+    reports the result of each. Each entry in `checks` matches what its
+    endpoint reports at that moment.
+  tags:
+    - health
+  security: []
+  responses:
+    "200":
+      description: Both checks pass.
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/HealthReport.yaml
+            properties:
+              status:
+                const: pass
+              checks:
+                properties:
+                  livez:
+                    properties:
+                      status:
+                        const: pass
+                  readyz:
+                    properties:
+                      status:
+                        const: pass
+          example:
+            status: pass
+            checks:
+              livez:
+                status: pass
+              readyz:
+                status: pass
+    "503":
+      description: At least one check fails, so `status` is `fail`.
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/HealthReport.yaml
+            properties:
+              status:
+                const: fail
+          examples:
+            notReady:
+              summary: The server is live but not ready.
+              value:
+                status: fail
+                checks:
+                  livez:
+                    status: pass
+                  readyz:
+                    status: fail

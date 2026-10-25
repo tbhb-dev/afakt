@@ -1,0 +1,13 @@
+---
+get:
+  operationId: getLivez
+  summary: Check that the server is live
+  description: |-
+    Passes whenever the HTTP server can answer requests, including while the
+    server starts or drains.
+  tags:
+    - health
+  security: []
+  responses:
+    "200":
+      $ref: ../components/responses/CheckPassed.yaml

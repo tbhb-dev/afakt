@@ -1,0 +1,16 @@
+---
+get:
+  operationId: getAPIRoot
+  summary: Get the API root
+  description: Returns an empty JSON object.
+  tags:
+    - api
+  security: []
+  responses:
+    "200":
+      description: The API root.
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/EmptyObject.yaml
+          example: {}
