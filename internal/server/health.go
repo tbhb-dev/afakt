@@ -44,6 +44,16 @@ func newHealth(ctx context.Context, manager *lifecycle.Manager, checks ...func(c
 
 // routes adds the health endpoints at the root of `mux`, outside the versioned API prefix.
 func (h health) routes(mux *http.ServeMux) {
+	h.probeRoutes(mux)
+	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, r *http.Request) {
+		live, ready := h.live(), h.ready(r.Context())
+		body := fmt.Sprintf(healthzFormat, checkStatus(live && ready), checkStatus(live), checkStatus(ready))
+		writeHealth(w, live && ready, body)
+	})
+}
+
+// probeRoutes adds /livez and /readyz.
+func (h health) probeRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("GET /livez", func(w http.ResponseWriter, _ *http.Request) {
 		live := h.live()
 		writeHealth(w, live, fmt.Sprintf(`{"status":%q}`, checkStatus(live)))
@@ -51,11 +61,6 @@ func (h health) routes(mux *http.ServeMux) {
 	mux.HandleFunc("GET /readyz", func(w http.ResponseWriter, r *http.Request) {
 		ready := h.ready(r.Context())
 		writeHealth(w, ready, fmt.Sprintf(`{"status":%q}`, checkStatus(ready)))
-	})
-	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, r *http.Request) {
-		live, ready := h.live(), h.ready(r.Context())
-		body := fmt.Sprintf(healthzFormat, checkStatus(live && ready), checkStatus(live), checkStatus(ready))
-		writeHealth(w, live && ready, body)
 	})
 }
 

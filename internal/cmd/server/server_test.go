@@ -65,6 +65,8 @@ func clapError(message, usage string) string {
 func TestNewCmdServerAccepts(t *testing.T) {
 	t.Parallel()
 	api := []string{server.TargetAPI}
+	webhook := []string{server.TargetWebhook}
+	combined := []string{server.TargetAPI, server.TargetWebhook}
 	cases := []struct {
 		name string
 		args []string
@@ -100,6 +102,26 @@ func TestNewCmdServerAccepts(t *testing.T) {
 			args: []string{"--target=api", "--"},
 			want: server.Config{Targets: api, Listen: "127.0.0.1:8080", ShutdownTimeout: 30 * time.Second},
 		},
+		{
+			name: "webhook defaults",
+			args: []string{"--target", "webhook"},
+			want: server.Config{Targets: webhook, Listen: "127.0.0.1:8080", ShutdownTimeout: 30 * time.Second},
+		},
+		{
+			name: "webhook equals form",
+			args: []string{"--target=webhook", "--listen=127.0.0.1:9001", "--shutdown-timeout=2m"},
+			want: server.Config{Targets: webhook, Listen: "127.0.0.1:9001", ShutdownTimeout: 2 * time.Minute},
+		},
+		{
+			name: "webhook separate form",
+			args: []string{"--listen", "[::1]:0", "--target", "webhook", "--shutdown-timeout", "250ms"},
+			want: server.Config{Targets: webhook, Listen: "[::1]:0", ShutdownTimeout: 250 * time.Millisecond},
+		},
+		{
+			name: "api and webhook",
+			args: []string{"--target=api,webhook"},
+			want: server.Config{Targets: combined, Listen: "127.0.0.1:8080", ShutdownTimeout: 30 * time.Second},
+		},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -131,7 +153,7 @@ func TestServerRejects(t *testing.T) {
 	}
 	target := func(value, reason string) string { return invalid(value, "--target <TARGET>", reason) }
 	unavailableIn := func(value, name string) string {
-		return target(value, "target is not available yet: '"+name+"'; only 'api' can run in this build")
+		return target(value, "target is not available yet: '"+name+"'; only 'api' and 'webhook' can run in this build")
 	}
 	unavailable := func(name string) string { return unavailableIn(name, name) }
 	listen := func(value, reason string) string { return invalid(value, "--listen <ADDR>", reason) }
@@ -223,7 +245,36 @@ func TestServerRejects(t *testing.T) {
 			args:   []string{"--target=api,api"},
 			stderr: target("api,api", "duplicate target 'api'"),
 		},
-		{name: "webhook", args: []string{"--target=webhook"}, stderr: unavailable("webhook")},
+		{
+			name:   "duplicate webhook",
+			args:   []string{"--target=webhook,api,webhook"},
+			stderr: target("webhook,api,webhook", "duplicate target 'webhook'"),
+		},
+		{
+			name:   "webhook and dashboard",
+			args:   []string{"--target=webhook,dashboard"},
+			stderr: unavailableIn("webhook,dashboard", "dashboard"),
+		},
+		{
+			name:   "webhook without port",
+			args:   []string{"--target=webhook", "--listen", "127.0.0.1"},
+			stderr: listen("127.0.0.1", listenForm),
+		},
+		{
+			name:   "webhook without host",
+			args:   []string{"--target", "webhook", "--listen=:9000"},
+			stderr: listen(":9000", listenHost),
+		},
+		{
+			name:   "webhook zero timeout",
+			args:   []string{"--target=webhook", "--shutdown-timeout", "0s"},
+			stderr: timeout("0s", durationPos),
+		},
+		{
+			name:   "webhook timeout not a duration",
+			args:   []string{"--target", "api,webhook", "--shutdown-timeout=later"},
+			stderr: timeout("later", durationForm),
+		},
 		{name: "dashboard", args: []string{"--target=dashboard"}, stderr: unavailable("dashboard")},
 		{name: "worker", args: []string{"--target=worker"}, stderr: unavailable("worker")},
 		{name: "all", args: []string{"--target=all"}, stderr: unavailable("all")},
@@ -364,14 +415,14 @@ func waitAddress(logs *logBuffer) (string, bool) {
 	return "", false
 }
 
-// waitLive polls the API root at address until it answers 200, and reports false if the
-// wait times out.
-func waitLive(t *testing.T, address string) bool {
+// waitLive polls path at address until it answers 200, and reports false if the wait times
+// out.
+func waitLive(t *testing.T, address, path string) bool {
 	t.Helper()
 	deadline := time.Now().Add(serveTimeout)
 	for time.Now().Before(deadline) {
 		ctx, cancel := context.WithTimeout(t.Context(), time.Second)
-		req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://"+address+"/api/v1/", http.NoBody)
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://"+address+path, http.NoBody)
 		if err != nil {
 			cancel()
 			t.Fatalf("NewRequest() error = %v", err)
@@ -394,18 +445,47 @@ func waitLive(t *testing.T, address string) bool {
 
 func TestServerRunShutsDownCleanly(t *testing.T) {
 	t.Parallel()
-	// This runs the real `serverRun`, which a canceled context stops as a signal does in main.
+	cases := []struct {
+		target string
+		// path answers 200 once the server is up.
+		path string
+	}{
+		{target: "api", path: "/api/v1/"},
+		{target: "webhook", path: "/readyz"},
+	}
+	for _, tc := range cases {
+		t.Run(tc.target, func(t *testing.T) {
+			t.Parallel()
+			stderr := runUntilCanceled(t, tc.target, tc.path)
+			for _, want := range []string{
+				"msg=\"server ready\"", "msg=\"shutting down\"", "msg=\"service terminated\" service=" + tc.target,
+			} {
+				if !strings.Contains(stderr, want) {
+					t.Errorf("stderr lacks %q:\n%s", want, stderr)
+				}
+			}
+			if strings.Contains(stderr, "Error:") {
+				t.Errorf("stderr reports an error:\n%s", stderr)
+			}
+		})
+	}
+}
+
+// runUntilCanceled runs the real `serverRun` for target until path answers 200, then cancels
+// its context as a signal does in main. It returns the logs once the command returns.
+func runUntilCanceled(t *testing.T, target, path string) string {
+	t.Helper()
 	ctx, cancel := context.WithCancel(t.Context())
 	defer cancel()
 	var stderr logBuffer
 	cmd := servercmd.NewCmdServer(newFactory(io.Discard, &stderr), nil)
-	cmd.SetArgs([]string{"--target=api", "--listen=127.0.0.1:0", "--shutdown-timeout=" + serveTimeout.String()})
+	cmd.SetArgs([]string{"--target=" + target, "--listen=127.0.0.1:0", "--shutdown-timeout=" + serveTimeout.String()})
 	done := make(chan error, 1)
 	go func() { done <- cmd.ExecuteContext(ctx) }()
 	address, ok := waitAddress(&stderr)
-	if !ok || !strings.HasPrefix(address, "127.0.0.1:") || !waitLive(t, address) {
+	if !ok || !strings.HasPrefix(address, "127.0.0.1:") || !waitLive(t, address, path) {
 		cancel()
-		t.Fatalf("the server never answered /api/v1/ on %q; error %v, stderr:\n%s", address, <-done, stderr.String())
+		t.Fatalf("the server never answered %s on %q; error %v, stderr:\n%s", path, address, <-done, stderr.String())
 	}
 	cancel()
 	select {
@@ -416,14 +496,7 @@ func TestServerRunShutsDownCleanly(t *testing.T) {
 	case <-time.After(serveTimeout):
 		t.Fatal("the server did not return")
 	}
-	for _, want := range []string{"msg=\"server ready\"", "msg=\"shutting down\"", "msg=\"service terminated\" service=api"} {
-		if !strings.Contains(stderr.String(), want) {
-			t.Errorf("stderr lacks %q:\n%s", want, stderr.String())
-		}
-	}
-	if strings.Contains(stderr.String(), "Error:") {
-		t.Errorf("stderr reports an error:\n%s", stderr.String())
-	}
+	return stderr.String()
 }
 
 func TestServerRunFailure(t *testing.T) {
@@ -435,15 +508,17 @@ func TestServerRunFailure(t *testing.T) {
 		t.Fatalf("Listen() error = %v", err)
 	}
 	defer taken.Close()
-	var stdout, stderr bytes.Buffer
-	args := []string{"server", "--target", "api", "--listen", taken.Addr().String(), "--shutdown-timeout=5s"}
-	if got := root.Execute(t.Context(), newFactory(&stdout, &stderr), args); got != runtimeExit {
-		t.Errorf("exit code = %d, want %d", got, runtimeExit)
-	}
-	if want := "Error: start \"api-listener\": listen: "; !strings.Contains(stderr.String(), want) {
-		t.Errorf("stderr lacks %q:\n%s", want, stderr.String())
-	}
-	if stdout.Len() != 0 {
-		t.Errorf("stdout = %q, want empty", stdout.String())
+	for _, target := range []string{"api", "webhook", "api,webhook"} {
+		var stdout, stderr bytes.Buffer
+		args := []string{"server", "--target", target, "--listen", taken.Addr().String(), "--shutdown-timeout=5s"}
+		if got := root.Execute(t.Context(), newFactory(&stdout, &stderr), args); got != runtimeExit {
+			t.Errorf("%s: exit code = %d, want %d", target, got, runtimeExit)
+		}
+		if want := "Error: start \"http-listener\": listen: "; !strings.Contains(stderr.String(), want) {
+			t.Errorf("%s: stderr lacks %q:\n%s", target, want, stderr.String())
+		}
+		if stdout.Len() != 0 {
+			t.Errorf("%s: stdout = %q, want empty", target, stdout.String())
+		}
 	}
 }

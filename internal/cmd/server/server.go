@@ -68,8 +68,10 @@ func NewCmdServer(f *cmdutil.Factory, runF func(*Options) error) *cobra.Command 
 		},
 	}
 	cmdutil.StringFlag(cmd, &target, targetFlag, "<TARGET>", "",
-		"Comma-separated targets: api, webhook, dashboard, worker, or all; only api can run")
-	cmdutil.StringFlag(cmd, &listen, listenFlag, "<ADDR>", defaultListen, "Host and port the API listens on")
+		"Comma-separated targets: api, webhook, dashboard, worker, or all; only api and webhook can run, "+
+			"and webhook has no receivers yet, only health endpoints")
+	cmdutil.StringFlag(cmd, &listen, listenFlag, "<ADDR>", defaultListen,
+		"Host and port the HTTP server listens on")
 	cmdutil.StringFlag(cmd, &timeout, timeoutFlag, "<DURATION>", defaultShutdownTimeout,
 		"Time limit for the whole shutdown, as a Go duration")
 	cmdutil.AddHelpFlag(cmd)
