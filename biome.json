@@ -57,21 +57,20 @@
       }
     },
     {
-      "includes": ["**/*.ts", "**/*.tsx"],
+      "includes": ["**/*.config.ts"],
       "linter": {
         "rules": {
-          "complexity": { "useLiteralKeys": "off" }
+          "style": {
+            "noDefaultExport": "off"
+          }
         }
       }
     },
     {
-      "includes": ["**/*.config.ts", "**/*.config.base.ts", "*.shared.ts"],
+      "includes": ["**/playwright.config.ts"],
       "linter": {
         "rules": {
-          "correctness": { "noNodejsModules": "off" },
           "style": {
-            "noDefaultExport": "off",
-            "noProcessEnv": "off",
             "useNamingConvention": {
               "level": "error",
               "options": { "strictCase": false }

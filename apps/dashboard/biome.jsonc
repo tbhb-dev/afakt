@@ -1,16 +1,14 @@
 {
   // The repository root's biome.json sets every rule group to error for
-  // TypeScript and relaxes the Node-only rules for configuration files.
+  // TypeScript. The browser version check reads the pinned version in Node.
   "root": false,
   "extends": "//",
   "overrides": [
     {
-      // The end-to-end specs run in Node, not the browser.
-      "includes": ["e2e/**"],
+      "includes": ["e2e/browser.spec.ts"],
       "linter": {
         "rules": {
-          "correctness": { "noNodejsModules": "off" },
-          "style": { "noProcessEnv": "off" }
+          "correctness": { "noNodejsModules": "off" }
         }
       }
     }
