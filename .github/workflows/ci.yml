@@ -112,6 +112,7 @@ jobs:
   # the root lockfile.
   web:
     name: "web (${{ matrix.task }})"
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
