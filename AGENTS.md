@@ -10,7 +10,7 @@ generated: { by: "claude-code:claude-sonnet-5-5", at: "2026-10-20T05:55:00Z" }
 
 ## What this is
 
-`afakt` is a proof of concept command-line tool written in Go. It has two commands: `status` prints a placeholder line, and `server` runs an HTTP API whose root, `GET /api/v1/`, answers with an empty JSON object. The repository also has shared development tools, docs, and CI gates. It uses devtools v0.19.0.
+`afakt` is a Go command-line tool. The repository also has shared development tools, docs, and CI gates.
 
 ## Layout
 
@@ -66,7 +66,7 @@ The shared payload pins Go 1.27.3. Use `mise exec -- go version` to inspect it. 
 
 Root configuration includes the shared Go task file and exposes local build and test tasks. Go tool directives declare the analyzer dependencies in the module. `DEVTOOLS_GO_MODULES_MODE=vendor` loads them from the tracked `vendor/` tree. Commit `go.sum` with those generated sources. Run `mise run vendor` to refresh them and `mise run vendor-check` to check for drift.
 
-`.testcoverage.yml` sets the coverage floors: 100% for each file, each package, and the total. The measured total is 100% (539 of 539 statements outside `main.go`). The floors skip `main.go`, whose `os.Exit` glue can't run inside a test process.
+`.testcoverage.yml` sets the coverage floors: 100% for each file, each package, and the total. The floors skip `main.go`, whose `os.Exit` glue can't run inside a test process.
 
 ## Conventions
 
