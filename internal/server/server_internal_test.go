@@ -72,8 +72,8 @@ func newProbe() *probe {
 	return p
 }
 
-func (p *probe) spec() lifecycle.Spec {
-	return lifecycle.Spec{Name: "probe", Service: p.fake, DependsOn: []string{"api"}}
+func (p *probe) reg() lifecycle.Registration {
+	return lifecycle.Registration{Name: "probe", Service: p.fake, DependsOn: []string{"api"}}
 }
 
 type harness struct {
@@ -175,7 +175,7 @@ func wantClosed(t *testing.T, address string) {
 func TestAPIRoutes(t *testing.T) {
 	t.Parallel()
 	p := newProbe()
-	s := startServer(t, testConfig(), hooks{services: []lifecycle.Spec{p.spec()}})
+	s := startServer(t, testConfig(), hooks{services: []lifecycle.Registration{p.reg()}})
 	receive(t, p.up, "the probe to start")
 	wantAPIRoot(t, s.addr(t))
 	// The API serves its root and nothing else.
@@ -202,7 +202,7 @@ func TestAPIServesWhileStopping(t *testing.T) {
 	p := newProbe()
 	stopEntered, stopRelease := make(chan struct{}), make(chan struct{})
 	p.fake.StopFunc = lifecycletest.Block(stopEntered, stopRelease)
-	s := startServer(t, testConfig(), hooks{services: []lifecycle.Spec{p.spec()}})
+	s := startServer(t, testConfig(), hooks{services: []lifecycle.Registration{p.reg()}})
 	receive(t, p.up, "the probe to start")
 	s.cancel()
 	receive(t, stopEntered, "the probe to stop")
@@ -219,7 +219,7 @@ func TestRequiredFailureAfterStartup(t *testing.T) {
 	p := newProbe()
 	entered, release := make(chan struct{}), make(chan struct{})
 	p.fake.StopFunc = lifecycletest.Block(entered, release)
-	s := startServer(t, testConfig(), hooks{services: []lifecycle.Spec{p.spec()}})
+	s := startServer(t, testConfig(), hooks{services: []lifecycle.Registration{p.reg()}})
 	receive(t, p.up, "the probe to start")
 	// The failure starts the same shutdown that a signal starts.
 	p.fake.Fail(errBoom)
@@ -236,7 +236,7 @@ func TestStartupFailureReleasesListener(t *testing.T) {
 	t.Parallel()
 	p := newProbe()
 	p.fake.StartFunc = func(context.Context) error { return errBoom }
-	s := startServer(t, testConfig(), hooks{services: []lifecycle.Spec{p.spec()}})
+	s := startServer(t, testConfig(), hooks{services: []lifecycle.Registration{p.reg()}})
 	err := s.wait(t)
 	if !errors.Is(err, errBoom) || err.Error() != `start "probe": boom` {
 		t.Errorf("run() error = %v, want start \"probe\": boom", err)
@@ -325,7 +325,7 @@ func TestShutdownDrainsRequests(t *testing.T) {
 	entered, release := make(chan struct{}), make(chan struct{})
 	p := newProbe()
 	s := startServer(t, testConfig(), hooks{
-		services: []lifecycle.Spec{p.spec()},
+		services: []lifecycle.Registration{p.reg()},
 		routes:   slowRoute(entered, release),
 	})
 	receive(t, p.up, "the probe to start")
@@ -351,7 +351,7 @@ func TestShutdownTimeout(t *testing.T) {
 	cfg := testConfig()
 	cfg.ShutdownTimeout = 200 * time.Millisecond
 	s := startServer(t, cfg, hooks{
-		services: []lifecycle.Spec{p.spec()},
+		services: []lifecycle.Registration{p.reg()},
 		routes:   slowRoute(entered, make(chan struct{})),
 	})
 	receive(t, p.up, "the probe to start")

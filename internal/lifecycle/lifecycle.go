@@ -28,11 +28,11 @@ type Service interface {
 	Stop(ctx context.Context) error
 }
 
-// Spec registers one service. DependsOn names the services that must be running before this
-// one starts. A required service can depend only on other required services. When a
-// required service fails, the manager reports a failure. When an optional one fails, it
-// logs the failure and goes on.
-type Spec struct {
+// Registration describes one service for Register. DependsOn names the services that must
+// be running before this one starts. A required service can depend only on other required
+// services. When a required service fails, the manager reports a failure. When an optional
+// one fails, it logs the failure and goes on.
+type Registration struct {
 	Name      string
 	Service   Service
 	DependsOn []string
@@ -75,9 +75,9 @@ func (s State) String() string {
 }
 
 var (
-	// ErrInvalidSpec reports a spec that lacks a name or a service.
-	ErrInvalidSpec = errors.New("invalid service spec")
-	// ErrDuplicateService reports a second spec with a name already registered.
+	// ErrInvalidRegistration reports a registration that lacks a name or a service.
+	ErrInvalidRegistration = errors.New("invalid service registration")
+	// ErrDuplicateService reports a second registration with a name already registered.
 	ErrDuplicateService = errors.New("duplicate service")
 	// ErrNotIdle reports a call to Register or Start after Start.
 	ErrNotIdle = errors.New("manager has already started")
@@ -106,7 +106,7 @@ const (
 )
 
 type service struct {
-	spec      Spec
+	reg       Registration
 	state     State
 	started   bool
 	stopping  bool
@@ -135,25 +135,25 @@ func New(logger *slog.Logger) *Manager {
 
 // Register adds a service. The manager starts services in dependency order and breaks ties
 // in registration order.
-func (m *Manager) Register(spec Spec) error {
+func (m *Manager) Register(reg Registration) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	switch {
 	case m.phase != phaseIdle:
-		return fmt.Errorf("register %q: %w", spec.Name, ErrNotIdle)
-	case spec.Name == "" || spec.Service == nil:
-		return fmt.Errorf("register %q: %w", spec.Name, ErrInvalidSpec)
-	case m.find(spec.Name) != nil:
-		return fmt.Errorf("register %q: %w", spec.Name, ErrDuplicateService)
+		return fmt.Errorf("register %q: %w", reg.Name, ErrNotIdle)
+	case reg.Name == "" || reg.Service == nil:
+		return fmt.Errorf("register %q: %w", reg.Name, ErrInvalidRegistration)
+	case m.find(reg.Name) != nil:
+		return fmt.Errorf("register %q: %w", reg.Name, ErrDuplicateService)
 	}
-	spec.DependsOn = slices.Clone(spec.DependsOn)
-	m.services = append(m.services, &service{spec: spec, runDone: make(chan struct{})})
+	reg.DependsOn = slices.Clone(reg.DependsOn)
+	m.services = append(m.services, &service{reg: reg, runDone: make(chan struct{})})
 	return nil
 }
 
 func (m *Manager) find(name string) *service {
 	for _, s := range m.services {
-		if s.spec.Name == name {
+		if s.reg.Name == name {
 			return s
 		}
 	}
@@ -164,13 +164,13 @@ func (m *Manager) find(name string) *service {
 // first service in registration order whose dependencies are all placed.
 func (m *Manager) resolve() ([]*service, error) {
 	for _, s := range m.services {
-		for _, name := range s.spec.DependsOn {
+		for _, name := range s.reg.DependsOn {
 			dep := m.find(name)
 			switch {
 			case dep == nil:
-				return nil, fmt.Errorf("service %q: %w %q", s.spec.Name, ErrUnknownDependency, name)
-			case !s.spec.Optional && dep.spec.Optional:
-				return nil, fmt.Errorf("service %q: %w %q", s.spec.Name, ErrOptionalDependency, name)
+				return nil, fmt.Errorf("service %q: %w %q", s.reg.Name, ErrUnknownDependency, name)
+			case !s.reg.Optional && dep.reg.Optional:
+				return nil, fmt.Errorf("service %q: %w %q", s.reg.Name, ErrOptionalDependency, name)
 			}
 		}
 	}
@@ -181,7 +181,7 @@ func (m *Manager) resolve() ([]*service, error) {
 		if next == nil {
 			return nil, fmt.Errorf("%w among %s", ErrDependencyCycle, m.unplacedNames(placed))
 		}
-		placed[next.spec.Name] = true
+		placed[next.reg.Name] = true
 		order = append(order, next)
 	}
 	return order, nil
@@ -189,10 +189,10 @@ func (m *Manager) resolve() ([]*service, error) {
 
 func (m *Manager) nextReady(placed map[string]bool) *service {
 	for _, s := range m.services {
-		if placed[s.spec.Name] {
+		if placed[s.reg.Name] {
 			continue
 		}
-		if !slices.ContainsFunc(s.spec.DependsOn, func(name string) bool { return !placed[name] }) {
+		if !slices.ContainsFunc(s.reg.DependsOn, func(name string) bool { return !placed[name] }) {
 			return s
 		}
 	}
@@ -202,8 +202,8 @@ func (m *Manager) nextReady(placed map[string]bool) *service {
 func (m *Manager) unplacedNames(placed map[string]bool) string {
 	var names []string
 	for _, s := range m.services {
-		if !placed[s.spec.Name] {
-			names = append(names, s.spec.Name)
+		if !placed[s.reg.Name] {
+			names = append(names, s.reg.Name)
 		}
 	}
 	return strings.Join(names, ", ")
@@ -231,7 +231,7 @@ func (m *Manager) Start(ctx context.Context) error {
 		if err = m.interrupted(ctx); err != nil {
 			return err
 		}
-		if err = m.startService(ctx, s); err != nil && !s.spec.Optional {
+		if err = m.startService(ctx, s); err != nil && !s.reg.Optional {
 			return err
 		}
 	}
@@ -253,9 +253,9 @@ func (m *Manager) interrupted(ctx context.Context) error {
 }
 
 func (m *Manager) startService(ctx context.Context, s *service) error {
-	name := s.spec.Name
+	name := s.reg.Name
 	m.mu.Lock()
-	for _, dep := range s.spec.DependsOn {
+	for _, dep := range s.reg.DependsOn {
 		if m.find(dep).state != StateRunning {
 			err := fmt.Errorf("start %q: %w: %q", name, ErrDependencyNotRunning, dep)
 			m.setFailed(ctx, s, err)
@@ -266,7 +266,7 @@ func (m *Manager) startService(ctx context.Context, s *service) error {
 	m.setState(ctx, s, StateStarting)
 	m.mu.Unlock()
 
-	err := protect(func() error { return s.spec.Service.Start(ctx) })
+	err := protect(func() error { return s.reg.Service.Start(ctx) })
 
 	m.mu.Lock()
 	defer m.mu.Unlock()
@@ -287,7 +287,7 @@ func (m *Manager) startService(ctx context.Context, s *service) error {
 // failure, and a failure of a required service ends Wait.
 func (m *Manager) run(ctx context.Context, s *service) {
 	defer close(s.runDone)
-	err := protect(func() error { return s.spec.Service.Run(ctx) })
+	err := protect(func() error { return s.reg.Service.Run(ctx) })
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	s.runErr = err
@@ -297,9 +297,9 @@ func (m *Manager) run(ctx context.Context, s *service) {
 	if err == nil {
 		err = ErrExited
 	}
-	err = fmt.Errorf("run %q: %w", s.spec.Name, err)
+	err = fmt.Errorf("run %q: %w", s.reg.Name, err)
 	m.setFailed(ctx, s, err)
-	if !s.spec.Optional && m.failure == nil {
+	if !s.reg.Optional && m.failure == nil {
 		m.failure = err
 		close(m.failed)
 	}
@@ -370,7 +370,7 @@ func (m *Manager) Stop(ctx context.Context) error {
 // stopService cancels Run and calls Stop, then waits until both return. The first result
 // reports whether the deadline passed first.
 func (m *Manager) stopService(ctx context.Context, s *service) (bool, error) {
-	name := s.spec.Name
+	name := s.reg.Name
 	m.mu.Lock()
 	s.stopping = true
 	alreadyFailed := s.state == StateFailed
@@ -381,7 +381,7 @@ func (m *Manager) stopService(ctx context.Context, s *service) (bool, error) {
 	s.cancelRun()
 
 	stopped := make(chan error, 1)
-	go func() { stopped <- protect(func() error { return s.spec.Service.Stop(ctx) }) }()
+	go func() { stopped <- protect(func() error { return s.reg.Service.Stop(ctx) }) }()
 	var stopErr error
 	select {
 	case stopErr = <-stopped:
@@ -422,29 +422,29 @@ func (m *Manager) timeout(ctx context.Context, pending []*service) error {
 	names := make([]string, 0, len(pending))
 	for _, s := range pending {
 		if s.started {
-			names = append(names, s.spec.Name)
+			names = append(names, s.reg.Name)
 		}
 	}
 	err := fmt.Errorf("%w while stopping %q; not confirmed stopped: %s",
-		ErrShutdownTimeout, pending[0].spec.Name, strings.Join(names, ", "))
-	m.logger.ErrorContext(ctx, "shutdown deadline exceeded", "service", pending[0].spec.Name, "pending", names)
+		ErrShutdownTimeout, pending[0].reg.Name, strings.Join(names, ", "))
+	m.logger.ErrorContext(ctx, "shutdown deadline exceeded", "service", pending[0].reg.Name, "pending", names)
 	return err
 }
 
 // setState records a transition and logs it. The caller holds m.mu.
 func (m *Manager) setState(ctx context.Context, s *service, state State) {
 	s.state = state
-	m.logger.InfoContext(ctx, "service "+state.String(), "service", s.spec.Name)
+	m.logger.InfoContext(ctx, "service "+state.String(), "service", s.reg.Name)
 }
 
 // setFailed records a failure and logs it. The caller holds m.mu.
 func (m *Manager) setFailed(ctx context.Context, s *service, err error) {
 	s.state = StateFailed
 	level := slog.LevelError
-	if s.spec.Optional {
+	if s.reg.Optional {
 		level = slog.LevelWarn
 	}
-	m.logger.Log(ctx, level, "service failed", "service", s.spec.Name, "required", !s.spec.Optional, "error", err)
+	m.logger.Log(ctx, level, "service failed", "service", s.reg.Name, "required", !s.reg.Optional, "error", err)
 }
 
 // protect runs call and turns a panic into an error that wraps ErrPanic.

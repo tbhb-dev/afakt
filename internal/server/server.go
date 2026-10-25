@@ -33,7 +33,7 @@ type Config struct {
 // hooks adds services and routes to the composition. Tests use it to hold a service in a
 // chosen state and to keep a request in flight.
 type hooks struct {
-	services []lifecycle.Spec
+	services []lifecycle.Registration
 	routes   func(mux *http.ServeMux)
 }
 
@@ -62,15 +62,15 @@ func run(ctx context.Context, cfg Config, logger *slog.Logger, h hooks) error {
 }
 
 func compose(manager *lifecycle.Manager, cfg Config, logger *slog.Logger, h hooks) error {
-	var specs []lifecycle.Spec
+	var regs []lifecycle.Registration
 	for _, target := range cfg.Targets {
 		if target != TargetAPI {
 			return fmt.Errorf("%w '%s'", ErrNotComposable, target)
 		}
 		ln := &listener{address: cfg.Listen, logger: logger}
-		specs = append(specs,
-			lifecycle.Spec{Name: "api-listener", Service: ln},
-			lifecycle.Spec{
+		regs = append(regs,
+			lifecycle.Registration{Name: "api-listener", Service: ln},
+			lifecycle.Registration{
 				Name:      "api",
 				Service:   &api{listener: ln, routes: h.routes},
 				DependsOn: []string{"api-listener"},
@@ -78,8 +78,8 @@ func compose(manager *lifecycle.Manager, cfg Config, logger *slog.Logger, h hook
 		)
 	}
 	// Services from the hooks come last, after the services of every target.
-	for _, spec := range append(specs, h.services...) {
-		if err := manager.Register(spec); err != nil {
+	for _, reg := range append(regs, h.services...) {
+		if err := manager.Register(reg); err != nil {
 			return fmt.Errorf("compose: %w", err)
 		}
 	}

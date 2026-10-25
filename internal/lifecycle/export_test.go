@@ -16,7 +16,7 @@ func (m *Manager) Statuses() []Status {
 	defer m.mu.Unlock()
 	statuses := make([]Status, 0, len(m.services))
 	for _, s := range m.services {
-		statuses = append(statuses, Status{Name: s.spec.Name, State: s.state})
+		statuses = append(statuses, Status{Name: s.reg.Name, State: s.state})
 	}
 	return statuses
 }

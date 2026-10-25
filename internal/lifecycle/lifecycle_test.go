@@ -27,11 +27,11 @@ func newManager() *lifecycle.Manager {
 	return lifecycle.New(slog.New(slog.DiscardHandler))
 }
 
-func mustRegister(t *testing.T, m *lifecycle.Manager, specs ...lifecycle.Spec) {
+func mustRegister(t *testing.T, m *lifecycle.Manager, regs ...lifecycle.Registration) {
 	t.Helper()
-	for _, spec := range specs {
-		if err := m.Register(spec); err != nil {
-			t.Fatalf("Register(%q) error = %v", spec.Name, err)
+	for _, reg := range regs {
+		if err := m.Register(reg); err != nil {
+			t.Fatalf("Register(%q) error = %v", reg.Name, err)
 		}
 	}
 }
@@ -127,16 +127,16 @@ func TestDependencyOrder(t *testing.T) {
 		rec := &lifecycletest.Recorder{}
 		m := newManager()
 		mustRegister(t, m,
-			lifecycle.Spec{Name: "d", Service: lifecycletest.NewFake("d", rec)},
-			lifecycle.Spec{
+			lifecycle.Registration{Name: "d", Service: lifecycletest.NewFake("d", rec)},
+			lifecycle.Registration{
 				Name: "c", Service: checkedFake(t, m, rec, "c", []string{"b", "a"}, nil),
 				DependsOn: []string{"b", "a"},
 			},
-			lifecycle.Spec{
+			lifecycle.Registration{
 				Name: "b", Service: checkedFake(t, m, rec, "b", []string{"a"}, []string{"c"}),
 				DependsOn: []string{"a"},
 			},
-			lifecycle.Spec{Name: "a", Service: checkedFake(t, m, rec, "a", nil, []string{"b", "c"})},
+			lifecycle.Registration{Name: "a", Service: checkedFake(t, m, rec, "a", nil, []string{"b", "c"})},
 		)
 		if err := m.Start(t.Context()); err != nil {
 			t.Fatalf("Start() error = %v", err)
@@ -162,19 +162,19 @@ func TestRegisterRejects(t *testing.T) {
 	fake := lifecycletest.NewFake("a", rec)
 	cases := []struct {
 		name string
-		spec lifecycle.Spec
+		reg  lifecycle.Registration
 		want error
 	}{
-		{name: "empty name", spec: lifecycle.Spec{Service: fake}, want: lifecycle.ErrInvalidSpec},
-		{name: "no service", spec: lifecycle.Spec{Name: "b"}, want: lifecycle.ErrInvalidSpec},
-		{name: "duplicate", spec: lifecycle.Spec{Name: "a", Service: fake}, want: lifecycle.ErrDuplicateService},
+		{name: "empty name", reg: lifecycle.Registration{Service: fake}, want: lifecycle.ErrInvalidRegistration},
+		{name: "no service", reg: lifecycle.Registration{Name: "b"}, want: lifecycle.ErrInvalidRegistration},
+		{name: "duplicate", reg: lifecycle.Registration{Name: "a", Service: fake}, want: lifecycle.ErrDuplicateService},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 			m := newManager()
-			mustRegister(t, m, lifecycle.Spec{Name: "a", Service: fake})
-			if err := m.Register(tc.spec); !errors.Is(err, tc.want) {
+			mustRegister(t, m, lifecycle.Registration{Name: "a", Service: fake})
+			if err := m.Register(tc.reg); !errors.Is(err, tc.want) {
 				t.Errorf("Register() error = %v, want %v", err, tc.want)
 			}
 		})
@@ -187,8 +187,8 @@ func TestDependsOnIsCopied(t *testing.T) {
 	m := newManager()
 	deps := []string{"a"}
 	mustRegister(t, m,
-		lifecycle.Spec{Name: "b", Service: lifecycletest.NewFake("b", rec), DependsOn: deps},
-		lifecycle.Spec{Name: "a", Service: lifecycletest.NewFake("a", rec)},
+		lifecycle.Registration{Name: "b", Service: lifecycletest.NewFake("b", rec), DependsOn: deps},
+		lifecycle.Registration{Name: "a", Service: lifecycletest.NewFake("a", rec)},
 	)
 	deps[0] = "missing"
 	if err := m.Start(t.Context()); err != nil {
@@ -204,11 +204,11 @@ func TestRegisterAndStartAfterStart(t *testing.T) {
 	t.Parallel()
 	rec := &lifecycletest.Recorder{}
 	m := newManager()
-	mustRegister(t, m, lifecycle.Spec{Name: "a", Service: lifecycletest.NewFake("a", rec)})
+	mustRegister(t, m, lifecycle.Registration{Name: "a", Service: lifecycletest.NewFake("a", rec)})
 	if err := m.Start(t.Context()); err != nil {
 		t.Fatalf("Start() error = %v", err)
 	}
-	if err := m.Register(lifecycle.Spec{Name: "b", Service: lifecycletest.NewFake("b", rec)}); !errors.Is(
+	if err := m.Register(lifecycle.Registration{Name: "b", Service: lifecycletest.NewFake("b", rec)}); !errors.Is(
 		err, lifecycle.ErrNotIdle,
 	) {
 		t.Errorf("Register() after Start error = %v, want %v", err, lifecycle.ErrNotIdle)
@@ -227,15 +227,15 @@ func TestRegisterAndStartAfterStart(t *testing.T) {
 func TestStartRejectsGraph(t *testing.T) {
 	t.Parallel()
 	cases := []struct {
-		name  string
-		specs func(rec *lifecycletest.Recorder) []lifecycle.Spec
-		want  error
-		text  string
+		name string
+		regs func(rec *lifecycletest.Recorder) []lifecycle.Registration
+		want error
+		text string
 	}{
 		{
 			name: "unknown dependency",
-			specs: func(rec *lifecycletest.Recorder) []lifecycle.Spec {
-				return []lifecycle.Spec{
+			regs: func(rec *lifecycletest.Recorder) []lifecycle.Registration {
+				return []lifecycle.Registration{
 					{Name: "a", Service: lifecycletest.NewFake("a", rec), DependsOn: []string{"nope"}},
 				}
 			},
@@ -244,8 +244,8 @@ func TestStartRejectsGraph(t *testing.T) {
 		},
 		{
 			name: "required on optional",
-			specs: func(rec *lifecycletest.Recorder) []lifecycle.Spec {
-				return []lifecycle.Spec{
+			regs: func(rec *lifecycletest.Recorder) []lifecycle.Registration {
+				return []lifecycle.Registration{
 					{Name: "o", Service: lifecycletest.NewFake("o", rec), Optional: true},
 					{Name: "r", Service: lifecycletest.NewFake("r", rec), DependsOn: []string{"o"}},
 				}
@@ -255,8 +255,8 @@ func TestStartRejectsGraph(t *testing.T) {
 		},
 		{
 			name: "cycle",
-			specs: func(rec *lifecycletest.Recorder) []lifecycle.Spec {
-				return []lifecycle.Spec{
+			regs: func(rec *lifecycletest.Recorder) []lifecycle.Registration {
+				return []lifecycle.Registration{
 					{Name: "free", Service: lifecycletest.NewFake("free", rec)},
 					{Name: "a", Service: lifecycletest.NewFake("a", rec), DependsOn: []string{"b"}},
 					{Name: "b", Service: lifecycletest.NewFake("b", rec), DependsOn: []string{"a"}},
@@ -267,8 +267,8 @@ func TestStartRejectsGraph(t *testing.T) {
 		},
 		{
 			name: "self",
-			specs: func(rec *lifecycletest.Recorder) []lifecycle.Spec {
-				return []lifecycle.Spec{
+			regs: func(rec *lifecycletest.Recorder) []lifecycle.Registration {
+				return []lifecycle.Registration{
 					{Name: "a", Service: lifecycletest.NewFake("a", rec), DependsOn: []string{"a"}},
 				}
 			},
@@ -281,7 +281,7 @@ func TestStartRejectsGraph(t *testing.T) {
 			t.Parallel()
 			rec := &lifecycletest.Recorder{}
 			m := newManager()
-			mustRegister(t, m, tc.specs(rec)...)
+			mustRegister(t, m, tc.regs(rec)...)
 			err := m.Start(t.Context())
 			if !errors.Is(err, tc.want) || err.Error() != tc.text {
 				t.Errorf("Start() error = %v, want %q wrapping %v", err, tc.text, tc.want)
@@ -312,8 +312,8 @@ func TestStatesWhileStartingAndStopping(t *testing.T) {
 		stopEntered, stopRelease := make(chan struct{}), make(chan struct{})
 		slow.StopFunc = lifecycletest.Block(stopEntered, stopRelease)
 		mustRegister(t, m,
-			lifecycle.Spec{Name: "a", Service: lifecycletest.NewFake("a", rec)},
-			lifecycle.Spec{Name: "slow", Service: slow, DependsOn: []string{"a"}},
+			lifecycle.Registration{Name: "a", Service: lifecycletest.NewFake("a", rec)},
+			lifecycle.Registration{Name: "slow", Service: slow, DependsOn: []string{"a"}},
 		)
 		started := make(chan error)
 		go func() { started <- m.Start(t.Context()) }()
@@ -345,13 +345,13 @@ func TestRequiredStartFailure(t *testing.T) {
 		bad := lifecycletest.NewFake("bad", rec)
 		bad.StartFunc = func(context.Context) error { return errBoom }
 		mustRegister(t, m,
-			lifecycle.Spec{Name: "a", Service: checkedFake(t, m, rec, "a", nil, []string{"b", "c"})},
-			lifecycle.Spec{
+			lifecycle.Registration{Name: "a", Service: checkedFake(t, m, rec, "a", nil, []string{"b", "c"})},
+			lifecycle.Registration{
 				Name: "b", Service: checkedFake(t, m, rec, "b", []string{"a"}, []string{"bad"}),
 				DependsOn: []string{"a"},
 			},
-			lifecycle.Spec{Name: "bad", Service: bad, DependsOn: []string{"b"}},
-			lifecycle.Spec{Name: "c", Service: lifecycletest.NewFake("c", rec), DependsOn: []string{"a"}},
+			lifecycle.Registration{Name: "bad", Service: bad, DependsOn: []string{"b"}},
+			lifecycle.Registration{Name: "c", Service: lifecycletest.NewFake("c", rec), DependsOn: []string{"a"}},
 		)
 		err := m.Start(t.Context())
 		if !errors.Is(err, errBoom) || err.Error() != `start "bad": boom` {
@@ -376,11 +376,12 @@ func TestOptionalStartFailure(t *testing.T) {
 		bad := lifecycletest.NewFake("bad", rec)
 		bad.StartFunc = func(context.Context) error { return errBoom }
 		mustRegister(t, m,
-			lifecycle.Spec{Name: "bad", Service: bad, Optional: true},
-			lifecycle.Spec{Name: "dependent", Service: lifecycletest.NewFake("dependent", rec), DependsOn: []string{
-				"bad",
-			}, Optional: true},
-			lifecycle.Spec{Name: "r", Service: lifecycletest.NewFake("r", rec)},
+			lifecycle.Registration{Name: "bad", Service: bad, Optional: true},
+			lifecycle.Registration{
+				Name: "dependent", Service: lifecycletest.NewFake("dependent", rec),
+				DependsOn: []string{"bad"}, Optional: true,
+			},
+			lifecycle.Registration{Name: "r", Service: lifecycletest.NewFake("r", rec)},
 		)
 		if err := m.Start(t.Context()); err != nil {
 			t.Fatalf("Start() error = %v", err)
@@ -402,8 +403,8 @@ func TestRequiredRunFailure(t *testing.T) {
 		m := newManager()
 		a := lifecycletest.NewFake("a", rec)
 		mustRegister(t, m,
-			lifecycle.Spec{Name: "a", Service: a},
-			lifecycle.Spec{Name: "b", Service: lifecycletest.NewFake("b", rec), DependsOn: []string{"a"}},
+			lifecycle.Registration{Name: "a", Service: a},
+			lifecycle.Registration{Name: "b", Service: lifecycletest.NewFake("b", rec), DependsOn: []string{"a"}},
 		)
 		if err := m.Start(t.Context()); err != nil {
 			t.Fatalf("Start() error = %v", err)
@@ -433,7 +434,7 @@ func TestRunExitCountsAsFailure(t *testing.T) {
 		m := newManager()
 		a := lifecycletest.NewFake("a", rec)
 		a.RunFunc = func(context.Context) error { return nil }
-		mustRegister(t, m, lifecycle.Spec{Name: "a", Service: a})
+		mustRegister(t, m, lifecycle.Registration{Name: "a", Service: a})
 		if err := m.Start(t.Context()); err != nil {
 			t.Fatalf("Start() error = %v", err)
 		}
@@ -453,8 +454,8 @@ func TestOptionalRunFailure(t *testing.T) {
 		m := newManager()
 		o := lifecycletest.NewFake("o", rec)
 		mustRegister(t, m,
-			lifecycle.Spec{Name: "r", Service: lifecycletest.NewFake("r", rec)},
-			lifecycle.Spec{Name: "o", Service: o, Optional: true},
+			lifecycle.Registration{Name: "r", Service: lifecycletest.NewFake("r", rec)},
+			lifecycle.Registration{Name: "o", Service: o, Optional: true},
 		)
 		if err := m.Start(t.Context()); err != nil {
 			t.Fatalf("Start() error = %v", err)
@@ -488,9 +489,9 @@ func TestStartStopsOnEarlierFailure(t *testing.T) {
 			return nil
 		}
 		mustRegister(t, m,
-			lifecycle.Spec{Name: "a", Service: a},
-			lifecycle.Spec{Name: "b", Service: b, DependsOn: []string{"a"}},
-			lifecycle.Spec{Name: "c", Service: lifecycletest.NewFake("c", rec), DependsOn: []string{"b"}},
+			lifecycle.Registration{Name: "a", Service: a},
+			lifecycle.Registration{Name: "b", Service: b, DependsOn: []string{"a"}},
+			lifecycle.Registration{Name: "c", Service: lifecycletest.NewFake("c", rec), DependsOn: []string{"b"}},
 		)
 		if err := m.Start(t.Context()); !errors.Is(err, errBoom) {
 			t.Errorf("Start() error = %v, want %v", err, errBoom)
@@ -506,7 +507,7 @@ func TestStartInterruptedByContext(t *testing.T) {
 	t.Parallel()
 	rec := &lifecycletest.Recorder{}
 	m := newManager()
-	mustRegister(t, m, lifecycle.Spec{Name: "a", Service: lifecycletest.NewFake("a", rec)})
+	mustRegister(t, m, lifecycle.Registration{Name: "a", Service: lifecycletest.NewFake("a", rec)})
 	ctx, cancel := context.WithCancel(t.Context())
 	cancel()
 	err := m.Start(ctx)
@@ -525,7 +526,7 @@ func TestWaitAfterContextEnds(t *testing.T) {
 		rec := &lifecycletest.Recorder{}
 		m := newManager()
 		a := lifecycletest.NewFake("a", rec)
-		mustRegister(t, m, lifecycle.Spec{Name: "a", Service: a})
+		mustRegister(t, m, lifecycle.Registration{Name: "a", Service: a})
 		if err := m.Start(t.Context()); err != nil {
 			t.Fatalf("Start() error = %v", err)
 		}
@@ -581,7 +582,7 @@ func TestPanicsBecomeErrors(t *testing.T) {
 				m := newManager()
 				a := lifecycletest.NewFake("a", rec)
 				tc.setup(a)
-				mustRegister(t, m, lifecycle.Spec{Name: "a", Service: a})
+				mustRegister(t, m, lifecycle.Registration{Name: "a", Service: a})
 				err := m.Start(t.Context())
 				if err == nil {
 					synctest.Wait()
@@ -622,9 +623,9 @@ func TestStopErrors(t *testing.T) {
 			return ctx.Err()
 		}
 		mustRegister(t, m,
-			lifecycle.Spec{Name: "canceled", Service: canceled},
-			lifecycle.Spec{Name: "run-fails", Service: runFails},
-			lifecycle.Spec{Name: "stop-fails", Service: stopFails},
+			lifecycle.Registration{Name: "canceled", Service: canceled},
+			lifecycle.Registration{Name: "run-fails", Service: runFails},
+			lifecycle.Registration{Name: "stop-fails", Service: stopFails},
 		)
 		if err := m.Start(t.Context()); err != nil {
 			t.Fatalf("Start() error = %v", err)
@@ -652,7 +653,7 @@ func TestStopBeforeStart(t *testing.T) {
 	t.Parallel()
 	rec := &lifecycletest.Recorder{}
 	m := newManager()
-	mustRegister(t, m, lifecycle.Spec{Name: "a", Service: lifecycletest.NewFake("a", rec)})
+	mustRegister(t, m, lifecycle.Registration{Name: "a", Service: lifecycletest.NewFake("a", rec)})
 	if err := m.Stop(stopCtx(t)); err != nil {
 		t.Fatalf("Stop() error = %v", err)
 	}
@@ -680,10 +681,10 @@ func TestShutdownDeadline(t *testing.T) {
 		hungEntered, hungRelease := make(chan struct{}), make(chan struct{})
 		hung.StopFunc = lifecycletest.Block(hungEntered, hungRelease)
 		mustRegister(t, m,
-			lifecycle.Spec{Name: "first", Service: first},
-			lifecycle.Spec{Name: "skipped", Service: skipped, Optional: true},
-			lifecycle.Spec{Name: "hung", Service: hung},
-			lifecycle.Spec{Name: "quick", Service: quick},
+			lifecycle.Registration{Name: "first", Service: first},
+			lifecycle.Registration{Name: "skipped", Service: skipped, Optional: true},
+			lifecycle.Registration{Name: "hung", Service: hung},
+			lifecycle.Registration{Name: "quick", Service: quick},
 		)
 		if err := m.Start(t.Context()); err != nil {
 			t.Fatalf("Start() error = %v", err)
@@ -726,7 +727,7 @@ func TestShutdownDeadlineWhileRunDrains(t *testing.T) {
 			<-release
 			return nil
 		}
-		mustRegister(t, m, lifecycle.Spec{Name: "draining", Service: draining})
+		mustRegister(t, m, lifecycle.Registration{Name: "draining", Service: draining})
 		if err := m.Start(t.Context()); err != nil {
 			t.Fatalf("Start() error = %v", err)
 		}
