@@ -35,7 +35,7 @@ Build a filename from letters, digits, `_`, `-`, and `.`, and begin it with a le
 
 `index.md` lists the topic pages under section headings. Each entry has the form `* [Title](link) - description`. Its only frontmatter key is `okf_version`.
 
-When you add a topic page, add its entry. When you move or rename one, update the link. The checker validates the entry format and the links, but it doesn't notice a page missing from the index, so you must catch an omission yourself.
+When you add a topic page, add its entry. When you move or rename one, update the link. The checker validates only the entry format. It doesn't resolve the links in `index.md` and doesn't notice a page missing from the index, so check each link and catch an omission yourself.
 
 `README.md`, `AGENTS.md`, and `CLAUDE.md` are entry points and have no index entries.
 
