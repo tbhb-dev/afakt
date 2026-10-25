@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright Tony Burns
 
-package main
+package cmdutil
 
 import (
 	"errors"
@@ -9,6 +9,20 @@ import (
 	"strings"
 	"syscall"
 )
+
+// WriteError is a failed write of a command's output. It prints as the text that
+// describeWriteError gives.
+type WriteError struct {
+	Err error
+}
+
+func (e *WriteError) Error() string {
+	return describeWriteError(e.Err)
+}
+
+func (e *WriteError) Unwrap() error {
+	return e.Err
+}
 
 // describeWriteError renders a write error as the text that follows the
 // Error label. An error from the operating system prints its code, an error kind name

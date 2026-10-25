@@ -9,6 +9,7 @@ afakt
 cspell
 devtools
 mise
+[Pp]flag
 prek
 shellcheck
 toolchain
