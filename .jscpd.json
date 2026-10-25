@@ -1,0 +1,12 @@
+{
+  "threshold": 0,
+  "reporters": ["console"],
+  "format": ["typescript", "tsx"],
+  "gitignore": true,
+  "path": [
+    "apps",
+    "eslint.config.base.ts",
+    "eslint.config.ts",
+    "vitest.shared.ts"
+  ]
+}

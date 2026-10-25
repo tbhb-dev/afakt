@@ -16,12 +16,17 @@ jq = "1.8.2"
 bats = "1.14.0"
 ast-grep = "0.51.0"
 vacuum = "0.33.2"
+# The web project's package manager. Node comes from the devtools payload.
+pnpm = "12.11.2"
 
 [env]
 DEVTOOLS_LOCK_PLATFORMS = "linux-x64,macos-arm64"
 DEVTOOLS_GO_MODULES_MODE = "vendor"
 DEVTOOLS_GENERATED_PATHS = ".devtools/\n.config/mise/\nbin/\ncoverage/\ntmp/\nspikes/\n.vale/"
 DEVTOOLS_PROSE_GLOB = "{*.md,*.go,api/openapi/**/*.yaml}"
+# The Chrome Headless Shell build that @playwright/test 1.64.0 installs. The
+# e2e-web task fails when the browser it runs reports a different version.
+AFAKT_WEB_CHROMIUM = "156.0.8078.4"
 
 [task_config]
 includes = [
@@ -272,3 +277,114 @@ ast-grep scan --config sgconfig.yml \
   --globs '!vendor/**' --globs '!apm_modules/**' --globs '!.devtools/**' --globs '!.config/mise/**' \
   --globs '!bin/**' --globs '!coverage/**' --globs '!tmp/**' --globs '!spikes/**' --globs '!.vale/**' .
 """
+
+# Web workspace. The pnpm workspace rooted here holds the shared tool
+# configuration; apps/dashboard holds the dashboard package.
+[tasks.install-web]
+description = "Install the pnpm workspace's packages from the root lockfile"
+run = "pnpm install --frozen-lockfile"
+
+[tasks.install-web-browsers]
+description = "Install the Chrome Headless Shell build that the pinned Playwright release runs"
+dir = "{{config_root}}/apps/dashboard"
+run = "pnpm exec playwright install chromium --only-shell"
+
+[tasks.dev-web]
+description = "Serve the dashboard from the Vite development server"
+dir = "{{config_root}}/apps/dashboard"
+run = "pnpm exec vite"
+
+[tasks.build-web]
+description = "Build the dashboard's static assets into apps/dashboard/dist"
+dir = "{{config_root}}/apps/dashboard"
+run = "pnpm exec vite build"
+
+[tasks.test-web]
+description = "Run the dashboard's unit tests"
+dir = "{{config_root}}/apps/dashboard"
+run = "pnpm exec vitest run"
+
+[tasks.cover-web]
+description = "Run the dashboard's unit tests and enforce 100% coverage per file and in total"
+dir = "{{config_root}}/apps/dashboard"
+run = "pnpm exec vitest run --coverage"
+
+[tasks.e2e-web]
+description = "Load the built and development dashboard in the pinned browser and scan it for accessibility violations"
+depends = ["build-web"]
+dir = "{{config_root}}/apps/dashboard"
+run = "pnpm exec playwright test"
+
+[tasks.mutate-web]
+description = "Run StrykerJS mutation testing on the dashboard and fail below a 100% score"
+dir = "{{config_root}}/apps/dashboard"
+run = "pnpm exec stryker run ../../stryker.config.json"
+
+[tasks.lint-web-biome]
+description = "Check the workspace with Biome, every rule group at error for TypeScript"
+run = "biome ci ."
+
+[tasks.lint-web-types]
+description = "Type-check the workspace root and the dashboard under the strict base tsconfig"
+run = [
+  "pnpm exec tsc -p tsconfig.json",
+  "pnpm exec tsc -p apps/dashboard/tsconfig.json",
+  "pnpm exec tsc -p apps/dashboard/tsconfig.node.json",
+]
+
+[tasks.lint-web-eslint]
+description = "Run the typescript-eslint type-aware rules that Biome lacks"
+run = [
+  "pnpm exec eslint --max-warnings 0 '*.ts'",
+  "cd apps/dashboard && pnpm exec eslint --max-warnings 0 .",
+]
+
+[tasks.lint-web-dup]
+description = "Fail on any duplicated TypeScript block with jscpd"
+run = "pnpm exec jscpd --config .jscpd.json"
+
+[tasks.lint-web-deadcode]
+description = "Fail on unused files, exports, and dependencies with knip"
+run = "pnpm exec knip"
+
+[tasks.lint-web-all]
+description = "Run every web lint gate"
+depends = [
+  "lint-web-biome",
+  "lint-web-types",
+  "lint-web-eslint",
+  "lint-web-dup",
+  "lint-web-deadcode",
+]
+
+[tasks.audit-web]
+description = "Fail on a high or critical advisory against any locked web dependency, or on an incomplete audit"
+run = "pnpm audit --audit-level high"
+
+# `mise run check-web-gate <gate>` writes broken input for one gate into a
+# temporary copy of the workspace, runs the gate there, and fails unless the
+# gate fails with the expected findings. scripts/check-web-gate.sh lists the gates.
+[tasks.check-web-gate]
+description = "Show that one web gate fails on generated broken input outside the source tree"
+run = "bash scripts/check-web-gate.sh"
+
+[tasks.check-web-gates]
+description = "Show that every web gate fails on generated broken input"
+shell = "bash -c"
+run = """
+set -euo pipefail
+for gate in biome types eslint cover property dup deadcode audit mutate e2e-console e2e-axe e2e-browser; do
+  bash scripts/check-web-gate.sh "$gate"
+done
+"""
+
+[tasks.check-web]
+description = "Run every web gate"
+depends = [
+  "lint-web-all",
+  "cover-web",
+  "e2e-web",
+  "mutate-web",
+  "audit-web",
+  "check-web-gates",
+]
