@@ -11,6 +11,8 @@
       "**/*.json",
       "**/*.jsonc",
       "**/*.json5",
+      "**/*.ts",
+      "**/*.tsx",
       "!vendor",
       "!dist",
       "!bin",
@@ -37,5 +39,45 @@
   },
   "assist": {
     "enabled": false
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["**/*.ts", "**/*.tsx"],
+      "linter": {
+        "rules": {
+          "a11y": "error",
+          "complexity": "error",
+          "correctness": "error",
+          "nursery": "error",
+          "performance": "error",
+          "security": "error",
+          "style": "error",
+          "suspicious": "error"
+        }
+      }
+    },
+    {
+      "includes": ["**/*.config.ts"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noDefaultExport": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["**/playwright.config.ts"],
+      "linter": {
+        "rules": {
+          "style": {
+            "useNamingConvention": {
+              "level": "error",
+              "options": { "strictCase": false }
+            }
+          }
+        }
+      }
+    }
+  ]
 }

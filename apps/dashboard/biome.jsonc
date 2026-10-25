@@ -1,0 +1,16 @@
+{
+  // The repository root's biome.json sets every rule group to error for
+  // TypeScript. The browser version check reads the pinned version in Node.
+  "root": false,
+  "extends": "//",
+  "overrides": [
+    {
+      "includes": ["e2e/browser.spec.ts"],
+      "linter": {
+        "rules": {
+          "correctness": { "noNodejsModules": "off" }
+        }
+      }
+    }
+  ]
+}

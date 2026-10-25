@@ -21,6 +21,8 @@ generated: { by: "claude-code:claude-sonnet-5-5", at: "2026-10-20T05:55:00Z" }
 - `internal/server/`: composes the services of the selected server targets.
 - `internal/lifecycle/`: starts and stops services. `internal/lifecycle/lifecycletest/` has fakes for tests.
 
+A pnpm workspace at the repository root has one dependency lock and keeps the configuration that every web package shares. In `apps/dashboard/`, a React and Vite app renders the blank dashboard page, with its unit tests in `src/` and its Playwright tests in `e2e/`. For each web gate, `scripts/check-web-gate.sh` writes broken input into a temporary copy of the workspace and shows that the gate fails.
+
 `docs/` holds the OKF docs bundle. `scripts/okf-check.py` checks its format and the Markdown frontmatter across the repository.
 
 `.devtools/` and `.config/mise/conf.d/` hold the devtools payload. The `vendir` tool owns both directories. Edit repository settings in the root configuration files.
@@ -29,7 +31,7 @@ APM deploys the skills and rules from the devtools packages named in `apm.yml` t
 
 ## Commands
 
-Read `mise.toml` before trusting it. In each fresh worktree, run `mise trust`, then `mise run bootstrap` to sync the payload and install the tools and hooks.
+Read `mise.toml` before trusting it. In each fresh worktree, run `mise trust`, then `mise run bootstrap` to sync the payload and install the tools and hooks. Bootstrap installs the Node and pnpm that `mise.toml` pins. The root Node pin overrides the payload's and must stay equal to it. For web work, run `mise run install-web` and `mise run install-web-browsers` next, then `mise run check-web` to run every web gate. The Go tasks run without those web packages and the browser.
 
 | Command | Purpose |
 | --- | --- |
@@ -92,7 +94,7 @@ Create commits as `tbhb-agent`. Route reviews through `gh-reviewer` as `tbhb-age
 
 All scheduled times use Coordinated Universal Time (UTC).
 
-`ci.yml` runs on pull requests, pushes to `main`, and manual dispatch. It runs bootstrap and checks lint on Linux, and it fails when bootstrap changes a tracked file. It runs the full check on Linux and macOS. Separate jobs enforce the Go coverage floors, scan reachable vulnerabilities (`vuln`), and check payload and Go vendor drift (`vendor-check`). The required `test` summary fails unless every matrix slot succeeds.
+`ci.yml` runs on pull requests, pushes to `main`, and manual dispatch. It runs bootstrap and checks lint on Linux, and it fails when bootstrap changes a tracked file. It runs the full check on Linux and macOS. Separate jobs enforce the Go coverage floors, scan reachable vulnerabilities (`vuln`), and check payload and Go vendor drift (`vendor-check`). A `web` matrix runs each web gate in its own Linux job. The required `test` summary fails unless every slot of the Go and web matrices succeeds.
 
 `security.yml` runs on pull requests and pushes to `main`. It also runs daily at 06:26 and on manual dispatch. `gitleaks` scans history through the head of the branch on pull requests. The Go scanners upload reports for reachable vulnerabilities and dependencies in `vendor/`.
 

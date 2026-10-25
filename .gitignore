@@ -25,3 +25,10 @@ __pycache__/
 coverage.out
 coverage.xml
 coverage.covdata*/
+node_modules/
+/apps/*/dist/
+/apps/*/coverage/
+/apps/*/reports/
+/apps/*/test-results/
+/apps/*/playwright-report/
+.stryker-tmp/

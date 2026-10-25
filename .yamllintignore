@@ -12,3 +12,5 @@ vendir.lock.yml
 vendor/
 # Generated dependency locks from mise.
 .config/mise/locks/
+# The pnpm workspace lockfile, which pnpm writes.
+pnpm-lock.yaml

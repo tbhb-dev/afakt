@@ -29,6 +29,7 @@
     "go.mod",
     "go.sum",
     "mise.lock",
+    "pnpm-lock.yaml",
     "dist/**/*",
     "coverage.xml",
     // Private values, gitignored; nothing in it belongs in a dictionary.
