@@ -23,6 +23,9 @@ export function recordRequests(page: Page): string[] {
 }
 
 export async function expectAccessible(page: Page): Promise<void> {
-  const results = await new AxeBuilder({ page }).analyze();
+  const results = await new AxeBuilder({ page })
+    // AC2 limits the page to a title and an empty root.
+    .disableRules(["page-has-heading-one"])
+    .analyze();
   expect(results.violations.map((violation) => violation.id)).toStrictEqual([]);
 }
