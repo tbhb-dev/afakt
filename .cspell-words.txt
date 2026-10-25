@@ -3,6 +3,7 @@ AGENTDESC
 AGENTMSG
 agentrepo
 buildmeta
+cmdutil
 cspell
 deadcode
 devtools
@@ -20,7 +21,7 @@ mise
 nolint
 nosuch
 nullglob
-oserror
+pflag
 pipefail
 PIPESTATUS
 preapproval
@@ -32,6 +33,7 @@ sgconfig
 shellcheck
 shfmt
 shopt
+Shortnames
 SIGPIPE
 tbhb
 Temporal

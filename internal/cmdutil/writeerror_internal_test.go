@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright Tony Burns
 
-package main
+package cmdutil
 
 import (
 	"errors"
@@ -141,5 +141,16 @@ func TestErrnoKindsAreAllTested(t *testing.T) {
 		if _, ok := mapped[code]; !ok && kind != "Uncategorized" {
 			t.Errorf("errno %d (%s) is in the test table but not mapped", code, kind)
 		}
+	}
+}
+
+func TestWriteError(t *testing.T) {
+	t.Parallel()
+	err := &WriteError{Err: syscall.EPIPE}
+	if want := `Os { code: 32, kind: BrokenPipe, message: "Broken pipe" }`; err.Error() != want {
+		t.Errorf("Error() = %s, want %s", err.Error(), want)
+	}
+	if !errors.Is(err, syscall.EPIPE) {
+		t.Errorf("errors.Is(%v, EPIPE) = false, want true", err)
 	}
 }

@@ -11,15 +11,16 @@
 # `mayDependOn` rules between them here.
 version: 3
 
-# Vendored third-party imports are governed by depguard / gomodguard,
-# not go-arch-lint. Allow any vendor dep at the architectural layer.
+# Each component names the third-party packages it may import under
+# canUse, so Cobra and pflag stay in the command packages and every other
+# component stays on the standard library and this module.
 #
 # deepScan: false disables the method-call / dependency-injection
 # tracking. The basic component-imports check is the rule that's
 # load-bearing at this scale; revisit when components grow interfaces
 # whose implementations cross layers.
 allow:
-  depOnAnyVendor: true
+  depOnAnyVendor: false
   deepScan: false
 
 # Exclude vendored code, test fixtures, and any out-of-band tooling
@@ -37,16 +38,68 @@ exclude:
   - testdata
   - tools
 
+vendors:
+  cobra:
+    in: github.com/spf13/cobra
+  pflag:
+    in: github.com/spf13/pflag
+
 components:
   cmd:
     in: cmd/afakt
+  cmdroot:
+    in: internal/cmd/root
+  cmdstatus:
+    in: internal/cmd/status
+  cmdhelp:
+    in: internal/cmd/help
+  cmdutil:
+    in: internal/cmdutil
   buildmeta:
     in: internal/buildmeta
 
 deps:
+  # Only main, the command packages, and cmdutil may use Cobra and pflag. cmdutil depends on
+  # no command package.
   cmd:
     mayDependOn:
       - buildmeta
+      - cmdroot
+      - cmdutil
+    canUse:
+      - cobra
+      - pflag
+  # go-arch-lint reads test files too, so each package's external tests importing the package
+  # itself needs a self-reference.
+  cmdroot:
+    mayDependOn:
+      - cmdroot
+      - cmdstatus
+      - cmdhelp
+      - cmdutil
+    canUse:
+      - cobra
+      - pflag
+  cmdhelp:
+    mayDependOn:
+      - cmdhelp
+      - cmdutil
+    canUse:
+      - cobra
+      - pflag
+  cmdstatus:
+    mayDependOn:
+      - cmdstatus
+      - cmdutil
+    canUse:
+      - cobra
+      - pflag
+  cmdutil:
+    mayDependOn:
+      - cmdutil
+    canUse:
+      - cobra
+      - pflag
   buildmeta:
     # The schema requires a reference; self-reference forbids other components.
     mayDependOn:

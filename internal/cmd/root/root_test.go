@@ -1,19 +1,25 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright Tony Burns
 
-package main
+package root_test
 
 import (
 	"bytes"
 	"errors"
+	"io"
 	"strings"
 	"syscall"
 	"testing"
 
-	"github.com/tbhb-dev/afakt/internal/buildmeta"
+	"github.com/tbhb-dev/afakt/internal/cmd/root"
+	"github.com/tbhb-dev/afakt/internal/cmdutil"
 )
 
 const (
+	testVersion = "1.2.3-test"
+
+	helpAbout = "Print this message or the help of the given subcommand(s)"
+
 	wantRootHelp = `A proof of concept CLI
 
 Usage: afakt <COMMAND>
@@ -57,6 +63,16 @@ func (w failWriter) Write([]byte) (int, error) {
 	return 0, w.err
 }
 
+func newFactory(out, errOut io.Writer) *cmdutil.Factory {
+	return &cmdutil.Factory{In: strings.NewReader(""), Out: out, ErrOut: errOut, Version: testVersion}
+}
+
+// execute runs the command line through the root command, as main does.
+func execute(t *testing.T, args []string, out, errOut io.Writer) int {
+	t.Helper()
+	return root.Execute(t.Context(), newFactory(out, errOut), args)
+}
+
 // clapError is the error text clap prints: the message, the usage line and the hint.
 func clapError(message, usage string) string {
 	return clapErrorWithoutHint(message, usage) + "\nFor more information, try '--help'.\n"
@@ -69,7 +85,7 @@ func clapErrorWithoutHint(message, usage string) string {
 
 func TestRun(t *testing.T) {
 	t.Parallel()
-	version := "afakt " + buildmeta.Version + "\n"
+	version := "afakt " + testVersion + "\n"
 	cases := []struct {
 		name   string
 		args   []string
@@ -87,6 +103,8 @@ func TestRun(t *testing.T) {
 		{name: "short help then version", args: []string{"-hV"}, stdout: wantRootHelp},
 		{name: "help before command", args: []string{"-h", "status"}, stdout: wantRootHelp},
 		{name: "help with bundled value", args: []string{"-h=1"}, stdout: wantRootHelp},
+		{name: "status help with bundled value", args: []string{"status", "-h=1"}, stdout: wantStatusHelp},
+		{name: "version with bundled value", args: []string{"-V=1"}, stdout: version},
 		{name: "version", args: []string{"--version"}, stdout: version},
 		{name: "short version", args: []string{"-V"}, stdout: version},
 		{name: "short version then help", args: []string{"-Vh"}, stdout: version},
@@ -162,6 +180,38 @@ func TestRun(t *testing.T) {
 			args:   []string{"-x"},
 			code:   2,
 			stderr: clapError("unexpected argument '-x' found", "afakt <COMMAND>"),
+		},
+		{name: "short help bundle", args: []string{"-hx"}, stdout: wantRootHelp},
+		{
+			name:   "three dashes",
+			args:   []string{"---x"},
+			code:   2,
+			stderr: clapError("unexpected argument '---x' found", "afakt <COMMAND>"),
+		},
+		{
+			name:   "value without a flag name",
+			args:   []string{"--=x"},
+			code:   2,
+			stderr: clapError("unexpected argument '--' found", "afakt <COMMAND>"),
+		},
+		{
+			// Cobra's hidden completion command counts as an unknown command, whatever follows it.
+			name:   "completion request",
+			args:   []string{"__complete", "s"},
+			code:   2,
+			stderr: clapError("unrecognized subcommand '__complete'", "afakt <COMMAND>"),
+		},
+		{
+			name:   "completion request without arguments",
+			args:   []string{"__complete"},
+			code:   2,
+			stderr: clapError("unrecognized subcommand '__complete'", "afakt <COMMAND>"),
+		},
+		{
+			name:   "completion request without descriptions",
+			args:   []string{"__completeNoDesc", "--help"},
+			code:   2,
+			stderr: clapError("unrecognized subcommand '__completeNoDesc'", "afakt <COMMAND>"),
 		},
 		{
 			name:   "unknown short option before help",
@@ -252,7 +302,7 @@ func TestRun(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 			var stdout, stderr bytes.Buffer
-			if got := Run(tc.args, &stdout, &stderr); got != tc.code {
+			if got := execute(t, tc.args, &stdout, &stderr); got != tc.code {
 				t.Errorf("exit code = %d, want %d", got, tc.code)
 			}
 			if stdout.String() != tc.stdout {
@@ -265,10 +315,10 @@ func TestRun(t *testing.T) {
 	}
 }
 
-func TestRunHelpListsCommandsAndFlags(t *testing.T) {
+func TestExecuteHelpListsCommandsAndFlags(t *testing.T) {
 	t.Parallel()
 	var stdout, stderr bytes.Buffer
-	if got := Run([]string{"--help"}, &stdout, &stderr); got != 0 {
+	if got := execute(t, []string{"--help"}, &stdout, &stderr); got != 0 {
 		t.Errorf("exit code = %d, want 0", got)
 	}
 	for _, want := range []string{"status", "--help", "--version"} {
@@ -281,19 +331,19 @@ func TestRunHelpListsCommandsAndFlags(t *testing.T) {
 	}
 }
 
-func TestRunVersionNamesTheBinary(t *testing.T) {
+func TestExecuteNilArguments(t *testing.T) {
 	t.Parallel()
-	var stdout bytes.Buffer
-	Run([]string{"--version"}, &stdout, &bytes.Buffer{})
-	if want := "afakt " + buildmeta.Version + "\n"; stdout.String() != want {
-		t.Errorf("version = %q, want %q", stdout.String(), want)
+	// Nil arguments mean no command. Cobra would read the arguments of the test process instead.
+	var stdout, stderr bytes.Buffer
+	if got := execute(t, nil, &stdout, &stderr); got != 2 {
+		t.Errorf("exit code = %d, want 2", got)
 	}
-	if buildmeta.Version == "" {
-		t.Error("buildmeta.Version is empty")
+	if stdout.Len() != 0 || stderr.String() != wantRootHelp {
+		t.Errorf("stdout = %q, stderr = %q; want only the root help on stderr", stdout.String(), stderr.String())
 	}
 }
 
-func TestRunStatusWriteFailure(t *testing.T) {
+func TestExecuteStatusWriteFailure(t *testing.T) {
 	t.Parallel()
 	cases := []struct {
 		name   string
@@ -325,7 +375,7 @@ func TestRunStatusWriteFailure(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 			var stderr bytes.Buffer
-			if got := Run([]string{"status"}, failWriter{err: tc.err}, &stderr); got != tc.code {
+			if got := execute(t, []string{"status"}, failWriter{err: tc.err}, &stderr); got != tc.code {
 				t.Errorf("exit code = %d, want %d", got, tc.code)
 			}
 			if stderr.String() != tc.stderr {
@@ -335,48 +385,35 @@ func TestRunStatusWriteFailure(t *testing.T) {
 	}
 }
 
-func TestRunHelpAndVersionIgnoreWriteErrors(t *testing.T) {
+func TestExecuteHelpAndVersionIgnoreWriteErrors(t *testing.T) {
 	t.Parallel()
-	for _, arg := range []string{"--help", "--version", "status"} {
-		t.Run(arg, func(t *testing.T) {
+	for _, args := range [][]string{{"--help"}, {"--version"}, {"help"}, {"bogus"}, {}, {"status"}} {
+		t.Run(strings.Join(args, " "), func(t *testing.T) {
 			t.Parallel()
 			writer := failWriter{err: syscall.ENOSPC}
 			want := 0
-			if arg == "status" {
+			switch {
+			case len(args) == 0, args[0] == "bogus":
+				want = 2
+			case args[0] == "status":
 				want = 1
 			}
-			if got := Run([]string{arg}, writer, writer); got != want {
+			if got := execute(t, args, writer, writer); got != want {
 				t.Errorf("exit code = %d, want %d", got, want)
 			}
 		})
 	}
 }
 
-func TestStatusWritesPlaceholder(t *testing.T) {
+func TestNewCmdRootUsesFactoryStreams(t *testing.T) {
 	t.Parallel()
-	var output bytes.Buffer
-	if err := status(&output); err != nil {
-		t.Fatalf("status() error = %v", err)
-	}
-	if output.String() != wantStatus {
-		t.Errorf("status() wrote %q, want %q", output.String(), wantStatus)
-	}
-}
-
-func TestWriteLineAddsOneNewline(t *testing.T) {
-	t.Parallel()
-	var output bytes.Buffer
-	if err := writeLine(&output, "hello"); err != nil {
-		t.Fatalf("writeLine() error = %v", err)
-	}
-	if output.String() != "hello\n" {
-		t.Errorf("writeLine() wrote %q, want %q", output.String(), "hello\n")
-	}
-}
-
-func TestStatusPropagatesWriterError(t *testing.T) {
-	t.Parallel()
-	if err := status(failWriter{err: errWrite}); !errors.Is(err, errWrite) {
-		t.Errorf("status() error = %v, want %v", err, errWrite)
+	// Cobra's own streams must be the factory's, so nothing below main writes to the process
+	// streams.
+	in := strings.NewReader("")
+	var stdout, stderr bytes.Buffer
+	f := &cmdutil.Factory{In: in, Out: &stdout, ErrOut: &stderr, Version: testVersion}
+	cmd := root.NewCmdRoot(f)
+	if cmd.InOrStdin() != in || cmd.OutOrStdout() != &stdout || cmd.ErrOrStderr() != &stderr {
+		t.Error("the root command doesn't use the factory streams")
 	}
 }

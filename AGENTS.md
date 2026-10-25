@@ -14,7 +14,7 @@ generated: { by: "claude-code:claude-sonnet-5-5", at: "2026-10-20T05:55:00Z" }
 
 ## Layout
 
-`cmd/afakt/` holds the command-line entry point, the argument parser, the `status` command, and their tests. `internal/buildmeta/` resolves version metadata from linker flags or runtime build info.
+`cmd/afakt/` holds the command-line entry point and its process tests. `internal/cmd/` holds the Cobra command tree, one package per command: `internal/cmd/root/` has the root command and the one place that maps errors to exit codes, and `internal/cmd/status/` and `internal/cmd/help/` have the `status` and `help` commands. `internal/cmdutil/` has what the commands share, from the factory and the flag types to the help layout. `internal/buildmeta/` resolves version metadata from linker flags or runtime build info.
 
 `docs/` holds the OKF docs bundle. `scripts/okf-check.py` checks its format and the Markdown frontmatter across the repository.
 
@@ -66,7 +66,7 @@ The shared payload pins Go 1.27.3. Use `mise exec -- go version` to inspect it. 
 
 Root configuration includes the shared Go task file and exposes local build and test tasks. Go tool directives declare the analyzer dependencies in the module. `DEVTOOLS_GO_MODULES_MODE=vendor` loads them from the tracked `vendor/` tree. Commit `go.sum` with those generated sources. Run `mise run vendor` to refresh them and `mise run vendor-check` to check for drift.
 
-`.testcoverage.yml` sets the coverage floors: 100% for each file, each package, and the total. The measured total is 100% (88 of 88 statements outside `main.go`). The floors skip `main.go`, whose `os.Exit` glue can't run inside a test process.
+`.testcoverage.yml` sets the coverage floors: 100% for each file, each package, and the total. The measured total is 100% (174 of 174 statements outside `main.go`). The floors skip `main.go`, whose `os.Exit` glue can't run inside a test process.
 
 ## Conventions
 

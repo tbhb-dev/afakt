@@ -14,6 +14,11 @@ tool (
 )
 
 require (
+	github.com/spf13/cobra v1.10.2
+	github.com/spf13/pflag v1.0.10
+)
+
+require (
 	github.com/MakeNowJust/heredoc v1.0.0 // indirect
 	github.com/alexflint/go-arg v1.6.0 // indirect
 	github.com/alexflint/go-scalar v1.2.0 // indirect
@@ -52,8 +57,6 @@ require (
 	github.com/sagikazarmark/locafero v0.12.0 // indirect
 	github.com/spf13/afero v1.15.0 // indirect
 	github.com/spf13/cast v1.10.0 // indirect
-	github.com/spf13/cobra v1.10.2 // indirect
-	github.com/spf13/pflag v1.0.10 // indirect
 	github.com/spf13/viper v1.21.0 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/vladopajic/go-test-coverage/v2 v2.20.0 // indirect
