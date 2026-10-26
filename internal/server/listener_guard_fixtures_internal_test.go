@@ -78,6 +78,23 @@ func TestListenerGuardFixtures(t *testing.T) {
 		},
 		{"same_name", `"net"`, `func listenTCP() { _, _ = net.Listen("tcp", "127.0.0.1:0") }`, "bypasses"},
 		{
+			"factory_bare", `"net"`,
+			`func listenTCP() (net.Listener, error) { return nil, nil }; func bypass() { _, _ = listenTCP() }`,
+			".listenTCP() (net.Listener, error) bypasses",
+		},
+		{
+			"factory_alias",
+			`"net"`,
+			`func listenTCP() (net.Listener, error) { return nil, nil }; var bind = listenTCP; func bypass() { _, _ = bind() }`,
+			".listenTCP() (net.Listener, error) bypasses",
+		},
+		{
+			"factory_wrapper",
+			`"net"`,
+			`func listenTCP() (net.Listener, error) { return nil, nil }; func wrap() { _, _ = listenTCP() }; func bypass() { wrap() }`,
+			".listenTCP() (net.Listener, error) bypasses",
+		},
+		{
 			"unrelated_method",
 			`"net"`,
 			`type config struct{}; func (config) Listen() {}; func bypass() { config{}.Listen(); var _ net.Listener }`,

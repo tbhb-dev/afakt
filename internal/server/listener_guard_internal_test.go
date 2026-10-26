@@ -172,18 +172,20 @@ func guardListenerDecl(positions *token.FileSet, decl ast.Decl, info *types.Info
 	report := func(node ast.Node, message string) {
 		findings = append(findings, fmt.Sprintf("%s: %s", positions.Position(node.Pos()), message))
 	}
-	fn, ok := decl.(*ast.FuncDecl)
-	factory := ok && filepath.Clean(positions.Position(decl.Pos()).Filename) == "server.go" &&
-		fn.Recv == nil && fn.Name.Name == "listenTCP"
-	var permitted *ast.Ident
+	name := listenerFunction(positions, decl)
+	factory := name == "listenTCP"
+	var permitted, injected *ast.Ident
 	binds := 0
 	ast.Inspect(decl, func(node ast.Node) bool {
 		if bind := listenerBind(node, info); factory && bind != nil {
 			permitted = bind
 			binds++
 		}
+		if id := listenerInjection(name, node); id != nil {
+			injected = id
+		}
 		id, named := node.(*ast.Ident)
-		if !named || id == permitted {
+		if !named || id == permitted || id == injected {
 			return true
 		}
 		obj := info.Uses[id]
@@ -196,6 +198,33 @@ func guardListenerDecl(positions *token.FileSet, decl ast.Decl, info *types.Info
 		report(decl, fmt.Sprintf("listenTCP has %d bind references, want exactly one", binds))
 	}
 	return findings
+}
+
+// listenerFunction identifies functions that own the shared listener's exceptions.
+func listenerFunction(positions *token.FileSet, decl ast.Decl) string {
+	fn, ok := decl.(*ast.FuncDecl)
+	if ok && fn.Recv == nil && filepath.Clean(positions.Position(decl.Pos()).Filename) == "server.go" {
+		return fn.Name.Name
+	}
+	return ""
+}
+
+// listenerInjection allows the factory value only at the composition's injection point.
+func listenerInjection(name string, node ast.Node) *ast.Ident {
+	assign, ok := node.(*ast.AssignStmt)
+	if name != "compose" || !ok || len(assign.Lhs) != 1 || len(assign.Rhs) != 1 {
+		return nil
+	}
+	field, selected := assign.Lhs[0].(*ast.SelectorExpr)
+	id, named := assign.Rhs[0].(*ast.Ident)
+	if !selected || !named || field.Sel.Name != "listen" {
+		return nil
+	}
+	receiver, owned := field.X.(*ast.Ident)
+	if owned && receiver.Name == "h" {
+		return id
+	}
+	return nil
 }
 
 // listenerBind resolves a direct call to the network configuration's binding method.
@@ -221,6 +250,10 @@ func listenerBind(node ast.Node, info *types.Info) *ast.Ident {
 func listenerReference(obj types.Object, factory bool) bool {
 	if obj == nil || obj.Pkg() == nil {
 		return false
+	}
+	if obj.Name() == "listenTCP" {
+		_, constructor := obj.(*types.Func)
+		return constructor
 	}
 	switch obj.Pkg().Path() {
 	case "net":
