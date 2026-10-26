@@ -470,6 +470,10 @@ depends = [
 description = "Fail on a high or critical advisory against any locked web dependency, or on an incomplete audit"
 run = "pnpm audit --audit-level high"
 
+[tasks.check-web-install]
+description = "Install web packages in a temporary clone and require a clean working tree"
+run = "bash scripts/check-web-install.sh"
+
 # `mise run check-web-gate <gate>` writes broken input for one gate into a
 # temporary copy of the workspace, runs the gate there, and fails unless the
 # gate fails with the expected findings. scripts/check-web-gate.sh lists the gates.
@@ -497,5 +501,6 @@ run = [
   { task = "e2e-web" },
   { task = "mutate-web" },
   { task = "audit-web" },
+  { task = "check-web-install" },
   { task = "check-web-gates" },
 ]

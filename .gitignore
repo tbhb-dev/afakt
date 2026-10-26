@@ -26,6 +26,7 @@ coverage.out
 coverage.xml
 coverage.covdata*/
 node_modules/
+.pnpm-store/
 /apps/*/dist/
 /internal/dashboard/assets/
 /apps/*/coverage/
