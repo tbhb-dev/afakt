@@ -17,6 +17,7 @@ import (
 	"path/filepath"
 	"slices"
 	"strconv"
+	"syscall"
 	"time"
 
 	"go.temporal.io/server/common/cluster"
@@ -196,6 +197,37 @@ func (s *Server) start(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+	if err = s.construct(ctx, sqlConfig); err != nil {
+		return err
+	}
+	if err = ctx.Err(); err != nil {
+		return fmt.Errorf("construct embedded Temporal server: %w", err)
+	}
+	if err = s.server.Start(ctx); err != nil {
+		return fmt.Errorf("start embedded Temporal server: %w", err)
+	}
+	s.logger.InfoContext(ctx, "temporal embedded server started", "address", s.address, "namespace", s.namespace,
+		"dir", s.dir)
+	return nil
+}
+
+func (s *Server) construct(ctx context.Context, sqlConfig *config.SQL) error {
+	for attempt := 1; ; attempt++ {
+		err := s.constructAttempt(ctx, sqlConfig)
+		if !errors.Is(err, syscall.EADDRINUSE) || ctx.Err() != nil || attempt == 3 {
+			return err
+		}
+		// The pinned HTTP constructor rebinds its reservation privately (issue #73).
+		// A competing bind requires fresh ports after complete construction rollback.
+		if cleanupErr := s.Stop(ctx); cleanupErr != nil {
+			return errors.Join(err, cleanupErr)
+		}
+		s.server = nil
+		s.listeners = nil
+	}
+}
+
+func (s *Server) constructAttempt(ctx context.Context, sqlConfig *config.SQL) error {
 	names := serviceNames()
 	listeners, err := s.listenAll(ctx, len(names)+1)
 	if err != nil {
@@ -224,15 +256,7 @@ func (s *Server) start(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("build embedded Temporal server: %w", err)
 	}
-	if err = ctx.Err(); err != nil {
-		return fmt.Errorf("construct embedded Temporal server: %w", err)
-	}
-	if err = server.Start(ctx); err != nil {
-		return fmt.Errorf("start embedded Temporal server: %w", err)
-	}
 	s.address = conf.PublicClient.HostPort
-	s.logger.InfoContext(ctx, "temporal embedded server started", "address", s.address, "namespace", s.namespace,
-		"dir", s.dir)
 	return nil
 }
 

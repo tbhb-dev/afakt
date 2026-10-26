@@ -33,13 +33,13 @@ The GitHub webhook receiver accepts webhook deliveries from GitHub.
 
 The web dashboard provides afakt's web UI.
 
-`afakt` embeds the dashboard's production assets and serves the entry page at `/dashboard` and `/dashboard/`. Assets load below `/dashboard/`. An unknown path whose last segment has no dot returns the entry page for client-side routing. A missing asset whose last segment contains a dot returns 404. Only the dashboard prefix belongs to this target. Combined API and dashboard targets share one listener. Readiness requires the selected services to run and fails during startup and shutdown.
-
-Entry pages and client-side routes require cache revalidation before reuse. Assets with content hashes in their names allow one year of immutable caching. Dashboard responses forbid framing from other origins, prevent content-type sniffing, and restrict scripts and styles to the same origin through a content security policy.
+The dashboard shares the API's origin and HTTP listener, including when every runtime role runs together. Its routes belong under `/dashboard/`. Readiness requires every selected service to run and fails during startup and shutdown.
 
 ## Workflow orchestrator
 
 The workflow orchestrator ([Temporal](https://temporal.io)) provides durable execution for afakt's workflows. A worker connects to an external Temporal service or runs an embedded Temporal server inside its own process. See [Workflows](architecture.md#workflows).
+
+The Temporal Web UI shares the HTTP listener with the other runtime roles and gives developers and testers access to the embedded server's namespaces, workflows, and histories. Embedded Temporal operates independently of afakt's operational store.
 
 ## Workflows
 

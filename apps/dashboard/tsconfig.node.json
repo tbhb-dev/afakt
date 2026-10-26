@@ -4,5 +4,5 @@
     "lib": ["ES2024", "DOM"],
     "types": ["node"]
   },
-  "include": ["*.ts", "e2e", "binary", "temporal"]
+  "include": ["*.ts", "e2e", "binary", "temporal", "all"]
 }

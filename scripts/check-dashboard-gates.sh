@@ -3,7 +3,7 @@
 set -euo pipefail
 root=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 if [[ $# == 0 ]]; then
-  for gate in results build revalidation console axe browser; do
+  for gate in results build revalidation console axe browser all-targets; do
     bash "$root/scripts/check-dashboard-gates.sh" "$gate"
   done
   exit 0
@@ -52,6 +52,15 @@ expect_failure() {
     exit 1
   fi
 }
+
+if [[ $gate == all-targets ]]; then
+  printf '\ntest("reject broken combined proof", () => { expect(false).toBe(true); });\n' \
+    >>apps/dashboard/all/targets.spec.ts
+  expect_failure 'reject broken combined proof' \
+    env GOMAXPROCS=2 GOFLAGS=-p=2 mise run check-all-targets
+  echo 'combined check rejects a browser assertion failure'
+  exit 0
+fi
 
 if [[ $gate == build ]]; then
   GOMAXPROCS=2 GOFLAGS=-p=2 mise run build
