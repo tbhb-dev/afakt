@@ -1,0 +1,13 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": [
+    "{index,cli,main}.{js,mjs,cjs,jsx,ts,tsx,mts,cts}!",
+    "src/{index,cli,main}.{js,mjs,cjs,jsx,ts,tsx,mts,cts}!",
+    "vendor/github.com/temporalio/ui-server/v2/ui/assets/local/_app/immutable/entry/*.js"
+  ],
+  "ignoreIssues": {
+    "vendor/github.com/temporalio/ui-server/v2/ui/assets/local/_app/immutable/chunks/*.js": [
+      "exports"
+    ]
+  }
+}
