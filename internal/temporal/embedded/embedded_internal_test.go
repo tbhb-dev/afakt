@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net"
+	"net/http"
 	"os"
 	"os/exec"
 	"os/signal"
@@ -270,6 +271,16 @@ func TestServerBindFailure(t *testing.T) {
 
 func TestServerHTTPBindFailure(t *testing.T) {
 	t.Parallel()
+	for _, collisions := range []int{1, 3} {
+		t.Run(strconv.Itoa(collisions), func(t *testing.T) {
+			t.Parallel()
+			checkHTTPBindCollision(t, collisions)
+		})
+	}
+}
+
+func checkHTTPBindCollision(t *testing.T, collisions int) {
+	t.Helper()
 	var buf bytes.Buffer
 	s := newTestServer("", &buf)
 	listen := s.listen
@@ -279,26 +290,82 @@ func TestServerHTTPBindFailure(t *testing.T) {
 		listeners = append(listeners, ln)
 		return ln, err
 	}
-	var conflict net.Listener
+	attempts := 0
 	s.newServer = func(ctx context.Context, owned []net.Listener, opts ...temporal.ServerOption) (runtimeServer, error) {
-		i := len(owned) - 1
-		owned[i] = &onCloseListener{Listener: owned[i], after: func() {
-			var err error
-			conflict, err = listen(ctx, "tcp", listeners[i].Addr().String())
-			if err != nil {
-				t.Error(err)
-			}
-		}}
+		attempts++
+		if attempts <= collisions {
+			i := len(owned) - 1
+			reservation := owned[i]
+			owned[i] = &onCloseListener{Listener: reservation, after: func() {
+				conflict, err := listen(ctx, "tcp", reservation.Addr().String())
+				if err != nil {
+					t.Error(err)
+					return
+				}
+				t.Cleanup(func() { _ = conflict.Close() })
+			}}
+		}
 		return newOwnedServer(ctx, owned, opts...)
 	}
-	if err := s.Start(t.Context()); !errors.Is(err, syscall.EADDRINUSE) {
-		t.Fatalf("Start() error = %v, want wrapped bind error", err)
+	err := s.Start(t.Context())
+	if collisions == 3 {
+		if !errors.Is(err, syscall.EADDRINUSE) || attempts != 3 {
+			t.Fatalf("Start() = %v after %d attempts, want wrapped bind error after 3", err, attempts)
+		}
+	} else {
+		if err != nil || attempts != 2 {
+			t.Fatalf("Start() = %v after %d attempts, want success after 2", err, attempts)
+		}
+		checkNamespace(t, s.listeners[len(s.listeners)-1].Addr().String())
+		if err = s.Stop(t.Context()); err != nil {
+			t.Fatal(err)
+		}
 	}
-	if conflict == nil {
-		t.Fatal("HTTP reservation was not released")
-	}
-	_ = conflict.Close()
 	wantListenersClosed(t, listeners)
+}
+
+func checkNamespace(t *testing.T, address string) {
+	t.Helper()
+	target := "http://" + address + "/api/v1/namespaces/default"
+	req, err := http.NewRequestWithContext(t.Context(), http.MethodGet, target, http.NoBody)
+	if err != nil {
+		t.Fatal(err)
+	}
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_ = resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		t.Errorf("describe namespace after retry = %d, want 200", resp.StatusCode)
+	}
+}
+
+func TestServerHTTPBindRetryInterrupted(t *testing.T) {
+	t.Parallel()
+	for _, cause := range []error{context.Canceled, errStop} {
+		t.Run(cause.Error(), func(t *testing.T) {
+			t.Parallel()
+			var buf bytes.Buffer
+			s := newTestServer("", &buf)
+			ctx, cancel := context.WithCancel(t.Context())
+			defer cancel()
+			attempts := 0
+			s.newServer = func(context.Context, []net.Listener, ...temporal.ServerOption) (runtimeServer, error) {
+				attempts++
+				if errors.Is(cause, context.Canceled) {
+					cancel()
+					return &fakeServer{}, syscall.EADDRINUSE
+				}
+				return &fakeServer{stop: cause}, syscall.EADDRINUSE
+			}
+			err := s.Start(ctx)
+			if !errors.Is(err, syscall.EADDRINUSE) || !errors.Is(err, cause) || attempts != 1 {
+				t.Errorf("Start() = %v after %d attempts, want bind error and %v without retry", err, attempts, cause)
+			}
+			wantListenersClosed(t, s.listeners)
+		})
+	}
 }
 
 type onCloseListener struct {
