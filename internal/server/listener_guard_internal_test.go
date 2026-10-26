@@ -5,12 +5,12 @@ package server
 
 import (
 	"go/ast"
+	"go/constant"
 	"go/parser"
 	"go/token"
 	"io/fs"
 	"path/filepath"
 	"slices"
-	"strconv"
 	"strings"
 	"testing"
 )
@@ -24,15 +24,11 @@ func TestListenerSourceGuard(t *testing.T) {
 	t.Parallel()
 	positions := token.NewFileSet()
 	for _, dir := range []string{".", "../lifecycle", "../temporal/ui", "../temporal/embedded"} {
-		err := filepath.WalkDir(dir, func(path string, entry fs.DirEntry, walkErr error) error {
-			if walkErr != nil {
-				return walkErr
+		err := filepath.WalkDir(dir, func(path string, _ fs.DirEntry, walkErr error) error {
+			if walkErr == nil && strings.HasSuffix(path, ".go") && !strings.HasSuffix(path, "_test.go") {
+				guardListenerPath(t, positions, path)
 			}
-			if entry.IsDir() || !strings.HasSuffix(path, ".go") || strings.HasSuffix(path, "_test.go") {
-				return nil
-			}
-			guardListenerPath(t, positions, path)
-			return nil
+			return walkErr
 		})
 		if err != nil {
 			t.Fatal(err)
@@ -56,24 +52,17 @@ func guardListenerImports(t *testing.T, positions *token.FileSet, file *ast.File
 	t.Helper()
 	const upstream = "github.com/temporalio/ui-server/v2/"
 	networkPackage := "net"
+	allowed := []string{"server/api", "server/config", "server/csrf", "server/route", "ui"}
 	for _, imp := range file.Imports {
-		pkg, err := strconv.Unquote(imp.Path.Value)
-		if err != nil {
-			t.Fatal(err)
-		}
+		pkg := constant.StringVal(constant.MakeFromLiteral(imp.Path.Value, token.STRING, 0))
 		if imp.Name != nil && imp.Name.Name == "." {
 			t.Errorf("%s: dot imports could bypass the listener guard", positions.Position(imp.Pos()))
 		}
 		if pkg == "net" && imp.Name != nil {
 			networkPackage = imp.Name.Name
 		}
-		if strings.HasPrefix(pkg, "github.com/temporalio/ui-server/") && !slices.Contains([]string{
-			upstream + "server/api",
-			upstream + "server/config",
-			upstream + "server/csrf",
-			upstream + "server/route",
-			upstream + "ui",
-		}, pkg) {
+		if strings.HasPrefix(pkg, "github.com/temporalio/ui-server/") &&
+			!slices.Contains(allowed, strings.TrimPrefix(pkg, upstream)) {
 			t.Errorf("%s: upstream UI must use only handlers and assets", positions.Position(imp.Pos()))
 		}
 	}

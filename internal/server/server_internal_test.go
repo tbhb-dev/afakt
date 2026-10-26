@@ -123,6 +123,7 @@ type harness struct {
 	addresses chan string
 	address   string
 	events    *events
+	listener  net.Listener
 }
 
 // startServer starts run in the background and returns at once. The test's
@@ -140,6 +141,9 @@ func startServerContext(parent context.Context, t *testing.T, cfg Config, h hook
 	h.listen = func(ctx context.Context, network, address string) (net.Listener, error) {
 		ln, err := listenTCP(ctx, network, address)
 		if err == nil {
+			if s.listener == nil {
+				s.listener = ln
+			}
 			s.events.add(ln.Addr().String() + " bound")
 		}
 		return ln, err
