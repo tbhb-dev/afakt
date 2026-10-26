@@ -8,6 +8,7 @@ package temporaltest
 
 import (
 	"context"
+	"fmt"
 	"net"
 	"slices"
 	"testing"
@@ -68,9 +69,10 @@ func (f *Frontend) DescribeNamespace(
 	_ context.Context, req *workflowservice.DescribeNamespaceRequest,
 ) (*workflowservice.DescribeNamespaceResponse, error) {
 	if !slices.Contains(f.namespaces, req.GetNamespace()) {
-		// A real frontend sends the error's status, which clients turn back into the error.
-		//nolint:wrapcheck // gRPC sends the code and details of a status error only when it isn't wrapped.
-		return nil, serviceerror.ToStatus(serviceerror.NewNamespaceNotFound(req.GetNamespace())).Err()
+		return nil, fmt.Errorf(
+			"describe namespace: %w",
+			serviceerror.ToStatus(serviceerror.NewNamespaceNotFound(req.GetNamespace())).Err(),
+		)
 	}
 	return &workflowservice.DescribeNamespaceResponse{
 		NamespaceInfo: &namespace.NamespaceInfo{Name: req.GetNamespace()},
