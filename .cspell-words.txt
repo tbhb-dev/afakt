@@ -12,6 +12,7 @@ dasharray
 dashboardish
 deadcode
 devtools
+dynamicconfig
 EBADF
 ENOSPC
 EPIPE

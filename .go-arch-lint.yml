@@ -55,6 +55,8 @@ vendors:
       - google.golang.org/grpc/**
   prometheus:
     in: github.com/prometheus/client_golang/**
+  fx:
+    in: go.uber.org/fx
 
 components:
   cmd:
@@ -172,6 +174,7 @@ deps:
     canUse:
       - temporalserver
       - prometheus
+      - fx
   temporaltest:
     mayDependOn:
       - temporaltest

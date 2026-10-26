@@ -47,9 +47,8 @@ const (
 	failoverVersionIncrement = 10
 )
 
-// newServerFunc builds a Temporal server from its options. It has the signature of the
-// server library's constructor, which tests replace to inject failures.
-type newServerFunc func(opts ...temporal.ServerOption) (temporal.Server, error)
+// newServerFunc builds a Temporal server using the adapter's owned gRPC listeners.
+type newServerFunc func([]net.Listener, ...temporal.ServerOption) (temporal.Server, error)
 
 // Server is the service that runs the embedded Temporal server. Start builds and starts it,
 // Address returns the address of its frontend, and Stop stops it.
@@ -62,6 +61,8 @@ type Server struct {
 	setupSchema func(*config.SQL) error
 	server      temporal.Server
 	address     string
+	listeners   []net.Listener
+	listen      func(context.Context, string, string) (net.Listener, error)
 }
 
 // New returns a server for namespace. With an empty dir it keeps its data in memory, and
@@ -69,7 +70,8 @@ type Server struct {
 func New(dir, namespace string, logger *slog.Logger) *Server {
 	return &Server{
 		dir: dir, namespace: namespace, logger: logger, host: loopback,
-		newServer: temporal.NewServer, setupSchema: sqliteschema.SetupSchema,
+		newServer: newOwnedServer, setupSchema: sqliteschema.SetupSchema,
+		listen: (&net.ListenConfig{}).Listen,
 	}
 }
 
@@ -86,16 +88,32 @@ func (s *Server) Start(ctx context.Context) error {
 		return err
 	}
 	names := serviceNames()
-	ports, err := freePorts(ctx, s.host, len(names))
+	listeners, err := s.listenAll(ctx, len(names)+1)
 	if err != nil {
 		return err
+	}
+	started := false
+	defer func() {
+		if !started {
+			closeListeners(listeners)
+		}
+	}()
+	ports := make([]int, len(listeners))
+	for i, ln := range listeners {
+		// ListenConfig with network tcp always returns a TCP address.
+		if addr, ok := ln.Addr().(*net.TCPAddr); ok {
+			ports[i] = addr.Port
+		}
 	}
 	conf := serverConfig(sqlConfig, s.host, ports)
 	hosts := make(map[primitives.ServiceName]static.Hosts, len(names))
 	for i, name := range names {
 		hosts[name] = static.SingleLocalHost(net.JoinHostPort(s.host, strconv.Itoa(ports[i])))
 	}
-	server, err := s.newServer(
+	// The public HTTP constructor still binds its own listener. Keep that reservation
+	// until construction; the gRPC listeners remain open throughout startup and serving.
+	_ = listeners[len(names)].Close()
+	server, err := s.newServer(listeners[:len(names)],
 		temporal.WithConfig(conf),
 		temporal.ForServices(temporal.DefaultServices),
 		temporal.WithStaticHosts(hosts),
@@ -108,6 +126,8 @@ func (s *Server) Start(ctx context.Context) error {
 		return errors.Join(fmt.Errorf("start embedded Temporal server: %w", err), stop(server))
 	}
 	s.server = server
+	s.listeners = listeners[:len(names)]
+	started = true
 	s.address = conf.PublicClient.HostPort
 	s.logger.InfoContext(ctx, "temporal embedded server started", "address", s.address, "namespace", s.namespace,
 		"dir", s.dir)
@@ -122,6 +142,7 @@ func (s *Server) Run(ctx context.Context) error {
 
 // Stop stops the server. The manager stops waiting for it at the shutdown deadline.
 func (s *Server) Stop(context.Context) error {
+	defer closeListeners(s.listeners)
 	return stop(s.server)
 }
 
@@ -224,28 +245,24 @@ func serverConfig(sqlConfig *config.SQL, host string, ports []int) *config.Confi
 	return &conf
 }
 
-// freePorts returns count gRPC ports and one HTTP port that are free on host. The system
-// picks each one, so two servers in one process don't collide. The listeners close only after
-// the last port is picked, which keeps a port from repeating.
-func freePorts(ctx context.Context, host string, count int) ([]int, error) {
-	var lc net.ListenConfig
-	listeners := make([]net.Listener, 0, count+1)
-	defer func() {
-		for _, ln := range listeners {
-			_ = ln.Close()
-		}
-	}()
-	ports := make([]int, 0, count+1)
-	for range count + 1 {
-		ln, err := lc.Listen(ctx, "tcp", net.JoinHostPort(host, "0"))
+// listenAll acquires listeners before constructing any Temporal service. A bind failure
+// retains its original error and releases the listeners already acquired.
+func (s *Server) listenAll(ctx context.Context, count int) ([]net.Listener, error) {
+	listeners := make([]net.Listener, 0, count)
+	for range count {
+		ln, err := s.listen(ctx, "tcp", net.JoinHostPort(s.host, "0"))
 		if err != nil {
+			closeListeners(listeners)
 			return nil, fmt.Errorf("pick an embedded Temporal port: %w", err)
 		}
 		listeners = append(listeners, ln)
-		// A TCP listener always has a TCP address.
-		if addr, ok := ln.Addr().(*net.TCPAddr); ok {
-			ports = append(ports, addr.Port)
-		}
 	}
-	return ports, nil
+	return listeners, nil
+}
+
+// closeListeners releases sockets even when construction failed before Temporal could own them.
+func closeListeners(listeners []net.Listener) {
+	for _, ln := range listeners {
+		_ = ln.Close()
+	}
 }

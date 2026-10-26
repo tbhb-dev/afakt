@@ -8,10 +8,12 @@ import (
 	"context"
 	"errors"
 	"log/slog"
+	"net"
 	"os"
 	"path/filepath"
 	"strings"
 	"sync"
+	"syscall"
 	"testing"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -63,6 +65,7 @@ func startStop(t *testing.T, s *Server, buf *bytes.Buffer) {
 	if err := s.Stop(t.Context()); err != nil {
 		t.Errorf("Stop() error = %v", err)
 	}
+	wantListenersClosed(t, s.listeners)
 }
 
 func TestServersShareAProcess(t *testing.T) {
@@ -181,6 +184,15 @@ func (tc startFailure) check(t *testing.T) {
 	t.Helper()
 	var buf bytes.Buffer
 	s := newTestServer(tc.dir, &buf)
+	listen := s.listen
+	var listeners []net.Listener
+	s.listen = func(ctx context.Context, network, address string) (net.Listener, error) {
+		ln, err := listen(ctx, network, address)
+		if err == nil {
+			listeners = append(listeners, ln)
+		}
+		return ln, err
+	}
 	if tc.schema != nil {
 		s.setupSchema = func(*config.SQL) error { return tc.schema }
 	}
@@ -188,7 +200,7 @@ func (tc startFailure) check(t *testing.T) {
 		s.host = tc.host
 	}
 	if tc.server != nil || tc.build != nil {
-		s.newServer = func(...temporal.ServerOption) (temporal.Server, error) { return tc.server, tc.build }
+		s.newServer = func([]net.Listener, ...temporal.ServerOption) (temporal.Server, error) { return tc.server, tc.build }
 	}
 	err := s.Start(t.Context())
 	if err == nil || !strings.HasPrefix(err.Error(), tc.want) {
@@ -200,13 +212,81 @@ func (tc startFailure) check(t *testing.T) {
 	if fake, ok := tc.server.(*fakeServer); ok && fake.stopped != tc.stopped {
 		t.Errorf("stopped = %v, want %v", fake.stopped, tc.stopped)
 	}
+	wantListenersClosed(t, listeners)
 }
 
 func TestServerStopFailure(t *testing.T) {
 	t.Parallel()
-	s := &Server{server: &fakeServer{stop: errStop}}
-	if err := s.Stop(t.Context()); !errors.Is(err, errStop) {
+	var lc net.ListenConfig
+	ln, err := lc.Listen(t.Context(), "tcp", net.JoinHostPort(loopback, "0"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	s := &Server{server: &fakeServer{stop: errStop}, listeners: []net.Listener{ln}}
+	if err = s.Stop(t.Context()); !errors.Is(err, errStop) {
 		t.Errorf("Stop() error = %v, want %v", err, errStop)
+	}
+	wantListenersClosed(t, s.listeners)
+}
+
+func TestServerBindFailure(t *testing.T) {
+	t.Parallel()
+	var buf bytes.Buffer
+	s := newTestServer("", &buf)
+	listen := s.listen
+	var acquired net.Listener
+	var bindErr error
+	s.listen = func(ctx context.Context, network, address string) (net.Listener, error) {
+		if acquired == nil {
+			var err error
+			acquired, err = listen(ctx, network, address)
+			return acquired, err
+		}
+		ln, err := listen(ctx, network, acquired.Addr().String())
+		bindErr = err
+		return ln, err
+	}
+	err := s.Start(t.Context())
+	if bindErr == nil || !errors.Is(err, bindErr) || !errors.Is(err, syscall.EADDRINUSE) {
+		t.Fatalf("Start() error = %v, want original bind error %v", err, bindErr)
+	}
+	wantListenersClosed(t, []net.Listener{acquired})
+}
+
+func TestServerHTTPBindFailure(t *testing.T) {
+	t.Parallel()
+	var buf bytes.Buffer
+	s := newTestServer("", &buf)
+	listen := s.listen
+	var listeners []net.Listener
+	s.listen = func(ctx context.Context, network, address string) (net.Listener, error) {
+		ln, err := listen(ctx, network, address)
+		listeners = append(listeners, ln)
+		return ln, err
+	}
+	s.newServer = func(owned []net.Listener, opts ...temporal.ServerOption) (temporal.Server, error) {
+		// Occupy the HTTP port after its reservation closes. The gRPC sockets stay
+		// bound, so this reaches the real HTTP constructor's error-return path.
+		ln, err := listen(t.Context(), "tcp", listeners[len(owned)].Addr().String())
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer func() { _ = ln.Close() }()
+		return newOwnedServer(owned, opts...)
+	}
+	if err := s.Start(t.Context()); !errors.Is(err, syscall.EADDRINUSE) {
+		t.Fatalf("Start() error = %v, want wrapped bind error", err)
+	}
+	wantListenersClosed(t, listeners)
+}
+
+// wantListenersClosed checks the actual sockets, including reservations from failed builds.
+func wantListenersClosed(t *testing.T, listeners []net.Listener) {
+	t.Helper()
+	for _, ln := range listeners {
+		if err := ln.Close(); !errors.Is(err, net.ErrClosed) {
+			t.Errorf("Close() error = %v, want already closed listener", err)
+		}
 	}
 }
 
