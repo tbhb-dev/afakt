@@ -67,7 +67,7 @@ func TestWorkerEmbedded(t *testing.T) {
 		t.Errorf("GET %s = %d, want 404", apiRootPath, code)
 	}
 	stopCleanly(t, s)
-	want := []string{"temporal-client", "temporal-server", "http", "http-listener"}
+	want := []string{"temporal-client", "temporal-ui", "temporal-server", "http", "http-listener"}
 	if got := s.events.matching("stopping"); !slices.Equal(got, want) {
 		t.Errorf("stop order = %q, want %q", got, want)
 	}

@@ -330,15 +330,15 @@ func TestServerStopsOnSignal(t *testing.T) {
 		{
 			name:    "SIGTERM with an embedded worker",
 			sig:     syscall.SIGTERM,
-			path:    "/readyz",
-			targets: []string{"temporal-client", "temporal-server"},
+			path:    "/temporal/",
+			targets: []string{"temporal-client", "temporal-ui", "temporal-server"},
 			args:    []string{"--target=worker", "--temporal-mode=embedded", "--listen=127.0.0.1:0"},
 		},
 		{
 			name:    "SIGINT with an embedded worker and the API",
 			sig:     syscall.SIGINT,
-			path:    "/readyz",
-			targets: []string{"api", "temporal-client", "temporal-server"},
+			path:    "/temporal/",
+			targets: []string{"api", "temporal-client", "temporal-ui", "temporal-server"},
 			args: []string{
 				"--target=worker,api", "--temporal-mode=embedded", "--listen=127.0.0.1:0",
 				"--temporal-embedded-dir=" + t.TempDir(),
@@ -348,7 +348,12 @@ func TestServerStopsOnSignal(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
-			got, elapsed := runServerChild(t, tc.sig, tc.path, nil, tc.args...)
+			before := func(address string) {
+				if !waitServing(t, address, "/readyz") {
+					t.Error("the process wasn't ready before shutdown")
+				}
+			}
+			got, elapsed := runServerChild(t, tc.sig, tc.path, before, tc.args...)
 			if got.exitCode != 0 {
 				t.Errorf("exit code = %d (%s), want 0; stderr:\n%s", got.exitCode, got.state, got.stderr)
 			}

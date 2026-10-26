@@ -21,6 +21,7 @@ import (
 	"github.com/tbhb-dev/afakt/internal/lifecycle"
 	"github.com/tbhb-dev/afakt/internal/temporal"
 	"github.com/tbhb-dev/afakt/internal/temporal/embedded"
+	"github.com/tbhb-dev/afakt/internal/temporal/ui"
 )
 
 // readHeaderTimeout bounds how long a client may take to send request headers.
@@ -31,6 +32,7 @@ const readHeaderTimeout = 10 * time.Second
 const (
 	listenerService = "http-listener"
 	httpService     = "http"
+	temporalService = "temporal-server"
 )
 
 // ErrNotComposable reports a target that Run has no services for.
@@ -43,6 +45,7 @@ type Config struct {
 	Listen          string
 	ShutdownTimeout time.Duration
 	Temporal        temporal.Config
+	TemporalUIPath  string
 }
 
 // hooks adds services and routes to the composition. Tests use it to hold a service in a
@@ -94,6 +97,12 @@ func run(ctx context.Context, cfg Config, logger *slog.Logger, h hooks) error {
 // starts first so that readiness answers while the other services start. A target without
 // services returns ErrNotComposable.
 func compose(ctx context.Context, manager *lifecycle.Manager, cfg Config, logger *slog.Logger, h hooks) error {
+	if cfg.TemporalUIPath == "" {
+		cfg.TemporalUIPath = ui.DefaultPath
+	}
+	if err := ui.CheckPath(cfg.TemporalUIPath); err != nil {
+		return fmt.Errorf("compose: %w", err)
+	}
 	ln := &listener{address: cfg.Listen, logger: logger}
 	web := &httpServer{listener: ln, routes: []func(*http.ServeMux){nil}}
 	var checks []func(context.Context) error
@@ -111,7 +120,7 @@ func compose(ctx context.Context, manager *lifecycle.Manager, cfg Config, logger
 			web.dashboard = true
 			web.routes = append(web.routes, dashboardRoutes)
 		case TargetWorker:
-			services, check := workerServices(cfg.Temporal, logger, cfg.ShutdownTimeout)
+			services, check := workerServices(cfg.Temporal, logger, cfg.ShutdownTimeout, cfg.TemporalUIPath, web)
 			regs = append(regs, services...)
 			checks = append(checks, check)
 			continue
@@ -152,15 +161,25 @@ func workerServices(
 	cfg temporal.Config,
 	logger *slog.Logger,
 	shutdownTimeout time.Duration,
+	uiPath string,
+	web *httpServer,
 ) ([]lifecycle.Registration, func(context.Context) error) {
 	var regs []lifecycle.Registration
 	var dependsOn []string
 	address := func() string { return cfg.Address }
 	if cfg.Mode == temporal.ModeEmbedded {
 		server := embedded.New(cfg.EmbeddedDir, cfg.Namespace, logger, shutdownTimeout)
-		regs = append(regs, lifecycle.Registration{Name: "temporal-server", Service: server})
-		dependsOn = []string{"temporal-server"}
+		regs = append(regs, lifecycle.Registration{Name: temporalService, Service: server})
+		dependsOn = []string{temporalService}
 		address = server.Address
+		view := ui.New(address, cfg.Namespace, uiPath)
+		web.routes = append(web.routes, func(mux *http.ServeMux) {
+			mux.Handle(uiPath, view)
+			mux.Handle(uiPath+"/", view)
+		})
+		regs = append(regs, lifecycle.Registration{
+			Name: "temporal-ui", Service: view, DependsOn: []string{temporalService, httpService},
+		})
 	}
 	client := temporal.NewClient(address, cfg.Namespace, logger)
 	return append(

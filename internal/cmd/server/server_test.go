@@ -156,7 +156,8 @@ func TestNewCmdServerAccepts(t *testing.T) {
 			args: []string{"--target=worker", "--temporal-mode=embedded"},
 			want: server.Config{
 				Targets: worker, Listen: "127.0.0.1:8080", ShutdownTimeout: 30 * time.Second,
-				Temporal: temporal.Config{Mode: temporal.ModeEmbedded, Namespace: temporal.DefaultNamespace},
+				Temporal:       temporal.Config{Mode: temporal.ModeEmbedded, Namespace: temporal.DefaultNamespace},
+				TemporalUIPath: "/temporal",
 			},
 		},
 		{
@@ -169,6 +170,7 @@ func TestNewCmdServerAccepts(t *testing.T) {
 				Targets: []string{server.TargetWorker, server.TargetAPI}, Listen: "127.0.0.1:8080",
 				ShutdownTimeout: 30 * time.Second,
 				Temporal:        temporal.Config{Mode: temporal.ModeEmbedded, Namespace: "orders", EmbeddedDir: "data"},
+				TemporalUIPath:  "/temporal",
 			},
 		},
 		{
@@ -191,7 +193,8 @@ func TestNewCmdServerAccepts(t *testing.T) {
 			}
 			got := opts.Config
 			if !slices.Equal(got.Targets, tc.want.Targets) || got.Listen != tc.want.Listen ||
-				got.ShutdownTimeout != tc.want.ShutdownTimeout || got.Temporal != tc.want.Temporal {
+				got.ShutdownTimeout != tc.want.ShutdownTimeout || got.Temporal != tc.want.Temporal ||
+				got.TemporalUIPath != tc.want.TemporalUIPath {
 				t.Errorf("config = %+v, want %+v", got, tc.want)
 			}
 			if opts.ErrOut != io.Discard {

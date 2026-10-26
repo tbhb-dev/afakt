@@ -1,0 +1,311 @@
+// The MIT License
+//
+// Copyright (c) 2020 Temporal Technologies Inc.  All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+
+package route
+
+import (
+	"bytes"
+	"crypto/rand"
+	_ "embed"
+	"encoding/hex"
+	"fmt"
+	"html/template"
+	"io/fs"
+	"log"
+	"net/http"
+	"path"
+	"regexp"
+	"strings"
+
+	"github.com/gomarkdown/markdown"
+	"github.com/gomarkdown/markdown/html"
+	"github.com/gomarkdown/markdown/parser"
+
+	"github.com/labstack/echo/v4"
+
+	"github.com/temporalio/ui-server/v2/server/config"
+)
+
+// SetUIRoutes sets UI routes
+func SetUIRoutes(
+	e *echo.Echo,
+	publicPath string,
+	assets fs.FS,
+	cfgProvider *config.ConfigProviderWithRefresh,
+) error {
+	assetsHandler := buildUIAssetsHandler(assets)
+	e.GET("/_app/*", assetsHandler)
+	e.GET("/css/*", assetsHandler)
+	e.GET("/codemirror/*", assetsHandler)
+	e.GET("/android*", assetsHandler)
+	e.GET("/apple*", assetsHandler)
+	e.GET("/banner*", assetsHandler)
+	e.GET("/favicon*", assetsHandler)
+	e.GET("/logo*", assetsHandler)
+	e.GET("/Temporal_Logo_Animation.gif", assetsHandler)
+	e.GET("/site.webmanifest", assetsHandler)
+	e.GET("/i18n/*", assetsHandler)
+	indexHandler, err := buildUIIndexHandler(publicPath, assets, cfgProvider)
+	if err != nil {
+		return err
+	}
+
+	e.GET("/*", indexHandler)
+
+	return nil
+}
+
+func removeCSPMeta(htmlStr string) string {
+	re := regexp.MustCompile(`(?i)<meta[^>]*http-equiv\s*=\s*["']content-security-policy["'][^>]*>`)
+	return re.ReplaceAllString(htmlStr, "")
+}
+
+func buildUIIndexHandler(
+	publicPath string,
+	assets fs.FS,
+	cfgProvider *config.ConfigProviderWithRefresh,
+) (echo.HandlerFunc, error) {
+	indexHTMLBytes, err := fs.ReadFile(assets, "index.html")
+	if err != nil {
+		return nil, err
+	}
+	hasPublicPath := publicPath != ""
+	if hasPublicPath {
+		indexHTML := string(indexHTMLBytes)
+		indexHTML = strings.ReplaceAll(indexHTML, "base: \"\"", fmt.Sprintf("base: \"%s\"", publicPath))
+		indexHTML = strings.ReplaceAll(indexHTML, "\"/_app/", fmt.Sprintf("\"%s/_app/", publicPath))
+		log.Printf("WARNING: CSP IS DISABLED WHEN USING PUBLIC PATH!")
+		indexHTML = removeCSPMeta(indexHTML)
+		indexHTMLBytes = []byte(indexHTML)
+	}
+
+	return func(c echo.Context) (err error) {
+		reqPath, rawQuery := splitRequestURI(c.Request().RequestURI)
+		if hasPublicPath && !hasPathPrefix(reqPath, publicPath) {
+			target := publicPath + path.Clean(reqPath)
+			if rawQuery != "" {
+				target += "?" + rawQuery
+			}
+			return c.Redirect(http.StatusPermanentRedirect, target)
+		}
+
+		cfg, err := cfgProvider.GetConfig()
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, "unable to load UI configuration").SetInternal(err)
+		}
+		frameSources, err := cfg.CustomUI.IframeFrameSources(cfg.Auth.Enabled)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, "invalid custom UI configuration").SetInternal(err)
+		}
+		c.Response().Header().Set("Content-Security-Policy", frameSourceCSP(frameSources))
+
+		return c.Stream(http.StatusOK, "text/html", bytes.NewBuffer(indexHTMLBytes))
+	}, nil
+}
+
+func frameSourceCSP(origins []string) string {
+	sources := append([]string{"'self'"}, origins...)
+	return "frame-src " + strings.Join(sources, " ") + ";"
+}
+
+func hasPathPrefix(p, prefix string) bool {
+	return p == prefix || strings.HasPrefix(p, prefix+"/")
+}
+
+func splitRequestURI(uri string) (reqPath, rawQuery string) {
+	if i := strings.Index(uri, "?"); i >= 0 {
+		return uri[:i], uri[i+1:]
+	}
+	return uri, ""
+}
+
+func buildUIAssetsHandler(assets fs.FS) echo.HandlerFunc {
+	handler := http.FileServer(http.FS(assets))
+	return echo.WrapHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if strings.HasPrefix(r.URL.Path, "/_app/immutable/") && !strings.HasSuffix(r.URL.Path, "/") {
+			handler.ServeHTTP(&immutableAssetResponseWriter{ResponseWriter: w}, r)
+			return
+		}
+		handler.ServeHTTP(w, r)
+	}))
+}
+
+type immutableAssetResponseWriter struct {
+	http.ResponseWriter
+	wroteHeader bool
+}
+
+func (w *immutableAssetResponseWriter) WriteHeader(status int) {
+	if !w.wroteHeader {
+		if (status >= http.StatusOK && status < http.StatusMultipleChoices) || status == http.StatusNotModified {
+			w.Header().Del("Set-Cookie")
+			vary := w.Header().Values("Vary")
+			w.Header().Del("Vary")
+			for _, value := range vary {
+				var tokens []string
+				for _, token := range strings.Split(value, ",") {
+					token = strings.TrimSpace(token)
+					if !strings.EqualFold(token, "Cookie") {
+						tokens = append(tokens, token)
+					}
+				}
+				if len(tokens) > 0 {
+					w.Header().Add("Vary", strings.Join(tokens, ", "))
+				}
+			}
+			w.Header().Set("Cache-Control", "public, max-age=31536000, immutable")
+		}
+		w.wroteHeader = true
+	}
+	w.ResponseWriter.WriteHeader(status)
+}
+
+func (w *immutableAssetResponseWriter) Write(data []byte) (int, error) {
+	if !w.wroteHeader {
+		w.WriteHeader(http.StatusOK)
+	}
+	return w.ResponseWriter.Write(data)
+}
+
+func generateNonce() string {
+	bytes := make([]byte, 16)
+	if _, err := rand.Read(bytes); err != nil {
+		panic(err)
+	}
+	return hex.EncodeToString(bytes)
+}
+
+// Generate CSP header
+func generateCSP(nonce string) string {
+	return fmt.Sprintf(
+		"base-uri 'self'; default-src 'none'; style-src 'nonce-%s'; script-src 'nonce-%s'; frame-ancestors 'self'; form-action 'none'; sandbox allow-same-origin allow-popups allow-popups-to-escape-sandbox;",
+		nonce,
+		nonce,
+	)
+}
+
+// Process markdown content
+func processMarkdown(content string) string {
+	// Create markdown parser with extensions
+	extensions := parser.CommonExtensions | parser.AutoHeadingIDs
+	p := parser.NewWithExtensions(extensions)
+
+	// Parse markdown to AST
+	ast := p.Parse([]byte(content))
+
+	// Setup HTML renderer
+	opts := html.RendererOptions{
+		Flags: html.CommonFlags | html.HrefTargetBlank,
+	}
+	renderer := html.NewRenderer(opts)
+
+	// Render to HTML
+	return string(markdown.Render(ast, renderer))
+}
+
+// The stylesheet is generated from src/lib/utilities/markdown-reset.ts and
+// the Io theme colours by scripts/generate-markdown-css.ts, so this route and
+// the SvelteKit one at src/routes/(app)/render serve identical CSS. Edit the
+// reset, then run `pnpm generate:markdown-css`.
+//
+//go:embed markdown.gen.css
+var markdownCSS string
+
+// Template for the HTML page
+const pageTemplate = `
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Rendered Markdown</title>
+	<base target="_blank">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<style nonce="{{.Nonce}}">
+			{{.CSS}}
+	</style>
+</head>
+<body class="{{.BodyClass}}" {{if .Theme}}data-theme="{{.Theme}}"{{end}}>
+	<main>
+			{{.Content}}
+	</main>
+</body>
+</html>
+`
+
+func SetRenderRoute(e *echo.Echo, publicPath string) {
+	renderPath := path.Join(publicPath, "render")
+
+	// Parse template once at startup
+	tmpl := template.Must(template.New("page").Parse(pageTemplate))
+
+	e.GET(renderPath, func(c echo.Context) error {
+		content := c.QueryParam("content")
+		theme := c.QueryParam("theme")
+		overrideTheme := c.QueryParam("overrideTheme")
+
+		finalTheme := theme
+		if theme != "" && overrideTheme != "" {
+			finalTheme = fmt.Sprintf("%s-%s", theme, overrideTheme)
+		}
+
+		// Matches the SvelteKit route's parsing: only the exact string opts in.
+		inline := c.QueryParam("inline") == "true"
+		compact := c.QueryParam("compact") == "true"
+		bodyClass := "prose"
+		if inline || compact {
+			bodyClass += " compact"
+		}
+		if inline {
+			bodyClass += " inline"
+		}
+
+		// Process markdown to HTML
+		renderedHTML := processMarkdown(content)
+
+		nonce := generateNonce()
+
+		data := struct {
+			Content   template.HTML
+			Nonce     string
+			Theme     string
+			BodyClass string
+			CSS       template.CSS
+		}{
+			Content:   template.HTML(renderedHTML),
+			Nonce:     nonce,
+			Theme:     finalTheme,
+			BodyClass: bodyClass,
+			CSS:       template.CSS(markdownCSS),
+		}
+
+		// Set headers
+		c.Response().Header().Set("Content-Type", "text/html")
+		c.Response().Header().Set("Content-Security-Policy", generateCSP(nonce))
+
+		err := tmpl.Execute(c.Response().Writer, data)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+}

@@ -1,0 +1,280 @@
+// The MIT License
+//
+// Copyright (c) 2022 Temporal Technologies Inc.  All rights reserved.
+//
+// Copyright (c) 2020 Uber Technologies, Inc.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+
+package config
+
+import (
+	"errors"
+	"strings"
+	"time"
+	"unicode"
+
+	"gopkg.in/yaml.v3"
+)
+
+type (
+	// Config contains the configuration for the UI server
+	Config struct {
+		TemporalGRPCAddress string `yaml:"temporalGrpcAddress"`
+		Host                string `yaml:"host"`
+		Port                int    `yaml:"port"`
+		PublicPath          string `yaml:"publicPath"`
+		TLS                 TLS    `yaml:"tls"`
+		Auth                Auth   `yaml:"auth"`
+		EnableUI            bool   `yaml:"enableUi"`
+		CloudUI             bool   `yaml:"cloudUi"`
+		UIAssetPath         string `yaml:"uiAssetPath"`
+		Banner              Banner `yaml:"banner"`
+		CORS                CORS   `yaml:"cors"`
+		DefaultNamespace    string `yaml:"defaultNamespace"`
+		FeedbackURL         string `yaml:"feedbackUrl"`
+		DisableNewsFetch    bool   `yaml:"disableNewsFetch"`
+		NotifyOnNewVersion  bool   `yaml:"notifyOnNewVersion"`
+		// How this server was installed: cli, docker, helm, or server
+		Distribution string `yaml:"distribution"`
+		// Version of the distribution, such as the CLI or Helm chart version
+		DistributionVersion string `yaml:"distributionVersion"`
+		// Show temporal-system namespace in namespace selector
+		ShowTemporalSystemNamespace bool `yaml:"showTemporalSystemNamespace"`
+		// Collapse the left navigation and saved views navigation by default
+		NavCollapsedByDefault bool `yaml:"navCollapsedByDefault"`
+		// How often to reload the config
+		RefreshInterval     time.Duration `yaml:"refreshInterval"`
+		Codec               Codec         `yaml:"codec"`
+		DisableWriteActions bool          `yaml:"disableWriteActions"`
+		// Discrete configuration for Workflow Actions in the UI
+		WorkflowTerminateDisabled bool `yaml:"workflowTerminateDisabled"`
+		WorkflowCancelDisabled    bool `yaml:"workflowCancelDisabled"`
+		WorkflowSignalDisabled    bool `yaml:"workflowSignalDisabled"`
+		WorkflowUpdateDisabled    bool `yaml:"workflowUpdateDisabled"`
+		WorkflowResetDisabled     bool `yaml:"workflowResetDisabled"`
+		WorkflowPauseDisabled     bool `yaml:"workflowPauseDisabled"`
+		// Whether bulk/batch actions are enabled in the UI
+		BatchActionsDisabled bool `yaml:"batchActionsDisabled"`
+		// Whether start workflow is enabled in the UI
+		StartWorkflowDisabled bool `yaml:"startWorkflowDisabled"`
+		// Whether to hide server errors for workflow queries in UI
+		HideWorkflowQueryErrors bool `yaml:"hideWorkflowQueryErrors"`
+		// Whether to disable refreshing workflow counts in UI
+		RefreshWorkflowCountsDisabled bool `yaml:"refreshWorkflowCountsDisabled"`
+		// Whether to disable activity commands in the UI
+		ActivityCommandsDisabled bool `yaml:"activityCommandsDisabled"`
+		// Custom UI extensions that can mount iframe content into stable UI slots
+		CustomUI CustomUI `yaml:"customUi"`
+		// Forward specified HTTP headers from HTTP API requests to Temporal gRPC backend
+		ForwardHeaders []string `yaml:"forwardHeaders"`
+		HideLogs       bool     `yaml:"hideLogs"`
+		// TLS configuration options to start UI Server in TLS mode
+		UIServerTLS UIServerTLS `yaml:"uiServerTLS"`
+	}
+
+	Banner struct {
+		Text  string `yaml:"text"`
+		Color string `yaml:"color"`
+	}
+
+	CORS struct {
+		AllowOrigins          []string `yaml:"allowOrigins"`
+		UnsafeAllowAllOrigins bool     `yaml:"unsafeAllowAllOrigins"`
+		// CookieInsecure allows CSRF cookie to be sent to servers that the browser considers
+		// unsecured. Useful for cases where the connection is secured via VPN rather than
+		// HTTPS directly.
+		CookieInsecure bool `yaml:"cookieInsecure"`
+	}
+
+	TLS struct {
+		CaFile                 string `yaml:"caFile"`
+		CertFile               string `yaml:"certFile"`
+		KeyFile                string `yaml:"keyFile"`
+		CaData                 string `yaml:"caData"`
+		CertData               string `yaml:"certData"`
+		KeyData                string `yaml:"keyData"`
+		EnableHostVerification bool   `yaml:"enableHostVerification"`
+		ServerName             string `yaml:"serverName"`
+	}
+
+	UIServerTLS struct {
+		CertFile string `yaml:"certFile"`
+		KeyFile  string `yaml:"keyFile"`
+		// MTLS - optional. When set, enables mTLS on the UI server.
+		MTLS *UIServerMTLS `yaml:"mTLS,omitempty"`
+	}
+
+	UIServerMTLS struct {
+		// CaFile is the path to a CA bundle used to verify client certificates.
+		CaFile string `yaml:"caFile"`
+		// ClientAuth controls how client certificates are handled. Valid values:
+		//   ""                 -> tls.RequireAndVerifyClientCert (default)
+		//   "requireAndVerify" -> tls.RequireAndVerifyClientCert
+		//   "verifyIfGiven"    -> tls.VerifyClientCertIfGiven
+		//   "request"          -> tls.RequestClientCert
+		//   "requireAny"       -> tls.RequireAnyClientCert
+		ClientAuth string `yaml:"clientAuth"`
+	}
+
+	Auth struct {
+		// Enabled - UI checks this first before reading your provider config
+		Enabled bool `yaml:"enabled"`
+		// RedirectToProvider - skip the UI login page and redirect unauthenticated users directly to the auth provider
+		RedirectToProvider bool `yaml:"redirectToProvider"`
+		// A list of auth providers. Currently enables only the first provider in the list.
+		Providers []AuthProvider `yaml:"providers"`
+		// MaxSessionDuration - optional maximum session duration. If set, users will be
+		// forced to re-login after this duration regardless of token validity.
+		// Example values: "8h", "24h", "168h" (1 week). If zero, no max duration is enforced.
+		MaxSessionDuration time.Duration `yaml:"maxSessionDuration"`
+	}
+
+	AuthProvider struct {
+		// Label - optional label for the provider
+		Label string `yaml:"label"`
+		// Type of the auth provider. Only OIDC is supported today
+		Type string `yaml:"type"`
+		// OIDC .well-known/openid-configuration URL, ex. https://accounts.google.com/
+		ProviderURL string `yaml:"providerUrl"`
+		// IssuerUrl - optional. Needed only when differs from the auth provider URL
+		IssuerUrl    string `yaml:"issuerUrl"`
+		ClientID     string `yaml:"clientId"`
+		ClientSecret string `yaml:"clientSecret"`
+		// Scopes for auth. Typically [openid, profile, email]
+		Scopes []string `yaml:"scopes"`
+		// CallbackURL - URL for the callback URL, ex. https://localhost:8080/sso/callback
+		CallbackURL string `yaml:"callbackUrl"`
+		// Options added as URL query params when redirecting to auth provider. Can be used to configure custom auth flows such as Auth0 invitation flow.
+		Options map[string]interface{} `yaml:"options"`
+		// UseIDTokenAsBearer - Use ID token instead of access token as Bearer in Authorization header
+		UseIDTokenAsBearer bool `yaml:"useIdTokenAsBearer"`
+		// RefreshTokenDuration - optional lifetime of the refresh token this provider issues.
+		// It is only needed for providers that issue opaque (non-JWT) refresh tokens, whose
+		// lifetime the server cannot read. For JWT refresh tokens the exp claim is used and
+		// this value is ignored. If neither is available, a 7 day default applies.
+		// Example values: "8h", "24h", "168h" (1 week).
+		RefreshTokenDuration time.Duration `yaml:"refreshTokenDuration"`
+	}
+
+	Codec struct {
+		Endpoint            string `yaml:"endpoint"`
+		PassAccessToken     bool   `yaml:"passAccessToken"`
+		IncludeCredentials  bool   `yaml:"includeCredentials"`
+		DefaultErrorMessage string `yaml:"defaultErrorMessage"`
+		DefaultErrorLink    string `yaml:"defaultErrorLink"`
+	}
+
+	CustomUI struct {
+		Enabled          bool              `yaml:"enabled"`
+		IframeExtensions []IframeExtension `yaml:"iframeExtensions"`
+	}
+
+	IframeExtension struct {
+		ID            string                `yaml:"id"`
+		Title         string                `yaml:"title"`
+		Slot          string                `yaml:"slot"`
+		Src           string                `yaml:"src"`
+		AllowedOrigin string                `yaml:"allowedOrigin"`
+		RoutePatterns []string              `yaml:"routePatterns"`
+		Sandbox       IframeSandbox         `yaml:"sandbox"`
+		Sizing        IframeExtensionSizing `yaml:"sizing"`
+		Permissions   []string              `yaml:"permissions"`
+	}
+
+	IframeSandbox struct {
+		AllowDownloads  bool `yaml:"allowDownloads"`
+		AllowForms      bool `yaml:"allowForms"`
+		AllowModals     bool `yaml:"allowModals"`
+		AllowPopups     bool `yaml:"allowPopups"`
+		AllowSameOrigin bool `yaml:"allowSameOrigin"`
+	}
+
+	IframeExtensionSizing struct {
+		DefaultHeight int `yaml:"defaultHeight"`
+		MinHeight     int `yaml:"minHeight"`
+		MaxHeight     int `yaml:"maxHeight"`
+		DefaultWidth  int `yaml:"defaultWidth"`
+		MinWidth      int `yaml:"minWidth"`
+		MaxWidth      int `yaml:"maxWidth"`
+	}
+
+	Filesystem struct {
+		Path string `yaml:"path"`
+	}
+)
+
+// UnmarshalYAML ignores invalid banner settings so they cannot prevent startup.
+func (b *Banner) UnmarshalYAML(node *yaml.Node) error {
+	*b = Banner{}
+	if node.Kind != yaml.MappingNode {
+		return nil
+	}
+	var fields struct {
+		Text  yaml.Node `yaml:"text"`
+		Color yaml.Node `yaml:"color"`
+	}
+	if err := node.Decode(&fields); err != nil {
+		return nil
+	}
+	if fields.Text.Kind != yaml.ScalarNode || fields.Text.Tag != "!!str" ||
+		fields.Color.Kind != yaml.ScalarNode || fields.Color.Tag != "!!str" {
+		return nil
+	}
+	text := strings.TrimSpace(fields.Text.Value)
+	color := strings.ToLower(strings.TrimSpace(fields.Color.Value))
+	if text == "" || strings.ContainsAny(fields.Text.Value, "\"'&:") ||
+		strings.IndexFunc(fields.Text.Value, unicode.IsControl) >= 0 {
+		return nil
+	}
+	switch color {
+	case "neutral", "info", "warning", "success", "danger", "error", "accent":
+		*b = Banner{Text: text, Color: color}
+	}
+	return nil
+}
+
+// Validate validates this config
+func (c *Config) Validate() error {
+	if c.TemporalGRPCAddress == "" {
+		return errors.New("temporal frontend gRPC address is not set")
+	}
+
+	if err := c.Auth.Validate(); err != nil {
+		return err
+	}
+
+	if err := c.CustomUI.Validate(c.Auth.Enabled); err != nil {
+		return err
+	}
+
+	if err := c.UIServerTLS.Validate(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Ensure that *Config implements ConfigProvider interface.
+var _ ConfigProvider = &Config{}
+
+// GetConfig implements ConfigProvider.
+func (c *Config) GetConfig() (*Config, error) {
+	return c, nil
+}

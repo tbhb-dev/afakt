@@ -25,8 +25,8 @@ The GitHub webhook receiver accepts webhook deliveries from GitHub. It calls the
 
 Temporal is the workflow orchestrator. It runs afakt's workflows on workers inside the binary, and a workflow can start other workflows. The Agent runner workflow runs AI coding agents.
 
-A process with the worker target connects to Temporal in the mode that `--temporal-mode` names. In `external` mode it connects to the Temporal frontend at `--temporal-address`. In `embedded` mode, for development and tests, it runs a Temporal server inside the process on its own loopback ports, with its data in memory or in `--temporal-embedded-dir`. Both modes use the namespace that `--temporal-namespace` names, `default` unless set. The worker target establishes the connection. Workflow registration and polling remain separate changes.
-
-The embedded adapter owns startup and cleanup. Cancellation starts the shutdown timeout while startup is still in progress. If a dependency call ignores cancellation, the adapter stops waiting at the deadline, reports an error, and keeps cleanup tracked for when that call returns. Construction failures release the services and public persistence handles in reverse order. The HTTP constructor still closes and rebinds a reserved port, and Temporal's SQLite plugin retains its private connection pool after public handles close. These remaining ownership limits are tracked in [issue #73](https://github.com/tbhb-dev/afakt/issues/73).
+Workers connect to an external Temporal server or use an embedded server for development and tests.
 
 Every process answers `/livez` and `/readyz` on its listener. `/livez` reports that the process answers at all. `/readyz` passes once every service has started and, with the worker target, only while the Temporal namespace is reachable. It fails again when the shutdown begins.
+
+The Temporal Web UI gives developers and testers a view of the embedded server's namespaces, workflows, and histories.

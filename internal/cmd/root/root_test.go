@@ -54,6 +54,7 @@ Options:
       --temporal-address <ADDR>         Host and port of the Temporal frontend, in external mode
       --temporal-namespace <NAMESPACE>  Temporal namespace the worker uses [default: default]
       --temporal-embedded-dir <DIR>     Directory for the data of the embedded server; without it, the data stays in memory
+      --temporal-ui-path <PATH>         Temporal Web UI path on --listen in embedded mode; release builds include the UI, Go-only builds a stand-in; development and test only, without authentication [default: /temporal]
   -h, --help                            Print help
 `
 
