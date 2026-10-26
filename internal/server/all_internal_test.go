@@ -7,6 +7,7 @@ import (
 	"context"
 	"errors"
 	"log/slog"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"path/filepath"
@@ -55,10 +56,7 @@ func TestAllAndExplicitComposition(t *testing.T) {
 		}
 		started = got
 		stopCleanly(t, s)
-		wantBoundAddresses(t, s, 6)
-		for _, address := range s.events.matching("bound") {
-			wantClosed(t, address)
-		}
+		wantAllListenersClosed(t, s)
 		want := []string{
 			"temporal-client",
 			"temporal-ui",
@@ -92,9 +90,7 @@ func TestAllInstancesAndStartupRollback(t *testing.T) {
 	}
 	for _, s := range servers {
 		stopCleanly(t, s)
-		for _, address := range s.events.matching("bound") {
-			wantClosed(t, address)
-		}
+		wantAllListenersClosed(t, s)
 	}
 	// Fail after all real services have acquired resources, including persistence.
 	cfg := allConfig(t, "all")
@@ -105,13 +101,23 @@ func TestAllInstancesAndStartupRollback(t *testing.T) {
 	if err := s.wait(t); !errors.Is(err, errBoom) {
 		t.Errorf("run() = %v, want startup failure", err)
 	}
-	for _, address := range s.events.matching("bound") {
-		wantClosed(t, address)
-	}
+	wantAllListenersClosed(t, s)
 	// Reusing the data directory proves the failed run released its persistence handles.
 	retry := startServer(t, cfg, hooks{})
 	waitReady(t, retry.addr(t))
 	stopCleanly(t, retry)
+}
+
+// wantAllListenersClosed checks owned sockets, since parallel tests can reuse their addresses.
+// Temporal replaces the frontend HTTP reservation internally (issue #73).
+func wantAllListenersClosed(t *testing.T, s *harness) {
+	t.Helper()
+	wantBoundAddresses(t, s, 6)
+	for _, ln := range s.listeners {
+		if err := ln.Close(); !errors.Is(err, net.ErrClosed) {
+			t.Errorf("listener %s Close() = %v, want already closed", ln.Addr(), err)
+		}
+	}
 }
 
 func TestAllRoleHealthStates(t *testing.T) {
