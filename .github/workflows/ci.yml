@@ -191,6 +191,7 @@ jobs:
   dashboard:
     name: "dashboard (${{ matrix.task }})"
     runs-on: ubuntu-24.04
+    timeout-minutes: 20
     env:
       GOMAXPROCS: "2"
       GOFLAGS: -p=2
@@ -198,7 +199,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        task: [check-dashboard, check-dashboard-gates]
+        task: [check-dashboard, check-dashboard-gates, check-all-targets]
     steps:
       - name: Harden the runner
         uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2

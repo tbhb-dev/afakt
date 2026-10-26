@@ -228,6 +228,15 @@ description = "Check the embedded Temporal UI and workflow list in the pinned br
 dir = "{{config_root}}/apps/dashboard"
 run = "pnpm exec playwright test --config temporal/playwright.config.ts"
 
+[tasks.check-all-targets]
+description = "Build the release and check every target together without external services"
+run = ["mise run build", "bash scripts/check-all-targets.sh"]
+
+[tasks.e2e-all-targets]
+description = "Check the running all-targets binary in the pinned browser"
+dir = "{{config_root}}/apps/dashboard"
+run = "pnpm exec playwright test --config all/playwright.config.ts"
+
 [tasks.check-dashboard-gates]
 description = "Prove release and browser failures and the required CI result on generated broken inputs"
 run = "bash scripts/check-dashboard-gates.sh"

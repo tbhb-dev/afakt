@@ -2,6 +2,7 @@
 # Exercise failure, cancellation and skip for each dependency of the required result.
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
+grep -qF 'task: [check-dashboard, check-dashboard-gates, check-all-targets]' .github/workflows/ci.yml
 bash scripts/require-ci-results.sh success success success success
 for position in 0 1 2 3; do
   for result in failure cancelled skipped; do

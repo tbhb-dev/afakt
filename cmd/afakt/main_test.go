@@ -335,6 +335,16 @@ func TestServerStopsOnSignal(t *testing.T) {
 			args:    []string{"--target=worker", "--temporal-mode=embedded", "--listen=127.0.0.1:0"},
 		},
 		{
+			name: "all SIGTERM", sig: syscall.SIGTERM, path: "/dashboard/",
+			targets: []string{"temporal-client", "temporal-ui", "temporal-server", "dashboard", "webhook", "api"},
+			args:    []string{"--target=all", "--temporal-mode=embedded", "--listen=127.0.0.1:0"},
+		},
+		{
+			name: "all SIGINT", sig: syscall.SIGINT, path: "/temporal/",
+			targets: []string{"temporal-client", "temporal-ui", "temporal-server", "dashboard", "webhook", "api"},
+			args:    []string{"--target=all", "--temporal-mode=embedded", "--listen=127.0.0.1:0"},
+		},
+		{
 			name:    "SIGINT with an embedded worker and the API",
 			sig:     syscall.SIGINT,
 			path:    "/temporal/",
@@ -448,17 +458,19 @@ func TestServerShutdownTimeout(t *testing.T) {
 	t.Parallel()
 	skipUnlessUnix(t)
 	for _, sig := range []syscall.Signal{syscall.SIGINT, syscall.SIGTERM} {
-		t.Run(sig.String(), func(t *testing.T) {
-			t.Parallel()
-			got, _ := runServerChild(t, sig, "/readyz", nil,
-				"--target=worker", "--temporal-mode=embedded", "--listen=127.0.0.1:0", "--shutdown-timeout=1ns")
-			if got.exitCode != 1 {
-				t.Errorf("exit code = %d (%s), want 1; stderr:\n%s", got.exitCode, got.state, got.stderr)
-			}
-			if !strings.Contains(got.stderr, "Error: shutdown deadline exceeded") {
-				t.Errorf("stderr lacks the timeout error:\n%s", got.stderr)
-			}
-		})
+		for _, target := range []string{"worker", "all"} {
+			t.Run(target+sig.String(), func(t *testing.T) {
+				t.Parallel()
+				got, _ := runServerChild(t, sig, "/readyz", nil,
+					"--target="+target, "--temporal-mode=embedded", "--listen=127.0.0.1:0", "--shutdown-timeout=1ns")
+				if got.exitCode != 1 {
+					t.Errorf("exit code = %d (%s), want 1; stderr:\n%s", got.exitCode, got.state, got.stderr)
+				}
+				if !strings.Contains(got.stderr, "Error: shutdown deadline exceeded") {
+					t.Errorf("stderr lacks the timeout error:\n%s", got.stderr)
+				}
+			})
+		}
 	}
 }
 

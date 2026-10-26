@@ -214,13 +214,9 @@ func TestServerRejects(t *testing.T) {
 		return clapError("invalid value '"+value+"' for '"+flag+"': "+reason, serverUsageLine)
 	}
 	target := func(value, reason string) string { return invalid(value, "--target <TARGET>", reason) }
-	unavailableIn := func(value, name string) string {
-		return target(
-			value,
-			"target is not available yet: '"+name+"'; only 'api', 'webhook', 'dashboard' and 'worker' can run in this build",
-		)
+	overlap := func(value string) string {
+		return target(value, "duplicate target: 'all' includes every target; use it on its own")
 	}
-	unavailable := func(name string) string { return unavailableIn(name, name) }
 	listen := func(value, reason string) string { return invalid(value, "--listen <ADDR>", reason) }
 	timeout := func(value, reason string) string {
 		return invalid(value, "--shutdown-timeout <DURATION>", reason)
@@ -374,12 +370,12 @@ func TestServerRejects(t *testing.T) {
 			args:   []string{"--target=dashboard", "--shutdown-timeout=later"},
 			stderr: timeout("later", durationForm),
 		},
-		{name: "all", args: []string{"--target=all"}, stderr: unavailable("all")},
-		{name: "api and all", args: []string{"--target=api,all"}, stderr: unavailableIn("api,all", "all")},
+		{name: "all without mode", args: []string{"--target=all"}, stderr: missing("--temporal-mode <MODE>")},
+		{name: "api and all", args: []string{"--target=api,all"}, stderr: overlap("api,all")},
 		{
 			name:   "worker and all",
 			args:   []string{"--target=worker,all", "--temporal-mode=embedded"},
-			stderr: unavailableIn("worker,all", "all"),
+			stderr: overlap("worker,all"),
 		},
 		{name: "worker without mode", args: []string{"--target=worker"}, stderr: missing("--temporal-mode <MODE>")},
 		{

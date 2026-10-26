@@ -17,6 +17,8 @@ func TestParseTargetsAccepts(t *testing.T) {
 		value string
 		want  []string
 	}{
+		{value: "all", want: []string{"api", "webhook", "dashboard", "worker"}},
+		{value: "api,webhook,dashboard,worker", want: []string{"api", "webhook", "dashboard", "worker"}},
 		{value: "worker", want: []string{"worker"}},
 		{value: "worker,api", want: []string{"worker", "api"}},
 		{value: "api,webhook,worker", want: []string{"api", "webhook", "worker"}},
@@ -45,9 +47,6 @@ func TestParseTargetsAccepts(t *testing.T) {
 func TestParseTargetsRejects(t *testing.T) {
 	t.Parallel()
 	const choices = "choose from api, webhook, dashboard, worker, all"
-	unavailable := func(name string) string {
-		return "target is not available yet: '" + name + "'; only 'api', 'webhook', 'dashboard' and 'worker' can run in this build"
-	}
 	cases := []struct {
 		value string
 		want  error
@@ -66,9 +65,17 @@ func TestParseTargetsRejects(t *testing.T) {
 		{value: "worker,api,worker", want: server.ErrDuplicateTarget, text: "duplicate target 'worker'"},
 		{value: "webhook,webhook", want: server.ErrDuplicateTarget, text: "duplicate target 'webhook'"},
 		{value: "dashboard,dashboard", want: server.ErrDuplicateTarget, text: "duplicate target 'dashboard'"},
-		{value: "all", want: server.ErrUnavailableTarget, text: unavailable("all")},
-		{value: "worker,all", want: server.ErrUnavailableTarget, text: unavailable("all")},
-		{value: "api,all", want: server.ErrUnavailableTarget, text: unavailable("all")},
+		{
+			value: "worker,all",
+			want:  server.ErrDuplicateTarget,
+			text:  "duplicate target: 'all' includes every target; use it on its own",
+		},
+		{
+			value: "all,api",
+			want:  server.ErrDuplicateTarget,
+			text:  "duplicate target: 'all' includes every target; use it on its own",
+		},
+		{value: "all,all", want: server.ErrDuplicateTarget, text: "duplicate target 'all'"},
 	}
 	for _, tc := range cases {
 		t.Run(tc.value, func(t *testing.T) {

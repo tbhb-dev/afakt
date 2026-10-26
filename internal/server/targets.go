@@ -31,12 +31,9 @@ var (
 	ErrUnknownTarget = errors.New("unknown target")
 	// ErrDuplicateTarget reports a target named more than once.
 	ErrDuplicateTarget = errors.New("duplicate target")
-	// ErrUnavailableTarget reports a target that this build can't run yet.
-	ErrUnavailableTarget = errors.New("target is not available yet")
 )
 
-// targetNames returns every target name in the order the help text lists them. Every name
-// that `availableTargets` lacks is reserved for later changes, and all stands for every target.
+// targetNames returns every target name in the order the help text lists them.
 func targetNames() []string {
 	return []string{TargetAPI, TargetWebhook, TargetDashboard, TargetWorker, "all"}
 }
@@ -64,11 +61,11 @@ func ParseTargets(value string) ([]string, error) {
 			return nil, fmt.Errorf("%w '%s'", ErrDuplicateTarget, name)
 		}
 	}
-	for _, name := range names {
-		if !slices.Contains(availableTargets(), name) {
-			return nil, fmt.Errorf("%w: '%s'; only '%s', '%s', '%s' and '%s' can run in this build",
-				ErrUnavailableTarget, name, TargetAPI, TargetWebhook, TargetDashboard, TargetWorker)
+	if slices.Contains(names, "all") {
+		if len(names) != 1 {
+			return nil, fmt.Errorf("%w: 'all' includes every target; use it on its own", ErrDuplicateTarget)
 		}
+		return availableTargets(), nil
 	}
 	return names, nil
 }
