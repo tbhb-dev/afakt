@@ -15,6 +15,7 @@ import (
 	"net"
 	"os"
 	"path/filepath"
+	"slices"
 	"strconv"
 	"time"
 
@@ -47,31 +48,45 @@ const (
 	failoverVersionIncrement = 10
 )
 
-// newServerFunc builds a Temporal server using the adapter's owned gRPC listeners.
-type newServerFunc func([]net.Listener, ...temporal.ServerOption) (temporal.Server, error)
+var errLifecyclePanic = errors.New("embedded Temporal lifecycle panic")
+
+// runtimeServer exposes context-aware startup and cleanup owned by the adapter.
+type runtimeServer interface {
+	Start(ctx context.Context) error
+	Stop(ctx context.Context) error
+}
+
+// newServerFunc returns the owner even on construction failure, so cleanup can release
+// resources created before the error.
+type newServerFunc func(context.Context, []net.Listener, ...temporal.ServerOption) (runtimeServer, error)
 
 // Server is the service that runs the embedded Temporal server. Start builds and starts it,
 // Address returns the address of its frontend, and Stop stops it.
 type Server struct {
-	dir         string
-	namespace   string
-	logger      *slog.Logger
-	host        string
-	newServer   newServerFunc
-	setupSchema func(*config.SQL) error
-	server      temporal.Server
-	address     string
-	listeners   []net.Listener
-	listen      func(context.Context, string, string) (net.Listener, error)
+	dir              string
+	namespace        string
+	logger           *slog.Logger
+	host             string
+	newServer        newServerFunc
+	setupSchema      func(*config.SQL) error
+	createNamespaces func(*config.SQL, ...*sqliteschema.NamespaceConfig) error
+	server           runtimeServer
+	address          string
+	listeners        []net.Listener
+	listen           func(context.Context, string, string) (net.Listener, error)
+	shutdownTimeout  time.Duration
 }
 
 // New returns a server for namespace. With an empty dir it keeps its data in memory, and
-// otherwise in DatabaseFile inside dir, which Start creates if it's missing.
-func New(dir, namespace string, logger *slog.Logger) *Server {
+// otherwise in DatabaseFile inside dir, which Start creates if it's missing. Cancellation
+// during Start allows shutdownTimeout for cleanup before returning a StartupError.
+func New(dir, namespace string, logger *slog.Logger, shutdownTimeout time.Duration) *Server {
 	return &Server{
 		dir: dir, namespace: namespace, logger: logger, host: loopback,
 		newServer: newOwnedServer, setupSchema: sqliteschema.SetupSchema,
-		listen: (&net.ListenConfig{}).Listen,
+		createNamespaces: sqliteschema.CreateNamespaces,
+		listen:           (&net.ListenConfig{}).Listen,
+		shutdownTimeout:  shutdownTimeout,
 	}
 }
 
@@ -83,6 +98,97 @@ func (s *Server) Address() string {
 // Start prepares the database and the namespace, then starts the server. A failure after the
 // server is built stops it again before Start returns.
 func (s *Server) Start(ctx context.Context) error {
+	// Temporal constructors and some hooks cannot be interrupted through the public API.
+	// Keep their goroutine tracked through cleanup, including resources returned late.
+	finished := make(chan error, 1)
+	started := make(chan error, 1)
+	cleanupDeadline := make(chan time.Time, 1)
+	go func() {
+		err := guarded(func() error { return s.start(ctx) })
+		started <- err
+		deadline := <-cleanupDeadline
+		if deadline.IsZero() {
+			return
+		}
+		stopCtx, cancel := context.WithDeadline(context.WithoutCancel(ctx), deadline)
+		defer cancel()
+		finished <- errors.Join(err, guarded(func() error { return s.Stop(stopCtx) }))
+	}()
+	select {
+	case err := <-started:
+		if err == nil && ctx.Err() == nil {
+			cleanupDeadline <- time.Time{}
+			return nil
+		}
+		return s.awaitCleanup(ctx, err, started, finished, cleanupDeadline)
+	case <-ctx.Done():
+		return s.awaitCleanup(ctx, nil, started, finished, cleanupDeadline)
+	}
+}
+
+// guarded retains the lifecycle manager's panic protection inside the supervision
+// goroutine. Temporal's fatal logger panics, including during constructor or hook calls.
+func guarded(call func() error) (err error) {
+	defer func() {
+		if failure := recover(); failure != nil {
+			err = fmt.Errorf("%w: %v", errLifecyclePanic, failure)
+		}
+	}()
+	return call()
+}
+
+// StartupError preserves cancellation and any construction or cleanup error.
+type StartupError struct {
+	Cause error
+}
+
+func (e *StartupError) Error() string {
+	return "embedded Temporal startup interrupted: " + e.Cause.Error()
+}
+func (e *StartupError) Unwrap() error { return e.Cause }
+
+func (s *Server) awaitCleanup(
+	ctx context.Context,
+	cause error,
+	started <-chan error,
+	finished <-chan error,
+	cleanupDeadline chan<- time.Time,
+) error {
+	deadline := time.Now().Add(s.shutdownTimeout)
+	stopCtx, cancel := context.WithDeadline(context.WithoutCancel(ctx), deadline)
+	defer cancel()
+	cleanupDeadline <- deadline
+	var cleanupErr error
+	select {
+	case err := <-finished:
+		cleanupErr = err
+	case <-stopCtx.Done():
+	}
+	if stopCtx.Err() != nil {
+		// Cancellation may win the initial select even though startup returned an
+		// error before cleanup stalled. Retain that error when it is now available.
+		select {
+		case err := <-started:
+			cause = errors.Join(cause, err)
+		default:
+		}
+		return s.cleanupTimeout(stopCtx, errors.Join(cause, ctx.Err(), cleanupErr))
+	}
+	if ctx.Err() != nil {
+		return &StartupError{Cause: errors.Join(ctx.Err(), cleanupErr)}
+	}
+	return cleanupErr
+}
+
+func (s *Server) cleanupTimeout(ctx context.Context, cause error) error {
+	s.logger.ErrorContext(ctx, "embedded Temporal startup cleanup exceeded shutdown deadline")
+	return &StartupError{Cause: errors.Join(cause, ctx.Err())}
+}
+
+func (s *Server) start(ctx context.Context) error {
+	if err := ctx.Err(); err != nil {
+		return fmt.Errorf("prepare embedded Temporal server: %w", err)
+	}
 	sqlConfig, err := s.database()
 	if err != nil {
 		return err
@@ -92,12 +198,7 @@ func (s *Server) Start(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	started := false
-	defer func() {
-		if !started {
-			closeListeners(listeners)
-		}
-	}()
+	s.listeners = listeners
 	ports := make([]int, len(listeners))
 	for i, ln := range listeners {
 		// ListenConfig with network tcp always returns a TCP address.
@@ -110,24 +211,22 @@ func (s *Server) Start(ctx context.Context) error {
 	for i, name := range names {
 		hosts[name] = static.SingleLocalHost(net.JoinHostPort(s.host, strconv.Itoa(ports[i])))
 	}
-	// The public HTTP constructor still binds its own listener. Keep that reservation
-	// until construction; the gRPC listeners remain open throughout startup and serving.
-	_ = listeners[len(names)].Close()
-	server, err := s.newServer(listeners[:len(names)],
+	server, err := s.newServer(ctx, listeners,
 		temporal.WithConfig(conf),
 		temporal.ForServices(temporal.DefaultServices),
 		temporal.WithStaticHosts(hosts),
 		temporal.WithLogger(newLogger(s.logger.With("component", "temporal-server"))),
 	)
+	s.server = server
 	if err != nil {
 		return fmt.Errorf("build embedded Temporal server: %w", err)
 	}
-	if err = server.Start(); err != nil {
-		return errors.Join(fmt.Errorf("start embedded Temporal server: %w", err), stop(server))
+	if err = ctx.Err(); err != nil {
+		return fmt.Errorf("construct embedded Temporal server: %w", err)
 	}
-	s.server = server
-	s.listeners = listeners[:len(names)]
-	started = true
+	if err = server.Start(ctx); err != nil {
+		return fmt.Errorf("start embedded Temporal server: %w", err)
+	}
 	s.address = conf.PublicClient.HostPort
 	s.logger.InfoContext(ctx, "temporal embedded server started", "address", s.address, "namespace", s.namespace,
 		"dir", s.dir)
@@ -141,14 +240,12 @@ func (s *Server) Run(ctx context.Context) error {
 }
 
 // Stop stops the server. The manager stops waiting for it at the shutdown deadline.
-func (s *Server) Stop(context.Context) error {
+func (s *Server) Stop(ctx context.Context) error {
 	defer closeListeners(s.listeners)
-	return stop(s.server)
-}
-
-// stop stops server and wraps any error it reports.
-func stop(server temporal.Server) error {
-	if err := server.Stop(); err != nil {
+	if s.server == nil {
+		return nil
+	}
+	if err := s.server.Stop(ctx); err != nil {
 		return fmt.Errorf("stop embedded Temporal server: %w", err)
 	}
 	return nil
@@ -182,7 +279,9 @@ func (s *Server) database() (*config.SQL, error) {
 	// NewNamespaceConfig fails only for custom search attributes, which this server has none of.
 	namespace, err := sqliteschema.NewNamespaceConfig(clusterName, s.namespace, false, nil)
 	if err == nil {
-		err = sqliteschema.CreateNamespaces(conf, namespace)
+		// The pinned SQLite plugin's public Close retains its private pool connection.
+		// Its final release remains tracked in https://github.com/tbhb-dev/afakt/issues/73.
+		err = s.createNamespaces(conf, namespace)
 	}
 	if err != nil {
 		return nil, fmt.Errorf("create embedded Temporal namespace %q: %w", s.namespace, err)
@@ -262,7 +361,7 @@ func (s *Server) listenAll(ctx context.Context, count int) ([]net.Listener, erro
 
 // closeListeners releases sockets even when construction failed before Temporal could own them.
 func closeListeners(listeners []net.Listener) {
-	for _, ln := range listeners {
+	for _, ln := range slices.Backward(listeners) {
 		_ = ln.Close()
 	}
 }

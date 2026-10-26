@@ -66,6 +66,10 @@ func Run(ctx context.Context, cfg Config, logger *slog.Logger) error {
 // caller's context but not its cancellation, because a signal that cancels the caller's
 // context starts the shutdown and the services still need time to stop.
 func run(ctx context.Context, cfg Config, logger *slog.Logger, h hooks) error {
+	// Cancellation starts one budget, including cleanup of a service whose Start fails.
+	deadline := make(chan time.Time, 1)
+	stopDeadline := context.AfterFunc(ctx, func() { deadline <- time.Now().Add(cfg.ShutdownTimeout) })
+	defer stopDeadline()
 	manager := lifecycle.New(logger)
 	if err := compose(ctx, manager, cfg, logger, h); err != nil {
 		return err
@@ -76,7 +80,11 @@ func run(ctx context.Context, cfg Config, logger *slog.Logger, h hooks) error {
 		err = manager.Wait(ctx)
 	}
 	logger.InfoContext(ctx, "shutting down", "timeout", cfg.ShutdownTimeout.String())
-	stopCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), cfg.ShutdownTimeout)
+	end := time.Now().Add(cfg.ShutdownTimeout)
+	if ctx.Err() != nil {
+		end = <-deadline
+	}
+	stopCtx, cancel := context.WithDeadline(context.WithoutCancel(ctx), end)
 	defer cancel()
 	return errors.Join(err, manager.Stop(stopCtx))
 }
@@ -103,7 +111,7 @@ func compose(ctx context.Context, manager *lifecycle.Manager, cfg Config, logger
 			web.dashboard = true
 			web.routes = append(web.routes, dashboardRoutes)
 		case TargetWorker:
-			services, check := workerServices(cfg.Temporal, logger)
+			services, check := workerServices(cfg.Temporal, logger, cfg.ShutdownTimeout)
 			regs = append(regs, services...)
 			checks = append(checks, check)
 			continue
@@ -140,12 +148,16 @@ func dashboardRoutes(mux *http.ServeMux) {
 // check to readiness. In embedded mode the client depends on the embedded server, so the
 // server starts first and stops last, and the client connects to the address the server
 // bound.
-func workerServices(cfg temporal.Config, logger *slog.Logger) ([]lifecycle.Registration, func(context.Context) error) {
+func workerServices(
+	cfg temporal.Config,
+	logger *slog.Logger,
+	shutdownTimeout time.Duration,
+) ([]lifecycle.Registration, func(context.Context) error) {
 	var regs []lifecycle.Registration
 	var dependsOn []string
 	address := func() string { return cfg.Address }
 	if cfg.Mode == temporal.ModeEmbedded {
-		server := embedded.New(cfg.EmbeddedDir, cfg.Namespace, logger)
+		server := embedded.New(cfg.EmbeddedDir, cfg.Namespace, logger, shutdownTimeout)
 		regs = append(regs, lifecycle.Registration{Name: "temporal-server", Service: server})
 		dependsOn = []string{"temporal-server"}
 		address = server.Address

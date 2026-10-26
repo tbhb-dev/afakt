@@ -26,6 +26,7 @@ GOFLAGS
 GOMAXPROCS
 gomodscan
 healthz
+HTTPAPI
 knip
 ldflags
 lifecycletest
