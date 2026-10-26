@@ -1,18 +1,156 @@
 ---
 type: Glossary
 title: Glossary
-description: Short definitions of afakt's component and workflow names, each linked to its section in the component reference.
+description: Short definitions of afakt's terms, each linked to the section that describes it.
 tags: [afakt, glossary]
 status: draft
-generated: { by: "claude-code:claude-fable-5-1", at: "2026-10-24T20:00:00Z" }
+generated: { by: "codex", at: "2026-10-27T00:00:00Z" }
 ---
 
 # Glossary
 
-- **Agent runner**: the workflow that runs AI coding agents. See [Agent runner](components.md#agent-runner).
+- **ACP adapter**: the harness's Agent Client Protocol (ACP) agent inside the sandbox. See [Parts](agent-session.md#parts).
+- **ACP gate**: the mediator's default-deny Cedar check on every ACP `JSON-RPC` message in both directions, with bounded update notifications. See [ACP gate](agent-session.md#acp-gate).
+- **ACP relay**: the guest relay inside the sandbox VM that acts as the ACP client to the adapter and connects through the mediator to the session hub. See [ACP relay](components.md#acp-relay).
+- **afakt MCP server**: the built-in Model Context Protocol (MCP) server whose tools call afakt operations with the execution’s own authority. Profiles allowlist its tools like any other server. See [Built-in afakt MCP server](agent-mcp-gateway.md#built-in-afakt-mcp-server).
+- **Agent**: a durable resource that owns configuration, workspace, conversations, and work history across harness runs. See [Agent](agent.md).
+- **Agent environment**: the environment variables that an agent profile and an execution specification add for the agent and its hooks. The profile may lock an entry against replacement. See [Agent environment](agent-workspace.md#agent-environment).
+- **Agent execution**: one harness run belonging to one durable agent from start to end. Provider operations identify it by execution ID and generation. See [Agent execution](agent-execution.md).
+- **Agent executor**: the workflow that runs one execution generation on its agent host and calls the execution provider's operations. See [Agent executor](components.md#agent-executor).
+- **Agent fork**: a separate agent copied from another agent, with its own identity. See [Agent fork](agent.md#forks).
+- **Agent group**: a named set of agents with membership, metadata, events, and broadcasts. See [Agent group](agent.md#agentmail-groups-and-subscriptions).
+- **Agent host**: a machine that runs agents, with an afakt worker that polls its host task queue for agent work. See [Agent host](agent-host.md).
+- **Agent host registry**: the API server's record of the agent hosts that can run executions. Each entry gives a host's task queue, lower and upper slot capacity bounds, current slot capacity, most recent capacity change reason, and host metadata, and it lasts while the host's worker renews its lease. See [Agent host registry](agent-placement.md#agent-host-registry).
+- **Agent profile**: the versioned definition of an agent's instruction template, workspace access, capabilities, sandbox, credentials, hooks, and the models it may run with. It comes from the profile catalog or a repository. See [Agent profile](agent-profile.md).
+- **Agent runner**: the workflow that runs AI coding agents, placing each execution on an agent host and starting the agent executor workflow there. See [Agent runner](components.md#agent-runner).
+- **Agent session**: the agent's conversation. Its transcript remains after a harness run ends. Interactive attachment uses ACP with writer and reader roles. See [Agent session](agent-session.md).
+- **Agent session workflow**: the entity workflow that holds a session's control state. This includes the lifecycle and writer as well as the attached clients. See [Agent session](components.md#agent-session).
+- **Agent snapshot**: an archive of agent state for restoration or transfer. Its scope extends beyond a workspace revision. See [Agent snapshot](agent.md#snapshots-and-the-snapshot-registry).
+- **AgentExecution resource**: the Kubernetes-style resource form of one execution generation, with its specification under `spec` and the provider's record under `status`. See [Agent execution resource](agent-execution-resource.md).
+- **Agentmail**: messaging addressed to durable agents. It includes incoming and outgoing mail with message verification. Delivery and signing semantics remain open. See [Agentmail](agent.md#agentmail-groups-and-subscriptions).
+- **Annotation**: descriptive metadata associated with a resource, without granting authority. See [Annotation](agent.md#owned-resources).
 - **API server**: the component that serves afakt's REST API to clients like the CLI and dashboard, and to its coordination workflows. See [API server](components.md#api-server).
+- **Archive**: snapshot storage for a stopped agent whose durable resource enters the archived state. See [Archive](agent.md#snapshots-and-the-snapshot-registry).
+- **Artifact**: stored content used as input or output, with optional associations to agents. See [Artifact](agent.md#memory-skills-and-artifacts).
+- **Artifact proxy**: the service that serves stored artifact content. See [Artifact proxy](components.md#artifact-proxy).
+- **Base workspace image**: an optional workspace image whose directory tree supplies a build's starting content. It supplies no host root filesystem. See [Image contents](agent-workspace-image.md#image-contents).
+- **Budget**: an agent-level bound on allowed spending or consumption across its work. See [Budget](agent.md#budgets-and-usage).
+- **Cancellation acknowledgement**: an execution provider's confirmation that it accepted a cancellation request, which is distinct from the agent having stopped. See [Cancel](agent-execution-contract.md#cancel).
+- **Capability**: one afakt API operation that an agent profile allows an agent to call through the afakt CLI or built-in afakt MCP server. An example is `pull-requests.review`. See [Capabilities](agent-profile.md#capabilities).
+- **Capacity controller**: the part of an agent host's afakt worker that measures host resource use and adjusts slot capacity between configured bounds to meet resource targets. See [Slot capacity](agent-placement.md#slot-capacity).
+- **Certificate**: trusted Transport Layer Security (TLS) certificate material used to establish certificate trust. See [Certificate](agent.md#secrets-credentials-and-trust-material).
+- **Checkpoint**: a paired VM snapshot, workspace disk delta and harness session state captured at an idle turn boundary. Rewind starts a new branch from it for audit. See [Checkpoint](agent.md#checkpoints).
+- **Combined sandbox configuration**: the sandbox configuration that the execution provider builds at launch from the profile's and the specification's configurations. See [Combining configurations](agent-sandbox.md#combining-configurations).
 - **Command-line interface (CLI)**: the `afakt` command, one command-line entrypoint for running afakt's server-side components and communicating with them. See [Command-line interface (CLI)](components.md#command-line-interface-cli).
+- **Credential**: authenticated service access described by secret material and authorization rules, loaded into an agent broker by reference. See [Credential](agent.md#secrets-credentials-and-trust-material).
+- **Credential broker**: the part of the per-agent mediator that injects an execution's credentials and execution token into matching outgoing requests without exposing them to the agent. See [Credential brokering](agent-sandbox.md#credential-brokering).
+- **Credential reference**: a stable name in an agent profile or agent execution that identifies a credential in afakt's credential store without containing its secret value. See [Credential brokering](agent-sandbox.md#credential-brokering).
+- **Evidence reference**: a pointer to one item of evidence from an execution, such as its transcript. It includes the item's media type and digest. See [Evidence, retention, and cleanup](agent-execution-model.md#evidence-retention-and-cleanup).
+- **Execution environment**: the `AFAKT_` environment variables with information about an execution, which the execution provider sets for the agent and its hooks. See [Execution environment](agent-workspace.md#execution-environment).
+- **Execution generation**: one deliberate attempt to run a logical execution, with its own specification, workspace, state, and result. See [Execution generation](agent-execution-model.md#execution-generation).
+- **Execution ID**: the UUIDv7 that afakt assigns to one logical agent execution when it creates it, in canonical lowercase hyphenated form. Retries and generations reuse it. See [Execution ID format](agent-execution-model.md#execution-id-format).
+- **Execution provider**: the component that offers the launch, status, cancel, and result operations for one way of running agents. See [Provider operations](agent-execution-contract.md#provider-operations).
+- **Execution result**: the terminal state, payload, evidence references, and provenance record an agent execution ends with. See [Execution result](agent-execution-contract.md#execution-result).
+- **Execution slot**: one place for a reserved or claimed execution generation on an agent host. The reservation API counts both kinds against slot capacity. See [Slot reservations](agent-placement.md#slot-reservations).
+- **Execution specification**: the fields an execution provider needs to start an agent, identified by its specification digest. See [Execution specification](agent-execution-contract.md#execution-specification).
+- **Execution token**: the signed JSON Web Token (JWT) with an agent execution's identity and capabilities. The mediator keeps it outside the guest and adds it to permitted afakt API requests. See [Execution token](agent-sandbox.md#execution-token).
+- **Execution trace**: the OpenTelemetry spans of one agent execution from placement to the result. They join the parent workflow's trace. See [Agent observability](agent-observability.md).
+- **Forwarded port**: a record of an execution's loopback listener, with its number, name, protocol, state, and first-seen time. See [Port discovery and records](agent-ports.md#port-discovery-and-records).
+- **Generation**: a positive integer that a caller raises to run the same logical execution again on purpose. See [Generations and supersession](agent-execution.md#generations-and-supersession).
 - **GitHub webhook receiver**: the component that accepts webhook deliveries from GitHub. See [GitHub webhook receiver](components.md#github-webhook-receiver).
+- **GPG key**: a GNU Privacy Guard (GPG) signing or encryption identity, with sandbox authorization controlling its use. See [GPG key](agent.md#secrets-credentials-and-trust-material).
+- **Guest relay**: the process inside a sandbox VM that alone accesses vsock and handles ACP as well as CLI and MCP control. It also handles port discovery and preview connections to loopback listeners. See [Guest relay](components.md#guest-relay).
+- **Harness**: the agent program that sends prompts to a model and runs the tools the model calls. See [Parts](agent-execution.md#parts).
+- **Harness capability matrix**: the table of which hook events and decisions each harness supports, fully, partly, or not at all. See [Harness capability matrix](agent-hooks.md#harness-capability-matrix).
+- **Harness event**: a hook event inside the harness, such as `tool-call-before`. The harness runs its hooks through the afakt CLI. See [Hook events](agent-hooks.md#hook-events).
+- **Harness permission**: one kind of action that an agent profile lets the harness offer the agent. An example is editing files. See [Harness permissions](agent-profile.md#harness-permissions).
+- **Harness transport**: the `acp` or `headless` path selected by an entry in a profile's models. See [Harness transport](agent-profile.md#harness-transport).
+- **Hook**: a command from an agent profile or an execution specification that runs inside the execution's sandbox on a hook event. A hook for a harness event can return a decision such as `deny`. See [Agent hooks](agent-hooks.md).
+- **Hook dispatch**: how the harness runs the hooks for harness events, through an entry in its global hook configuration that runs the afakt CLI. See [Hook dispatch](agent-hooks.md#hook-dispatch).
+- **Hook event**: the moment at which a hook runs. It's a provider event or a harness event. See [Hook events](agent-hooks.md#hook-events).
+- **Host agent provider**: the default execution provider, which runs each agent in its own sandbox VM under the agent host supervisor. See [Agent sandbox](agent-sandbox.md).
+- **Image build**: one execution-like job for a workspace image definition. It runs the steps in a profile sandbox and publishes the resulting directory tree as image layers. See [Build process](agent-workspace-image.md#image-builds).
+- **Index**: registered content organized for retrieval by agents. Its source and query contract remains open. See [Index](cli.md#configuration-and-indexing).
+- **Input schema**: the JSON Schema in an agent profile for the instruction inputs its template uses. See [Instruction templates](agent-profile.md#instruction-templates).
+- **Instruction inputs**: the values an execution specification supplies to its profile's instruction template. See [Instruction templates](agent-profile.md#instruction-templates).
+- **Instruction template**: an agent profile's instructions, a Go template that the execution provider renders with the instruction inputs at launch. See [Instruction templates](agent-profile.md#instruction-templates).
+- **Keychain item**: sensitive material in a keychain that a sandbox may use under an explicit authorization. See [Keychain item](agent.md#secrets-credentials-and-trust-material).
+- **Label**: resource metadata for selection and reporting, without granting authority. See [Label](agent.md#owned-resources).
+- **Layer cache**: the worker's local store of verified image layer blobs keyed by digest, with a cache of unpacked layers for reuse in independent workspaces. See [Agent host caches and startup](agent-workspace-image.md#agent-host-caches-and-startup).
+- **Logical execution**: the provider record for one execution ID and all its generations. See [Logical execution](agent-execution-model.md#logical-execution).
+- **MCP gateway**: afakt’s single MCP endpoint for each execution or session harness, enforcing tool access, credential isolation, approvals, and audit. It doesn't serve outside MCP clients. See [Agent MCP gateway](agent-mcp-gateway.md).
+- **MCP server**: a service that exposes tools through MCP, reached by the gateway over HTTP or standard input and output. See [Server hosting and lifecycle](agent-mcp-gateway.md#server-hosting-and-lifecycle).
+- **Mediator**: the per-agent process outside the guest that supplies its network stack and policy checks along with TLS inspection and credential brokering. It also supplies authenticated control identity and one decision log. See [Mediator](components.md#mediator).
+- **Memory**: knowledge retained for reuse across an agent's sessions. Operations support storage and query. See [Memory](agent.md#memory-skills-and-artifacts).
+- **Model provider**: the service that serves the model an agent uses. See [Parts](agent-execution.md#parts).
+- **Object store**: the embedded or external S3 API compatible endpoint that stores registry content and other afakt blobs. See [Object store](agent-workspace-image.md#object-store).
+- **OCI artifact**: an Open Container Initiative (OCI) package used to export and import agent state and workspace content. See [OCI artifact](agent.md#export-import-and-migrate).
+- **Organization**: a grouping of managed work and its access scope. See [Organization](agent.md#policies-roles-and-organizational-scope).
+- **Override**: a value in an execution specification that replaces a profile default within the bounds the profile sets. See [Overrides](agent-profile.md#overrides).
+- **Placement**: the binding of an agent execution to one agent host and its host task queue before launch. See [Agent placement](agent-placement.md).
+- **Policy**: authorization rules associated with roles, credentials, or sandbox configurations. See [Policy](agent.md#policies-roles-and-organizational-scope).
+- **Policy proposal**: a proposed policy change with explicit approval or rejection. See [Policy proposal](agent.md#policies-roles-and-organizational-scope).
+- **Port forwarder**: the mediator and guest relay path that connects authorized publication streams to guest loopback listeners. See [Port forwarder](components.md#port-forwarder).
+- **Preheating**: pulling and unpacking a published image into chosen agent hosts' caches before executions need it. See [Placement and preheating](agent-workspace-image.md#placement-and-preheating).
+- **Preview**: an HTTP view of one forwarded port through an authenticated control plane URL. See [HTTP previews](agent-ports.md#http-previews).
+- **Preview broker**: the service beside the preview proxy that accepts mediator outbound connections and sends preview and client tunnel requests back as streams. See [Preview broker](components.md#preview-broker).
+- **Preview domain**: the configured domain beneath which each port and execution receives a distinct preview host name. See [HTTP previews](agent-ports.md#http-previews).
+- **Preview listener**: the control plane listener for preview access checks and routing to execution ports. It runs separately from the API and dashboard listener. See [Preview listener](components.md#preview-listener).
+- **Preview proxy**: the API server component that authorizes viewer requests with Cedar and routes publication streams through the preview broker. See [Preview proxy](components.md#preview-proxy).
+- **Profile binding**: an agent's selection of a profile that bounds its behavior and authority across runs. See [Profile binding](agent.md#owned-resources).
+- **Profile catalog**: the central store of published agent profile versions. See [Profile sources](agent-profile.md#profile-sources).
+- **Profile digest**: the digest of one agent profile version's canonical encoding, which an execution specification pins with the source, name, and version. See [Pinning a profile version](agent-profile.md#pinning-a-profile-version).
+- **Profile resource**: the Kubernetes-style `AgentProfile` form of an agent profile, which repository profile files and the profile catalog both use. See [Profile resource](agent-profile.md#profile-resource).
+- **Profile validation errors**: the launch errors that report how an execution specification fails to match its pinned profile version. See [Launch validation](agent-profile.md#launch-validation).
+- **Project**: a grouping of work within organizational scope. See [Project](agent.md#policies-roles-and-organizational-scope).
+- **Provenance record**: the record of what an execution generation requested and what the provider observed, in separate fields. See [Provenance record](agent-execution-model.md#provenance-record).
+- **Provider event**: a hook event whose hooks the execution provider runs itself: `before-agent`, `stop-requested`, `sandbox-violation`, `session-end`, `after-agent`, or `before-teardown`. See [Hook events](agent-hooks.md#hook-events).
+- **Provider rule**: a numbered statement of what an execution provider does. Tests cite each item by its ID, such as `OPS-1`. See [Agent provider requirements](agent-provider-requirements.md).
+- **Publication**: an authorized port exposure recording a random preview label, agent, port, generation, and agent host. See [Publication](components.md#publication).
+- **Quarantine**: a network condition that removes network access from a running agent without changing its lifecycle state. See [Quarantine](agent.md#lifecycle).
+- **Reconciliation**: the rule that an attempt resolves an existing execution through status before it launches. See [Reconciliation after restart or retry](agent-execution.md#reconciliation-after-restart-or-retry).
+- **Registry**: the Open Container Initiative (OCI) distribution component for storing and serving workspace images. It checks repository and action scopes. Upstream base caching and collection of unreferenced content also belong to it. It's distinct from the agent host registry. See [Registry](agent-workspace-image.md#registry).
+- **Registry token**: a short-lived bearer token issued by the control plane for repository actions at the registry, separate from an execution token. See [Registry authentication](agent-workspace-image.md#registry-authentication).
+- **Repository profile**: an agent profile defined in a YAML file under `.afakt/agent-profiles/` in a source repository, versioned by commit. See [Repository profile files](agent-profile.md#repository-profile-files).
+- **Request**: a record of work to perform. Closure is complete or incomplete and includes a reason. See [Request](agent.md#policies-roles-and-organizational-scope).
+- **Reservation API**: the API server's operations that match placement requirements against the agent host registry and reserve, claim, and free execution slots. See [Reservation API](agent-placement.md#reservation-api).
+- **Resource target**: a configured bound that guides the capacity controller. It's an upper bound on host CPU or memory use or a lower bound on free disk space on the workspace volume. See [Slot capacity](agent-placement.md#slot-capacity).
+- **Retention hold**: a marker that keeps an execution's workspace and evidence past its retention period. See [Evidence, retention, and cleanup](agent-execution-model.md#evidence-retention-and-cleanup).
+- **Role**: an authorization resource grouping policies and credential grants. Its relationship to the execution reporting label remains open. See [Role](agent.md#policies-roles-and-organizational-scope).
+- **Sandbox configuration**: the network, filesystem, and isolation rules that confine an agent. Agent profiles and execution specifications both contain one. See [Sandbox configuration](agent-sandbox.md#sandbox-configuration).
+- **Sandbox variable**: a `${name}` placeholder that the execution provider replaces with a value about the execution. Sandbox rules, capability scopes, hooks, and agent environment values accept them. See [Sandbox variables](agent-sandbox.md#sandbox-variables).
+- **Sandbox VM**: a virtual machine per agent that supplies its isolation boundary and contains the guest relay, adapter, and harness. See [Sandbox VM](components.md#sandbox-vm).
+- **Secret**: a stored sensitive value, separate from the credential that describes how to use it. See [Secret](agent.md#secrets-credentials-and-trust-material).
+- **Session hub**: the part of the API server that joins a relay to attached clients. It enforces writer rules and keeps the session message log. See [Session hub](components.md#session-hub).
+- **Share link**: a grant to one forwarded HTTP port for a signed-in recipient. It expires and permits revocation. See [Access and share links](agent-ports.md#access-and-share-links).
+- **Skill**: reusable instructions and supporting resources associated with an agent. See [Skill](agent.md#memory-skills-and-artifacts).
+- **Slot capacity**: the number of execution slots an agent host allows, within its configured lower and upper bounds and reported by its worker to the reservation API. Lowering it leaves existing reservations and running executions intact. See [Slot capacity](agent-placement.md#slot-capacity).
+- **Snapshot registry**: the service that stores and serves agent state archives. See [Snapshot registry](components.md#snapshot-registry).
+- **Specification digest**: the digest of an execution specification's canonical encoding, excluding the generation. See [Execution specification](agent-execution-contract.md#execution-specification).
+- **SSH key**: key material for SSH authentication or content signing, subject to sandbox authorization. See [SSH key](agent.md#secrets-credentials-and-trust-material).
+- **SSH known host**: a trusted remote host key used to verify an SSH connection. See [SSH known host](agent.md#secrets-credentials-and-trust-material).
+- **Standalone sandbox**: a sandbox that runs commands without requiring an agent conversation. See [Standalone sandbox](agent.md#sandboxes).
+- **Stop reason**: the ACP outcome reported when an execution's turn ends, in place of the headless harness's exit status. See [Harness transport](agent-execution.md#harness-transport).
+- **Subscription**: an event-source association that queues user messages for an agent as deliveries arrive. See [Subscription](agent.md#agentmail-groups-and-subscriptions).
+- **Tailnet**: the Tailscale network whose domain and node policy the Funnel provider uses. See [Tailscale Funnel](agent-ports.md#tailscale).
+- **Target path**: the relative path from the workspace root to where the provider places one workspace source. See [Workspace sources](agent-workspace.md#workspace-sources).
+- **Telemetry content**: an agent profile's setting, `omit` or `include`, for whether telemetry may record prompt and response content. See [What telemetry never records](agent-observability.md#what-telemetry-never-records).
+- **Telemetry endpoint**: the receiver on an agent host for the harness's OpenTelemetry data from the sandbox. It adds the execution's identity before forwarding the data. See [Trace context propagation](agent-observability.md#trace-context-propagation).
+- **Tool allowlist**: the profile’s permitted servers and per-server tools, which a specification may only narrow and deny entries override. See [Server and tool access](agent-mcp-gateway.md#server-and-tool-access).
+- **Tool approval**: permission for one pending MCP tool call, answered by a session writer or an execution’s unattended profile rule before gateway dispatch. See [Tool approvals](agent-mcp-gateway.md#tool-approvals).
+- **Tool namespace**: the gateway’s reversible mapping from a configured server identity and upstream tool name to a distinct exposed name. See [Server and tool access](agent-mcp-gateway.md#server-and-tool-access).
+- **Trace context**: the `TRACEPARENT`, `TRACESTATE`, and OpenTelemetry exporter variables that tie the harness's telemetry to the execution trace. See [Trace context](agent-workspace.md#trace-context).
+- **Tunnel provider**: a built-in connector that publishes an afakt listener on public host names through outbound connections from the control plane. See [Public tunnel providers](agent-ports.md#public-tunnel-providers).
+- **Unattended approval**: the pinned profile’s `allow` or `deny` answer to an approval-required MCP call in an execution without an attached writer. See [Tool approvals](agent-mcp-gateway.md#tool-approvals).
+- **Usage**: observed cost, tokens, and subscription consumption across an agent's work. See [Usage](agent.md#budgets-and-usage).
+- **Verified termination**: a provider's observation that every process it started for an execution has exited. See [Execution states](agent-execution.md#execution-states).
 - **Web dashboard**: the component that provides afakt's web UI. See [Web dashboard](components.md#web-dashboard).
-- **Workflow**: a Temporal workflow through which afakt coordinates work, such as Agent runner. See [Workflows](components.md#workflows).
+- **Workflow**: a Temporal workflow through which afakt coordinates work, such as the agent runner workflow. See [Workflows](components.md#workflows).
 - **Workflow orchestrator**: the component, Temporal, that provides durable execution for afakt's workflows. See [Workflow orchestrator](components.md#workflow-orchestrator).
+- **Workspace**: the directory tree owned by a durable agent, materialized by the execution provider for each generation. See [Agent workspace](agent-workspace.md).
+- **Workspace image**: an Open Container Initiative (OCI) image whose layers contain a prepared workspace directory tree with checkouts, dependencies, and build outputs. See [Agent workspace image](agent-workspace-image.md).
+- **Workspace image builder**: the component that coordinates image builds and publishes successful results. See [Workspace image builder](components.md#workspace-image-builder).
+- **Workspace image definition**: the sources, optional base image, steps, agent profile, triggers, destination, and retention settings that describe how to produce a workspace image. See [Workspace image definitions](agent-workspace-image.md#workspace-image-definitions).
+- **Workspace registry**: the service storing workspace content and revision references for agents and reusable workspace images. See [Workspace registry](components.md#workspace-registry).
+- **Workspace revision**: a recorded point in an agent's file history, distinct from source repository history. See [Workspace revision](agent.md#workspace-revisions-and-the-workspace-registry).
+- **Workspace source**: one `repository`, `image`, `execution`, or `empty` entry that the execution provider places at a target path in the workspace. See [Workspace sources](agent-workspace.md#workspace-sources).

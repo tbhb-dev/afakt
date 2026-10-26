@@ -88,3 +88,14 @@ exceptions:
   - SPDX
   - OKF
   - APM
+  # BCP 14 requirement keywords (RFC 2119, RFC 8174) and their source names.
+  - BCP
+  - RFC
+  - MUST
+  - NOT
+  - SHALL
+  - SHOULD
+  - MAY
+  - REQUIRED
+  - RECOMMENDED
+  - OPTIONAL
