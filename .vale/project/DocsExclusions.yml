@@ -1,0 +1,10 @@
+---
+extends: existence
+message: "The docs bundle excludes '%s'."
+level: error
+ignorecase: true
+nonword: true
+tokens:
+  - '\b(?:today|currently|planned|forge|combination|conformance|avirt|runbook|spike|spikes|experiment)\b'
+  - '/Users/'
+  - '\b(?:usdholt04|usdholt05|usdhowv01|usdhomv01|hzhelsv01)\b'

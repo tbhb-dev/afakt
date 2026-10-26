@@ -13,7 +13,7 @@ This directory contains the durable documentation for `afakt`: pages that descri
 
 ## What belongs here
 
-A page belongs in `docs/` when it describes afakt as designed and a reader wants it later. Write each page as if the system it describes exists, without build status, "planned" markers, or notes about what the current code lacks. Draft design work, plans, and scratch notes don't belong. Keep them outside the repository.
+A page belongs in `docs/` when it describes afakt as designed and a reader wants it later. Write each page as if the system it describes exists, without build status, roadmap markers, or notes about what the current code lacks. Draft design work, plans, and scratch notes don't belong. Keep them outside the repository.
 
 `AGENTS.md` and `CLAUDE.md` in this directory are entry points for agents, not topic pages. The index leaves them out.
 
