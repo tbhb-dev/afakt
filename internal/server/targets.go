@@ -18,6 +18,8 @@ const (
 	TargetWebhook = "webhook"
 	// TargetDashboard selects the embedded web dashboard.
 	TargetDashboard = "dashboard"
+	// TargetWorker selects the workflow worker and its Temporal service.
+	TargetWorker = "worker"
 )
 
 var (
@@ -36,12 +38,12 @@ var (
 // targetNames returns every target name in the order the help text lists them. Every name
 // that `availableTargets` lacks is reserved for later changes, and all stands for every target.
 func targetNames() []string {
-	return []string{TargetAPI, TargetWebhook, TargetDashboard, "worker", "all"}
+	return []string{TargetAPI, TargetWebhook, TargetDashboard, TargetWorker, "all"}
 }
 
 // availableTargets returns the targets that this build can run.
 func availableTargets() []string {
-	return []string{TargetAPI, TargetWebhook, TargetDashboard}
+	return []string{TargetAPI, TargetWebhook, TargetDashboard, TargetWorker}
 }
 
 // ParseTargets checks a comma-separated target list and returns its names. Every name must
@@ -64,8 +66,8 @@ func ParseTargets(value string) ([]string, error) {
 	}
 	for _, name := range names {
 		if !slices.Contains(availableTargets(), name) {
-			return nil, fmt.Errorf("%w: '%s'; only '%s', '%s' and '%s' can run in this build",
-				ErrUnavailableTarget, name, TargetAPI, TargetWebhook, TargetDashboard)
+			return nil, fmt.Errorf("%w: '%s'; only '%s', '%s', '%s' and '%s' can run in this build",
+				ErrUnavailableTarget, name, TargetAPI, TargetWebhook, TargetDashboard, TargetWorker)
 		}
 	}
 	return names, nil

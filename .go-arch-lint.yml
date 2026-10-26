@@ -43,6 +43,20 @@ vendors:
     in: github.com/spf13/cobra
   pflag:
     in: github.com/spf13/pflag
+  temporalapi:
+    in: go.temporal.io/api/**
+  temporalsdk:
+    in: go.temporal.io/sdk/**
+  temporalserver:
+    in: go.temporal.io/server/**
+  grpc:
+    in:
+      - google.golang.org/grpc
+      - google.golang.org/grpc/**
+  prometheus:
+    in: github.com/prometheus/client_golang/**
+  fx:
+    in: go.uber.org/fx
 
 components:
   cmd:
@@ -67,6 +81,12 @@ components:
     in: internal/lifecycle
   lifecycletest:
     in: internal/lifecycle/lifecycletest
+  temporal:
+    in: internal/temporal
+  temporalembedded:
+    in: internal/temporal/embedded
+  temporaltest:
+    in: internal/temporal/temporaltest
 
 deps:
   # Only main, the command packages, and cmdutil may use Cobra and pflag. cmdutil depends on
@@ -113,6 +133,7 @@ deps:
       - cmdroot
       - cmdutil
       - server
+      - temporal
     canUse:
       - cobra
       - pflag
@@ -126,12 +147,40 @@ deps:
     # The schema requires a reference; self-reference forbids other components.
     mayDependOn:
       - buildmeta
+  # The server reaches Temporal only through the temporal packages, and its tests use the
+  # stand-in frontend in temporaltest.
   server:
     mayDependOn:
       - server
       - dashboard
       - lifecycle
       - lifecycletest
+      - temporal
+      - temporalembedded
+      - temporaltest
+  # The Temporal SDK, API and server libraries stay inside the temporal packages. The client
+  # uses the SDK, the embedded server uses the server library, and its tests read the metrics
+  # registry. The stand-in frontend serves the API over gRPC.
+  temporal:
+    mayDependOn:
+      - temporal
+      - temporaltest
+    canUse:
+      - temporalapi
+      - temporalsdk
+  temporalembedded:
+    mayDependOn:
+      - temporalembedded
+    canUse:
+      - temporalserver
+      - prometheus
+      - fx
+  temporaltest:
+    mayDependOn:
+      - temporaltest
+    canUse:
+      - temporalapi
+      - grpc
   dashboard:
     mayDependOn:
       - dashboard

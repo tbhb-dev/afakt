@@ -1,0 +1,14 @@
+[
+  {
+    "module": "github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp",
+    "version": "v1.33.0",
+    "finding": "deprecated",
+    "reason": "Required by the OpenTelemetry GCP detector in the Temporal graph; deprecated at its latest release. Interim until tbhb-dev/devtools#732 ships; remove this waiver then."
+  },
+  {
+    "module": "github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric",
+    "version": "v0.56.0",
+    "finding": "deprecated",
+    "reason": "Imported by the storage client in the Temporal graph; deprecated at its latest release. Interim until tbhb-dev/devtools#732 ships; remove this waiver then."
+  }
+]
