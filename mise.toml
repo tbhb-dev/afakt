@@ -78,7 +78,12 @@ uv run --no-project --with pyyaml python scripts/okf-check.py --repo .
 
 [tasks.check]
 description = "Check documentation and Go tests with coverage"
-depends = ["check-docs", "test-go", "test-go-race", "cover-go"]
+run = [
+  { task = "check-docs" },
+  { task = "test-go" },
+  { task = "test-go-race" },
+  { task = "cover-go" },
+]
 
 [tasks.lint-draft]
 extends = "devtools:lint-draft"
