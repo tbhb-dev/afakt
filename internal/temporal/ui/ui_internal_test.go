@@ -9,6 +9,7 @@ import (
 	"io/fs"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"strings"
 	"testing"
 	"testing/fstest"
@@ -20,16 +21,20 @@ import (
 
 func TestCheckPath(t *testing.T) {
 	t.Parallel()
-	for _, prefix := range []string{DefaultPath, "/tools/temporal", "/apiary", "/dashboard-tools"} {
+	for _, prefix := range []string{
+		DefaultPath, "/tools/temporal", "/apiary", "/dashboard-tools",
+		"/ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~$&+:=@",
+	} {
 		if err := CheckPath(prefix); err != nil {
 			t.Errorf("CheckPath(%q) = %v", prefix, err)
 		}
 	}
 	for _, prefix := range []string{
 		"", "/", "temporal", "/temporal/", "/a/../b", "/a//b", "/a?b", "/a#b", "/a%20b", "/a b", "/a/{b}",
+		"/t\u00e9st", "/a;b", "/a,b", "/a!b", "/a'b", "/a(b", "/a)b", "/a*b", "/a[b", "/a]b", "/a\\b", "/a\"b", "/a<b", "/a>b", "/a|b", "/a^b", "/a`b",
 		"/api", "/api/v1", "/dashboard", "/dashboard/settings", "/livez", "/readyz", "/healthz", "/readyz/child",
 	} {
-		if err := CheckPath(prefix); err == nil || !strings.Contains(err.Error(), prefix) {
+		if err := CheckPath(prefix); err == nil || !strings.Contains(err.Error(), strconv.Quote(prefix)) {
 			t.Errorf("CheckPath(%q) = %v, want an error naming the path", prefix, err)
 		}
 	}

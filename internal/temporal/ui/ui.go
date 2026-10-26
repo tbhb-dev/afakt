@@ -28,7 +28,10 @@ import (
 // DefaultPath is the UI's subtree on the shared listener.
 const DefaultPath = "/temporal"
 
-var errPath = errors.New("expected a clean, non-root URL path without a trailing slash")
+var errPath = errors.New(
+	"expected a clean, non-root URL path without a trailing slash, " +
+		"using only ASCII path-segment characters that need no percent-encoding and /",
+)
 
 var errPathConflict = errors.New("temporal UI path conflicts with a reserved path")
 
@@ -36,7 +39,9 @@ var errPathConflict = errors.New("temporal UI path conflicts with a reserved pat
 // target isn't selected. A later addition of a target cannot change where the UI routes go.
 func CheckPath(prefix string) error {
 	if prefix == "/" || !strings.HasPrefix(prefix, "/") || path.Clean(prefix) != prefix ||
-		strings.ContainsAny(prefix, "?#%{} \t\r\n") {
+		strings.ContainsFunc(prefix, func(r rune) bool {
+			return !strings.ContainsRune("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~$&+:=@/", r)
+		}) {
 		return fmt.Errorf("temporal UI path %q: %w", prefix, errPath)
 	}
 	for _, reserved := range []string{"/api", "/dashboard", "/livez", "/readyz", "/healthz"} {

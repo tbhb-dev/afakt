@@ -55,19 +55,41 @@ func wantTemporalUI(t *testing.T, prefix string) {
 func TestTemporalUIAbsent(t *testing.T) {
 	t.Parallel()
 	frontend := startFrontend(t, temporal.DefaultNamespace)
-	for _, cfg := range []Config{testConfig(), workerConfig(external(frontend.Address(), temporal.DefaultNamespace))} {
-		s := startServer(t, cfg, hooks{})
-		waitReady(t, s.addr(t))
-		for _, target := range []string{"/temporal", "/temporal/", "/temporal/api/v1/namespaces"} {
-			if code, _, _ := request(t, http.MethodGet, s.addr(t), target); code != http.StatusNotFound {
-				t.Errorf("GET %s = %d, want 404", target, code)
-			}
+	for name, cfg := range map[string]Config{
+		"no worker": testConfig(),
+		"external":  workerConfig(external(frontend.Address(), temporal.DefaultNamespace)),
+	} {
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			wantTemporalUIAbsent(t, cfg)
+		})
+	}
+}
+
+func wantTemporalUIAbsent(t *testing.T, cfg Config) {
+	t.Helper()
+	s := startServer(t, cfg, hooks{})
+	waitReady(t, s.addr(t))
+	host, port, err := net.SplitHostPort(s.addr(t))
+	if err != nil || host != "127.0.0.1" || port == "0" || port == "" {
+		t.Fatalf("bound address = %q, want a chosen loopback port: %v", s.addr(t), err)
+	}
+	for _, target := range []string{"/temporal", "/temporal/", "/temporal/api/v1/namespaces"} {
+		if code, _, _ := request(t, http.MethodGet, s.addr(t), target); code != http.StatusNotFound {
+			t.Errorf("GET %s = %d, want 404", target, code)
 		}
-		// Every listener is lifecycle-owned; neither configuration registers a UI service.
-		if slices.Contains(s.events.matching("starting"), "temporal-ui") {
-			t.Fatal("inactive UI started a service")
-		}
-		stopCleanly(t, s)
+	}
+	// Every listener is lifecycle-owned; neither configuration registers a UI service.
+	if slices.Contains(s.events.matching("starting"), "temporal-ui") {
+		t.Fatal("inactive UI started a service")
+	}
+	stopCleanly(t, s)
+	// addr consumed the shared listener's bound address. After shutdown all
+	// address records have arrived; a UI listener would leave another address.
+	select {
+	case address := <-s.addresses:
+		t.Fatalf("unexpected additional bound address %q beside shared listener %q", address, s.addr(t))
+	default:
 	}
 }
 
@@ -102,7 +124,7 @@ func TestTemporalUIHealthStates(t *testing.T) {
 func TestTemporalUIConflicts(t *testing.T) {
 	t.Parallel()
 	logger := slog.New(slog.DiscardHandler)
-	for _, prefix := range []string{"/api/v1", "/dashboard"} {
+	for _, prefix := range []string{"/api/v1", "/dashboard", "/t\u00e9st"} {
 		cfg := workerConfig(temporal.Config{Mode: temporal.ModeEmbedded})
 		cfg.TemporalUIPath = prefix
 		if err := Run(t.Context(), cfg, logger); err == nil || !strings.Contains(err.Error(), prefix) {
