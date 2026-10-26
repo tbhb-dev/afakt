@@ -20,7 +20,7 @@ vacuum = "0.33.2"
 # the same Node release for cspell; this pin is the one Renovate tracks, and
 # it must stay equal to the payload's.
 node = "24.21.0"
-pnpm = "12.11.2"
+pnpm = "12.14.0"
 
 [env]
 DEVTOOLS_LOCK_PLATFORMS = "linux-x64,macos-arm64"
