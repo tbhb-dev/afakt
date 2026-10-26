@@ -28,6 +28,7 @@ gomodscan
 healthz
 HTTPAPI
 knip
+labstack
 ldflags
 lifecycletest
 livez
@@ -48,6 +49,7 @@ preapproval
 prek
 pyyaml
 readyz
+requestfailed
 ringpop
 rumdl
 SAMEORIGIN
@@ -71,6 +73,7 @@ synctest
 tbhb
 tchannel
 Temporal
+temporalio
 temporaltest
 testcoverage
 tmpl

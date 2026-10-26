@@ -57,6 +57,12 @@ vendors:
     in: github.com/prometheus/client_golang/**
   fx:
     in: go.uber.org/fx
+  temporalui:
+    in: github.com/temporalio/ui-server/v2/**
+  echo:
+    in:
+      - github.com/labstack/echo/v4
+      - github.com/labstack/echo/v4/middleware
 
 components:
   cmd:
@@ -87,6 +93,8 @@ components:
     in: internal/temporal/embedded
   temporaltest:
     in: internal/temporal/temporaltest
+  temporalui:
+    in: internal/temporal/ui
 
 deps:
   # Only main, the command packages, and cmdutil may use Cobra and pflag. cmdutil depends on
@@ -134,6 +142,7 @@ deps:
       - cmdutil
       - server
       - temporal
+      - temporalui
     canUse:
       - cobra
       - pflag
@@ -158,6 +167,7 @@ deps:
       - temporal
       - temporalembedded
       - temporaltest
+      - temporalui
   # The Temporal SDK, API and server libraries stay inside the temporal packages. The client
   # uses the SDK, the embedded server uses the server library, and its tests read the metrics
   # registry. The stand-in frontend serves the API over gRPC.
@@ -181,6 +191,14 @@ deps:
     canUse:
       - temporalapi
       - grpc
+  temporalui:
+    mayDependOn:
+      - temporalui
+    canUse:
+      - temporalui
+      - echo
+      - grpc
+      - temporalapi
   dashboard:
     mayDependOn:
       - dashboard

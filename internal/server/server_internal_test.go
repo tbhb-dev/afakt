@@ -123,6 +123,7 @@ type harness struct {
 	addresses chan string
 	address   string
 	events    *events
+	listener  net.Listener
 }
 
 // startServer starts run in the background and returns at once. The test's
@@ -137,6 +138,16 @@ func startServerContext(parent context.Context, t *testing.T, cfg Config, h hook
 	t.Helper()
 	ctx, cancel := context.WithCancel(parent)
 	s := &harness{cancel: cancel, done: make(chan error, 1), addresses: make(chan string, 1), events: &events{}}
+	h.listen = func(ctx context.Context, network, address string) (net.Listener, error) {
+		ln, err := listenTCP(ctx, network, address)
+		if err == nil {
+			if s.listener == nil {
+				s.listener = ln
+			}
+			s.events.add(ln.Addr().String() + " bound")
+		}
+		return ln, err
+	}
 	logger := slog.New(recordHandler{addresses: s.addresses, events: s.events})
 	go func() { s.done <- run(ctx, cfg, logger, h) }()
 	t.Cleanup(cancel)
@@ -522,7 +533,7 @@ func TestListenerStopReportsCloseError(t *testing.T) {
 
 func TestAPIRunReportsServeError(t *testing.T) {
 	t.Parallel()
-	l := &listener{address: "127.0.0.1:0", logger: slog.New(slog.DiscardHandler)}
+	l := &listener{address: "127.0.0.1:0", logger: slog.New(slog.DiscardHandler), listen: listenTCP}
 	if err := l.Start(t.Context()); err != nil {
 		t.Fatalf("Start() error = %v", err)
 	}

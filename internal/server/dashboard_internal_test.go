@@ -4,6 +4,8 @@
 package server
 
 import (
+	"errors"
+	"net"
 	"net/http"
 	"strings"
 	"testing"
@@ -26,7 +28,10 @@ func TestDashboardComposition(t *testing.T) {
 			if err := s.wait(t); err != nil {
 				t.Fatal(err)
 			}
-			wantClosed(t, s.addr(t))
+			// Check the owned socket: another parallel test can reuse its released address.
+			if err := s.listener.Close(); !errors.Is(err, net.ErrClosed) {
+				t.Fatalf("listener Close() = %v, want already closed", err)
+			}
 		})
 	}
 }

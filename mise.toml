@@ -215,12 +215,18 @@ run = [
   "go test -tags dashboard_production ./...",
   "bash scripts/check-dashboard-binary.sh",
   "mise run e2e-dashboard",
+  "mise run e2e-temporal-ui",
 ]
 
 [tasks.e2e-dashboard]
 description = "Check the release binary in the pinned browser with console and accessibility assertions"
 dir = "{{config_root}}/apps/dashboard"
 run = "pnpm exec playwright test --config binary/playwright.config.ts"
+
+[tasks.e2e-temporal-ui]
+description = "Check the embedded Temporal UI and workflow list in the pinned browser"
+dir = "{{config_root}}/apps/dashboard"
+run = "pnpm exec playwright test --config temporal/playwright.config.ts"
 
 [tasks.check-dashboard-gates]
 description = "Prove release and browser failures and the required CI result on generated broken inputs"

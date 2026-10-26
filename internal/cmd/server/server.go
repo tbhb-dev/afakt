@@ -23,6 +23,7 @@ import (
 	"github.com/tbhb-dev/afakt/internal/cmdutil"
 	"github.com/tbhb-dev/afakt/internal/server"
 	"github.com/tbhb-dev/afakt/internal/temporal"
+	"github.com/tbhb-dev/afakt/internal/temporal/ui"
 )
 
 const (
@@ -37,6 +38,7 @@ const (
 	temporalAddressFlag   = "temporal-address"
 	temporalNamespaceFlag = "temporal-namespace"
 	temporalDirFlag       = "temporal-embedded-dir"
+	temporalUIPathFlag    = "temporal-ui-path"
 )
 
 var (
@@ -56,9 +58,10 @@ var (
 	errTemporalDirSet = errors.New(
 		"only embedded mode keeps data in a directory; external mode stores nothing, so leave this flag out",
 	)
-	errTemporalDirEmpty  = errors.New("the directory is empty; leave the flag out to keep the data in memory")
-	errTemporalNamespace = errors.New("the namespace must not be empty")
-	errTemporalNoWorker  = errors.New(
+	errTemporalDirEmpty   = errors.New("the directory is empty; leave the flag out to keep the data in memory")
+	errTemporalUIExternal = errors.New("only embedded mode serves the Temporal Web UI; leave this flag out")
+	errTemporalNamespace  = errors.New("the namespace must not be empty")
+	errTemporalNoWorker   = errors.New(
 		"only the worker target uses Temporal; add worker to --target or leave this flag out",
 	)
 )
@@ -68,6 +71,7 @@ type flagValues struct {
 	target, listen, timeout                  string
 	temporalMode, temporalAddress, namespace string
 	temporalDir                              string
+	temporalUIPath                           string
 }
 
 // Options holds the checked configuration and the stream for the logs.
@@ -116,6 +120,14 @@ func NewCmdServer(f *cmdutil.Factory, runF func(*Options) error) *cobra.Command 
 		"Temporal namespace the worker uses")
 	cmdutil.StringFlag(cmd, &v.temporalDir, temporalDirFlag, "<DIR>", "",
 		"Directory for the data of the embedded server; without it, the data stays in memory")
+	cmdutil.StringFlag(
+		cmd,
+		&v.temporalUIPath,
+		temporalUIPathFlag,
+		"<PATH>",
+		ui.DefaultPath,
+		"Temporal Web UI path on --listen in embedded mode; release builds include the UI, Go-only builds a stand-in; development and test only, without authentication",
+	)
 	cmdutil.AddHelpFlag(cmd)
 	return cmd
 }
@@ -140,7 +152,14 @@ func serverConfig(cmd *cobra.Command, v flagValues) (server.Config, error) {
 	if err != nil {
 		return server.Config{}, err
 	}
-	return server.Config{Targets: targets, Listen: v.listen, ShutdownTimeout: timeout, Temporal: tc}, nil
+	cfg := server.Config{Targets: targets, Listen: v.listen, ShutdownTimeout: timeout, Temporal: tc}
+	if tc.Mode == temporal.ModeEmbedded {
+		if err = ui.CheckPath(v.temporalUIPath); err != nil {
+			return server.Config{}, cmdutil.InvalidValue(cmd, temporalUIPathFlag, v.temporalUIPath, err)
+		}
+		cfg.TemporalUIPath = v.temporalUIPath
+	}
+	return cfg, nil
 }
 
 // temporalConfig checks the Temporal flags. The worker target requires a mode, and each
@@ -175,7 +194,7 @@ func temporalConfig(cmd *cobra.Command, worker bool, v flagValues) (temporal.Con
 // rejectTemporalFlags reports the first Temporal flag the command line sets, for a run
 // without the worker target.
 func rejectTemporalFlags(cmd *cobra.Command) error {
-	for _, name := range []string{temporalModeFlag, temporalAddressFlag, temporalNamespaceFlag, temporalDirFlag} {
+	for _, name := range []string{temporalModeFlag, temporalAddressFlag, temporalNamespaceFlag, temporalDirFlag, temporalUIPathFlag} {
 		if cmd.Flags().Changed(name) {
 			return invalidFlag(cmd, name, errTemporalNoWorker)
 		}
@@ -193,6 +212,8 @@ func checkExternal(cmd *cobra.Command, v flagValues) error {
 		return invalidFlag(cmd, temporalAddressFlag, errTemporalAddressForm)
 	case flags.Changed(temporalDirFlag):
 		return invalidFlag(cmd, temporalDirFlag, errTemporalDirSet)
+	case flags.Changed(temporalUIPathFlag):
+		return invalidFlag(cmd, temporalUIPathFlag, errTemporalUIExternal)
 	}
 	return nil
 }
