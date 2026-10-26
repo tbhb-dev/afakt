@@ -50,6 +50,8 @@ func wantTemporalUI(t *testing.T, prefix string) {
 	wantDashboardPaths(t, s.addr(t))
 	wantHealth(t, s.addr(t), true)
 	stopCleanly(t, s)
+	// Shared HTTP, four Temporal gRPC ports, and the frontend HTTP reservation.
+	wantBoundAddresses(t, s, 6)
 }
 
 func TestTemporalUIAbsent(t *testing.T) {
@@ -70,26 +72,34 @@ func wantTemporalUIAbsent(t *testing.T, cfg Config) {
 	t.Helper()
 	s := startServer(t, cfg, hooks{})
 	waitReady(t, s.addr(t))
-	host, port, err := net.SplitHostPort(s.addr(t))
-	if err != nil || host != "127.0.0.1" || port == "0" || port == "" {
-		t.Fatalf("bound address = %q, want a chosen loopback port: %v", s.addr(t), err)
-	}
 	for _, target := range []string{"/temporal", "/temporal/", "/temporal/api/v1/namespaces"} {
 		if code, _, _ := request(t, http.MethodGet, s.addr(t), target); code != http.StatusNotFound {
 			t.Errorf("GET %s = %d, want 404", target, code)
 		}
 	}
-	// Every listener is lifecycle-owned; neither configuration registers a UI service.
+	// Neither configuration registers a UI service.
 	if slices.Contains(s.events.matching("starting"), "temporal-ui") {
 		t.Fatal("inactive UI started a service")
 	}
 	stopCleanly(t, s)
-	// addr consumed the shared listener's bound address. After shutdown all
-	// address records have arrived; a UI listener would leave another address.
-	select {
-	case address := <-s.addresses:
-		t.Fatalf("unexpected additional bound address %q beside shared listener %q", address, s.addr(t))
-	default:
+	wantBoundAddresses(t, s, 1)
+}
+
+// wantBoundAddresses checks actual successful binds after shutdown, independently of logs.
+// The embedded frontend privately rebinds its recorded HTTP reservation (issue #73).
+func wantBoundAddresses(t *testing.T, s *harness, count int) {
+	t.Helper()
+	bound := s.events.matching("bound")
+	if len(bound) != count || bound[0] != s.addr(t) {
+		t.Fatalf("bound addresses = %q, want shared HTTP %q and %d total", bound, s.addr(t), count)
+	}
+	seen := make(map[string]bool)
+	for _, address := range bound {
+		host, port, err := net.SplitHostPort(address)
+		if err != nil || host != "127.0.0.1" || port == "0" || port == "" || seen[address] {
+			t.Errorf("bound address = %q, want a distinct chosen loopback port: %v", address, err)
+		}
+		seen[address] = true
 	}
 }
 

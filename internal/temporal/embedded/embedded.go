@@ -80,12 +80,15 @@ type Server struct {
 // New returns a server for namespace. With an empty dir it keeps its data in memory, and
 // otherwise in DatabaseFile inside dir, which Start creates if it's missing. Cancellation
 // during Start allows shutdownTimeout for cleanup before returning a StartupError.
-func New(dir, namespace string, logger *slog.Logger, shutdownTimeout time.Duration) *Server {
+// The caller supplies the listener factory for every address acquired by the adapter.
+func New(dir, namespace string, logger *slog.Logger, shutdownTimeout time.Duration,
+	listen func(context.Context, string, string) (net.Listener, error),
+) *Server {
 	return &Server{
 		dir: dir, namespace: namespace, logger: logger, host: loopback,
 		newServer: newOwnedServer, setupSchema: sqliteschema.SetupSchema,
 		createNamespaces: sqliteschema.CreateNamespaces,
-		listen:           (&net.ListenConfig{}).Listen,
+		listen:           listen,
 		shutdownTimeout:  shutdownTimeout,
 	}
 }

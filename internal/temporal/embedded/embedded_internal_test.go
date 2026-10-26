@@ -57,7 +57,7 @@ func (f *fakeServer) Stop(context.Context) error {
 func newTestServer(dir string, buf *bytes.Buffer) *Server {
 	// Real Temporal service shutdown includes its mandatory drain. Clock tests below
 	// separately verify short, exact deadlines without waiting for those drain timers.
-	return New(dir, "default", slog.New(slog.NewTextHandler(buf, nil)), 15*time.Second)
+	return New(dir, "default", slog.New(slog.NewTextHandler(buf, nil)), 15*time.Second, (&net.ListenConfig{}).Listen)
 }
 
 // startStop checks that s starts and serves before it stops s.
@@ -704,7 +704,8 @@ func TestCleanupPanicContinues(t *testing.T) {
 func startupSignalChild() int {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer cancel()
-	s := New("", "default", slog.New(slog.NewTextHandler(os.Stderr, nil)), 100*time.Millisecond)
+	logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
+	s := New("", "default", logger, 100*time.Millisecond, (&net.ListenConfig{}).Listen)
 	s.createNamespaces = func(*config.SQL, ...*sqliteschema.NamespaceConfig) error { return nil }
 	s.listen = func(context.Context, string, string) (net.Listener, error) { return &clockListener{}, nil }
 	s.newServer = func(context.Context, []net.Listener, ...temporal.ServerOption) (runtimeServer, error) {

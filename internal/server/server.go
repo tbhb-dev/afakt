@@ -53,6 +53,7 @@ type Config struct {
 type hooks struct {
 	services []lifecycle.Registration
 	routes   func(mux *http.ServeMux)
+	listen   func(context.Context, string, string) (net.Listener, error)
 }
 
 // Run starts the services of the selected targets and serves until the context ends or a
@@ -103,7 +104,10 @@ func compose(ctx context.Context, manager *lifecycle.Manager, cfg Config, logger
 	if err := ui.CheckPath(cfg.TemporalUIPath); err != nil {
 		return fmt.Errorf("compose: %w", err)
 	}
-	ln := &listener{address: cfg.Listen, logger: logger}
+	if h.listen == nil {
+		h.listen = listenTCP
+	}
+	ln := &listener{address: cfg.Listen, logger: logger, listen: h.listen}
 	web := &httpServer{listener: ln, routes: []func(*http.ServeMux){nil}}
 	var checks []func(context.Context) error
 	regs := []lifecycle.Registration{
@@ -168,7 +172,7 @@ func workerServices(
 	var dependsOn []string
 	address := func() string { return cfg.Address }
 	if cfg.Mode == temporal.ModeEmbedded {
-		server := embedded.New(cfg.EmbeddedDir, cfg.Namespace, logger, shutdownTimeout)
+		server := embedded.New(cfg.EmbeddedDir, cfg.Namespace, logger, shutdownTimeout, web.listener.listen)
 		regs = append(regs, lifecycle.Registration{Name: temporalService, Service: server})
 		dependsOn = []string{temporalService}
 		address = server.Address
@@ -196,13 +200,23 @@ type listener struct {
 	address string
 	logger  *slog.Logger
 	ln      net.Listener
+	listen  func(context.Context, string, string) (net.Listener, error)
+}
+
+// listenTCP is the composition's sole socket-binding path, shared with embedded Temporal.
+func listenTCP(ctx context.Context, network, address string) (net.Listener, error) {
+	var config net.ListenConfig
+	ln, err := config.Listen(ctx, network, address)
+	if err != nil {
+		return nil, fmt.Errorf("bind: %w", err)
+	}
+	return ln, nil
 }
 
 // Start binds the address and logs the address it bound. With port 0 in the configuration,
 // that log line shows the port the system chose.
 func (l *listener) Start(ctx context.Context) error {
-	var config net.ListenConfig
-	ln, err := config.Listen(ctx, "tcp", l.address)
+	ln, err := l.listen(ctx, "tcp", l.address)
 	if err != nil {
 		return fmt.Errorf("listen: %w", err)
 	}
