@@ -401,6 +401,85 @@ func TestOwnedStartupRollback(t *testing.T) {
 	}
 }
 
+func TestOwnedHookStartupRollback(t *testing.T) {
+	t.Parallel()
+	for _, failure := range []struct {
+		name  string
+		start func() error
+		want  error
+	}{
+		{"error", func() error { return errStart }, errStart},
+		{"panic", func() error { panic(errStart) }, errLifecyclePanic},
+	} {
+		t.Run(failure.name, func(t *testing.T) {
+			t.Parallel()
+			synctest.Test(t, func(t *testing.T) {
+				checkOwnedHookStartupRollback(t, failure.start, failure.want)
+			})
+		})
+	}
+}
+
+func checkOwnedHookStartupRollback(t *testing.T, start func() error, want error) {
+	t.Helper()
+	var buf bytes.Buffer
+	s := newTestServer("", &buf)
+	s.createNamespaces = func(*config.SQL, ...*sqliteschema.NamespaceConfig) error { return nil }
+	s.listen = func(context.Context, string, string) (net.Listener, error) { return &clockListener{}, nil }
+	ctx, cancel := context.WithCancel(t.Context())
+	defer cancel()
+	var release context.CancelFunc
+	released := make(chan struct{})
+	var stopped []int
+	owner := &ownedApp{}
+	owner.app = fx.New(fx.NopLogger, owner.options(), fx.Invoke(func(lc fx.Lifecycle) {
+		lc.Append(fx.Hook{
+			OnStart: func(context.Context) error { return nil },
+			OnStop:  func(context.Context) error { stopped = append(stopped, 0); return nil },
+		})
+		lc.Append(fx.Hook{
+			OnStart: func(context.Context) error {
+				var resourceCtx context.Context
+				resourceCtx, release = context.WithCancel(context.WithoutCancel(ctx))
+				t.Cleanup(release)
+				go func() { <-resourceCtx.Done(); close(released) }()
+				cancel()
+				return start()
+			},
+			OnStop: func(ctx context.Context) error {
+				deadline, ok := ctx.Deadline()
+				if !ok || time.Until(deadline) != s.shutdownTimeout || ctx.Err() != nil {
+					t.Errorf("cleanup context = %v, deadline = %v", ctx.Err(), deadline)
+				}
+				release()
+				<-released
+				stopped = append(stopped, 1)
+				return errStop
+			},
+		})
+		lc.Append(fx.Hook{
+			OnStart: func(context.Context) error { t.Error("later hook ran"); return nil },
+			OnStop:  func(context.Context) error { t.Error("stopped a hook that never ran"); return nil },
+		})
+	}))
+	s.newServer = func(context.Context, []net.Listener, ...temporal.ServerOption) (runtimeServer, error) {
+		return &ownedServer{top: owner}, nil
+	}
+	err := s.Start(ctx)
+	if !errors.Is(err, want) || !errors.Is(err, errStop) || !errors.Is(err, context.Canceled) ||
+		!strings.Contains(err.Error(), errStart.Error()) {
+		t.Errorf("Start() = %v, want original failure, cancellation, and cleanup error", err)
+	}
+	select {
+	case <-released:
+	default:
+		t.Error("startup resource was not released")
+	}
+	if !slices.Equal(stopped, []int{1, 0}) {
+		t.Errorf("stopped = %v, want failing hook then earlier hook", stopped)
+	}
+}
+
 func TestOwnedHookCancellation(t *testing.T) {
 	t.Parallel()
 	owner := &ownedApp{}

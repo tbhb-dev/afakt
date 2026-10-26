@@ -128,11 +128,12 @@ func (a *ownedApp) start(ctx context.Context) error {
 		if err := ctx.Err(); err != nil {
 			return fmt.Errorf("start owned hook: %w", err)
 		}
+		if hook.OnStop != nil {
+			// A failed or panicking start can still acquire resources that need cleanup.
+			a.cleanup = append(a.cleanup, hook.OnStop)
+		}
 		if err := hook.OnStart(ctx); err != nil {
 			return fmt.Errorf("start owned app: %w", err)
-		}
-		if hook.OnStop != nil {
-			a.cleanup = append(a.cleanup, hook.OnStop)
 		}
 	}
 	return nil
