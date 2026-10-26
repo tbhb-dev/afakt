@@ -31,3 +31,7 @@ api/openapi.bundle.yaml linguist-generated rebase-resolve=regenerate
 # own text, and marker-scan.sh reads this attribute to skip the copy.
 .claude/skills/resolve-rebase-conflicts/SKILL.md conflict-markers=documented
 .agents/skills/resolve-rebase-conflicts/SKILL.md conflict-markers=documented
+
+# Keep additions from both branches in the shared vocabulary lists.
+/.cspell-words.txt merge=union
+/.vale/config/vocabularies/project/accept.txt merge=union
