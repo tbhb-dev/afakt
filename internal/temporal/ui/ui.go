@@ -25,7 +25,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-// DefaultPath is the UI's subtree on the shared listener.
+// DefaultPath is the root path for the UI on the shared listener.
 const DefaultPath = "/temporal"
 
 var errPath = errors.New(
@@ -36,7 +36,7 @@ var errPath = errors.New(
 var errPathConflict = errors.New("temporal UI path conflicts with a reserved path")
 
 // CheckPath rejects paths that overlap another target or a health endpoint, even when that
-// target isn't selected. A later addition of a target cannot change where the UI routes go.
+// target isn't selected. A later addition of a target can't change where the UI routes go.
 func CheckPath(prefix string) error {
 	if prefix == "/" || !strings.HasPrefix(prefix, "/") || path.Clean(prefix) != prefix ||
 		strings.ContainsFunc(prefix, func(r rune) bool {
@@ -52,7 +52,7 @@ func CheckPath(prefix string) error {
 	return nil
 }
 
-// Service owns a handler and its connection, but never opens an HTTP listener. The handler
+// Service manages a handler and its connection, but never opens an HTTP listener. The handler
 // answers 404 until Start publishes it and after Stop removes it.
 type Service struct {
 	address   func() string
@@ -113,7 +113,7 @@ func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	http.NotFound(w, r)
 }
 
-// newHandler uses the upstream UI routes and gateway with an Afakt-owned connection. The
+// newHandler uses the upstream UI routes and gateway with a connection that afakt manages. The
 // upstream server's Start would own another listener and its route helper would hide the
 // connection, so neither is used here.
 func newHandler(provider config.ConfigProvider, conn *grpc.ClientConn, prefix string, files fs.FS) (*echo.Echo, error) {
@@ -137,8 +137,8 @@ func newHandler(provider config.ConfigProvider, conn *grpc.ClientConn, prefix st
 	return e, nil
 }
 
-// mustFiles unwraps compile-time asset directories. A missing directory is a packaging
-// error, rather than a condition that can arise from a request or server configuration.
+// mustFiles unwraps compile-time asset directories. A missing directory means packaging
+// failed, independently of requests or server configuration.
 func mustFiles(files fs.FS, err error) fs.FS {
 	if err != nil {
 		panic(err)

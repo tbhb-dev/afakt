@@ -80,7 +80,7 @@ type Server struct {
 
 // New returns a server for namespace. With an empty dir it keeps its data in memory, and
 // otherwise in DatabaseFile inside dir, which Start creates if it's missing. Cancellation
-// during Start allows shutdownTimeout for cleanup before returning a StartupError.
+// during Start allows `shutdownTimeout` for cleanup before returning a StartupError.
 // The caller supplies the listener factory for every address acquired by the adapter.
 func New(dir, namespace string, logger *slog.Logger, shutdownTimeout time.Duration,
 	listen func(context.Context, string, string) (net.Listener, error),
@@ -102,7 +102,7 @@ func (s *Server) Address() string {
 // Start prepares the database and the namespace, then starts the server. A failure after the
 // server is built stops it again before Start returns.
 func (s *Server) Start(ctx context.Context) error {
-	// Temporal constructors and some hooks cannot be interrupted through the public API.
+	// The public API can't interrupt Temporal constructors and some hooks.
 	// Keep their goroutine tracked through cleanup, including resources returned late.
 	finished := make(chan error, 1)
 	started := make(chan error, 1)
@@ -170,7 +170,7 @@ func (s *Server) awaitCleanup(
 	}
 	if stopCtx.Err() != nil {
 		// Cancellation may win the initial select even though startup returned an
-		// error before cleanup stalled. Retain that error when it is now available.
+		// error before cleanup stalled. Keep that error if the channel now has it.
 		select {
 		case err := <-started:
 			cause = errors.Join(cause, err)
@@ -236,7 +236,7 @@ func (s *Server) constructAttempt(ctx context.Context, sqlConfig *config.SQL) er
 	s.listeners = listeners
 	ports := make([]int, len(listeners))
 	for i, ln := range listeners {
-		// ListenConfig with network tcp always returns a TCP address.
+		// ListenConfig with network `tcp` always returns a TCP address.
 		if addr, ok := ln.Addr().(*net.TCPAddr); ok {
 			ports[i] = addr.Port
 		}

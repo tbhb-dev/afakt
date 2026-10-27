@@ -12,7 +12,7 @@ import "embed"
 //go:embed standin
 var content embed.FS
 
-// entry is the entry page, embedded separately so it cannot fail to load at runtime.
+// entry is the entry page, embedded separately so it can't fail to load at runtime.
 //
 //go:embed standin/index.html
 var entry []byte

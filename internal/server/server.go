@@ -70,7 +70,7 @@ func Run(ctx context.Context, cfg Config, logger *slog.Logger) error {
 // caller's context but not its cancellation, because a signal that cancels the caller's
 // context starts the shutdown and the services still need time to stop.
 func run(ctx context.Context, cfg Config, logger *slog.Logger, h hooks) error {
-	// Cancellation starts one budget, including cleanup of a service whose Start fails.
+	// Cancellation starts one budget, including cleanup after a service fails to start.
 	deadline := make(chan time.Time, 1)
 	stopDeadline := context.AfterFunc(ctx, func() { deadline <- time.Now().Add(cfg.ShutdownTimeout) })
 	defer stopDeadline()
@@ -150,7 +150,7 @@ func compose(ctx context.Context, manager *lifecycle.Manager, cfg Config, logger
 	return nil
 }
 
-// dashboardRoutes adds only the dashboard's exact root and its subtree.
+// dashboardRoutes adds only the exact dashboard root and the paths below it.
 func dashboardRoutes(mux *http.ServeMux) {
 	handler := dashboard.New()
 	mux.Handle("/dashboard", handler)

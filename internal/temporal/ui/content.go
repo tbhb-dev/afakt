@@ -10,7 +10,7 @@ import (
 	"io/fs"
 )
 
-// standin keeps Go-only builds independent of the production UI assets.
+// `standin` keeps Go-only builds independent of the production UI assets.
 //
 //go:embed standin/*
 var standin embed.FS

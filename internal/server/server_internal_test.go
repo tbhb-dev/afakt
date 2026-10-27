@@ -134,7 +134,7 @@ func startServer(t *testing.T, cfg Config, h hooks) *harness {
 	return startServerContext(t.Context(), t, cfg, h)
 }
 
-// startServerContext is startServer under parent, whose end stops the server as a signal does.
+// startServerContext is `startServer` under parent, whose end stops the server as a signal does.
 func startServerContext(parent context.Context, t *testing.T, cfg Config, h hooks) *harness {
 	t.Helper()
 	ctx, cancel := context.WithCancel(parent)

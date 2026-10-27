@@ -155,7 +155,7 @@ func TestReadinessAfterFailure(t *testing.T) {
 }
 
 // TestCombinedTargetsMatchAPI runs the API alone and the API with the webhook target on
-// separate listeners, then repeats with the dashboard. No API response changes.
+// separate listeners, then repeats with the dashboard. The API responses stay the same.
 func TestCombinedTargetsMatchAPI(t *testing.T) {
 	t.Parallel()
 	for _, target := range []string{"api,webhook", "api,dashboard", "dashboard,webhook,api"} {
@@ -166,7 +166,7 @@ func TestCombinedTargetsMatchAPI(t *testing.T) {
 	}
 }
 
-// wantCombinedAPI compares the API's paths and methods with and without another target.
+// wantCombinedAPI compares API paths and methods with and without another target.
 func wantCombinedAPI(t *testing.T, cfg Config) {
 	t.Helper()
 	apiProbe, combinedProbe := newProbe(), newProbe()

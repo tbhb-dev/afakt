@@ -27,8 +27,9 @@ import (
 	"go.uber.org/fx"
 )
 
-// listenerFactory delegates connections and TLS to Temporal but never asks its factory to
-// bind. Temporal v1.32.1's GetGRPCListener fatally logs a bind failure instead of returning it.
+// listenerFactory delegates connections and Transport Layer Security to Temporal but never
+// asks its factory to bind. Temporal v1.32.1's GetGRPCListener fatally logs a bind failure
+// instead of returning it.
 type listenerFactory struct {
 	common.RPCFactory
 
@@ -38,7 +39,7 @@ type listenerFactory struct {
 func (f *listenerFactory) GetGRPCListener() net.Listener { return f.listener }
 
 // httpHandoff retains the HTTP reservation until the pinned frontend HTTP constructor
-// asks for its bind address. In v1.32.1 that is the first Addr call on this listener.
+// asks for its bind address. In v1.32.1 that's the first `Addr` call on this listener.
 // The public constructor then binds privately; the remaining close-and-rebind window
 // requires an upstream listener handoff: https://github.com/tbhb-dev/afakt/issues/73.
 type httpHandoff struct {
@@ -71,9 +72,9 @@ func (l *servingListener) Accept() (net.Conn, error) {
 	return conn, nil
 }
 
-// ownedApp records construction-time stop hooks too: Fx only stops hooks reached by
-// Start, so app.Stop alone cannot roll back a failed fx.New. The adapter runs the recorded
-// hooks itself and app.Stop releases the Fx app after their cleanup.
+// ownedApp records construction-time stop hooks too. The `fx` lifecycle only stops hooks
+// reached by Start, so stopping the app alone can't roll back failed construction.
+// The adapter runs the recorded hooks itself and stops the `fx` app after their cleanup.
 type ownedApp struct {
 	app         *fx.App
 	cleanup     []func(context.Context) error
@@ -94,7 +95,7 @@ func (l *ownedLifecycle) Append(hook fx.Hook) {
 		// serving goroutine before cleanup can stop its gRPC server.
 		start := hook.OnStart
 		hook.OnStart = func(ctx context.Context) error {
-			// Service.Start has no error result in the pinned version.
+			// The pinned service's Start method has no error result.
 			err := start(ctx)
 			l.owner.running = true
 			<-l.owner.listener.accepted
@@ -129,7 +130,7 @@ func (a *ownedApp) start(ctx context.Context) error {
 			return fmt.Errorf("start owned hook: %w", err)
 		}
 		if hook.OnStop != nil {
-			// A failed or panicking start can still acquire resources that need cleanup.
+			// A failed or panicking start can still get resources that need cleanup.
 			a.cleanup = append(a.cleanup, hook.OnStop)
 		}
 		if err := hook.OnStart(ctx); err != nil {
@@ -173,8 +174,8 @@ type ownedVisibility struct {
 
 func (v *ownedVisibility) Close() { v.closeOnce.Do(v.VisibilityManager.Close) }
 
-// newOwnedServer follows temporal.TopLevelModule in the pinned v1.32.1, replacing only
-// its service providers so their RPC factories receive listeners acquired by the adapter.
+// newOwnedServer follows the top-level Temporal module in the pinned v1.32.1, replacing only
+// its service providers so their remote procedure call factories receive listeners from the adapter.
 // Keep this wiring aligned with that module when upgrading the server dependency.
 func newOwnedServer(
 	ctx context.Context,
@@ -226,7 +227,7 @@ type ownedServices struct {
 
 // buildServices follows the pinned service providers. Services are constructed and started
 // in dependency order, then stopped in reverse. The top-level ServerImpl receives an empty
-// group: it initializes system namespaces, while this adapter starts the apps with ctx.
+// group: it initializes system namespaces, while this adapter starts the apps with `ctx`.
 func (s *ownedServer) buildServices(
 	ctx context.Context,
 	params temporal.ServiceProviderParamsCommon,

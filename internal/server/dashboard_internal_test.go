@@ -59,7 +59,8 @@ func TestDashboardCanonicalSecurity(t *testing.T) {
 	}
 }
 
-// wantDashboardCanonicalSecurity checks headers on errors before routing.
+// wantDashboardCanonicalSecurity checks security headers on the 404 response for a path
+// that the server rejects before routing.
 func wantDashboardCanonicalSecurity(t *testing.T, address, path string) {
 	t.Helper()
 	req, err := http.NewRequestWithContext(t.Context(), http.MethodGet, "http://"+address+path, http.NoBody)
@@ -102,7 +103,8 @@ func wantDashboardAPI(t *testing.T, address string, enabled bool) {
 	}
 }
 
-// wantDashboardPaths checks entry routes and boundaries on a running composition.
+// wantDashboardPaths checks a running composition. Entry routes serve the same page,
+// while paths outside the dashboard and missing assets return 404.
 func wantDashboardPaths(t *testing.T, address string) {
 	t.Helper()
 	_, _, entry := request(t, http.MethodGet, address, "/dashboard/")

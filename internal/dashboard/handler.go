@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright Tony Burns
 
-// Package dashboard serves the embedded web application below /dashboard.
+// Package dashboard serves the embedded web app below /dashboard.
 package dashboard
 
 import (

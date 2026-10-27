@@ -26,7 +26,7 @@ pnpm = "12.14.0"
 DEVTOOLS_LOCK_PLATFORMS = "linux-x64,macos-arm64"
 DEVTOOLS_GO_MODULES_MODE = "vendor"
 DEVTOOLS_GENERATED_PATHS = ".devtools/\n.config/mise/\nbin/\ncoverage/\ntmp/\nspikes/\n.vale/"
-DEVTOOLS_PROSE_GLOB = "{**/*.md,*.go,api/openapi/**/*.yaml}"
+DEVTOOLS_PROSE_GLOB = "{**/*.md,**/*.go,api/openapi/**/*.yaml}"
 # The Chrome Headless Shell build that @playwright/test 1.64.0 installs. The
 # e2e-web task fails when the browser it runs reports a different version.
 AFAKT_WEB_CHROMIUM = "156.0.8078.4"
@@ -101,7 +101,7 @@ run = [
 extends = "devtools:lint-prose"
 
 [tasks.check-prose-gate]
-description = "Prove prose lint rejects generated findings in root and nested Markdown"
+description = "Prove prose lint rejects generated findings in Markdown and Go comments"
 run = "bash scripts/check-prose-gate.sh"
 
 [tasks.fix-prose-replacements]

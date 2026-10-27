@@ -12,7 +12,7 @@ import (
 )
 
 // content embeds the pinned upstream distribution through its Go module, without runtime
-// downloads or filesystem lookups. Both directories exist in the module at compile time.
+// downloads or filesystem searches. Both directories exist in the module at compile time.
 func content() fs.FS {
 	return mustFiles(fs.Sub(mustFiles(upstream.Assets()), "local"))
 }

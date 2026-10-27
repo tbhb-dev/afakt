@@ -24,8 +24,8 @@ import (
 )
 
 // TestListenerSourceGuard covers composition and UI source, including inactive build tags.
-// References are resolved before calls, so aliases and wrappers can't hide constructors.
-// This guard and bound-address recording don't inspect OS sockets.
+// Resolving references before calls exposes constructors behind aliases and wrappers.
+// OS sockets remain outside the scope of this guard and bound-address recording.
 func TestListenerSourceGuard(t *testing.T) {
 	t.Parallel()
 	for _, dir := range []string{".", "../lifecycle", "../temporal/ui", "../temporal/embedded"} {
@@ -74,7 +74,7 @@ func guardListenerDirectory(t *testing.T, dir string) []string {
 	return findings
 }
 
-// listenerSources separates common declarations from build-tagged alternatives.
+// listenerSources separates common declarations from alternatives. Build tags mark each alternative.
 func listenerSources(t *testing.T, positions *token.FileSet, dir string) ([]*ast.File, []*ast.File, []string) {
 	t.Helper()
 	paths, err := filepath.Glob(filepath.Join(dir, "*.go"))
@@ -108,7 +108,7 @@ func listenerSources(t *testing.T, positions *token.FileSet, dir string) ([]*ast
 	return common, alternatives, imports
 }
 
-// listenerImporter reads compiler export data without adding module dependencies.
+// listenerImporter reads compiler export data. Loading it leaves module dependencies unchanged.
 func listenerImporter(t *testing.T, positions *token.FileSet, dir string, imports []string) types.Importer {
 	t.Helper()
 	cmd := exec.CommandContext(t.Context(), "go", "list", "-deps", "-export", "-json", "--")
@@ -142,7 +142,7 @@ func listenerImporter(t *testing.T, positions *token.FileSet, dir string, import
 	})
 }
 
-// guardListenerFile permits only the direct bind call in the shared factory.
+// guardListenerFile checks imports and declarations. Only the shared factory may bind directly.
 func guardListenerFile(positions *token.FileSet, file *ast.File, info *types.Info) []string {
 	var findings []string
 	report := func(node ast.Node, message string) {
@@ -166,7 +166,8 @@ func guardListenerFile(positions *token.FileSet, file *ast.File, info *types.Inf
 	return findings
 }
 
-// guardListenerDecl checks references while counting direct binds in the shared factory.
+// guardListenerDecl checks references in each declaration. The shared factory must contain
+// exactly one direct bind call.
 func guardListenerDecl(positions *token.FileSet, decl ast.Decl, info *types.Info) []string {
 	var findings []string
 	report := func(node ast.Node, message string) {
@@ -200,7 +201,7 @@ func guardListenerDecl(positions *token.FileSet, decl ast.Decl, info *types.Info
 	return findings
 }
 
-// listenerFunction identifies functions that own the shared listener's exceptions.
+// listenerFunction identifies guard exceptions for functions in server.go. Methods don't qualify.
 func listenerFunction(positions *token.FileSet, decl ast.Decl) string {
 	fn, ok := decl.(*ast.FuncDecl)
 	if ok && fn.Recv == nil && filepath.Clean(positions.Position(decl.Pos()).Filename) == "server.go" {
@@ -209,7 +210,8 @@ func listenerFunction(positions *token.FileSet, decl ast.Decl) string {
 	return ""
 }
 
-// listenerInjection allows the factory value only at the composition's injection point.
+// listenerInjection allows the factory value at the composition's injection point. Each assignment
+// must have one listener field on the left and one factory value on the right.
 func listenerInjection(name string, node ast.Node) *ast.Ident {
 	assign, ok := node.(*ast.AssignStmt)
 	if name != "compose" || !ok || len(assign.Lhs) != 1 || len(assign.Rhs) != 1 {
@@ -227,7 +229,7 @@ func listenerInjection(name string, node ast.Node) *ast.Ident {
 	return nil
 }
 
-// listenerBind resolves a direct call to the network configuration's binding method.
+// listenerBind resolves a direct binding call. Only the network configuration's method qualifies.
 func listenerBind(node ast.Node, info *types.Info) *ast.Ident {
 	call, called := node.(*ast.CallExpr)
 	if !called {
