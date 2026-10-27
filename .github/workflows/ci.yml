@@ -138,6 +138,7 @@ jobs:
           - e2e-web
           - mutate-web
           - audit-web
+          - check-web-install
           - check-web-gates
     steps:
       - name: Harden the runner
