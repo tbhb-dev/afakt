@@ -27,6 +27,7 @@ GOMAXPROCS
 gomodscan
 healthz
 HTTPAPI
+jsdom
 knip
 labstack
 ldflags
@@ -83,6 +84,7 @@ toplevel
 unseparated
 vendir
 vite
+vitejs
 vitest
 workflowservice
 wrapcheck
