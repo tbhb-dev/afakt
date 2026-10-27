@@ -124,7 +124,7 @@ func TestReadiness(t *testing.T) {
 			if err := s.wait(t); err != nil {
 				t.Fatalf("run() error = %v", err)
 			}
-			wantClosed(t, s.addr(t))
+			wantClosed(t, s.listener)
 		})
 	}
 }
