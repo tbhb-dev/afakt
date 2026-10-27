@@ -9,6 +9,7 @@
 afakt
 cspell
 devtools
+jsdom
 jscpd
 knip
 mise
@@ -17,13 +18,14 @@ pnpm
 prek
 shellcheck
 toolchain
+[Uu]buntu
 vendir
-ESLint
-Stryker
+(?:ESLint|eslint)
+[Ss]tryker
 Temporal
 Dasel
-Vite
-Vitest
+[Vv]ite
+[Vv]itest
 [Nn]amespaces?
 [Ll]oopback
 [Ll]iveness
