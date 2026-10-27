@@ -33,7 +33,7 @@ The GitHub webhook receiver accepts webhook deliveries from GitHub.
 
 The web dashboard provides afakt's web UI.
 
-The dashboard shares the API's origin and HTTP listener, including when every runtime role runs together. Its routes belong under `/dashboard/`. Readiness requires every selected service to run and fails during startup and shutdown.
+The dashboard shares the origin and HTTP listener of the API, including when every runtime role runs together. Its routes belong under `/dashboard/`. Readiness requires every selected service to run and fails during startup and shutdown.
 
 ## Workflow orchestrator
 

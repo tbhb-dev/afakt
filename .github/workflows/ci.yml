@@ -77,6 +77,9 @@ jobs:
       - name: Lint
         run: mise run lint
 
+      - name: Prove prose lint rejects nested Markdown findings
+        run: mise run check-prose-gate
+
       # The tree scan in `lint` sees only the checkout. This reads every
       # commit, message, and author line the pull request adds, so a value
       # committed and removed again within the branch still fails. CI has no
