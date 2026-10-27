@@ -48,6 +48,15 @@
 
   packageRules: [
     {
+      // typescript-eslint 8.72.0 requires TypeScript <6.1.0 and rejects v7.
+      // TypeScript 7 replaced the compiler API these lint gates use. Remove
+      // this bound when the installed typescript-eslint supports that API.
+      // See #100 for the failing checks.
+      matchManagers: ["npm"],
+      matchPackageNames: ["typescript"],
+      allowedVersions: "<6.1.0",
+    },
+    {
       matchFileNames: [".github/renovate.json5"],
       matchPackageNames: ["jdx/mise"],
       groupName: "github-actions",
