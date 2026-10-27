@@ -211,6 +211,20 @@ run = "bash scripts/workspace-diagrams.sh export"
 description = "Check diagram sources and rendering hashes"
 run = "bash scripts/workspace-diagrams.sh check"
 
+# `structurizr local` writes layout and workspace.json beside the DSL it serves.
+# It serves a symlink in a temporary directory so docs/workspace.json stays the
+# generated file. Set SERVER_PORT to change the default port 8080.
+[tasks.serve-structurizr]
+description = "Serve docs/workspace.dsl in Structurizr's local web UI"
+shell = "bash -c"
+run = '''
+set -euo pipefail
+dir=$(mktemp -d)
+trap 'rm -rf "$dir"' EXIT
+ln -s "$PWD/${WORKSPACE_ROOT:-docs}/workspace.dsl" "$dir/workspace.dsl"
+STRUCTURIZR_EDITABLE=false STRUCTURIZR_AUTOSAVEINTERVAL=0 structurizr local "$dir"
+'''
+
 # The REST contract is the multi-file OpenAPI document under api/openapi/, and
 # api/openapi.bundle.yaml is its committed single-file bundle. OPENAPI_ROOT points
 # these tasks at another copy of api/, such as a broken copy in a temporary directory.

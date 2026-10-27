@@ -1,0 +1,93 @@
+@startuml
+title <size:24>Deployment View: Topology launch</size>\n<size:24>One launch crosses guest, mediation, network and service boundaries.</size>
+
+set separator none
+left to right direction
+skinparam ranksep 20
+skinparam nodesep 5
+hide stereotype
+
+skinparam {
+  nodesep 80
+  ranksep 160
+}
+
+<style>
+  root {
+    BackgroundColor: #ffffff;
+    FontColor: #444444;
+  }
+  // Element,Topology
+  .Element-RWxlbWVudCxUb3BvbG9neQ== {
+    BackgroundColor: #e8f1fa;
+    LineColor: #315b7d;
+    LineStyle: 0;
+    LineThickness: 2;
+    FontColor: #122b44;
+    FontSize: 24;
+    HorizontalAlignment: center;
+    Shadowing: 0;
+    MaximumWidth: 450;
+  }
+  // Relationship
+  .Relationship-UmVsYXRpb25zaGlw {
+    LineThickness: 2;
+    LineStyle: 10-10;
+    LineColor: #444444;
+    FontColor: #444444;
+    FontSize: 24;
+    MaximumWidth: 200;
+  }
+  // Element,Deployment Node
+  .DeploymentNode-RWxlbWVudCxEZXBsb3ltZW50IE5vZGU= {
+    BackgroundColor: #f5f7fa;
+    LineColor: #536b7e;
+    LineStyle: 0;
+    LineThickness: 2;
+    FontColor: #182c3e;
+    FontSize: 24;
+    HorizontalAlignment: center;
+    Shadowing: 0;
+  }
+</style>
+
+rectangle "Agent host trust boundary\n<size:16>[Deployment Node: Agent host]</size>" <<DeploymentNode-RWxlbWVudCxEZXBsb3ltZW50IE5vZGU=>> as Topologylaunch.Agenthosttrustboundary {
+  rectangle "Agent launch boundary\n<size:16>[Deployment Node: Launch isolation]</size>" <<DeploymentNode-RWxlbWVudCxEZXBsb3ltZW50IE5vZGU=>> as Topologylaunch.Agenthosttrustboundary.Agentlaunchboundary {
+    rectangle "Guest trust boundary\n<size:16>[Deployment Node: Provider confinement]</size>" <<DeploymentNode-RWxlbWVudCxEZXBsb3ltZW50IE5vZGU=>> as Topologylaunch.Agenthosttrustboundary.Agentlaunchboundary.Guesttrustboundary {
+      rectangle "==Guest workload\n<size:16>[Container: Provider confinement]</size>\n\nUntrusted harness, relay and loopback listeners; no overlay membership or workload keys." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as Topologylaunch.Agenthosttrustboundary.Agentlaunchboundary.Guesttrustboundary.Guestworkload_1
+    }
+
+    rectangle "Mediation trust boundary\n<size:16>[Deployment Node: Local confinement; user undecided]</size>" <<DeploymentNode-RWxlbWVudCxEZXBsb3ltZW50IE5vZGU=>> as Topologylaunch.Agenthosttrustboundary.Agentlaunchboundary.Mediationtrustboundary {
+      rectangle "==Agent mediator\n<size:16>[Container: Local policy enforcement]</size>\n\nEnforces this launch's policy and stamps identity; has no network access of its own." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as Topologylaunch.Agenthosttrustboundary.Agentlaunchboundary.Mediationtrustboundary.Agentmediator_1
+    }
+
+    rectangle "Agent proxy trust boundary\n<size:16>[Deployment Node: tsnet node; user undecided]</size>" <<DeploymentNode-RWxlbWVudCxEZXBsb3ltZW50IE5vZGU=>> as Topologylaunch.Agenthosttrustboundary.Agentlaunchboundary.Agentproxytrustboundary {
+      rectangle "==Agent proxy\n<size:16>[Container: Tailscale tsnet]</size>\n\nOwn overlay node, hub connection and launch X.509-SVID; only launch component opening connections off the host." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as Topologylaunch.Agenthosttrustboundary.Agentlaunchboundary.Agentproxytrustboundary.Agentproxy_1
+    }
+
+  }
+
+}
+
+rectangle "Control plane trust boundary\n<size:16>[Deployment Node: Cluster overlay]</size>" <<DeploymentNode-RWxlbWVudCxEZXBsb3ltZW50IE5vZGU=>> as Topologylaunch.Controlplanetrustboundary {
+  rectangle "Agent hub node\n<size:16>[Deployment Node: tsnet node]</size>" <<DeploymentNode-RWxlbWVudCxEZXBsb3ltZW50IE5vZGU=>> as Topologylaunch.Controlplanetrustboundary.Agenthubnode {
+    rectangle "==Agent hub\n<size:16>[Container: Application service]</size>\n\nJoins per-launch connections carrying sessions, remote control, ports and previews." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as Topologylaunch.Controlplanetrustboundary.Agenthubnode.Agenthub_1
+  }
+
+  rectangle "API service node\n<size:16>[Deployment Node: tsnet node]</size>" <<DeploymentNode-RWxlbWVudCxEZXBsb3ltZW50IE5vZGU=>> as Topologylaunch.Controlplanetrustboundary.APIservicenode {
+    rectangle "==API server and web dashboard\n<size:16>[Container: Application service]</size>\n\nAuthorizes operations and serves the dashboard from its own origin." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as Topologylaunch.Controlplanetrustboundary.APIservicenode.APIserverandwebdashboard_1
+  }
+
+}
+
+rectangle "Internet boundary\n<size:16>[Deployment Node: External services]</size>" <<DeploymentNode-RWxlbWVudCxEZXBsb3ltZW50IE5vZGU=>> as Topologylaunch.Internetboundary {
+  rectangle "==Internet services\n<size:16>[Software System]</size>\n\nPermitted upstream destinations outside the cluster trust domain." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as Topologylaunch.Internetboundary.Internetservices_1
+}
+
+Topologylaunch.Agenthosttrustboundary.Agentlaunchboundary.Guesttrustboundary.Guestworkload_1 --> Topologylaunch.Agenthosttrustboundary.Agentlaunchboundary.Mediationtrustboundary.Agentmediator_1 <<Relationship-UmVsYXRpb25zaGlw>> : "Sends traffic bound to this launch\n<size:16>[Local provider carrier]</size>"
+Topologylaunch.Agenthosttrustboundary.Agentlaunchboundary.Mediationtrustboundary.Agentmediator_1 --> Topologylaunch.Agenthosttrustboundary.Agentlaunchboundary.Agentproxytrustboundary.Agentproxy_1 <<Relationship-UmVsYXRpb25zaGlw>> : "Sends policy-permitted traffic and stamped launch identity\n<size:16>[Local channel]</size>"
+Topologylaunch.Agenthosttrustboundary.Agentlaunchboundary.Agentproxytrustboundary.Agentproxy_1 --> Topologylaunch.Controlplanetrustboundary.Agenthubnode.Agenthub_1 <<Relationship-UmVsYXRpb25zaGlw>> : "Opens own multiplexed connection with launch X.509-SVID\n<size:16>[Workload mutual TLS over overlay]</size>"
+Topologylaunch.Agenthosttrustboundary.Agentlaunchboundary.Agentproxytrustboundary.Agentproxy_1 --> Topologylaunch.Controlplanetrustboundary.APIservicenode.APIserverandwebdashboard_1 <<Relationship-UmVsYXRpb25zaGlw>> : "Calls authorized operations with launch X.509-SVID\n<size:16>[Workload mutual TLS over overlay]</size>"
+Topologylaunch.Agenthosttrustboundary.Agentlaunchboundary.Agentproxytrustboundary.Agentproxy_1 --> Topologylaunch.Internetboundary.Internetservices_1 <<Relationship-UmVsYXRpb25zaGlw>> : "Opens permitted egress; inspection where required\n<size:16>[Destination protocol]</size>"
+
+@enduml

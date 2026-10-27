@@ -1,48 +1,52 @@
 ---
 type: Design
-title: Agent execution resource
-description: The AgentExecution resource, a Kubernetes-style form of one execution generation with its specification in spec and the provider's record in status, and a full example.
-tags: [afakt, agents, execution, resources]
+title: Agent launch resource
+description: The AgentLaunch resource, the resource form of one agent launch, with its specification in spec and the provider's record in status, and a full example.
+tags: [afakt, agents, agent-launch, resources]
 status: draft
-generated: { by: "codex", at: "2026-10-27T00:00:00Z" }
+generated: { by: "codex:gpt-6-astra", at: "2026-10-27T00:00:00Z" }
 ---
 
-# Agent execution resource
+# Agent launch resource
 
-Each execution is a harness run from start to end and belongs to a durable [agent](agent.md). Its provider record has one resource form per generation, `AgentExecution`, in the style of a Kubernetes resource. `metadata` identifies the generation, `spec` contains its [execution specification](agent-execution-contract.md#execution-specification), and `status` contains what the execution provider records about it. Launch takes the resource without `status`. Status and result return it with `status`. The [profile resource](agent-profile.md#profile-resource) uses the same `apiVersion`.
+[Public key infrastructure](pki.md).
 
-The field that links this resource to the agent it belongs to remains an [open question](agent-open-questions.md#agents), along with the mapping between generations and harness runs.
+The `AgentLaunch` resource represents one agent launch. `metadata.name` is its agent launch ID, `spec` contains its immutable [agent launch spec](agent-launch-contract.md#Agent%20launch%20spec), and `status` records the agent sandbox provider's observations. Provision takes the resource without `status`. Status and result return it with `status`.
+
+The public fields that bind this resource to its durable agent and session remain [open](agent-open-questions.md#%60OQ-AGT-10%60).
 
 ## Envelope
 
 | Key | Meaning | Who sets it |
 | --- | --- | --- |
-| `apiVersion` | The schema version of the resource, `afakt/v1alpha1`. The provider rejects any other with `invalid-specification`. | The parent workflow |
-| `kind` | `AgentExecution`. | The parent workflow |
-| `metadata.name` | The [execution ID](agent-execution-model.md#execution-id-format). | afakt, when it creates the execution |
-| `metadata.generation` | The generation. | The parent workflow |
-| `metadata.creationTimestamp` | When afakt created the logical execution. | afakt, when it creates the execution |
-| `metadata.labels` | The specification's labels: `task-class`, `variant`, and `role`. | The parent workflow |
-| `spec` | The other specification fields, under the keys in [Specification keys](#specification-keys). | The parent workflow |
-| `status` | The provider's record of the generation, under the keys in [Status keys](#status-keys). | The provider |
+| `apiVersion` | The schema version of the resource, `afakt/v1alpha1`. The provider rejects any other with `invalid-specification`. | The agent dispatcher workflow |
+| `kind` | `AgentLaunch`. | The agent dispatcher workflow |
+| `metadata.name` | The [agent launch ID](agent-launch-model.md#Agent%20launch%20ID%20format). | afakt, when it creates the agent launch |
+| `metadata.creationTimestamp` | When afakt created the agent launch. | afakt, when it creates the agent launch |
+| `metadata.labels` | The specification's labels: `task-class`, `variant`, and `role`. | The agent dispatcher workflow |
+| `spec` | The other specification fields, under the keys in [Specification keys](#Specification%20keys). | The agent dispatcher workflow |
+| `status` | The provider's record of the agent launch, under the keys in [Status keys](#Status%20keys). | The provider |
 
-One resource shows one generation. Status for an older generation returns that generation's resource, and its `status.current_generation` gives the newest. The specification digest covers `metadata.name`, `metadata.labels`, and `spec`. It never covers `metadata.generation`, `metadata.creationTimestamp`, or `status`.
+One resource represents one agent launch. Status addresses an earlier launch by its own ID. The specification digest covers `metadata.name`, `metadata.labels`, and `spec`, including `spec.generation`. It excludes `metadata.creationTimestamp` and `status`.
 
 ## Specification keys
 
 | Specification field | Key |
 | --- | --- |
+| Generation | `generation`, the agent spec revision recorded at finalization. |
+| Predecessor | `predecessor_agent_launch_id`, absent for the first agent launch. |
+| Agent sandbox provider | `agent_sandbox_provider` |
 | Agent profile | `profile`, with `source`, `name`, `version`, and `digest`. `version` takes the form of `metadata.version` in the profile resource. |
-| Credential references | `credentials`, with `service` naming each credential in afakt's credential store. See [Credential brokering](agent-sandbox.md#credential-brokering). |
+| Credential references | `credentials`, with `service` naming each credential in afakt's credential store. See [Credential brokering](agent-sandbox.md#Credential%20brokering). |
 | Workspace access | `workspace_access` |
-| Harness | `harness`, with `name` and an optional `version` |
+| Agent harness | `harness`, with `name` and an optional `version` |
 | Model provider | `model_provider` |
 | Model | `model` |
 | Model effort | `effort` |
 | Inputs | `inputs`, with `prompt` and a list of `attachments`. Each reference has a `ref` and a `digest`, and an attachment also has a `media_type`. |
 | Input digest | `input_digest` |
 | Instruction inputs | `instruction_inputs` |
-| Workspace sources | `workspace_sources`. Each entry has a `target` and a `kind`. A `repository` source adds `url`, `commit`, and an optional `branch`. An `image` source adds `reference` for an image repository and tag or manifest digest. An `execution` source adds `execution_id` and `generation`. |
+| Workspace sources | `workspace_sources`. Each entry has a `target` and a `kind`. A `repository` source adds `url`, `commit`, and an optional `branch`. An `image` source adds `reference` for an image repository and tag or manifest digest. An `agent-launch` source adds `agent_launch_id`. |
 | Environment | `environment`, with the entry keys of the profile's `environment` |
 | Hooks | `hooks`, with the entry keys of the profile's `hooks`, plus `working_directory`, `environment`, and `when` |
 | Time limit | `time_limit` |
@@ -50,51 +54,54 @@ One resource shows one generation. Status for an older generation returns that g
 | Resource limits | `resource_limits`, a map of limit names to values |
 | Output schema | `output_schema` |
 | Capabilities | `capabilities`, in the form of the profile's `capabilities` |
-| Model Context Protocol (MCP) access | `mcp.servers` and `mcp.tools`, with the profile’s allow and deny list keys. Approval keys are profile-only. See [MCP access](agent-profile.md#mcp-access). |
+| Model Context Protocol (MCP) access | `mcp.servers` and `mcp.tools`, with the profile’s allow and deny list keys. Approval keys are profile-only. See [MCP access](agent-profile.md#MCP%20access). |
 | Sandbox | `sandbox`, in the form of the profile's `sandbox` |
 | Placement requirements | `placement`, a map of names to values |
 | Retention | `retention` |
 
-Credential references appear in `spec.credentials` and in the pinned profile. Their bounds remain [on hold](agent-open-questions.md#agent-sandbox). Neither the specification nor the provider's record contains secret values.
+Credential references appear in `spec.credentials` and in the pinned profile. Their bounds remain [on hold](agent-open-questions.md#Agent%20sandbox). Neither the specification nor the provider's record contains secret values. The Application Programming Interface (API) server reads capabilities and scopes from the spec it already stores after identifying the agent launch from the agent proxy's peer certificate. See [Agent launch authentication](agent-proxy.md#Agent%20launch%20authentication).
 
 ## Status keys
 
 | Key | Field |
 | --- | --- |
-| `current_generation` | The execution's current generation. |
-| `specification_digest` and `configuration_digest` | The digests that identify the specification and the configuration. See [Execution generation](agent-execution-model.md#execution-generation). |
-| `placement` | The `agent_host` and `task_queue` the generation runs on. |
-| `workspace` | The workspace `path` inside the guest. |
+| `specification_digest` and `configuration_digest` | The digests that identify the specification and the configuration. See [Agent launch record](agent-launch-model.md#Agent%20launch%20record). |
+| `placement` | The `agent_host` and `task_queue` the agent launch runs on. |
+| `workspace` | The agent workspace `path` inside the guest. |
 | `configuration` | The combined configuration: `sandbox`, `environment` with the source of each entry, `hooks` as the combined list of names in run order, `transport` as `acp` or `headless`, and `harness_settings_digest`. |
-| `state`, `phase`, and `last_observed` | Where the generation stands. `phase` is absent before the first part runs and once the generation is terminal. |
+| `state`, `phase`, and `last_observed` | Where the agent launch stands. `phase` is absent before the first part runs and once the agent launch is terminal. |
 | `state_history` | Each transition, with its `state`, the time `at`, and the `observation` behind it. |
 | `cancellation` | The cancellation acknowledgement, with `accepted_at`, `state`, and `reason`. Absent without one. |
-| `superseded_by` | The higher generation that superseded this one. Absent unless one did. |
-| `observed_times` | `launch_accepted`, `agent_start`, `agent_end`, and `execution_end`. |
-| `evidence` | The [evidence references](agent-execution-model.md#evidence-retention-and-cleanup), each with `id`, `name`, `media_type`, and `digest`. |
-| `provenance` | The [provenance record](agent-execution-model.md#provenance-record), with `requested` and `observed` under each field. Each `image` workspace source has its requested `reference` and observed manifest `digest` at its `target`. |
-| `result` | Once terminal, the result's `reason`, `payload`, `payload_digest`, and `observed_usage`, with `exit_status` for headless runs or `stop_reason` for ACP runs. |
+| `superseded_by` | The successor agent launch ID. Absent unless one did. |
+| `observed_times` | `launch_accepted`, `agent_start`, `agent_end`, and `agent_launch_end`. |
+| `evidence` | The [evidence references](agent-launch-model.md#Evidence,%20retention,%20and%20cleanup), each with `id`, `name`, `media_type`, and `digest`. |
+| `provenance` | The [provenance record](agent-launch-model.md#Provenance%20record), with `requested` and `observed` under each field. Each `image` workspace source has its requested `reference` and observed manifest `digest` at its `target`. |
+| `result` | Once terminal, the result's `reason`, `payload`, `payload_digest`, and `observed_usage`, with `exit_status` for headless agent launches or `stop_reason` for Agent Client Protocol (ACP) agent launches. |
 | `retention` | `ends_at` and the list of `holds`. |
 | `cleanup` | `state`, one of `none`, `complete`, or `incomplete`, and the `remaining` items. |
 
-The [execution result](agent-execution-contract.md#execution-result) consists of `status.result` together with `metadata.name`, `metadata.generation`, `status.specification_digest`, `status.state`, `status.evidence`, `status.provenance`, and `status.observed_times` at the moment the generation became terminal.
+The [agent launch result](agent-launch-contract.md#Agent%20launch%20result) consists of `status.result` together with `metadata.name`, `status.specification_digest`, `status.state`, `status.evidence`, `status.provenance`, and `status.observed_times` at the moment the agent launch became terminal.
 
 ## Example
 
-This generation 2 of a `build` execution uses headless transport. Its cancellation and supersession fields appear as comments. It runs the catalog profile `build` against two repositories, a copy of generation 1's workspace, and an empty directory. Its hooks add to the profile's `lint` and `check-command` hooks.
+Headless transport defaults and its integration with agent launch validation, hooks, results, and evidence remain [`OQ-SES-16`](agent-open-questions.md#%60OQ-SES-16%60).
+
+This agent launch uses headless transport and a frozen agent spec revision. It links to a predecessor and copies that predecessor's agent workspace alongside two repositories and an empty directory. Its hooks add to the pinned profile's hooks.
 
 ```yaml
 apiVersion: afakt/v1alpha1
-kind: AgentExecution
+kind: AgentLaunch
 metadata:
   name: 019a1a2b-3c4d-7e5f-8a6b-7c8d9e0f1a2b
-  generation: 2
   creationTimestamp: "2026-10-25T14:00:00Z"
   labels:
     task-class: build
     variant: b
     role: builder
 spec:
+  generation: 2
+  predecessor_agent_launch_id: 019a1a2b-3c4d-7e5f-8a6b-7c8d9e0f1a2a
+  agent_sandbox_provider: linux-vm
   profile:
     source: catalog
     name: build
@@ -107,7 +114,7 @@ spec:
   workspace_access: read-write
   harness: { name: example-harness, version: example-release }
   model_provider: example-provider
-  model: example-model-large-2026-09
+  model: example-model-large
   effort: high
   inputs:
     prompt: { ref: content/prompts/7c1d, digest: sha256:7c1d… }
@@ -128,9 +135,8 @@ spec:
       url: https://git.example.com/team/library
       commit: 1a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d
     - target: previous
-      kind: execution
-      execution_id: 019a1a2b-3c4d-7e5f-8a6b-7c8d9e0f1a2b
-      generation: 1
+      kind: agent-launch
+      agent_launch_id: 019a1a2b-3c4d-7e5f-8a6b-7c8d9e0f1a2a
     - target: notes
       kind: empty
   environment:
@@ -200,7 +206,6 @@ spec:
     harness: example-harness
   retention: 14d
 status:
-  current_generation: 2
   specification_digest: sha256:5d2c…
   configuration_digest: sha256:b7e9…
   placement:
@@ -239,13 +244,13 @@ status:
     - { state: succeeded, at: "2026-10-25T15:01:30Z", observation: agent exited 0 with a valid payload, and run-tests succeeded }
   # Only after an acknowledged cancellation:
   # cancellation: { accepted_at: "2026-10-25T14:40:00Z", state: running, reason: operator request }
-  # Only on a generation that a higher one superseded:
-  # superseded_by: 3
+  # Only on a superseded agent launch:
+  # superseded_by: 019a1a2b-3c4d-7e5f-8a6b-7c8d9e0f1a2c
   observed_times:
     launch_accepted: "2026-10-25T14:05:02Z"
     agent_start: "2026-10-25T14:08:41Z"
     agent_end: "2026-10-25T14:52:10Z"
-    execution_end: "2026-10-25T15:01:30Z"
+    agent_launch_end: "2026-10-25T15:01:30Z"
   evidence:
     - { id: ev-01, name: transcript, media_type: application/x-ndjson, digest: sha256:91aa… }
     - { id: ev-02, name: standard-error, media_type: text/plain, digest: sha256:2b70… }
@@ -259,7 +264,8 @@ status:
     - { id: ev-10, name: final-answer, media_type: application/json, digest: sha256:5a8e… }
     - { id: ev-11, name: workspace-changes, media_type: application/x-git-bundle, digest: sha256:e7b5… }
   provenance:
-    execution_id: 019a1a2b-3c4d-7e5f-8a6b-7c8d9e0f1a2b
+    agent_launch_id: 019a1a2b-3c4d-7e5f-8a6b-7c8d9e0f1a2b
+    predecessor_agent_launch_id: 019a1a2b-3c4d-7e5f-8a6b-7c8d9e0f1a2a
     generation: 2
     specification_digest: sha256:5d2c…
     input_digest: sha256:e02b…
@@ -276,8 +282,8 @@ status:
       requested: example-provider
       observed: example-provider
     model:
-      requested: example-model-large-2026-09
-      observed: example-model-large-2026-09
+      requested: example-model-large
+      observed: example-model-large
     effort:
       requested: high
       observed: high
@@ -287,7 +293,7 @@ status:
       requested:
         - { target: app, kind: repository, url: https://git.example.com/team/app, commit: 9f8e7d6c5b4a39281706f5e4d3c2b1a098765432, branch: agent/issue-37 }
         - { target: deps/library, kind: repository, url: https://git.example.com/team/library, commit: 1a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d }
-        - { target: previous, kind: execution, execution_id: 019a1a2b-3c4d-7e5f-8a6b-7c8d9e0f1a2b, generation: 1 }
+        - { target: previous, kind: agent-launch, agent_launch_id: 019a1a2b-3c4d-7e5f-8a6b-7c8d9e0f1a2a }
         - { target: notes, kind: empty }
       observed:
         - { target: app, commit: 9f8e7d6c5b4a39281706f5e4d3c2b1a098765432, branch: agent/issue-37 }
@@ -337,9 +343,9 @@ status:
   result:
     reason: agent-exit
     exit_status: 0
-    # ACP runs report stop_reason, such as end_turn, instead of exit_status.
+    # ACP agent launches report stop_reason, such as end_turn, instead of exit_status.
     payload:
-      summary: Added the migrations runner and its tests.
+      summary: Added database migrations and tests.
       branch: agent/issue-37
       tests_passed: true
     payload_digest: sha256:5a8e…

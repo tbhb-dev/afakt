@@ -1,0 +1,98 @@
+@startuml
+title <size:24>Container View: afakt</size>\n<size:24>Service roles supporting the deployment topology; connections are control or transport dependencies.</size>
+
+set separator none
+top to bottom direction
+skinparam ranksep 20
+skinparam nodesep 5
+hide stereotype
+
+skinparam {
+  nodesep 80
+  ranksep 160
+}
+
+<style>
+  root {
+    BackgroundColor: #ffffff;
+    FontColor: #444444;
+  }
+  // Element,Topology
+  .Element-RWxlbWVudCxUb3BvbG9neQ== {
+    BackgroundColor: #e8f1fa;
+    LineColor: #315b7d;
+    LineStyle: 0;
+    LineThickness: 2;
+    FontColor: #122b44;
+    FontSize: 24;
+    HorizontalAlignment: center;
+    Shadowing: 0;
+    MaximumWidth: 450;
+  }
+  // Relationship
+  .Relationship-UmVsYXRpb25zaGlw {
+    LineThickness: 2;
+    LineStyle: 10-10;
+    LineColor: #444444;
+    FontColor: #444444;
+    FontSize: 24;
+    MaximumWidth: 200;
+  }
+  // afakt
+  .Boundary-YWZha3Q= {
+    BackgroundColor: #ffffff;
+    LineColor: #444444;
+    LineStyle: 0;
+    LineThickness: 2;
+    FontColor: #444444;
+    FontSize: 24;
+    HorizontalAlignment: center;
+    Shadowing: 0;
+  }
+  // Control plane services
+  .Group-Q29udHJvbCBwbGFuZSBzZXJ2aWNlcw== {
+    BackgroundColor: #ffffff;
+    LineColor: #536b7e;
+    LineStyle: 2-2;
+    LineThickness: 2;
+    FontColor: #182c3e;
+    FontSize: 24;
+    HorizontalAlignment: center;
+    Shadowing: 0;
+  }
+  // Host management boundary
+  .Group-SG9zdCBtYW5hZ2VtZW50IGJvdW5kYXJ5 {
+    BackgroundColor: #ffffff;
+    LineColor: #536b7e;
+    LineStyle: 2-2;
+    LineThickness: 2;
+    FontColor: #182c3e;
+    FontSize: 24;
+    HorizontalAlignment: center;
+    Shadowing: 0;
+  }
+</style>
+
+rectangle "afakt\n<size:16>[Software System]</size>" <<Boundary-YWZha3Q=>> {
+  rectangle "Control plane services" <<Group-Q29udHJvbCBwbGFuZSBzZXJ2aWNlcw==>> as group1 {
+    rectangle "==Agent hub\n<size:16>[Container: Application service]</size>\n\nJoins per-launch connections carrying sessions, remote control, ports and previews." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Agenthub
+    rectangle "==API server and web dashboard\n<size:16>[Container: Application service]</size>\n\nAuthorizes operations and serves the dashboard from its own origin." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.APIserverandwebdashboard
+    rectangle "==MCP gateway\n<size:16>[Container: Application service]</size>\n\nChecks launch tool grants and keeps upstream credentials outside guests." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.MCPgateway
+    rectangle "==Overlay coordination\n<size:16>[Container: Headscale]</size>\n\nAn afakt interface fronts isolated Headscale coordination; cluster nodes retain a static map of stable nodes." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Overlaycoordination
+    rectangle "==Overlay relay\n<size:16>[Container: Overlay transport]</size>\n\nCarries encrypted overlay traffic when a relay path is needed." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Overlayrelay
+  }
+
+  rectangle "Host management boundary" <<Group-SG9zdCBtYW5hZ2VtZW50IGJvdW5kYXJ5>> as group2 {
+    rectangle "==Agent host worker\n<size:16>[Container: Host service]</size>\n\nControls launch lifecycle as a dedicated user; stays outside every launch data path." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Agenthostworker
+    rectangle "==Privileged helper\n<size:16>[Container: Host privilege boundary]</size>\n\nPerforms narrowly authorized setup and launch operations; caller binding is undecided." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Privilegedhelper
+  }
+
+}
+
+afakt.Agenthub --> afakt.Overlaycoordination <<Relationship-UmVsYXRpb25zaGlw>> : "Obtains overlay coordination through afakt interface\n<size:16>[Overlay control]</size>"
+afakt.Agenthub --> afakt.Overlayrelay <<Relationship-UmVsYXRpb25zaGlw>> : "Uses encrypted relay transport when needed\n<size:16>[Overlay transport]</size>"
+afakt.Agenthostworker --> afakt.Privilegedhelper <<Relationship-UmVsYXRpb25zaGlw>> : "Requests authorized setup and launch operations\n<size:16>[Authenticated local control]</size>"
+afakt.APIserverandwebdashboard --> afakt.Agenthub <<Relationship-UmVsYXRpb25zaGlw>> : "Uses agent streams; endpoint ownership undecided\n<size:16>[Authenticated service connection]</size>"
+afakt.MCPgateway --> afakt.APIserverandwebdashboard <<Relationship-UmVsYXRpb25zaGlw>> : "Calls permitted operations with launch context\n<size:16>[Authenticated service connection]</size>"
+
+@enduml

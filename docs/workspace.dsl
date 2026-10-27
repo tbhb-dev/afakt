@@ -23,6 +23,45 @@ workspace "afakt" "Architecture of the afakt modular monolith." {
                 runner = component "Agent runner" "Runs AI coding agents as a workflow." "Temporal"
                 temporalUI = component "Temporal Web UI" "Shows the embedded server's namespaces, workflows, and histories." "Temporal"
             }
+
+            group "Control plane services" {
+                hub = container "Agent hub" "Joins per-launch connections carrying sessions, remote control, ports and previews." "Application service" "Topology"
+                controlApi = container "API server and web dashboard" "Authorizes operations and serves the dashboard from its own origin." "Application service" "Topology"
+                previewServer = container "Preview server" "Serves previews as a client of authorized published ports through the agent hub." "Application service" "Topology"
+                mcpGateway = container "MCP gateway" "Checks launch tool grants and keeps upstream credentials outside guests." "Application service" "Topology"
+                coordination = container "Overlay coordination" "An afakt interface fronts isolated Headscale coordination; cluster nodes retain a static map of stable nodes." "Headscale" "Topology"
+                overlayRelay = container "Overlay relay" "Carries encrypted overlay traffic when a relay path is needed." "Overlay transport" "Topology"
+            }
+            group "External ingress boundary" {
+                edge = container "External ingress gateway" "Accepts public and attached-tailnet application requests; never routes packets between tailnets and the cluster." "Application proxy" "Topology"
+            }
+            group "Host management boundary" {
+                hostWorker = container "Agent host worker" "Controls launch lifecycle as a dedicated user; stays outside every launch data path." "Host service" "Topology"
+                helper = container "Privileged helper" "Performs narrowly authorized setup and launch operations; caller binding is undecided." "Host privilege boundary" "Topology"
+                hostResolver = container "Host name resolver" "Resolves names under *.afakt.internal for host clients." "Domain Name System" "Topology"
+            }
+            group "Operator access on the agent host" {
+                loopbackProxy = container "Host access boundary" "Host-level authorization for services, previews and ports; local caller and connection mechanisms undecided." "Access mechanism undecided" "Topology"
+                hostNetwork = container "Host-level connectivity" "Host authorization for agent and cluster services; connection mechanism undecided; optional user tailnet attachment." "Host access role" "Topology"
+            }
+            group "Launch guest boundary" {
+                guest = container "Guest workload" "Untrusted harness, relay and loopback listeners; no overlay membership or workload keys." "Provider confinement" "Topology"
+            }
+            group "Launch mediation boundary" {
+                mediator = container "Agent mediator" "Enforces this launch's policy and stamps identity; has no network access of its own." "Local policy enforcement" "Topology"
+            }
+            group "Launch agent proxy boundary" {
+                agent-proxy = container "Agent proxy" "Own overlay node, hub connection and launch X.509-SVID; only launch component opening connections off the host." "Tailscale tsnet" "Topology"
+            }
+            group "Destination launch guest boundary" {
+                destinationGuest = container "Destination guest" "Untrusted workload and published loopback listener; no overlay membership or workload keys." "Provider confinement" "Topology"
+            }
+            group "Destination launch mediation boundary" {
+                destinationMediator = container "Destination mediator" "Checks the source grant and current destination launch before listener access; no independent network." "Local policy enforcement" "Topology"
+            }
+            group "Destination launch network boundary" {
+                destination-agent-proxy = container "Destination agent proxy" "Independent overlay node, hub connection and destination launch X.509-SVID." "Tailscale tsnet" "Topology"
+            }
         }
 
         developer -> cli "Runs commands" "CLI"
@@ -45,6 +84,204 @@ workspace "afakt" "Architecture of the afakt modular monolith." {
         workflows -> runner "Starts agent work" "Temporal"
         runner -> agents "Runs coding agents" "Process"
         temporalUI -> orchestrator "Reads namespaces and workflow histories" "Temporal"
+
+        // Existing implied relationships precede this point and remain unchanged.
+        !impliedRelationships false
+        group "Operator devices" {
+            browser = softwareSystem "Operator browser" "A browser under the operator's local user identity." "Topology"
+            phone = softwareSystem "Phone and native clients" "Operator devices using their attached user tailnet and afakt sign-in." "Topology"
+        }
+        group "User network boundary" {
+            userTailnet = softwareSystem "Attached user tailnet" "User-controlled private connectivity; separate from the cluster overlay." "Topology"
+        }
+        group "External service boundary" {
+            internet = softwareSystem "Internet services" "Permitted upstream destinations outside the cluster trust domain." "Topology"
+        }
+
+        browser -> hostResolver "Resolves *.afakt.internal" "Local name query" "TopologyConnection,OverviewHidden"
+        browser -> loopbackProxy "Requests service, preview or port" "Host access mechanism undecided" "TopologyConnection,OverviewHidden"
+        loopbackProxy -> hostNetwork "Uses host-level authorization" "Connection mechanism undecided" "TopologyConnection,OverviewHidden"
+        hostNetwork -> previewServer "Requests preview as host identity" "Workload mutual TLS over overlay" "TopologyConnection,OverviewHidden"
+        hostNetwork -> hub "Requests authorized port or service as host identity" "Workload mutual TLS over overlay" "TopologyConnection,OverviewHidden"
+        hostWorker -> helper "Requests authorized setup and launch operations" "Authenticated local control" "TopologyConnection"
+        hostWorker -> hostResolver "Requires host name resolution" "Local control" "TopologyConnection,OverviewHidden"
+        hostWorker -> mediator "Starts and manages launch; no data forwarding" "Local lifecycle control" "LifecycleDetail,TopologyConnection,OverviewHidden"
+        hostWorker -> destinationMediator "Starts and manages destination launch; no data forwarding" "Local lifecycle control" "LifecycleDetail,TopologyConnection,OverviewHidden"
+        hostWorker -> hostNetwork "Sends host management requests" "Local channel" "TopologyConnection"
+        hostNetwork -> controlApi "Registers host and reports capacity as host identity" "Workload mutual TLS over overlay" "TopologyConnection"
+        phone -> userTailnet "Connects with device identity" "User tailnet" "TopologyConnection,OverviewHidden"
+        userTailnet -> edge "Delivers application requests" "Transport Layer Security" "ClusterAttachment,OverviewHidden"
+        userTailnet -> hostNetwork "Optional host attachment; application access only" "User tailnet" "ClusterAttachment,OverviewHidden"
+        browser -> edge "Sends public application requests as signed-in user" "Transport Layer Security" "TopologyConnection,OverviewHidden"
+        edge -> controlApi "Forwards authenticated dashboard and API requests" "Application protocol over overlay" "TopologyConnection,OverviewHidden"
+        edge -> previewServer "Forwards preview requests with user context" "Application protocol over overlay" "TopologyConnection,OverviewHidden"
+        controlApi -> hub "Uses agent streams; endpoint ownership undecided" "Authenticated service connection" "TopologyConnection,ReturnDetail"
+        mcpGateway -> controlApi "Calls permitted operations with launch context" "Authenticated service connection" "TopologyConnection"
+        guest -> mediator "Sends traffic bound to this launch" "Local provider carrier" "TopologyConnection,OverviewHidden"
+        mediator -> agent-proxy "Sends policy-permitted traffic and stamped launch identity" "Local channel" "TopologyConnection,OverviewHidden"
+        agent-proxy -> hub "Opens own multiplexed connection with launch X.509-SVID" "Workload mutual TLS over overlay" "TopologyConnection,OverviewHidden"
+        agent-proxy -> controlApi "Calls authorized operations with launch X.509-SVID" "Workload mutual TLS over overlay" "TopologyConnection,OverviewHidden"
+        agent-proxy -> mcpGateway "Calls allowed tools with launch X.509-SVID" "Workload mutual TLS over overlay" "TopologyConnection,OverviewHidden"
+        agent-proxy -> internet "Opens permitted egress; inspection where required" "Destination protocol" "TopologyConnection,OverviewHidden"
+        previewServer -> hub "Opens authorized published port as preview service" "Authenticated service connection" "TopologyConnection,OverviewHidden"
+        hub -> agent-proxy "Returns authorized stream over launch's existing connection" "Workload mutual TLS over overlay" "TopologyConnection,ReturnDetail,OverviewHidden"
+        agent-proxy -> mediator "Delivers stream with authenticated caller and target launch" "Local channel" "TopologyConnection,ReturnDetail,OverviewHidden"
+        mediator -> guest "Connects permitted stream to current guest listener" "Local provider carrier" "TopologyConnection,ReturnDetail,OverviewHidden"
+        destination-agent-proxy -> hub "Opens independent connection with destination launch X.509-SVID" "Workload mutual TLS over overlay" "TopologyConnection,OverviewHidden"
+        destinationGuest -> destinationMediator "Requests access bound to destination launch" "Local provider carrier" "TopologyConnection,OverviewHidden"
+        destinationMediator -> destination-agent-proxy "Sends policy-permitted destination traffic" "Local channel" "TopologyConnection,OverviewHidden"
+        destination-agent-proxy -> destinationMediator "Delivers stream with source identity and target grant" "Local channel" "TopologyConnection,ReturnDetail,OverviewHidden"
+        destinationMediator -> destinationGuest "Connects grant-permitted stream to bound listener" "Local provider carrier" "TopologyConnection,ReturnDetail,OverviewHidden"
+        agent-proxy -> destination-agent-proxy "Logical grant-bound stream; direct overlay or agent hub undecided" "Transport undecided" "TopologyConnection,OverviewHidden,Undecided"
+        agent-proxy -> coordination "Obtains overlay coordination through afakt interface" "Overlay control" "TopologyConnection,OverviewHidden"
+        hostNetwork -> coordination "Obtains overlay coordination through afakt interface" "Overlay control" "TopologyConnection,OverviewHidden"
+        hub -> coordination "Obtains overlay coordination through afakt interface" "Overlay control" "TopologyConnection"
+        agent-proxy -> overlayRelay "Uses encrypted relay transport when needed" "Overlay transport" "TopologyConnection,OverviewHidden"
+        hub -> overlayRelay "Uses encrypted relay transport when needed" "Overlay transport" "TopologyConnection"
+
+        deploymentEnvironment "Topology context" {
+            deploymentNode "Operator device boundary" "Operator-controlled clients." "Client devices" {
+                contextClients = infrastructureNode "Browser, phone, tablet and native apps" "Operator and device identities." "Application clients"
+            }
+            deploymentNode "User tailnet boundary" "User-owned network; no cluster routing." "User network" {
+                contextTailnet = infrastructureNode "Attached user tailnets" "Private application access to attached gateways." "Tailscale"
+            }
+            deploymentNode "Cluster trust domain" "Control plane and agent hosts share authenticated overlay reachability." "Private cluster" {
+                deploymentNode "External ingress boundary" "Application entry only." "Gateway node" {
+                    contextIngress = infrastructureNode "External ingress gateway" "Public and user-tailnet application traffic; no packet routing." "Application proxy"
+                }
+                contextCluster = infrastructureNode "Control plane and agent hosts" "Per-service, per-host and per-launch nodes; guests have no overlay membership." "Isolated Headscale overlay"
+            }
+            deploymentNode "Internet boundary" "Upstream destinations outside cluster trust." "External network" {
+                contextInternet = infrastructureNode "Internet services" "Only permitted egress leaves an agent host." "Destination services"
+            }
+            contextClients -> contextTailnet "Device identity" "User tailnet"
+            contextClients -> contextIngress "Signed-in user" "Public application request"
+            contextTailnet -> contextIngress "User context; no packet routing" "Private application request"
+            contextIngress -> contextCluster "Authenticated application request" "Cluster overlay"
+            contextCluster -> contextInternet "Permitted destination request" "Agent proxy egress"
+        }
+        deploymentEnvironment "Topology cluster" {
+            deploymentNode "User tailnet boundary" "Separate user network." "User tailnet" {
+                clusterTailnet = softwareSystemInstance userTailnet
+            }
+            deploymentNode "External ingress boundary" "User-tailnet attachments do not route cluster packets." "Gateway node" {
+                clusterEdge = containerInstance edge
+            }
+            deploymentNode "Cluster overlay boundary" "Tailscale tsnet nodes use isolated Headscale; every node retains a static stable-node map." "Private overlay" {
+                clusterOverlay = infrastructureNode "Private overlay reachability" "Each cluster node retains a static map of stable nodes. Launch access is limited to the hub and permitted service groups." "Tailscale tsnet"
+                deploymentNode "Control plane boundary" "One overlay node for each service." "Control plane" {
+                    deploymentNode "Agent hub node" "Independent service identity." "tsnet node" {
+                        cluster_hub = containerInstance hub
+                    }
+                    deploymentNode "API service node" "Independent service identity; dashboard shares its origin." "tsnet node" {
+                        cluster_controlApi = containerInstance controlApi
+                    }
+                    deploymentNode "Preview service node" "Independent service identity." "tsnet node" {
+                        cluster_previewServer = containerInstance previewServer
+                    }
+                    deploymentNode "MCP service node" "Independent service identity." "tsnet node" {
+                        cluster_mcpGateway = containerInstance mcpGateway
+                    }
+                    deploymentNode "Coordination node" "Isolated Headscale behind an afakt interface; instance count undecided." "Coordination service" {
+                        cluster_coordination = containerInstance coordination
+                    }
+                    deploymentNode "Relay node" "Encrypted overlay transport." "Relay service" {
+                        cluster_overlayRelay = containerInstance overlayRelay
+                    }
+                }
+                deploymentNode "Agent host boundary" "Host management is separate from launch traffic." "Agent host" {
+                    deploymentNode "Host node" "Host identity; optional user-tailnet attachment." "tsnet node" {
+                        cluster_hostNetwork = containerInstance hostNetwork
+                    }
+                    deploymentNode "Agent launch boundary" "Independent mediator, agent proxy and guest; no shared launch data path." "Launch isolation" {
+                        cluster_agent-proxy = containerInstance agent-proxy
+                    }
+                }
+                deploymentNode "Another agent host boundary" "Independent host and launch identities." "Agent host" {
+                    deploymentNode "Another host node" "Independent host identity; optional attached user tailnet." "tsnet node" {
+                        cluster_otherHost = containerInstance hostNetwork
+                    }
+                    deploymentNode "Another launch boundary" "Independent launch connection." "Launch isolation" {
+                        cluster_destination-agent-proxy = containerInstance destination-agent-proxy
+                    }
+                }
+            }
+            clusterEdge -> clusterOverlay "Authenticated app requests" "Overlay access"
+            cluster_controlApi -> clusterOverlay "Service identity" "Overlay membership"
+            cluster_previewServer -> clusterOverlay "Service identity" "Overlay membership"
+            cluster_mcpGateway -> clusterOverlay "Service identity" "Overlay membership"
+            cluster_hub -> clusterOverlay "Service identity" "Overlay membership"
+            cluster_coordination -> clusterOverlay "Node coordination" "afakt interface"
+            cluster_overlayRelay -> clusterOverlay "Encrypted transport" "Relay path"
+            cluster_hostNetwork -> clusterOverlay "Host identity" "Overlay membership"
+            cluster_otherHost -> clusterOverlay "Host identity" "Overlay membership"
+            cluster_agent-proxy -> clusterOverlay "Launch identity" "Coarse service access"
+            cluster_destination-agent-proxy -> clusterOverlay "Destination launch identity" "Coarse service access"
+        }
+        deploymentEnvironment "Topology host" {
+            deploymentNode "Agent host trust boundary" "Privileged host control remains outside every guest." "Agent host" {
+                deploymentNode "Dedicated worker user" "Separate from the host-mode agent user." "User boundary" {
+                    containerInstance hostWorker
+                }
+                deploymentNode "Privileged setup boundary" "Helper authority and caller binding remain undecided." "Privilege boundary" {
+                    containerInstance helper
+                }
+                containerInstance hostResolver
+                deploymentNode "Operator access boundary" "Host access requires authorization; name resolution grants none." "Host service" {
+                    containerInstance loopbackProxy
+                    containerInstance hostNetwork
+                }
+                deploymentNode "Agent launch A" "Independent data path; mediation and network users undecided." "Launch boundary" {
+                    deploymentNode "Guest A" "Host mode uses the dedicated agent user, separate from the worker." "Dedicated agent user in host mode" {
+                        containerInstance guest
+                    }
+                    deploymentNode "Mediator A" "Policy boundary; no independent network." "Local confinement; user undecided" {
+                        containerInstance mediator
+                    }
+                    deploymentNode "Agent proxy A" "Own node, hub connection and launch X.509-SVID." "tsnet node; user undecided" {
+                        containerInstance agent-proxy
+                    }
+                }
+                deploymentNode "Agent launch B" "Independent data path; same-host traffic uses the overlay." "Launch boundary" {
+                    deploymentNode "Guest B" "Host mode uses the dedicated agent user, separate from the worker." "Dedicated agent user in host mode" {
+                        containerInstance destinationGuest
+                    }
+                    deploymentNode "Mediator B" "Policy boundary; no independent network." "Local confinement; user undecided" {
+                        containerInstance destinationMediator
+                    }
+                    deploymentNode "Agent proxy B" "Own node, hub connection and launch X.509-SVID." "tsnet node; user undecided" {
+                        containerInstance destination-agent-proxy
+                    }
+                }
+            }
+        }
+        deploymentEnvironment "Topology launch" {
+            deploymentNode "Agent host trust boundary" "Worker stays outside this data path; service users undecided." "Agent host" {
+                deploymentNode "Agent launch boundary" "Launch-bound local carriers; private keys stay outside the guest." "Launch isolation" {
+                    deploymentNode "Guest trust boundary" "Guest has no overlay node or workload key." "Provider confinement" {
+                        containerInstance guest
+                    }
+                    deploymentNode "Mediation trust boundary" "Enforces connection and message policy; no independent network." "Local confinement; user undecided" {
+                        containerInstance mediator
+                    }
+                    deploymentNode "Agent proxy trust boundary" "Only launch component opening off-host connections." "tsnet node; user undecided" {
+                        containerInstance agent-proxy
+                    }
+                }
+            }
+            deploymentNode "Control plane trust boundary" "Service identities authenticate workload connections." "Cluster overlay" {
+                deploymentNode "Agent hub node" "One multiplexed connection per launch." "tsnet node" {
+                    containerInstance hub
+                }
+                deploymentNode "API service node" "Checks live launch capabilities and scopes." "tsnet node" {
+                    containerInstance controlApi
+                }
+            }
+            deploymentNode "Internet boundary" "Destination authentication differs from workload identity." "External services" {
+                softwareSystemInstance internet
+            }
+        }
     }
 
     views {
@@ -53,15 +290,102 @@ workspace "afakt" "Architecture of the afakt modular monolith." {
         }
         systemContext afakt "afakt-context" "afakt and the people and systems it interacts with." {
             include *
+            exclude "element.tag==Topology"
             autoLayout lr
         }
         container afakt "afakt-containers" "The afakt process and its external dependencies." {
             include *
+            exclude "element.tag==Topology"
             autoLayout lr
         }
         component runtime "afakt-components" "The roles inside the combined afakt process." {
             include *
+            exclude "element.tag==Topology"
             autoLayout lr
+        }
+
+        deployment * "Topology context" "network-context" "Operator devices, attached tailnets, cluster and internet trust boundaries." {
+            include *
+            autoLayout lr
+        }
+        deployment * "Topology cluster" "network-cluster" "Service nodes and independent launch nodes on the private overlay." {
+            include *
+            exclude "relationship.tag==TopologyConnection"
+            autoLayout lr
+        }
+        deployment * "Topology host" "network-host" "Host management, operator access and independent launch trust boundaries." {
+            include *
+            exclude "relationship.tag==LifecycleDetail"
+            exclude "relationship.tag==ReturnDetail"
+            exclude "relationship.tag==Undecided"
+            autoLayout tb
+        }
+        deployment * "Topology launch" "network-launch" "One launch crosses guest, mediation, network and service boundaries." {
+            include *
+            exclude "relationship.tag==ReturnDetail"
+            autoLayout lr
+        }
+        dynamic afakt "network-flow-internet" "Guest egress through its mediator and agent proxy." {
+            guest -> mediator "Launch-bound request; no guest workload key"
+            mediator -> agent-proxy "Policy-permitted destination; inspection required for credentialed traffic"
+            agent-proxy -> internet "Permitted request; destination credentials when authorized"
+            autoLayout lr
+        }
+        dynamic afakt "network-flow-control" "Guest request to the control plane API service." {
+            guest -> mediator "Request bound to current launch"
+            mediator -> agent-proxy "Policy permit and stamped launch identity"
+            agent-proxy -> controlApi "Launch X.509-SVID; service checks capabilities and scopes"
+            autoLayout lr
+        }
+        dynamic afakt "network-flow-preview" "Operator browser reaches a preview through the host node." {
+            browser -> hostResolver "Resolve internal preview name"
+            browser -> loopbackProxy "Host access request; mechanism undecided"
+            loopbackProxy -> hostNetwork "Request under host-level authorization"
+            hostNetwork -> previewServer "Host workload identity; served app may require its own sign-in"
+            previewServer -> hub "Preview service identity; authorized published port"
+            hub -> agent-proxy "Target launch X.509-SVID on existing outbound connection"
+            agent-proxy -> mediator "Authenticated caller and current publication"
+            mediator -> guest "Permitted stream to bound guest listener"
+            autoLayout tb
+        }
+        dynamic afakt "network-flow-phone" "Phone reaches the dashboard through an attached user tailnet." {
+            phone -> userTailnet "Device identity in user-owned network"
+            userTailnet -> edge "Private application request; afakt sign-in"
+            edge -> controlApi "Authenticated user context to web dashboard; no packet routing"
+            autoLayout lr
+        }
+        dynamic afakt "network-flow-grant" "Logical grant flow; direct overlay versus agent hub transport is undecided." {
+            guest -> mediator "Source launch requests published destination"
+            mediator -> agent-proxy "Source policy permits destination name and port"
+            agent-proxy -> destination-agent-proxy "Source and destination workload identities; route undecided"
+            destination-agent-proxy -> destinationMediator "Authenticated source launch and destination grant"
+            destinationMediator -> destinationGuest "Check current publication and grant before listener access"
+            autoLayout tb
+        }
+        container afakt "network-service-boundaries" "Service roles supporting the deployment topology; connections are control or transport dependencies." {
+            include hostWorker helper hub controlApi mcpGateway coordination overlayRelay
+            exclude "relationship.tag==OverviewHidden"
+            autoLayout tb
+        }
+        styles {
+            element "Topology" {
+                background #e8f1fa
+                color #122b44
+                stroke #315b7d
+            }
+            element "Deployment Node" {
+                background #f5f7fa
+                color #182c3e
+                stroke #536b7e
+            }
+            element "Group" {
+                color #182c3e
+                stroke #536b7e
+            }
+            relationship "Undecided" {
+                color #8a5a00
+                style dashed
+            }
         }
     }
 

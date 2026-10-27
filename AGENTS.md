@@ -69,6 +69,7 @@ Read `mise.toml` before trusting it. In each fresh worktree, run `mise trust`, t
 | `mise run check-workspace` | Check workspace JSON freshness |
 | `mise run export-diagrams` | Render workspace views as images |
 | `mise run check-diagrams` | Check diagram sources and rendering hashes |
+| `mise run serve-structurizr` | Serve the workspace in Structurizr's local web UI |
 | `mise run vuln` | Scan reachable Go vulnerabilities |
 | `mise run devtools:gomodscan` | Scan module dependencies |
 | `mise run vendor` | Tidy `go.mod` and refresh `vendor/` |

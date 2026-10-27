@@ -4,28 +4,30 @@ title: Command-line reference
 description: Commands grouped by noun, with agent and deployment resource boundaries.
 tags: [afakt, cli, agents, reference]
 status: draft
-generated: { by: "codex", at: "2026-10-27T00:00:00Z" }
+generated: { by: "codex:gpt-6-astra", at: "2026-10-27T00:00:00Z" }
 ---
 
 # Command-line reference
 
-The `afakt` command manages durable [agents](agent.md), their work, and deployment services. Angle brackets mark a required choice or value, and square brackets mark optional arguments.
+The `afakt` command-line interface (CLI) manages durable [agents](agent.md), their work, and deployment services. Angle brackets mark a required choice or value, and square brackets mark optional arguments.
 
 ## Resource boundaries
 
-`afakt agent mcp` manages MCP servers attached to one agent. Use `afakt mcp-gateway` to configure the deployment's servers. Profile server and tool rules still apply. Whether an agent may attach a server outside deployment configuration remains [open](agent-open-questions.md#agents).
+`afakt agent mcp` manages Model Context Protocol (MCP) servers attached to one agent. Use `afakt mcp-gateway` to configure the deployment's servers. Profile server and tool rules still apply. Whether an agent may attach a server outside deployment configuration remains [open](agent-open-questions.md#Agents).
 
-To view the agent's sandbox configuration, use `afakt agent sandbox`. `afakt sandbox` manages configurations and standalone sandboxes, including sandboxes that run commands without an agent conversation. See [Sandboxes](agent.md#sandboxes).
+To view the agent sandbox configuration, use `afakt agent sandbox`. `afakt sandbox` manages configurations and standalone sandboxes, including sandboxes that run commands without an agent conversation. See [Sandboxes](agent.md#Sandboxes).
 
-Manage revisions of one agent's workspace with `afakt agent workspace`. `afakt workspace` manages reusable workspace images and definitions. The workspace registry stores their content and references. See [Workspace revisions and the workspace registry](agent.md#workspace-revisions-and-the-workspace-registry).
+Manage revisions of one agent workspace with `afakt agent workspace`. `afakt workspace` manages reusable workspace images and definitions. The workspace registry stores their content and references. See [Workspace revisions and the workspace registry](agent.md#Workspace%20revisions%20and%20the%20workspace%20registry).
 
 ## Configuration and indexing
 
 Client and deployment settings don't override an agent profile's authority bounds. Configuration holds these settings. The explain operation identifies a setting's effective value and source. Use paths to list configuration sources and lint to check their validity.
 
-An index organizes registered content for retrieval by agents. `afakt index add` registers content for indexing. Its storage, source types, and query interface remain [open](agent-open-questions.md#command-line-reference).
+An index organizes registered content for retrieval by agents. `afakt index add` registers content for indexing. Its storage, source types, and query interface remain [open](agent-open-questions.md#Command-line%20reference).
 
 ## Agent operations
+
+Authority to run `afakt agent exec` or `afakt agent shell` outside the agent sandbox remains [`OQ-AGT-26`](agent-open-questions.md#%60OQ-AGT-26%60).
 
 See [Agents](agent.md).
 
@@ -33,24 +35,24 @@ See [Agents](agent.md).
 | --- | --- |
 | `afakt agent` | Manage durable agents and their work history. |
 | `afakt agent annotate` | Update an agent's annotations. |
-| `afakt agent archive` | Snapshot a stopped agent and move snapshot to archive. |
+| `afakt agent archive` | Take an agent snapshot of a stopped agent and move it to archive storage. |
 | `afakt agent attach` | Attach interactively to an agent in the terminal. |
 | `afakt agent budget` | Set or update an agent's usage budget. |
 | `afakt agent clear` | Clear an agent's session. |
 | `afakt agent compact` | Compact the selected agent's session. |
-| `afakt agent copy` | Copy files to or from an agent's workspace. |
-| `afakt agent create` | Create an agent without starting the harness. |
+| `afakt agent copy` | Copy files to or from an agent workspace. |
+| `afakt agent create` | Create an agent without starting the agent harness. |
 | `afakt agent debug` | Fetch or follow an agent's debug logs. |
 | `afakt agent delete` | Permanently delete a stopped agent (can't be undone). |
 | `afakt agent diff` | Inspect changes to an agent's workspace. |
 | `afakt agent env` | List an agent's environment variables. |
 | `afakt agent events` | List or follow an agent's events. |
-| `afakt agent exec` | Run a sandboxed or unsandboxed command in an agent's workspace. |
+| `afakt agent exec` | Run a sandboxed command in an agent's workspace. |
 | `afakt agent export` | Export an agent and its workspace as an Open Container Initiative (OCI) artifact. |
 | `afakt agent history` | Fetch or follow an agent's current and historical transcripts. |
 | `afakt agent import` | Create an agent from an Open Container Initiative (OCI) artifact. |
 | `afakt agent info` | View a summary or detailed information about an agent. |
-| `afakt agent kill` | Stop the sandbox VM through the agent host supervisor. |
+| `afakt agent kill` | Stop the agent sandbox through its provider under [Cancellation and limits](agent-sandbox-lifecycle.md#Cancellation%20and%20limits). |
 | `afakt agent label` | Update an agent's labels. |
 | `afakt agent limits` | View details about an agent's resource and usage limits. |
 | `afakt agent list` | List agents. |
@@ -60,29 +62,29 @@ See [Agents](agent.md).
 | `afakt agent quarantine` | Remove network access from an agent. |
 | `afakt agent queue-message` | Send a user message to an agent after its current turn. |
 | `afakt agent rename` | Rename an agent. |
-| `afakt agent restart` | Restart an agent's workspace and harness. |
-| `afakt agent restore` | Start an agent from a snapshot. |
+| `afakt agent restart` | Restart the workspace and agent harness through a new agent launch linked to its predecessor. |
+| `afakt agent restore` | Start an agent from an agent snapshot. |
 | `afakt agent result` | View an agent's final message. |
 | `afakt agent resume` | Start a suspended agent. |
 | `afakt agent run` | Start an agent, wait for its session to end, and output its final message. |
-| `afakt agent sandbox` | View details about an agent's sandbox configuration (use `afakt sandbox` for managing sandbox configuration). |
-| `afakt agent shell` | Start a sandboxed or unsandboxed shell in an agent's workspace. |
+| `afakt agent sandbox` | View details about its agent sandbox configuration (use `afakt sandbox` for managing sandbox configuration). |
+| `afakt agent shell` | Start a sandboxed shell in an agent's workspace. |
 | `afakt agent signal` | Send a process signal to an agent. |
-| `afakt agent start` | Create an agent and start the harness. |
+| `afakt agent start` | Create an agent and start the agent harness. |
 | `afakt agent stats` | View an agent's statistics. |
 | `afakt agent status` | View status information about an agent. |
 | `afakt agent steer` | Interrupt an agent's current turn with a user message. |
-| `afakt agent suspend` | Save a checkpoint at an idle turn boundary and stop the sandbox VM. |
+| `afakt agent suspend` | Take an agent snapshot and an agent checkpoint together at an idle turn boundary and stop the sandbox VM. |
 | `afakt agent top` | Start a real-time view of agent activity. |
 | `afakt agent unarchive` | Restore an archived agent. |
 | `afakt agent unquarantine` | Restore network connectivity to an agent. |
-| `afakt agent update` | Update an agent's attributes, may require restarting the harness. |
+| `afakt agent update` | Update an agent's attributes. Changes to its agent spec replace its agent launch at a turn boundary. |
 | `afakt agent usage` | View cost, token, and subscription usage. |
 | `afakt agent wait` | Wait for an agent's session to end. |
 
 ## Agent artifact
 
-See [Memory, skills, and artifacts](agent.md#memory-skills-and-artifacts).
+See [Memory, skills, and artifacts](agent.md#Memory,%20skills,%20and%20artifacts).
 
 | Command | Description |
 | --- | --- |
@@ -94,11 +96,11 @@ See [Memory, skills, and artifacts](agent.md#memory-skills-and-artifacts).
 
 ## Agent checkpoint
 
-See [Checkpoints](agent.md#checkpoints).
+See [Agent checkpoints](agent.md#Agent%20checkpoints).
 
 | Command | Description |
 | --- | --- |
-| `afakt agent checkpoint` | Manage checkpoints in an agent's current session. |
+| `afakt agent checkpoint` | Manage agent checkpoints of harness session state. |
 | `afakt agent checkpoint clear` | Delete all checkpoints in an agent's current session. |
 | `afakt agent checkpoint create` | Create a checkpoint in an agent's current session. |
 | `afakt agent checkpoint delete` | Delete a checkpoint from the current session. |
@@ -119,11 +121,11 @@ See [Agent session attachment](agent-session-attachment.md).
 
 ## Agent credential
 
-See [Secrets, credentials, and trust material](agent.md#secrets-credentials-and-trust-material).
+See [Secrets, credentials, and trust material](agent.md#Secrets,%20credentials,%20and%20trust%20material).
 
 | Command | Description |
 | --- | --- |
-| `afakt agent credential` | Manage credentials loaded into an agent broker. |
+| `afakt agent credential` | Manage credentials loaded into a credential broker. |
 | `afakt agent credential attach` | Load a credential into an agent's credential broker. |
 | `afakt agent credential clear` | Clear all credentials from an agent's credential broker. |
 | `afakt agent credential detach` | Detach a credential from an agent's credential broker. |
@@ -131,19 +133,19 @@ See [Secrets, credentials, and trust material](agent.md#secrets-credentials-and-
 
 ## Agent fork
 
-See [Forks](agent.md#forks).
+See [Forks](agent.md#Forks).
 
 | Command | Description |
 | --- | --- |
 | `afakt agent fork` | Copy an agent and inspect its forks. |
-| `afakt agent fork create` | Copy an agent without starting the harness. |
+| `afakt agent fork create` | Copy an agent without starting the agent harness. |
 | `afakt agent fork list` | List an agent's forks. |
-| `afakt agent fork run` | Copy an agent, start the harness, wait for its session to end, and output its final message. |
-| `afakt agent fork start` | Copy an agent and start the harness. |
+| `afakt agent fork run` | Copy an agent, start the agent harness, wait for its session to end, and output its final message. |
+| `afakt agent fork start` | Copy an agent and start the agent harness. |
 
 ## Agent group
 
-See [Agentmail, groups, and subscriptions](agent.md#agentmail-groups-and-subscriptions).
+See [Agentmail, groups, and subscriptions](agent.md#Agentmail,%20groups,%20and%20subscriptions).
 
 | Command | Description |
 | --- | --- |
@@ -176,7 +178,7 @@ See [Agent hooks](agent-hooks.md).
 
 ## Agent mail
 
-See [Agentmail, groups, and subscriptions](agent.md#agentmail-groups-and-subscriptions).
+See [Agentmail, groups, and subscriptions](agent.md#Agentmail,%20groups,%20and%20subscriptions).
 
 | Command | Description |
 | --- | --- |
@@ -214,7 +216,7 @@ See [Agent MCP gateway](agent-mcp-gateway.md).
 
 ## Agent memory
 
-See [Memory, skills, and artifacts](agent.md#memory-skills-and-artifacts).
+See [Memory, skills, and artifacts](agent.md#Memory,%20skills,%20and%20artifacts).
 
 | Command | Description |
 | --- | --- |
@@ -255,7 +257,7 @@ See [Agent session](agent-session.md).
 
 ## Agent skill
 
-See [Memory, skills, and artifacts](agent.md#memory-skills-and-artifacts).
+See [Memory, skills, and artifacts](agent.md#Memory,%20skills,%20and%20artifacts).
 
 | Command | Description |
 | --- | --- |
@@ -267,13 +269,13 @@ See [Memory, skills, and artifacts](agent.md#memory-skills-and-artifacts).
 
 ## Agent snapshot
 
-See [Snapshots and the snapshot registry](agent.md#snapshots-and-the-snapshot-registry).
+See [Agent snapshots and the snapshot registry](agent.md#Agent%20snapshots%20and%20the%20snapshot%20registry). Agent snapshots require an eligible virtual machine (VM) provider under [Suspend and resume](agent-sandbox-lifecycle.md#Suspend%20and%20resume). Host modes and container managers have none.
 
 | Command | Description |
 | --- | --- |
-| `afakt agent snapshot` | Manage archives of agent state in the snapshot registry. |
+| `afakt agent snapshot` | Manage agent snapshots in the snapshot registry. |
 | `afakt agent snapshot annotate` | Update an agent snapshot's annotations. |
-| `afakt agent snapshot create` | Create an archive of an agent's state and upload to the snapshot registry. |
+| `afakt agent snapshot create` | Capture the agent sandbox's VM state and upload the agent snapshot to the snapshot registry. |
 | `afakt agent snapshot delete` | Delete an agent snapshot. |
 | `afakt agent snapshot download` | Download an agent snapshot. |
 | `afakt agent snapshot info` | View a summary of an agent snapshot. |
@@ -285,7 +287,7 @@ See [Snapshots and the snapshot registry](agent.md#snapshots-and-the-snapshot-re
 
 ## Agent subscription
 
-See [Agentmail, groups, and subscriptions](agent.md#agentmail-groups-and-subscriptions).
+See [Agentmail, groups, and subscriptions](agent.md#Agentmail,%20groups,%20and%20subscriptions).
 
 | Command | Description |
 | --- | --- |
@@ -299,11 +301,11 @@ See [Agentmail, groups, and subscriptions](agent.md#agentmail-groups-and-subscri
 
 ## Agent workspace
 
-See [Workspace revisions and the workspace registry](agent.md#workspace-revisions-and-the-workspace-registry).
+See [Workspace revisions and the workspace registry](agent.md#Workspace%20revisions%20and%20the%20workspace%20registry).
 
 | Command | Description |
 | --- | --- |
-| `afakt agent workspace` | Git-like operations against an agent's workspace. |
+| `afakt agent workspace` | Git-like operations against an agent workspace. |
 | `afakt agent workspace commit` | Create a local revision of an agent's workspace. |
 | `afakt agent workspace info` | View details about an agent's workspace. |
 | `afakt agent workspace pull` | Fetch and apply another revision of an agent's workspace from the workspace registry. |
@@ -313,7 +315,7 @@ See [Workspace revisions and the workspace registry](agent.md#workspace-revision
 
 ## Artifact
 
-See [Memory, skills, and artifacts](agent.md#memory-skills-and-artifacts).
+See [Memory, skills, and artifacts](agent.md#Memory,%20skills,%20and%20artifacts).
 
 | Command | Description |
 | --- | --- |
@@ -331,7 +333,9 @@ See [Memory, skills, and artifacts](agent.md#memory-skills-and-artifacts).
 
 ## Certificate
 
-See [Secrets, credentials, and trust material](agent.md#secrets-credentials-and-trust-material).
+[Public key infrastructure](pki.md).
+
+See [Secrets, credentials, and trust material](agent.md#Secrets,%20credentials,%20and%20trust%20material).
 
 | Command | Description |
 | --- | --- |
@@ -343,7 +347,7 @@ See [Secrets, credentials, and trust material](agent.md#secrets-credentials-and-
 
 ## Configuration
 
-See [Configuration and indexing](#configuration-and-indexing).
+See [Configuration and indexing](#Configuration%20and%20indexing).
 
 | Command | Description |
 | --- | --- |
@@ -358,7 +362,7 @@ See [Configuration and indexing](#configuration-and-indexing).
 
 ## Credential
 
-See [Secrets, credentials, and trust material](agent.md#secrets-credentials-and-trust-material).
+See [Secrets, credentials, and trust material](agent.md#Secrets,%20credentials,%20and%20trust%20material).
 
 | Command | Description |
 | --- | --- |
@@ -397,11 +401,11 @@ See [Components](components.md).
 
 ## GPG key
 
-See [Secrets, credentials, and trust material](agent.md#secrets-credentials-and-trust-material).
+See [Secrets, credentials, and trust material](agent.md#Secrets,%20credentials,%20and%20trust%20material).
 
 | Command | Description |
 | --- | --- |
-| `afakt gpg-key` | Manage GNU Privacy Guard (GPG) signing and encryption keys. |
+| `afakt gpg-key` | Manage GNU (GNU's Not Unix) Privacy Guard (GPG) signing and encryption keys. |
 | `afakt gpg-key clear` | Delete all GPG keys. |
 | `afakt gpg-key generate` | Generate a GPG key and add it to the GPG key store. |
 | `afakt gpg-key import` | Import a GPG key. |
@@ -411,7 +415,7 @@ See [Secrets, credentials, and trust material](agent.md#secrets-credentials-and-
 
 ## Index
 
-See [Configuration and indexing](#configuration-and-indexing).
+See [Configuration and indexing](#Configuration%20and%20indexing).
 
 | Command | Description |
 | --- | --- |
@@ -435,7 +439,7 @@ See [Agent MCP gateway](agent-mcp-gateway.md).
 
 ## Organization
 
-See [Policies, roles, and organizational scope](agent.md#policies-roles-and-organizational-scope).
+See [Policies, roles, and organizational scope](agent.md#Policies,%20roles,%20and%20organizational%20scope).
 
 | Command | Description |
 | --- | --- |
@@ -447,7 +451,7 @@ See [Policies, roles, and organizational scope](agent.md#policies-roles-and-orga
 
 ## Policy
 
-See [Policies, roles, and organizational scope](agent.md#policies-roles-and-organizational-scope).
+See [Policies, roles, and organizational scope](agent.md#Policies,%20roles,%20and%20organizational%20scope).
 
 | Command | Description |
 | --- | --- |
@@ -461,7 +465,7 @@ See [Policies, roles, and organizational scope](agent.md#policies-roles-and-orga
 
 ## Policy proposal
 
-See [Policies, roles, and organizational scope](agent.md#policies-roles-and-organizational-scope).
+See [Policies, roles, and organizational scope](agent.md#Policies,%20roles,%20and%20organizational%20scope).
 
 | Command | Description |
 | --- | --- |
@@ -475,19 +479,21 @@ See [Policies, roles, and organizational scope](agent.md#policies-roles-and-orga
 
 ## Port
 
+The mapping between port publications, sandbox port commands, and share-link operations remains [`OQ-HUB-7`](agent-open-questions.md#%60OQ-HUB-7%60).
+
 See [Agent ports and previews](agent-ports.md).
 
 | Command | Description |
 | --- | --- |
 | `afakt port` | Manage port publications and authenticated client tunnels. |
-| `afakt port expose <port>` | Request Cedar authorization to publish a loopback listener from inside the agent VM through its guest relay and mediator. |
+| `afakt port expose <port>` | Ask the policy engine for permission to publish a loopback listener through the agent mediator and the provider’s control path. |
 | `afakt port forward` | Open an authenticated tunnel to a forwarded port. |
 | `afakt port list` | List accessible forwarded ports. |
 | `afakt port unforward` | Close a client port tunnel. |
 
 ## Project
 
-See [Policies, roles, and organizational scope](agent.md#policies-roles-and-organizational-scope).
+See [Policies, roles, and organizational scope](agent.md#Policies,%20roles,%20and%20organizational%20scope).
 
 | Command | Description |
 | --- | --- |
@@ -501,7 +507,7 @@ See [Policies, roles, and organizational scope](agent.md#policies-roles-and-orga
 
 ## Repository
 
-See [Workspace sources](agent-workspace.md#workspace-sources).
+See [Workspace sources](agent-workspace.md#Workspace%20sources).
 
 | Command | Description |
 | --- | --- |
@@ -513,7 +519,7 @@ See [Workspace sources](agent-workspace.md#workspace-sources).
 
 ## Request
 
-See [Policies, roles, and organizational scope](agent.md#policies-roles-and-organizational-scope).
+See [Policies, roles, and organizational scope](agent.md#Policies,%20roles,%20and%20organizational%20scope).
 
 | Command | Description |
 | --- | --- |
@@ -525,7 +531,7 @@ See [Policies, roles, and organizational scope](agent.md#policies-roles-and-orga
 
 ## Role
 
-See [Policies, roles, and organizational scope](agent.md#policies-roles-and-organizational-scope).
+See [Policies, roles, and organizational scope](agent.md#Policies,%20roles,%20and%20organizational%20scope).
 
 | Command | Description |
 | --- | --- |
@@ -553,7 +559,7 @@ See [Agent sandbox](agent-sandbox.md).
 
 | Command | Description |
 | --- | --- |
-| `afakt sandbox` | Manage sandbox configurations and standalone sandboxes. |
+| `afakt sandbox` | Manage configurations for agent sandboxes and standalone sandboxes. |
 | `afakt sandbox cap` | Manage sandbox capabilities. |
 | `afakt sandbox cap disable` | Disable a capability for a sandbox. |
 | `afakt sandbox cap enable` | Turn on a capability in the sandbox. |
@@ -604,12 +610,12 @@ See [Agent sandbox](agent-sandbox.md).
 | `afakt sandbox policy list` | List a sandbox's local and attached policies. |
 | `afakt sandbox policy save` | Save a sandbox-local policy as a global policy. |
 | `afakt sandbox port` | Manage forwarded sandbox ports. |
-| `afakt sandbox port close` | Close a port forwarded from the port proxy to the sandbox. |
-| `afakt sandbox port expose` | Forward a port from the port proxy to the sandbox. |
-| `afakt sandbox port list` | List ports that the port proxy forwards to the sandbox. |
+| `afakt sandbox port close` | Close a sandbox port publication under [Published ports](agent-ports.md#Port%20discovery%20and%20records). |
+| `afakt sandbox port expose` | Publish a sandbox port under [Published ports](agent-ports.md#Port%20discovery%20and%20records). |
+| `afakt sandbox port list` | List sandbox port publications under [Published ports](agent-ports.md#Port%20discovery%20and%20records). |
 | `afakt sandbox rename` | Rename a sandbox configuration. |
 | `afakt sandbox run` | Create a standalone sandbox configuration and execute a command in it. |
-| `afakt sandbox ssh-key` | Manage sandbox SSH key authorizations. |
+| `afakt sandbox ssh-key` | Manage sandbox Secure Shell (SSH) key authorizations. |
 | `afakt sandbox ssh-key authorize` | Allow a sandbox to use an SSH key. |
 | `afakt sandbox ssh-key list` | List SSH keys allowed for a sandbox. |
 | `afakt sandbox ssh-key revoke` | Disallow a sandbox from using an SSH key. |
@@ -618,7 +624,7 @@ See [Agent sandbox](agent-sandbox.md).
 
 ## Secret
 
-See [Secrets, credentials, and trust material](agent.md#secrets-credentials-and-trust-material).
+See [Secrets, credentials, and trust material](agent.md#Secrets,%20credentials,%20and%20trust%20material).
 
 | Command | Description |
 | --- | --- |
@@ -638,11 +644,11 @@ See [Architecture](architecture.md).
 
 | Command | Description |
 | --- | --- |
-| `afakt server [--target=<all\|api\|dashboard\|webhook\|worker>] [--temporal-mode=<embedded\|external>] [--temporal-address=<address>]` | Run selected API, dashboard, webhook, and worker services with embedded or external Temporal. |
+| `afakt server [--target=<all\|api\|dashboard\|webhook\|worker>] [--temporal-mode=<embedded\|external>] [--temporal-address=<address>]` | Run selected Application Programming Interface (API), dashboard, webhook, and worker services with embedded or external Temporal. |
 
 ## SSH host
 
-See [Secrets, credentials, and trust material](agent.md#secrets-credentials-and-trust-material).
+See [Secrets, credentials, and trust material](agent.md#Secrets,%20credentials,%20and%20trust%20material).
 
 | Command | Description |
 | --- | --- |
@@ -655,7 +661,7 @@ See [Secrets, credentials, and trust material](agent.md#secrets-credentials-and-
 
 ## SSH key
 
-See [Secrets, credentials, and trust material](agent.md#secrets-credentials-and-trust-material).
+See [Secrets, credentials, and trust material](agent.md#Secrets,%20credentials,%20and%20trust%20material).
 
 | Command | Description |
 | --- | --- |
@@ -667,7 +673,7 @@ See [Secrets, credentials, and trust material](agent.md#secrets-credentials-and-
 | `afakt ssh-key list` | List SSH keys. |
 | `afakt ssh-key remove` | Remove an SSH key. |
 
-## Workspace
+## Workspace images
 
 See [Agent workspace image](agent-workspace-image.md).
 

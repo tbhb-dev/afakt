@@ -1,0 +1,121 @@
+@startuml
+title <size:24>Dynamic View: afakt</size>\n<size:24>Guest request to the control plane API service.</size>
+
+set separator none
+left to right direction
+skinparam ranksep 20
+skinparam nodesep 5
+hide stereotype
+
+skinparam {
+  nodesep 80
+  ranksep 160
+}
+
+<style>
+  root {
+    BackgroundColor: #ffffff;
+    FontColor: #444444;
+  }
+  // Element,Topology
+  .Element-RWxlbWVudCxUb3BvbG9neQ== {
+    BackgroundColor: #e8f1fa;
+    LineColor: #315b7d;
+    LineStyle: 0;
+    LineThickness: 2;
+    FontColor: #122b44;
+    FontSize: 24;
+    HorizontalAlignment: center;
+    Shadowing: 0;
+    MaximumWidth: 450;
+  }
+  // Relationship
+  .Relationship-UmVsYXRpb25zaGlw {
+    LineThickness: 2;
+    LineStyle: 10-10;
+    LineColor: #444444;
+    FontColor: #444444;
+    FontSize: 24;
+    MaximumWidth: 200;
+  }
+  // afakt
+  .Boundary-YWZha3Q= {
+    BackgroundColor: #ffffff;
+    LineColor: #444444;
+    LineStyle: 0;
+    LineThickness: 2;
+    FontColor: #444444;
+    FontSize: 24;
+    HorizontalAlignment: center;
+    Shadowing: 0;
+  }
+  // Control plane services
+  .Group-Q29udHJvbCBwbGFuZSBzZXJ2aWNlcw== {
+    BackgroundColor: #ffffff;
+    LineColor: #536b7e;
+    LineStyle: 2-2;
+    LineThickness: 2;
+    FontColor: #182c3e;
+    FontSize: 24;
+    HorizontalAlignment: center;
+    Shadowing: 0;
+  }
+  // Launch agent proxy boundary
+  .Group-TGF1bmNoIGFnZW50IHByb3h5IGJvdW5kYXJ5 {
+    BackgroundColor: #ffffff;
+    LineColor: #536b7e;
+    LineStyle: 2-2;
+    LineThickness: 2;
+    FontColor: #182c3e;
+    FontSize: 24;
+    HorizontalAlignment: center;
+    Shadowing: 0;
+  }
+  // Launch guest boundary
+  .Group-TGF1bmNoIGd1ZXN0IGJvdW5kYXJ5 {
+    BackgroundColor: #ffffff;
+    LineColor: #536b7e;
+    LineStyle: 2-2;
+    LineThickness: 2;
+    FontColor: #182c3e;
+    FontSize: 24;
+    HorizontalAlignment: center;
+    Shadowing: 0;
+  }
+  // Launch mediation boundary
+  .Group-TGF1bmNoIG1lZGlhdGlvbiBib3VuZGFyeQ== {
+    BackgroundColor: #ffffff;
+    LineColor: #536b7e;
+    LineStyle: 2-2;
+    LineThickness: 2;
+    FontColor: #182c3e;
+    FontSize: 24;
+    HorizontalAlignment: center;
+    Shadowing: 0;
+  }
+</style>
+
+rectangle "afakt\n<size:16>[Software System]</size>" <<Boundary-YWZha3Q=>> {
+  rectangle "Control plane services" <<Group-Q29udHJvbCBwbGFuZSBzZXJ2aWNlcw==>> as group6 {
+    rectangle "==API server and web dashboard\n<size:16>[Container: Application service]</size>\n\nAuthorizes operations and serves the dashboard from its own origin." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.APIserverandwebdashboard
+  }
+
+  rectangle "Launch agent proxy boundary" <<Group-TGF1bmNoIGFnZW50IHByb3h5IGJvdW5kYXJ5>> as group7 {
+    rectangle "==Agent proxy\n<size:16>[Container: Tailscale tsnet]</size>\n\nOwn overlay node, hub connection and launch X.509-SVID; only launch component opening connections off the host." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Agentproxy
+  }
+
+  rectangle "Launch guest boundary" <<Group-TGF1bmNoIGd1ZXN0IGJvdW5kYXJ5>> as group8 {
+    rectangle "==Guest workload\n<size:16>[Container: Provider confinement]</size>\n\nUntrusted harness, relay and loopback listeners; no overlay membership or workload keys." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Guestworkload
+  }
+
+  rectangle "Launch mediation boundary" <<Group-TGF1bmNoIG1lZGlhdGlvbiBib3VuZGFyeQ==>> as group9 {
+    rectangle "==Agent mediator\n<size:16>[Container: Local policy enforcement]</size>\n\nEnforces this launch's policy and stamps identity; has no network access of its own." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Agentmediator
+  }
+
+}
+
+afakt.Guestworkload --> afakt.Agentmediator <<Relationship-UmVsYXRpb25zaGlw>> : "1: Request bound to current launch\n<size:16>[Local provider carrier]</size>"
+afakt.Agentmediator --> afakt.Agentproxy <<Relationship-UmVsYXRpb25zaGlw>> : "2: Policy permit and stamped launch identity\n<size:16>[Local channel]</size>"
+afakt.Agentproxy --> afakt.APIserverandwebdashboard <<Relationship-UmVsYXRpb25zaGlw>> : "3: Launch X.509-SVID; service checks capabilities and scopes\n<size:16>[Workload mutual TLS over overlay]</size>"
+
+@enduml

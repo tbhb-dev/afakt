@@ -1,0 +1,68 @@
+---
+type: Design
+title: "Agent sandbox provider for Linux host"
+description: Isolation, mediation, storage, and lifecycle for the linux-host agent sandbox provider.
+tags: [afakt, agents, sandbox]
+status: draft
+generated: { by: "codex:gpt-6-astra", at: "2026-10-27T00:00:00Z" }
+---
+
+# Agent sandbox provider for Linux host
+
+[Public key infrastructure](pki.md).
+
+## Platforms and privileges
+
+The linux-host provider runs the harness directly on Linux without a virtual machine (VM). A dedicated non-root user runs the agent host worker. Setup privileges and service lifetime remain under [`OQ-SBX-10`](agent-open-questions.md#%60OQ-SBX-10%60), [`OQ-SBX-11`](agent-open-questions.md#%60OQ-SBX-11%60). Supported platforms and distribution requirements remain under [`OQ-PRQ-7`](agent-open-questions.md#%60OQ-PRQ-7%60). Launch confinement uses unprivileged namespaces with a network tunnel device. Systems that can't enforce the selected configuration can't silently fall back to unrestricted host networking.
+
+## Isolation boundary
+
+The agent harness shares the Linux kernel with the agent host. A private network namespace and a tunnel device constrain external traffic. bubblewrap and Landlock both constrain filesystem access, with seccomp restricting system calls. Landlock doesn't replace the private network namespace. Namespace and mount construction must exclude host service sockets and inherited host-network descriptors. Complete handle and service coverage remains under [`OQ-SBX-54`](agent-open-questions.md#%60OQ-SBX-54%60), [`OQ-SBX-28`](agent-open-questions.md#%60OQ-SBX-28%60). The host isolation baseline and per-launch users remain on hold under [`OQ-SBX-18`](agent-open-questions.md#%60OQ-SBX-18%60).
+
+## Process placement and startup
+
+The agent host starts afakt-agent on Linux. afakt-agent starts afakt-sandbox, which establishes the network and filesystem confinement before the harness runs. Outside harness control, the tunnel endpoint sends packets to the agent mediator. Authority for endpoint construction, registration, and retirement remains under [`OQ-SBX-59`](agent-open-questions.md#%60OQ-SBX-59%60).
+
+Commands started by `afakt agent exec` use standalone afakt-sandbox without the runner. afakt-agent is absent. Command placement, inherited environment, launch binding, capture ordering, and descendant lifetime remain under [`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60). That choice also determines command transport. Authority for an unsandboxed command remains under [`OQ-AGT-26`](agent-open-questions.md#%60OQ-AGT-26%60).
+
+Local helper authentication and binding to the intended launch remain under [`OQ-SBX-27`](agent-open-questions.md#%60OQ-SBX-27%60). Provider-installed hook protection and repository project configuration remain on hold under [`OQ-HOOK-16`](agent-open-questions.md#%60OQ-HOOK-16%60) and [`OQ-HOOK-17`](agent-open-questions.md#%60OQ-HOOK-17%60).
+
+## Mediator connection and name resolution
+
+Each agent launch's agent mediator and agent proxy follow [Per-launch services](agent-proxy.md#Launch%20boundary) and the authenticated [hub connection](agent-proxy.md#Hub%20connection).
+
+The private network namespace has a loopback interface and a Network Tunnel (TUN) device. The agent mediator serves that device as the only external network path. bubblewrap mount restrictions and Landlock filesystem restrictions exclude host path sockets that could relay traffic around it. Domain Name System (DNS) queries go through the mediator. The harness can't select a host resolver or an extra external route merely by changing client configuration. Traffic confined to the launch’s own loopback doesn't traverse the tunnel. Applying mediator policy to those local flows remains unresolved under [`OQ-SBX-54`](agent-open-questions.md#%60OQ-SBX-54%60).
+
+[Workload identity](agent-host.md#Workload%20identity) keeps agent-proxy credentials outside this provider’s confinement. Kernel-attested local transport remains the leading option in [`OQ-SBX-13`](agent-open-questions.md#%60OQ-SBX-13%60). Current-launch binding and sender attribution remain unresolved under [`OQ-SES-6`](agent-open-questions.md#%60OQ-SES-6%60). Control capacity remains under [`OQ-SBX-14`](agent-open-questions.md#%60OQ-SBX-14%60), while mediator placement and confinement remain under [`OQ-SBX-12`](agent-open-questions.md#%60OQ-SBX-12%60), [`OQ-SBX-19`](agent-open-questions.md#%60OQ-SBX-19%60), [`OQ-SBX-20`](agent-open-questions.md#%60OQ-SBX-20%60), [`OQ-SBX-23`](agent-open-questions.md#%60OQ-SBX-23%60).
+
+Complete descriptor and address-family coverage, indirect host services, and attachment of workspace commands remain under [`OQ-SBX-54`](agent-open-questions.md#%60OQ-SBX-54%60), [`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60). Mediator loss cuts off external routing. Binding within the namespace still needs the listener policy in [`OQ-SBX-16`](agent-open-questions.md#%60OQ-SBX-16%60). A private namespace alone doesn't prohibit wildcard binds. Tunnel registration and reuse remain under [`OQ-SBX-59`](agent-open-questions.md#%60OQ-SBX-59%60). Upstream name policy remains under [`OQ-SBX-21`](agent-open-questions.md#%60OQ-SBX-21%60), [`OQ-SBX-22`](agent-open-questions.md#%60OQ-SBX-22%60), and [Egress gateway routing](agent-mediator.md#Egress%20gateway%20routing) governs host or site forwarding.
+
+## Workspace, scratch, and caches
+
+Host directory storage holds the agent workspace. The confined process mount view exposes it to the harness. Scratch remains a separate allocation, and shared named tool caches require explicit attachment to that view. Ownership, filesystem backing, and worker capture access remain under [`OQ-WSP-20`](agent-open-questions.md#%60OQ-WSP-20%60).
+
+Provider storage mappings and capture access remain under [`OQ-WSP-20`](agent-open-questions.md#%60OQ-WSP-20%60). [Sandbox variables](agent-sandbox.md#Sandbox%20variables) defines separate scratch and host-shared named tool caches. Cache authorization, provenance, confidentiality, capacity, and invalidation remain under [`OQ-WSP-19`](agent-open-questions.md#%60OQ-WSP-19%60). Host-side processing of hostile repository metadata needs the isolation in [`OQ-WSP-18`](agent-open-questions.md#%60OQ-WSP-18%60). Worker capture rights and native history path stability remain under [`OQ-WSP-15`](agent-open-questions.md#%60OQ-WSP-15%60) and [`OQ-WSP-16`](agent-open-questions.md#%60OQ-WSP-16%60).
+
+## Workspace image materialization
+
+[Agent workspace lifecycle](agent-workspace-lifecycle.md#Attachment%20and%20provider%20storage) connects materialization to capture and cleanup.
+
+[Agent host caches and startup](agent-workspace-image.md#Agent%20host%20caches%20and%20startup) governs verified extraction and independent writable materialization. Immutable image caches remain outside launch-writable storage. Agent workspace images contain directory trees. Their format is Open Container Initiative (OCI). Materialization creates an independent Linux directory tree, which the process mount view exposes to the harness. Native filesystem cloning or full copying and the mapping between worker and launch ownership remain under [`OQ-WSP-20`](agent-open-questions.md#%60OQ-WSP-20%60). Read-only mounts don't prevent connections to a visible host service socket. Materialization and socket exclusion have separate responsibilities.
+
+## Agent snapshots and agent checkpoints
+
+This provider has no agent snapshot: it doesn't capture a private guest kernel or process memory. A native harness checkpoint is distinct from workspace content. Checkpoint and workspace pairing remain unresolved. Resume at a changed workspace path, restore authorization, retention, and old authority remain under [`OQ-AGT-28`](agent-open-questions.md#%60OQ-AGT-28%60). [Agent checkpoints](agent.md#Agent%20checkpoints) supplies the shared checkpoint model. A checkpoint can't undo an external effect.
+
+## Cancellation and teardown
+
+[Cancellation and limits](agent-sandbox-lifecycle.md#Cancellation%20and%20limits) requires observed termination before a terminal state or slot release. A stop request or process-group exit alone doesn't prove every descendant has stopped.
+
+Independent termination, worker and helper failure, runtime restart, and recovery remain under [`OQ-SBX-57`](agent-open-questions.md#%60OQ-SBX-57%60). Reusing launch identities while descendants survive remains under [`OQ-SBX-29`](agent-open-questions.md#%60OQ-SBX-29%60). Standalone command termination and capture ordering remain under [`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60). A private process namespace can bound descendants, but the authority that owns and verifies the complete namespace lifetime remains unresolved. Harness or parent exit is insufficient. Tunnel retirement and stale registration cleanup remain under [`OQ-SBX-59`](agent-open-questions.md#%60OQ-SBX-59%60).
+
+## Host observations
+
+The agent host controls process lifecycle, workspace backing, retained captures, and the agent mediator. Host administrators can inspect or change these resources. This provider supplies no confidentiality against the agent host. Independent evidence of a compromised host remains under [`OQ-SBX-37`](agent-open-questions.md#%60OQ-SBX-37%60). Same-user process access and the broader host isolation baseline remain on hold under [`OQ-SBX-18`](agent-open-questions.md#%60OQ-SBX-18%60). [What telemetry never records](agent-observability.md#What%20telemetry%20never%20records) limits exported content. It doesn't prevent local host access. Command attribution remains under [`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60). Administrators can inspect the process tree despite private namespace membership. The agent host also controls the namespace and tunnel endpoint and can observe captured packet destinations.
+
+## Platform dependencies
+
+This provider relies on Linux user, network, mount, and process namespaces, tunnel devices, bubblewrap, Landlock, and seccomp. Required kernel support and device permissions remain under [`OQ-PRQ-7`](agent-open-questions.md#%60OQ-PRQ-7%60), [`OQ-SBX-10`](agent-open-questions.md#%60OQ-SBX-10%60). Landlock availability without a private network namespace doesn't enforce this provider’s selected confinement.

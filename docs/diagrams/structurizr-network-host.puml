@@ -1,0 +1,110 @@
+@startuml
+title <size:24>Deployment View: Topology host</size>\n<size:24>Host management, operator access and independent launch trust boundaries.</size>
+
+set separator none
+top to bottom direction
+skinparam ranksep 20
+skinparam nodesep 5
+hide stereotype
+
+skinparam {
+  nodesep 80
+  ranksep 160
+}
+
+<style>
+  root {
+    BackgroundColor: #ffffff;
+    FontColor: #444444;
+  }
+  // Element,Topology
+  .Element-RWxlbWVudCxUb3BvbG9neQ== {
+    BackgroundColor: #e8f1fa;
+    LineColor: #315b7d;
+    LineStyle: 0;
+    LineThickness: 2;
+    FontColor: #122b44;
+    FontSize: 24;
+    HorizontalAlignment: center;
+    Shadowing: 0;
+    MaximumWidth: 450;
+  }
+  // Relationship
+  .Relationship-UmVsYXRpb25zaGlw {
+    LineThickness: 2;
+    LineStyle: 10-10;
+    LineColor: #444444;
+    FontColor: #444444;
+    FontSize: 24;
+    MaximumWidth: 200;
+  }
+  // Element,Deployment Node
+  .DeploymentNode-RWxlbWVudCxEZXBsb3ltZW50IE5vZGU= {
+    BackgroundColor: #f5f7fa;
+    LineColor: #536b7e;
+    LineStyle: 0;
+    LineThickness: 2;
+    FontColor: #182c3e;
+    FontSize: 24;
+    HorizontalAlignment: center;
+    Shadowing: 0;
+  }
+</style>
+
+rectangle "Agent host trust boundary\n<size:16>[Deployment Node: Agent host]</size>" <<DeploymentNode-RWxlbWVudCxEZXBsb3ltZW50IE5vZGU=>> as Topologyhost.Agenthosttrustboundary {
+  rectangle "Dedicated worker user\n<size:16>[Deployment Node: User boundary]</size>" <<DeploymentNode-RWxlbWVudCxEZXBsb3ltZW50IE5vZGU=>> as Topologyhost.Agenthosttrustboundary.Dedicatedworkeruser {
+    rectangle "==Agent host worker\n<size:16>[Container: Host service]</size>\n\nControls launch lifecycle as a dedicated user; stays outside every launch data path." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as Topologyhost.Agenthosttrustboundary.Dedicatedworkeruser.Agenthostworker_1
+  }
+
+  rectangle "Privileged setup boundary\n<size:16>[Deployment Node: Privilege boundary]</size>" <<DeploymentNode-RWxlbWVudCxEZXBsb3ltZW50IE5vZGU=>> as Topologyhost.Agenthosttrustboundary.Privilegedsetupboundary {
+    rectangle "==Privileged helper\n<size:16>[Container: Host privilege boundary]</size>\n\nPerforms narrowly authorized setup and launch operations; caller binding is undecided." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as Topologyhost.Agenthosttrustboundary.Privilegedsetupboundary.Privilegedhelper_1
+  }
+
+  rectangle "==Host name resolver\n<size:16>[Container: Domain Name System]</size>\n\nResolves names under *.afakt.internal for host clients." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as Topologyhost.Agenthosttrustboundary.Hostnameresolver_1
+  rectangle "Operator access boundary\n<size:16>[Deployment Node: Host service]</size>" <<DeploymentNode-RWxlbWVudCxEZXBsb3ltZW50IE5vZGU=>> as Topologyhost.Agenthosttrustboundary.Operatoraccessboundary {
+    rectangle "==Host access boundary\n<size:16>[Container: Access mechanism undecided]</size>\n\nHost-level authorization for services, previews and ports; local caller and connection mechanisms undecided." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as Topologyhost.Agenthosttrustboundary.Operatoraccessboundary.Hostaccessboundary_1
+    rectangle "==Host-level connectivity\n<size:16>[Container: Host access role]</size>\n\nHost authorization for agent and cluster services; connection mechanism undecided; optional user tailnet attachment." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as Topologyhost.Agenthosttrustboundary.Operatoraccessboundary.Hostlevelconnectivity_1
+  }
+
+  rectangle "Agent launch A\n<size:16>[Deployment Node: Launch boundary]</size>" <<DeploymentNode-RWxlbWVudCxEZXBsb3ltZW50IE5vZGU=>> as Topologyhost.Agenthosttrustboundary.AgentlaunchA {
+    rectangle "Guest A\n<size:16>[Deployment Node: Dedicated agent user in host mode]</size>" <<DeploymentNode-RWxlbWVudCxEZXBsb3ltZW50IE5vZGU=>> as Topologyhost.Agenthosttrustboundary.AgentlaunchA.GuestA {
+      rectangle "==Guest workload\n<size:16>[Container: Provider confinement]</size>\n\nUntrusted harness, relay and loopback listeners; no overlay membership or workload keys." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as Topologyhost.Agenthosttrustboundary.AgentlaunchA.GuestA.Guestworkload_1
+    }
+
+    rectangle "Mediator A\n<size:16>[Deployment Node: Local confinement; user undecided]</size>" <<DeploymentNode-RWxlbWVudCxEZXBsb3ltZW50IE5vZGU=>> as Topologyhost.Agenthosttrustboundary.AgentlaunchA.MediatorA {
+      rectangle "==Agent mediator\n<size:16>[Container: Local policy enforcement]</size>\n\nEnforces this launch's policy and stamps identity; has no network access of its own." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as Topologyhost.Agenthosttrustboundary.AgentlaunchA.MediatorA.Agentmediator_1
+    }
+
+    rectangle "Agent proxy A\n<size:16>[Deployment Node: tsnet node; user undecided]</size>" <<DeploymentNode-RWxlbWVudCxEZXBsb3ltZW50IE5vZGU=>> as Topologyhost.Agenthosttrustboundary.AgentlaunchA.AgentproxyA {
+      rectangle "==Agent proxy\n<size:16>[Container: Tailscale tsnet]</size>\n\nOwn overlay node, hub connection and launch X.509-SVID; only launch component opening connections off the host." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as Topologyhost.Agenthosttrustboundary.AgentlaunchA.AgentproxyA.Agentproxy_1
+    }
+
+  }
+
+  rectangle "Agent launch B\n<size:16>[Deployment Node: Launch boundary]</size>" <<DeploymentNode-RWxlbWVudCxEZXBsb3ltZW50IE5vZGU=>> as Topologyhost.Agenthosttrustboundary.AgentlaunchB {
+    rectangle "Guest B\n<size:16>[Deployment Node: Dedicated agent user in host mode]</size>" <<DeploymentNode-RWxlbWVudCxEZXBsb3ltZW50IE5vZGU=>> as Topologyhost.Agenthosttrustboundary.AgentlaunchB.GuestB {
+      rectangle "==Destination guest\n<size:16>[Container: Provider confinement]</size>\n\nUntrusted workload and published loopback listener; no overlay membership or workload keys." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as Topologyhost.Agenthosttrustboundary.AgentlaunchB.GuestB.Destinationguest_1
+    }
+
+    rectangle "Mediator B\n<size:16>[Deployment Node: Local confinement; user undecided]</size>" <<DeploymentNode-RWxlbWVudCxEZXBsb3ltZW50IE5vZGU=>> as Topologyhost.Agenthosttrustboundary.AgentlaunchB.MediatorB {
+      rectangle "==Destination mediator\n<size:16>[Container: Local policy enforcement]</size>\n\nChecks the source grant and current destination launch before listener access; no independent network." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as Topologyhost.Agenthosttrustboundary.AgentlaunchB.MediatorB.Destinationmediator_1
+    }
+
+    rectangle "Agent proxy B\n<size:16>[Deployment Node: tsnet node; user undecided]</size>" <<DeploymentNode-RWxlbWVudCxEZXBsb3ltZW50IE5vZGU=>> as Topologyhost.Agenthosttrustboundary.AgentlaunchB.AgentproxyB {
+      rectangle "==Destination agent proxy\n<size:16>[Container: Tailscale tsnet]</size>\n\nIndependent overlay node, hub connection and destination launch X.509-SVID." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as Topologyhost.Agenthosttrustboundary.AgentlaunchB.AgentproxyB.Destinationagentproxy_1
+    }
+
+  }
+
+}
+
+Topologyhost.Agenthosttrustboundary.Dedicatedworkeruser.Agenthostworker_1 --> Topologyhost.Agenthosttrustboundary.Privilegedsetupboundary.Privilegedhelper_1 <<Relationship-UmVsYXRpb25zaGlw>> : "Requests authorized setup and launch operations\n<size:16>[Authenticated local control]</size>"
+Topologyhost.Agenthosttrustboundary.Dedicatedworkeruser.Agenthostworker_1 --> Topologyhost.Agenthosttrustboundary.Hostnameresolver_1 <<Relationship-UmVsYXRpb25zaGlw>> : "Requires host name resolution\n<size:16>[Local control]</size>"
+Topologyhost.Agenthosttrustboundary.Dedicatedworkeruser.Agenthostworker_1 --> Topologyhost.Agenthosttrustboundary.Operatoraccessboundary.Hostlevelconnectivity_1 <<Relationship-UmVsYXRpb25zaGlw>> : "Sends host management requests\n<size:16>[Local channel]</size>"
+Topologyhost.Agenthosttrustboundary.Operatoraccessboundary.Hostaccessboundary_1 --> Topologyhost.Agenthosttrustboundary.Operatoraccessboundary.Hostlevelconnectivity_1 <<Relationship-UmVsYXRpb25zaGlw>> : "Uses host-level authorization\n<size:16>[Connection mechanism undecided]</size>"
+Topologyhost.Agenthosttrustboundary.AgentlaunchA.GuestA.Guestworkload_1 --> Topologyhost.Agenthosttrustboundary.AgentlaunchA.MediatorA.Agentmediator_1 <<Relationship-UmVsYXRpb25zaGlw>> : "Sends traffic bound to this launch\n<size:16>[Local provider carrier]</size>"
+Topologyhost.Agenthosttrustboundary.AgentlaunchA.MediatorA.Agentmediator_1 --> Topologyhost.Agenthosttrustboundary.AgentlaunchA.AgentproxyA.Agentproxy_1 <<Relationship-UmVsYXRpb25zaGlw>> : "Sends policy-permitted traffic and stamped launch identity\n<size:16>[Local channel]</size>"
+Topologyhost.Agenthosttrustboundary.AgentlaunchB.GuestB.Destinationguest_1 --> Topologyhost.Agenthosttrustboundary.AgentlaunchB.MediatorB.Destinationmediator_1 <<Relationship-UmVsYXRpb25zaGlw>> : "Requests access bound to destination launch\n<size:16>[Local provider carrier]</size>"
+Topologyhost.Agenthosttrustboundary.AgentlaunchB.MediatorB.Destinationmediator_1 --> Topologyhost.Agenthosttrustboundary.AgentlaunchB.AgentproxyB.Destinationagentproxy_1 <<Relationship-UmVsYXRpb25zaGlw>> : "Sends policy-permitted destination traffic\n<size:16>[Local channel]</size>"
+
+@enduml

@@ -1,0 +1,66 @@
+---
+type: Design
+title: "Agent sandbox provider for Linux VM"
+description: Isolation, mediation, storage, and lifecycle for the linux-vm agent sandbox provider.
+tags: [afakt, agents, sandbox]
+status: draft
+generated: { by: "codex:gpt-6-astra", at: "2026-10-27T00:00:00Z" }
+---
+
+# Agent sandbox provider for Linux VM
+
+[Public key infrastructure](pki.md).
+
+## Platforms and privileges
+
+The linux-vm provider runs a Linux virtual machine (VM) through Cloud Hypervisor and Kernel-based Virtual Machine (KVM) support. A dedicated non-root user runs the agent host worker. Setup privileges and service lifetime remain under [`OQ-SBX-10`](agent-open-questions.md#%60OQ-SBX-10%60), [`OQ-SBX-11`](agent-open-questions.md#%60OQ-SBX-11%60). Supported platforms and distribution requirements remain under [`OQ-PRQ-7`](agent-open-questions.md#%60OQ-PRQ-7%60). Device access must permit the dedicated worker to run the hypervisor without making the harness a host user.
+
+## Isolation boundary
+
+Each agent launch has its own Linux guest kernel. afakt-sandbox confines the harness inside that guest under [Host process sandbox](agent-sandbox.md#Host%20process%20sandbox). An exploited host-side device processor remains outside this guest boundary, while the agent host controls the hypervisor and virtual devices. That containment remains under [`OQ-SBX-53`](agent-open-questions.md#%60OQ-SBX-53%60).
+
+## Process placement and startup
+
+The agent host starts Cloud Hypervisor under an independent supervisor. Guest init starts afakt-agent, which starts afakt-sandbox and the harness as the agent user. A separate guest relay user controls the guest control endpoint under [Guest layout and lifecycle control](agent-sandbox.md#Guest%20layout%20and%20lifecycle%20control).
+
+Commands started by `afakt agent exec` use standalone afakt-sandbox without the runner. afakt-agent is absent. Command placement, inherited environment, launch binding, capture ordering, and descendant lifetime remain under [`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60). That choice also determines command transport. Authority for an unsandboxed command remains under [`OQ-AGT-26`](agent-open-questions.md#%60OQ-AGT-26%60).
+
+Local helper authentication and binding to the intended launch remain under [`OQ-SBX-27`](agent-open-questions.md#%60OQ-SBX-27%60). Provider-installed hook protection and repository project configuration remain on hold under [`OQ-HOOK-16`](agent-open-questions.md#%60OQ-HOOK-16%60) and [`OQ-HOOK-17`](agent-open-questions.md#%60OQ-HOOK-17%60).
+
+## Mediator connection and name resolution
+
+Each agent launch's agent mediator and agent proxy follow [Per-launch services](agent-proxy.md#Launch%20boundary) and the authenticated [hub connection](agent-proxy.md#Hub%20connection).
+
+The only network device in the Linux guest connects to the agent mediator. No alternate device or host route sends external traffic. Domain Name System (DNS) queries go to the mediator with no host resolver fallback under [Agent DNS](agent-mediator.md#Agent%20DNS). The guest relay sends control requests and preview streams over a distinct control channel. A host socket that relays virtual-socket bytes is insufficient proof of guest identity. Binding the kernel peer and launch generation remains under [`OQ-SBX-13`](agent-open-questions.md#%60OQ-SBX-13%60).
+
+[Workload identity](agent-host.md#Workload%20identity) keeps agent-proxy credentials outside this provider’s confinement. Kernel-attested local transport remains the leading option in [`OQ-SBX-13`](agent-open-questions.md#%60OQ-SBX-13%60). Current-launch binding and sender attribution remain unresolved under [`OQ-SES-6`](agent-open-questions.md#%60OQ-SES-6%60). Control capacity remains under [`OQ-SBX-14`](agent-open-questions.md#%60OQ-SBX-14%60), while mediator placement and confinement remain under [`OQ-SBX-12`](agent-open-questions.md#%60OQ-SBX-12%60), [`OQ-SBX-19`](agent-open-questions.md#%60OQ-SBX-19%60), [`OQ-SBX-20`](agent-open-questions.md#%60OQ-SBX-20%60), [`OQ-SBX-23`](agent-open-questions.md#%60OQ-SBX-23%60).
+
+[Egress gateway routing](agent-mediator.md#Egress%20gateway%20routing) selects host egress by default and a site gateway when configured. Resolver upstreams and synthetic name answers remain under [`OQ-SBX-21`](agent-open-questions.md#%60OQ-SBX-21%60), [`OQ-SBX-22`](agent-open-questions.md#%60OQ-SBX-22%60). Listener and publication binding remain under [`OQ-SES-5`](agent-open-questions.md#%60OQ-SES-5%60), [`OQ-PORT-6`](agent-open-questions.md#%60OQ-PORT-6%60). Workspace command routing remains under [`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60).
+
+## Workspace, scratch, and caches
+
+The Linux guest uses a read-only root disk and a separate writable workspace disk. The agent host retains the disk backing and verified image cache outside the guest’s writable filesystem. Disk layout, ownership mappings, and cache attachment remain under [`OQ-WSP-20`](agent-open-questions.md#%60OQ-WSP-20%60).
+
+Provider storage mappings and capture access remain under [`OQ-WSP-20`](agent-open-questions.md#%60OQ-WSP-20%60). [Sandbox variables](agent-sandbox.md#Sandbox%20variables) defines separate scratch and host-shared named tool caches. Cache authorization, provenance, confidentiality, capacity, and invalidation remain under [`OQ-WSP-19`](agent-open-questions.md#%60OQ-WSP-19%60). Host-side processing of hostile repository metadata needs the isolation in [`OQ-WSP-18`](agent-open-questions.md#%60OQ-WSP-18%60). Worker capture rights and native history path stability remain under [`OQ-WSP-15`](agent-open-questions.md#%60OQ-WSP-15%60) and [`OQ-WSP-16`](agent-open-questions.md#%60OQ-WSP-16%60).
+
+## Workspace image materialization
+
+[Agent workspace lifecycle](agent-workspace-lifecycle.md#Attachment%20and%20provider%20storage) connects materialization to capture and cleanup.
+
+[Agent host caches and startup](agent-workspace-image.md#Agent%20host%20caches%20and%20startup) governs verified extraction and independent writable materialization. Immutable image caches remain outside launch-writable storage. Agent workspace images contain directory trees. Their format is Open Container Initiative (OCI). Extraction fills the Linux workspace disk. Filesystem cloning may reuse immutable blocks only while preserving independent writable state. The backing filesystem and allocation strategy remain under [`OQ-WSP-20`](agent-open-questions.md#%60OQ-WSP-20%60). The workspace image doesn't replace the guest boot disk.
+
+## Agent snapshots and agent checkpoints
+
+[Agent snapshots and the snapshot registry](agent.md#Agent%20snapshots%20and%20the%20snapshot%20registry) defines agent snapshots, while [Agent checkpoints](agent.md#Agent%20checkpoints) separates native harness state from the captured machine. Capture pairs an idle agent with frozen workspace state. Snapshot state, disk and memory consistency, rewind effects, private data and restored authority, retention, and owner binding remain under [`OQ-AGT-1`](agent-open-questions.md#%60OQ-AGT-1%60), [`OQ-AGT-3`](agent-open-questions.md#%60OQ-AGT-3%60), [`OQ-AGT-4`](agent-open-questions.md#%60OQ-AGT-4%60), [`OQ-AGT-16`](agent-open-questions.md#%60OQ-AGT-16%60), [`OQ-AGT-11`](agent-open-questions.md#%60OQ-AGT-11%60), [`OQ-AGT-31`](agent-open-questions.md#%60OQ-AGT-31%60). Cloud Hypervisor supplies the virtual machine capture boundary. Coordinating device state, disk state, and renewed mediator connections belongs to the unresolved snapshot contract in [`OQ-AGT-1`](agent-open-questions.md#%60OQ-AGT-1%60). A machine image doesn't restore external credentials or effects.
+
+## Cancellation and teardown
+
+The independent agent host supervisor stops Cloud Hypervisor without relying on the harness or guest kernel under [Guest layout and lifecycle control](agent-sandbox.md#Guest%20layout%20and%20lifecycle%20control). Machine termination stops its guest processes together. [Provider observations](agent-sandbox-lifecycle.md#Provider%20observations) requires observed machine exit before release. Worker restart preserves the supervisor and machine. Host reboot reconciliation remains under [`OQ-HST-1`](agent-open-questions.md#%60OQ-HST-1%60). Helper ownership and safe identity reuse remain under [`OQ-SBX-29`](agent-open-questions.md#%60OQ-SBX-29%60). Standalone command placement and termination remain under [`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60).
+
+## Host observations
+
+The agent host controls process lifecycle, workspace backing, retained captures, and the agent mediator. Host administrators can inspect or change these resources. This provider supplies no confidentiality against the agent host. Independent evidence of a compromised host remains under [`OQ-SBX-37`](agent-open-questions.md#%60OQ-SBX-37%60). Same-user process access and the broader host isolation baseline remain on hold under [`OQ-SBX-18`](agent-open-questions.md#%60OQ-SBX-18%60). [What telemetry never records](agent-observability.md#What%20telemetry%20never%20records) limits exported content. It doesn't prevent local host access. Command attribution remains under [`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60).
+
+## Platform dependencies
+
+This provider relies on Linux virtualization device access, Cloud Hypervisor, a guest kernel, and independent host supervision. Guest process confinement uses the Linux mechanisms in [Host process sandbox](agent-sandbox.md#Host%20process%20sandbox). Supported hardware, device permissions, service installation, and service survival remain under [`OQ-PRQ-7`](agent-open-questions.md#%60OQ-PRQ-7%60), [`OQ-SBX-10`](agent-open-questions.md#%60OQ-SBX-10%60), [`OQ-SBX-11`](agent-open-questions.md#%60OQ-SBX-11%60).

@@ -1,69 +1,95 @@
 ---
 type: Design
 title: Agent host
-description: A machine's role in the agent fleet, its execution services, trust boundary, and recovery behavior.
+description: A machine's role in the agent fleet, its agent launch services, trust boundary, and recovery behavior.
 tags: [afakt, agents, agent-host]
 status: draft
-generated: { by: "codex", at: "2026-10-27T00:00:00Z" }
+generated: { by: "codex:gpt-6-astra", at: "2026-10-27T00:00:00Z" }
 ---
 
 # Agent host
 
-An agent host is a machine that runs agents, with an afakt worker that polls its host task queue for agent work. Fleet hosts supply execution capacity. The [API server](components.md#api-server) keeps their registry and reserves slots. Each execution starts with placement by the [agent runner workflow](components.md#agent-runner), which starts the agent executor workflow on the chosen host. That host's [agent executor workflow](components.md#agent-executor) calls its execution provider and returns the result. Placement keeps later operations on the same host.
+[Public key infrastructure](pki.md).
+
+An agent host is a bare metal machine, virtual machine, container manager, or remote platform that hosts agent sandboxes. Its agent host worker connects it to the control plane and runs the [agent launcher workflow](components.md#Agent%20launcher). The [agent dispatcher workflow](components.md#Agent%20dispatcher) selects a host task queue. It finalizes the agent launch spec and queues the launch there, binding every operation for that launch to the chosen host.
+
+[Agent host caches and startup](agent-workspace-lifecycle.md#Agent%20host%20caches%20and%20startup).
 
 ## What runs on an agent host
 
 | Part | Responsibility |
 | --- | --- |
-| afakt worker and capacity controller | The worker runs placed agent executor workflows and their activities. Its [capacity controller](agent-placement.md#slot-capacity) adjusts execution slots within configured bounds from CPU use, memory use, and free workspace disk space. |
-| Execution provider | The [host agent provider](agent-sandbox.md) is the default. It prepares and confines executions and supplies launch, status, cancel, and result operations under the [provider requirements](agent-provider-requirements.md#4-provider-operations). |
-| Agent host supervisor | The supervisor controls virtual machine monitors independently of the worker, guest, and Agent Client Protocol (ACP). It starts, suspends, resumes, stops, and snapshots VMs and verifies forced stops. See [Virtual machine lifecycle](agent-execution.md#virtual-machine-lifecycle). |
-| Sandbox VM | Each agent has a guest kernel, a read-only operating system disk, and an independent writable workspace disk. The guest contains the relay, harness, adapter when needed, hooks, and helpers. See [Guest layout and lifecycle control](agent-sandbox.md#guest-layout-and-lifecycle-control) and [Image contents](agent-workspace-image.md#image-contents). |
-| Per-agent mediator | A confined host process outside the guest supplies its only network route and applies network and HTTP policy. It inspects permitted encrypted traffic and records decisions. See [Per-agent mediator](agent-sandbox.md#per-agent-mediator). |
-| Credential broker | Inside the mediator, the broker resolves credential references on the host and injects credentials into permitted outgoing requests without exposing them to the agent. See [Credential brokering](agent-sandbox.md#credential-brokering). |
-| Guest relay's host side | The mediator ends the guest relay's channel and checks ACP messages. It stamps identity on control requests. The relay itself runs inside the guest. See [Control requests](agent-sandbox.md#control-requests) and [ACP gate](agent-session.md#acp-gate). |
-| Telemetry endpoint | The endpoint receives harness telemetry through the mediator and adds execution identity. It filters content and forwards it to the deployment's collector. See [Trace context propagation](agent-observability.md#trace-context-propagation). Whether it belongs to the worker or a separate component remains [open](agent-open-questions.md#agent-observability). |
-| Port forwarder | Authorized streams cross the mediator and guest relay to guest loopback listeners. Each stream requires publication and generation checks. See [Port forwarder](components.md#port-forwarder) and [HTTP previews](agent-ports.md#http-previews). |
-| Layer and image caches | The worker keeps verified layer blobs, unpacked layers, and reusable workspace base disks outside writable workspaces. Each agent gets an independent writable disk. See [Agent host caches and startup](agent-workspace-image.md#agent-host-caches-and-startup). |
+| Agent host worker and capacity controller | The worker runs placed agent launcher workflows and their activities. Its [capacity controller](agent-placement.md#Slot%20capacity) adjusts agent launch slots within configured bounds from central processing unit (CPU) use, memory use, and free workspace disk space. |
+| Agent sandbox provider | The [VM sandbox provider](agent-sandbox.md) is the default. It prepares and confines agent launches and supplies provision, restore, release, status, cancel, and result operations under the [provider operations](agent-launch-contract.md#Provider%20operations). |
+| Agent host supervisor | The supervisor controls virtual machine monitors independently of the worker, guest, and Agent Client Protocol (ACP). It starts, suspends, resumes, stops, and snapshots VMs and verifies forced stops. See [Virtual machine lifecycle](agent-sandbox-lifecycle.md#Virtual%20machine%20lifecycle). |
+| Sandbox VM | Each agent has a guest kernel, a read-only operating system disk, and an independent writable workspace disk. The guest contains the relay, agent harness, adapter when needed, hooks, and helpers. See [Guest layout and lifecycle control](agent-sandbox.md#Guest%20layout%20and%20lifecycle%20control) and [Image contents](agent-workspace-image.md#Image%20contents). |
+| Agent proxy | One per launch opens its hub and permitted service connections with the launch's identity. See [Per-launch services](agent-proxy.md#Launch%20boundary). |
+| Agent mediator | A mediator per agent launch controls the guest's only network route and resolver. It applies connection policy. Inspected destinations go to the agent egress gateway. Traffic to passthrough destinations remains mediated without decryption. See [Agent mediator](agent-mediator.md#Launch%20boundary). |
+| Agent egress gateway | The gateway decrypts inspected destinations for Hypertext Transfer Protocol (HTTP) policy. It runs on the host by default. The worker can select a standalone site gateway instead. See [Agent egress gateway](components.md#Agent%20egress%20gateway). |
+| Credential broker | A host-side component that injects credentials into permitted requests outside the guest. Its placement relative to the agent egress gateway and agent mediator remains [open](agent-open-questions.md#%60OQ-SBX-23%60). |
+| Guest relay's host side | The mediator ends the guest relay's channel and checks ACP messages. It stamps identity on control requests. The relay itself runs inside the guest. See [Control requests](agent-mediator.md#Control%20requests) and [ACP message policy](agent-acp.md#ACP%20message%20policy). |
+| Telemetry endpoint | The endpoint receives harness telemetry through the mediator and adds agent launch identity. It filters content and forwards it to the deployment's collector. See [Trace context propagation](agent-observability.md#Trace%20context%20propagation). Whether it belongs to the worker or a separate component remains [open](agent-open-questions.md#Agent%20observability). |
+| Port forwarder | Authorized streams cross the mediator and guest relay to guest loopback listeners. Each stream requires publication and agent launch ID checks. See [Port forwarder](components.md#Port%20forwarder) and [HTTP previews](agent-previews.md#HTTP%20previews). |
+| Layer and image caches | The worker keeps verified layer blobs, unpacked layers, and reusable workspace base disks outside writable agent workspaces. Each agent gets an independent writable disk. See [Agent host caches and startup](agent-workspace-image.md#Agent%20host%20caches%20and%20startup). |
 
-Workspace-local Model Context Protocol (MCP) servers also run inside the sandbox VM when a configured server needs the workspace. The [MCP gateway](agent-mcp-gateway.md#server-hosting-and-lifecycle) connects to them through the guest relay and mediator. Central servers run on the control plane.
+Workspace-local Model Context Protocol (MCP) servers also run inside the sandbox VM when a configured server needs the workspace. The [MCP gateway](agent-mcp-gateway.md#Server%20hosting%20and%20lifecycle) connects to them through the guest relay and mediator. Central servers run on the control plane.
 
 ## Fleet membership and capacity
 
-At startup, the worker registers its host, task queue, metadata, and slot capacity bounds with the [agent host registry](agent-placement.md#agent-host-registry). It polls only its own host task queue. When renewing its registration lease, the worker reports metadata, capacity, the most recent capacity change reason, and the execution IDs and generations holding slots. Metadata describes platform, harnesses, sandbox runtime, labels, and resolvable credential references.
+At startup, the worker registers its host, task queue, metadata, and slot capacity bounds with the [agent host registry](agent-placement.md#Agent%20host%20registry). It polls only its own host task queue. When renewing its registration lease, the worker reports metadata, capacity, the most recent capacity change reason, and the agent launch IDs holding slots. Metadata describes platform, harnesses, agent sandbox runtime, labels, and resolvable credential references.
 
-The [reservation API](agent-placement.md#reservation-api) selects an eligible host with a free slot. Reserved and claimed slots both count against capacity. Lowering capacity preserves running executions and existing reservations, blocking new reservations until capacity permits them. [Image locality](agent-placement.md#image-locality) is advisory and never overrides requirements, host binding, or slot accounting. [Preheating](agent-workspace-image.md#placement-and-preheating) uses host task queues and respects disk pressure without reserving future slots.
+The [reservation Application Programming Interface (API)](agent-placement.md#Reservation%20API) selects an eligible host with a free slot. Reserved and claimed slots both count against capacity. Lowering capacity preserves running agent launches and existing reservations, blocking new reservations until capacity permits them. [Image locality](agent-placement.md#Image%20locality) is advisory and never overrides requirements, host binding, or slot accounting. [Preheating](agent-workspace-image.md#Placement%20and%20preheating) uses host task queues and respects disk pressure without reserving future slots.
 
-The mediator relays sessions over the host's [authenticated outbound connection](agent-session.md#acp-gate) to the API server. The connection transport remains [open](agent-open-questions.md#agent-session). Preview traffic returns over the mediator's outbound connection to the [preview broker](agent-ports.md#http-previews). Both paths work without an inbound listener on the agent host.
+Each launch's agent proxy opens its own authenticated [agent hub connection](agent-proxy.md#Hub%20connection) over the overlay. It also opens permitted API and service connections using that launch's identity. The mediator enforces policy and has no network of its own. User-facing traffic enters through the ingress gateway. Traffic between launches on the same host uses the overlay, with no worker shortcut. Every host also supplies [host-level DNS resolution and authorized connectivity](agent-hub.md#Agent%20host%20access). The mechanism remains undecided.
 
 ## Runtime privileges and platforms
 
-The [rootless runtime](agent-sandbox.md#enforcement) runs under the host user, without root privileges: a systemd user unit on Linux and a launchd agent on macOS. One-time setup may require an administrator. Whether that setup counts as rootless and how the user service continues running after logout remain [open](agent-open-questions.md#agent-sandbox).
+The agent host worker and host-mode agents use separate dedicated users under [Agent host access](agent-hub.md#Agent%20host%20access). Provider privileges and platform-specific capture services follow [Enforcement](agent-sandbox.md#Enforcement), without settling the held [host isolation baseline](agent-open-questions.md#%60OQ-SBX-18%60).
 
-The sandbox's [platform backends](agent-sandbox.md#enforcement) are:
+afakt permits all the modes in this table: [agent sandbox providers](agent-launch-contract.md#Provider%20operations) use host modes or container managers, or they use virtual machine monitors.
 
-| Host platform | VM backend |
-| --- | --- |
-| Linux | A Kernel-based Virtual Machine (KVM) microVM driven by Cloud Hypervisor. |
-| macOS | Virtualization.framework. Using Apple's Containerization framework or driving Virtualization.framework directly, including the guest init choice, remains [open](agent-open-questions.md#agent-sandbox). |
-| Windows | The Linux microVM inside Windows Subsystem for Linux by default. An agent that needs a Windows guest uses a Windows-native utility VM. |
+| Mode | Provider kind | Platform |
+| --- | --- | --- |
+| `docker-desktop` | Container manager | The Docker virtual machine (VM) on macOS and Windows. Windows uses Windows Subsystem for Linux (WSL2) or Hyper-V. |
+| `docker-engine` | Container manager | Docker Engine on amd64 Linux bare metal and VMs, and arm64 Linux VMs. |
+| `podman` | Container manager | Podman. |
+| `macos-vm` | Virtual machine | The macOS microVM design using Virtualization.framework. |
+| `windows-vm` | Virtual machine | The Linux microVM inside WSL2 by default. A Windows-native utility VM for an agent needing a Windows guest. |
+| `linux-vm` | Virtual machine | A Kernel-based Virtual Machine (KVM) microVM driven by Cloud Hypervisor. |
+| `macos-host` | Host mode | macOS. |
+| `windows-host` | Host mode | Windows. |
+| `linux-host` | Host mode | Linux. |
+| [Claude Managed Agents](agent-sandbox-claude-managed-agents.md) | Remote provider | Managed harness and cloud execution. |
+| [OpenAI Agents API](agent-sandbox-openai-agents-api.md) | Remote provider | Managed harness and cloud execution. |
+| [Modal Sandboxes](agent-sandbox-modal.md) | Remote provider | Remote Linux sandbox execution. |
+| [Cloudflare Sandbox SDK](agent-sandbox-cloudflare.md) | Remote provider | Remote Linux sandbox execution. |
 
-The weaker host sandbox mode serves hosts without virtualization only where deployment policy permits it. Whether a deployment requires sandbox VMs everywhere or permits host sandboxes, and where, remains an on-hold [operator decision](agent-open-questions.md#agent-sandbox). A provider rejects a launch whose sandbox settings it can't enforce.
+Host modes share their host kernel. The selected provider's isolation boundary and [afakt-sandbox enforcement](agent-sandbox.md#Enforcement) determine their confinement, while managed harness integration remains [`OQ-SBX-63`](agent-open-questions.md#%60OQ-SBX-63%60).
 
 ## Trust boundary
 
-Trust in the host covers VM control, mediator policy enforcement, and [credential custody](agent-sandbox.md#credential-brokering). Host configuration defines the mediator's certificate authority custody. Brokered secrets and signing material remain outside the sandbox. The guest receives neither long-lived secrets nor brokered credential values nor the [execution token](agent-sandbox.md#execution-token). For the agent, the mediator authenticates control requests. A guest can't choose another agent's identity.
+Trust in the host covers VM control, agent mediator connection policy, the agent egress gateway's HTTP policy, and the credential broker's [credential custody](agent-sandbox.md#Credential%20brokering). Host configuration defines the agent egress gateway's certificate authority custody. When the worker selects a standalone site gateway, that gateway has the same trust boundary for policy enforcement and certificate authority custody. Its own workload identity authenticates it to the control plane. The credential broker receives credentials according to their types. Brokered secrets and signing material remain outside the agent sandbox, and the guest receives neither direct brokered-secret delivery nor SPIFFE Verifiable Identity Documents (SVIDs). For the agent, the mediator stamps identity and its agent proxy authenticates control requests with the launch's SVID. Receiving services handle workload mutual Transport Layer Security (TLS) termination over the overlay. User-facing traffic enters through the ingress gateway. A guest can't choose another agent's identity.
 
-Profiles select brokered credentials, and network rules bound each injection. Bounds on repository profile self-grants and credential domains remain an on-hold [operator decision](agent-open-questions.md#agent-profile). Protection of provider-installed hooks and the scope of repository project configuration also remain [undecided](agent-open-questions.md#agent-hooks), as sandbox confinement doesn't settle either question. The session-end wait and the lifetime of the execution token remain [undecided together](agent-open-questions.md#agent-hooks).
+Profiles select brokered credentials, and network rules bound each injection. Bounds on repository profile self-grants and credential domains remain an on-hold [operator decision](agent-open-questions.md#Agent%20profile). Protection of provider-installed hooks and the scope of repository project configuration also remain [undecided](agent-open-questions.md#Agent%20hooks), as sandbox confinement doesn't settle either question. The session-end wait and SVID lifetime remain [on hold together](agent-open-questions.md#%60OQ-HOOK-18%60).
+
+Workload identities use the provisional lifetimes and half-life renewal in [Certificate policies](pki.md#Certificate%20policies), subject to [`OQ-HOOK-18`](agent-open-questions.md#%60OQ-HOOK-18%60).
+
+## Workload identity
+
+afakt identifies its workloads with SPIFFE. Each control plane has one trust domain, and every workload identity is a SPIFFE ID of the form `spiffe://<trust-domain>/...`. A trust domain doesn't federate with other control planes.
+
+Connections from an agent host to the control plane, including agent proxy connections, use mutual Transport Layer Security (TLS) with X.509 SPIFFE Verifiable Identity Documents (SVIDs). SVIDs come from a Workload API endpoint on every agent host. On behalf of the agents they serve, host-side processes request SVIDs from that endpoint, which agents can't connect to. Neither an SVID nor its private key enters the guest.
+
+Inside a SPIFFE ID, the path scheme remains [open](agent-open-questions.md#%60OQ-MOD-9%60), as does the [SVID form for other connections](agent-open-questions.md#%60OQ-SBX-17%60).
 
 ## Restart and recovery
 
-A [worker restart](agent-execution.md#reconciliation-after-restart-or-retry) leaves the supervisor, virtual machine monitors, mediators, and running agents alive. Execution records persist on the host. The restarted worker loads them and observes each agent before answering status. An executor checks status before launch and adopts an existing execution. It launches only on `not-found` and retries `unavailable` on the same host. Interrupted preparation fails after verified termination. Interrupted hooks follow the hook failure rules. Output validation and result construction can restart.
+A [worker restart](agent-launch.md#Reconciliation%20after%20restart%20or%20retry) leaves the supervisor, virtual machine monitors, agent mediators, and running agents alive. Agent launch records persist on the host. The restarted worker loads them and observes each agent before answering status. Before provision, the agent launcher reads status and adopts an existing agent launch. It provisions only on `not-found` and retries `unavailable` on the same host. Interrupted preparation fails after the provider observes that every process from the interrupted step has exited. Interrupted hooks follow the hook failure rules. Output validation and result construction can restart.
 
-A missed watch heartbeat or lost host contact never proves termination. The executor retains the [host binding](agent-execution.md#placement-on-agent-hosts).
+A missed watch heartbeat or lost host contact never proves termination. The agent launcher retains the [host binding](agent-launch.md#Placement%20on%20agent%20hosts).
 
-An expired registration lease stops new placement until the worker registers again. Executions and reservations are unchanged. Unclaimed reservations still expire under their own bounds. Terminal executions release their slots, and lease renewals reconcile slots no longer reported. See [Agent host registry](agent-placement.md#agent-host-registry) and [Slot reservations](agent-placement.md#slot-reservations).
+An expired registration lease stops new placement until the worker registers again. Agent launches and reservations are unchanged. Unclaimed reservations still expire under their own bounds. Terminal agent launches release their slots, and lease renewals reconcile slots no longer reported. See [Agent host registry](agent-placement.md#Agent%20host%20registry) and [Slot reservations](agent-placement.md#Slot%20reservations).
 
-Recovery after a whole-machine restart remains [open](agent-open-questions.md#agent-host), separately from recovery after a worker restart. Handling a host that never returns also remains [open](agent-open-questions.md#agent-execution). Neither lost contact nor an expired lease authorizes launching the same generation on another host.
+Recovery after a whole-machine restart remains [open](agent-open-questions.md#Agent%20host), separately from recovery after a worker restart. Handling a host that never returns also remains [open](agent-open-questions.md#Agent%20launch). Neither lost contact nor an expired lease authorizes running the same agent launch on another host.
 
-[Session suspension](agent-session.md#session-lifecycle) saves a checkpoint at an idle turn boundary. It stops the VM and frees its slot. [Resume](agent-session.md#suspend-and-resume) restores guest paths and reacquires credentials outside the guest. It rechecks channels and port publications. Which process state survives and how resume or migration maps to execution generations remain [open](agent-open-questions.md#agents).
+Capture eligibility and restoration follow [Suspend and resume](agent-sandbox-lifecycle.md#Suspend%20and%20resume), with the provider-specific limits in [Provider lifecycle contracts](agent-sandbox-lifecycle.md#Provider%20lifecycle%20contracts).

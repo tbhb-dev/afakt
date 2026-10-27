@@ -27,7 +27,7 @@ exclude = [
 [per-file-ignores]
 # OKF indexes use star markers and docs use named top-level sections.
 "docs/index.md" = ["MD004"]
-"docs/*.md" = ["MD025"]
+"docs/*.md" = ["MD025", "MD051"]  # Links use Obsidian heading-text anchors.
 ".github/pull_request_template.md" = ["MD041"]
 
 [MD003]
