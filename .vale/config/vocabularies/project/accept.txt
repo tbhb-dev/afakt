@@ -20,6 +20,7 @@ shellcheck
 toolchain
 [Uu]buntu
 vendir
+vitejs
 (?:ESLint|eslint)
 [Ss]tryker
 Temporal
