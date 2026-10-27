@@ -35,3 +35,8 @@ api/openapi.bundle.yaml linguist-generated rebase-resolve=regenerate
 # Keep additions from both branches in the shared vocabulary lists.
 /.cspell-words.txt merge=union
 /.vale/config/vocabularies/project/accept.txt merge=union
+
+# Architecture exports are regenerated from docs/workspace.dsl.
+docs/workspace.json linguist-generated rebase-resolve=regenerate
+docs/diagrams/structurizr-* linguist-generated rebase-resolve=regenerate
+docs/diagrams/structurizr.sha256 linguist-generated rebase-resolve=regenerate

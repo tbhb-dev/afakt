@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+installation=$(mise where github:plantuml/plantuml)
+exec java -Djava.awt.headless=true -jar "$installation/plantuml.jar" "$@"

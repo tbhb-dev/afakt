@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+installation=$(mise where http:structurizr)
+exec java -Djava.awt.headless=true -jar "$installation/structurizr.war" "$@"

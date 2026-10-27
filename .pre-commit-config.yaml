@@ -66,6 +66,21 @@ repos:
 
   - repo: local
     hooks:
+      # Workspace exports must match the DSL before they enter history.
+      - id: check-workspace
+        name: Structurizr workspace freshness
+        entry: mise run check-workspace
+        language: system
+        files: ^docs/(workspace\.(dsl|json)$|diagrams/)
+        pass_filenames: false
+
+      - id: check-diagrams
+        name: Structurizr diagram freshness
+        entry: mise run check-diagrams
+        language: system
+        files: ^docs/(workspace\.(dsl|json)$|diagrams/)
+        pass_filenames: false
+
       - id: go-fmt
         exclude: ^vendor/
         name: go format check

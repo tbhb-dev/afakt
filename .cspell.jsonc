@@ -29,6 +29,10 @@
     "go.mod",
     "go.sum",
     "mise.lock",
+    // Architecture exports contain encoded DSL, style keys, and image metadata.
+    "docs/workspace.json",
+    "docs/diagrams/structurizr-*",
+    "docs/diagrams/structurizr.sha256",
     "pnpm-lock.yaml",
     "dist/**/*",
     "coverage.xml",

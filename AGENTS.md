@@ -26,6 +26,8 @@ A pnpm workspace at the repository root has one dependency lock and keeps the co
 
 `docs/` holds the OKF docs bundle. `scripts/okf-check.py` checks its format and the Markdown frontmatter across the repository.
 
+`docs/workspace.dsl` models the architecture. Structurizr and PlantUML generate its JSON and diagrams.
+
 `.devtools/` and `.config/mise/conf.d/` hold the devtools payload. The `vendir` tool owns both directories. Edit repository settings in the root configuration files.
 
 APM deploys the skills and rules from the devtools packages named in `apm.yml` to `.agents/` and `.claude/`. That includes `agent-commit`, `agent-pr`, and `agent-merge-pr`. `.agents/agent-skills.conf` holds this repository's policy for them, such as the lint commands and which changed paths go to the owner. The machine supplies the reviewer, the GitHub account, the required reviewer, and the delegation. The repository supplies none of them.
@@ -61,6 +63,12 @@ Read `mise.toml` before trusting it. In each fresh worktree, run `mise trust`, t
 | `mise run bundle-openapi` | Bundle the OpenAPI document into its single-file bundle |
 | `mise run check-openapi-bundle` | Fail when the committed OpenAPI bundle is out of date |
 | `mise run lint-openapi` | Lint the OpenAPI document and its bundle |
+| `mise run validate-workspace` | Check the Structurizr model |
+| `mise run lint-workspace` | Check workspace inspections |
+| `mise run generate-workspace` | Generate workspace JSON |
+| `mise run check-workspace` | Check workspace JSON freshness |
+| `mise run export-diagrams` | Render workspace views as images |
+| `mise run check-diagrams` | Check diagram sources and rendering hashes |
 | `mise run vuln` | Scan reachable Go vulnerabilities |
 | `mise run devtools:gomodscan` | Scan module dependencies |
 | `mise run vendor` | Tidy `go.mod` and refresh `vendor/` |

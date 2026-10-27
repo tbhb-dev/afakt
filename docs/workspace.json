@@ -1,0 +1,759 @@
+{
+  "configuration": {
+    "scope": "SoftwareSystem"
+  },
+  "description": "Architecture of the afakt modular monolith.",
+  "documentation": {},
+  "id": 0,
+  "model": {
+    "people": [
+      {
+        "description": "Runs afakt and inspects its workflows.",
+        "id": "1",
+        "name": "Developer or tester",
+        "properties": {
+          "structurizr.dsl.identifier": "developer"
+        },
+        "relationships": [
+          {
+            "description": "Runs commands",
+            "destinationId": "8",
+            "id": "16",
+            "sourceId": "1",
+            "tags": "Relationship",
+            "technology": "CLI"
+          },
+          {
+            "description": "Runs commands",
+            "destinationId": "7",
+            "id": "17",
+            "linkedRelationshipId": "16",
+            "sourceId": "1",
+            "technology": "CLI"
+          },
+          {
+            "description": "Runs commands",
+            "destinationId": "6",
+            "id": "18",
+            "linkedRelationshipId": "16",
+            "sourceId": "1",
+            "technology": "CLI"
+          },
+          {
+            "description": "Uses the dashboard",
+            "destinationId": "11",
+            "id": "19",
+            "sourceId": "1",
+            "tags": "Relationship",
+            "technology": "HTTP"
+          },
+          {
+            "description": "Inspects workflows",
+            "destinationId": "15",
+            "id": "20",
+            "sourceId": "1",
+            "tags": "Relationship",
+            "technology": "HTTP"
+          }
+        ],
+        "tags": "Element,Person"
+      }
+    ],
+    "softwareSystems": [
+      {
+        "description": "Delivers webhooks and exposes the GitHub API.",
+        "documentation": {},
+        "id": "2",
+        "name": "GitHub",
+        "properties": {
+          "structurizr.dsl.identifier": "github"
+        },
+        "relationships": [
+          {
+            "description": "Delivers webhooks",
+            "destinationId": "10",
+            "id": "26",
+            "sourceId": "2",
+            "tags": "Relationship",
+            "technology": "HTTP"
+          },
+          {
+            "description": "Delivers webhooks",
+            "destinationId": "7",
+            "id": "27",
+            "linkedRelationshipId": "26",
+            "sourceId": "2",
+            "technology": "HTTP"
+          },
+          {
+            "description": "Delivers webhooks",
+            "destinationId": "6",
+            "id": "28",
+            "linkedRelationshipId": "26",
+            "sourceId": "2",
+            "technology": "HTTP"
+          }
+        ],
+        "tags": "Element,Software System"
+      },
+      {
+        "description": "Clients of afakt's REST API.",
+        "documentation": {},
+        "id": "3",
+        "name": "Native apps",
+        "properties": {
+          "structurizr.dsl.identifier": "native"
+        },
+        "relationships": [
+          {
+            "description": "Calls the REST API",
+            "destinationId": "9",
+            "id": "21",
+            "sourceId": "3",
+            "tags": "Relationship",
+            "technology": "HTTP"
+          },
+          {
+            "description": "Calls the REST API",
+            "destinationId": "7",
+            "id": "22",
+            "linkedRelationshipId": "21",
+            "sourceId": "3",
+            "technology": "HTTP"
+          },
+          {
+            "description": "Calls the REST API",
+            "destinationId": "6",
+            "id": "23",
+            "linkedRelationshipId": "21",
+            "sourceId": "3",
+            "technology": "HTTP"
+          }
+        ],
+        "tags": "Element,Software System"
+      },
+      {
+        "description": "Perform coding work started by Agent runner.",
+        "documentation": {},
+        "id": "4",
+        "name": "AI coding agents",
+        "properties": {
+          "structurizr.dsl.identifier": "agents"
+        },
+        "tags": "Element,Software System"
+      },
+      {
+        "description": "Provides durable execution when workers use an external server.",
+        "documentation": {},
+        "id": "5",
+        "name": "External Temporal",
+        "properties": {
+          "structurizr.dsl.identifier": "temporal"
+        },
+        "tags": "Element,Software System"
+      },
+      {
+        "containers": [
+          {
+            "components": [
+              {
+                "description": "Runs server roles and communicates with the API.",
+                "documentation": {},
+                "id": "8",
+                "name": "Command-line interface",
+                "properties": {
+                  "structurizr.dsl.identifier": "cli"
+                },
+                "relationships": [
+                  {
+                    "description": "Calls the REST API",
+                    "destinationId": "9",
+                    "id": "24",
+                    "sourceId": "8",
+                    "tags": "Relationship",
+                    "technology": "HTTP"
+                  }
+                ],
+                "tags": "Element,Component",
+                "technology": "Go"
+              },
+              {
+                "description": "Serves the REST API and starts workflows.",
+                "documentation": {},
+                "id": "9",
+                "name": "API server",
+                "properties": {
+                  "structurizr.dsl.identifier": "api"
+                },
+                "relationships": [
+                  {
+                    "description": "Starts workflows in embedded mode",
+                    "destinationId": "12",
+                    "id": "34",
+                    "sourceId": "9",
+                    "tags": "Relationship",
+                    "technology": "Temporal"
+                  },
+                  {
+                    "description": "Starts workflows in external mode",
+                    "destinationId": "5",
+                    "id": "35",
+                    "sourceId": "9",
+                    "tags": "Relationship",
+                    "technology": "Temporal"
+                  },
+                  {
+                    "description": "Calls the GitHub API",
+                    "destinationId": "2",
+                    "id": "36",
+                    "sourceId": "9",
+                    "tags": "Relationship",
+                    "technology": "HTTP"
+                  }
+                ],
+                "tags": "Element,Component",
+                "technology": "Go"
+              },
+              {
+                "description": "Accepts webhook deliveries and starts coordination work.",
+                "documentation": {},
+                "id": "10",
+                "name": "GitHub webhook receiver",
+                "properties": {
+                  "structurizr.dsl.identifier": "webhook"
+                },
+                "relationships": [
+                  {
+                    "description": "Calls the REST API",
+                    "destinationId": "9",
+                    "id": "29",
+                    "sourceId": "10",
+                    "tags": "Relationship",
+                    "technology": "HTTP"
+                  },
+                  {
+                    "description": "Starts workflows in embedded mode",
+                    "destinationId": "12",
+                    "id": "30",
+                    "sourceId": "10",
+                    "tags": "Relationship",
+                    "technology": "Temporal"
+                  },
+                  {
+                    "description": "Starts workflows in external mode",
+                    "destinationId": "5",
+                    "id": "31",
+                    "sourceId": "10",
+                    "tags": "Relationship",
+                    "technology": "Temporal"
+                  }
+                ],
+                "tags": "Element,Component",
+                "technology": "Go"
+              },
+              {
+                "description": "Provides the web UI from the API's origin.",
+                "documentation": {},
+                "id": "11",
+                "name": "Web dashboard",
+                "properties": {
+                  "structurizr.dsl.identifier": "dashboard"
+                },
+                "relationships": [
+                  {
+                    "description": "Calls the REST API",
+                    "destinationId": "9",
+                    "id": "25",
+                    "sourceId": "11",
+                    "tags": "Relationship",
+                    "technology": "HTTP"
+                  }
+                ],
+                "tags": "Element,Component",
+                "technology": "React"
+              },
+              {
+                "description": "Provides durable execution inside the process for development and tests.",
+                "documentation": {},
+                "id": "12",
+                "name": "Embedded workflow orchestrator",
+                "properties": {
+                  "structurizr.dsl.identifier": "orchestrator"
+                },
+                "tags": "Element,Component",
+                "technology": "Temporal"
+              },
+              {
+                "description": "Coordinate work on workers inside the binary and start other workflows.",
+                "documentation": {},
+                "id": "13",
+                "name": "Coordination workflows",
+                "properties": {
+                  "structurizr.dsl.identifier": "workflows"
+                },
+                "relationships": [
+                  {
+                    "description": "Calls the REST API",
+                    "destinationId": "9",
+                    "id": "39",
+                    "sourceId": "13",
+                    "tags": "Relationship",
+                    "technology": "HTTP"
+                  },
+                  {
+                    "description": "Calls the GitHub API",
+                    "destinationId": "2",
+                    "id": "40",
+                    "sourceId": "13",
+                    "tags": "Relationship",
+                    "technology": "HTTP"
+                  },
+                  {
+                    "description": "Uses durable execution in embedded mode",
+                    "destinationId": "12",
+                    "id": "41",
+                    "sourceId": "13",
+                    "tags": "Relationship",
+                    "technology": "Temporal"
+                  },
+                  {
+                    "description": "Uses durable execution in external mode",
+                    "destinationId": "5",
+                    "id": "42",
+                    "sourceId": "13",
+                    "tags": "Relationship",
+                    "technology": "Temporal"
+                  },
+                  {
+                    "description": "Starts agent work",
+                    "destinationId": "14",
+                    "id": "43",
+                    "sourceId": "13",
+                    "tags": "Relationship",
+                    "technology": "Temporal"
+                  }
+                ],
+                "tags": "Element,Component",
+                "technology": "Temporal"
+              },
+              {
+                "description": "Runs AI coding agents as a workflow.",
+                "documentation": {},
+                "id": "14",
+                "name": "Agent runner",
+                "properties": {
+                  "structurizr.dsl.identifier": "runner"
+                },
+                "relationships": [
+                  {
+                    "description": "Runs coding agents",
+                    "destinationId": "4",
+                    "id": "44",
+                    "sourceId": "14",
+                    "tags": "Relationship",
+                    "technology": "Process"
+                  }
+                ],
+                "tags": "Element,Component",
+                "technology": "Temporal"
+              },
+              {
+                "description": "Shows the embedded server's namespaces, workflows, and histories.",
+                "documentation": {},
+                "id": "15",
+                "name": "Temporal Web UI",
+                "properties": {
+                  "structurizr.dsl.identifier": "temporalUI"
+                },
+                "relationships": [
+                  {
+                    "description": "Reads namespaces and workflow histories",
+                    "destinationId": "12",
+                    "id": "47",
+                    "sourceId": "15",
+                    "tags": "Relationship",
+                    "technology": "Temporal"
+                  }
+                ],
+                "tags": "Element,Component",
+                "technology": "Temporal"
+              }
+            ],
+            "description": "Runs the selected runtime roles together or separately from the same binary.",
+            "documentation": {},
+            "id": "7",
+            "name": "afakt process",
+            "properties": {
+              "structurizr.dsl.identifier": "runtime"
+            },
+            "relationships": [
+              {
+                "description": "Starts workflows in external mode",
+                "destinationId": "5",
+                "id": "32",
+                "linkedRelationshipId": "31",
+                "sourceId": "7",
+                "technology": "Temporal"
+              },
+              {
+                "description": "Calls the GitHub API",
+                "destinationId": "2",
+                "id": "37",
+                "linkedRelationshipId": "36",
+                "sourceId": "7",
+                "technology": "HTTP"
+              },
+              {
+                "description": "Runs coding agents",
+                "destinationId": "4",
+                "id": "45",
+                "linkedRelationshipId": "44",
+                "sourceId": "7",
+                "technology": "Process"
+              }
+            ],
+            "tags": "Element,Container",
+            "technology": "Go"
+          }
+        ],
+        "description": "Coordinates coding work through its API and workflows.",
+        "documentation": {},
+        "id": "6",
+        "name": "afakt",
+        "properties": {
+          "structurizr.dsl.identifier": "afakt"
+        },
+        "relationships": [
+          {
+            "description": "Starts workflows in external mode",
+            "destinationId": "5",
+            "id": "33",
+            "linkedRelationshipId": "31",
+            "sourceId": "6",
+            "technology": "Temporal"
+          },
+          {
+            "description": "Calls the GitHub API",
+            "destinationId": "2",
+            "id": "38",
+            "linkedRelationshipId": "36",
+            "sourceId": "6",
+            "technology": "HTTP"
+          },
+          {
+            "description": "Runs coding agents",
+            "destinationId": "4",
+            "id": "46",
+            "linkedRelationshipId": "44",
+            "sourceId": "6",
+            "technology": "Process"
+          }
+        ],
+        "tags": "Element,Software System"
+      }
+    ]
+  },
+  "name": "afakt",
+  "properties": {
+    "structurizr.inspection.error": "0",
+    "structurizr.inspection.model.softwaresystem.documentation": "ignore",
+    "structurizr.dsl": "d29ya3NwYWNlICJhZmFrdCIgIkFyY2hpdGVjdHVyZSBvZiB0aGUgYWZha3QgbW9kdWxhciBtb25vbGl0aC4iIHsKICAgIHByb3BlcnRpZXMgewogICAgICAgIC8vIERvY3VtZW50YXRpb24gYW5kIGRlY2lzaW9ucyBzdGF5IGluIHRoZSByZXBvc2l0b3J5J3MgZG9jcyBidW5kbGUuCiAgICAgICAgc3RydWN0dXJpenIuaW5zcGVjdGlvbi5tb2RlbC5zb2Z0d2FyZXN5c3RlbS5kb2N1bWVudGF0aW9uIGlnbm9yZQogICAgICAgIHN0cnVjdHVyaXpyLmluc3BlY3Rpb24ubW9kZWwuc29mdHdhcmVzeXN0ZW0uZGVjaXNpb25zIGlnbm9yZQogICAgfQoKICAgIG1vZGVsIHsKICAgICAgICBkZXZlbG9wZXIgPSBwZXJzb24gIkRldmVsb3BlciBvciB0ZXN0ZXIiICJSdW5zIGFmYWt0IGFuZCBpbnNwZWN0cyBpdHMgd29ya2Zsb3dzLiIKICAgICAgICBnaXRodWIgPSBzb2Z0d2FyZVN5c3RlbSAiR2l0SHViIiAiRGVsaXZlcnMgd2ViaG9va3MgYW5kIGV4cG9zZXMgdGhlIEdpdEh1YiBBUEkuIgogICAgICAgIG5hdGl2ZSA9IHNvZnR3YXJlU3lzdGVtICJOYXRpdmUgYXBwcyIgIkNsaWVudHMgb2YgYWZha3QncyBSRVNUIEFQSS4iCiAgICAgICAgYWdlbnRzID0gc29mdHdhcmVTeXN0ZW0gIkFJIGNvZGluZyBhZ2VudHMiICJQZXJmb3JtIGNvZGluZyB3b3JrIHN0YXJ0ZWQgYnkgQWdlbnQgcnVubmVyLiIKICAgICAgICB0ZW1wb3JhbCA9IHNvZnR3YXJlU3lzdGVtICJFeHRlcm5hbCBUZW1wb3JhbCIgIlByb3ZpZGVzIGR1cmFibGUgZXhlY3V0aW9uIHdoZW4gd29ya2VycyB1c2UgYW4gZXh0ZXJuYWwgc2VydmVyLiIKCiAgICAgICAgYWZha3QgPSBzb2Z0d2FyZVN5c3RlbSAiYWZha3QiICJDb29yZGluYXRlcyBjb2Rpbmcgd29yayB0aHJvdWdoIGl0cyBBUEkgYW5kIHdvcmtmbG93cy4iIHsKICAgICAgICAgICAgcnVudGltZSA9IGNvbnRhaW5lciAiYWZha3QgcHJvY2VzcyIgIlJ1bnMgdGhlIHNlbGVjdGVkIHJ1bnRpbWUgcm9sZXMgdG9nZXRoZXIgb3Igc2VwYXJhdGVseSBmcm9tIHRoZSBzYW1lIGJpbmFyeS4iICJHbyIgewogICAgICAgICAgICAgICAgY2xpID0gY29tcG9uZW50ICJDb21tYW5kLWxpbmUgaW50ZXJmYWNlIiAiUnVucyBzZXJ2ZXIgcm9sZXMgYW5kIGNvbW11bmljYXRlcyB3aXRoIHRoZSBBUEkuIiAiR28iCiAgICAgICAgICAgICAgICBhcGkgPSBjb21wb25lbnQgIkFQSSBzZXJ2ZXIiICJTZXJ2ZXMgdGhlIFJFU1QgQVBJIGFuZCBzdGFydHMgd29ya2Zsb3dzLiIgIkdvIgogICAgICAgICAgICAgICAgd2ViaG9vayA9IGNvbXBvbmVudCAiR2l0SHViIHdlYmhvb2sgcmVjZWl2ZXIiICJBY2NlcHRzIHdlYmhvb2sgZGVsaXZlcmllcyBhbmQgc3RhcnRzIGNvb3JkaW5hdGlvbiB3b3JrLiIgIkdvIgogICAgICAgICAgICAgICAgZGFzaGJvYXJkID0gY29tcG9uZW50ICJXZWIgZGFzaGJvYXJkIiAiUHJvdmlkZXMgdGhlIHdlYiBVSSBmcm9tIHRoZSBBUEkncyBvcmlnaW4uIiAiUmVhY3QiCiAgICAgICAgICAgICAgICBvcmNoZXN0cmF0b3IgPSBjb21wb25lbnQgIkVtYmVkZGVkIHdvcmtmbG93IG9yY2hlc3RyYXRvciIgIlByb3ZpZGVzIGR1cmFibGUgZXhlY3V0aW9uIGluc2lkZSB0aGUgcHJvY2VzcyBmb3IgZGV2ZWxvcG1lbnQgYW5kIHRlc3RzLiIgIlRlbXBvcmFsIgogICAgICAgICAgICAgICAgd29ya2Zsb3dzID0gY29tcG9uZW50ICJDb29yZGluYXRpb24gd29ya2Zsb3dzIiAiQ29vcmRpbmF0ZSB3b3JrIG9uIHdvcmtlcnMgaW5zaWRlIHRoZSBiaW5hcnkgYW5kIHN0YXJ0IG90aGVyIHdvcmtmbG93cy4iICJUZW1wb3JhbCIKICAgICAgICAgICAgICAgIHJ1bm5lciA9IGNvbXBvbmVudCAiQWdlbnQgcnVubmVyIiAiUnVucyBBSSBjb2RpbmcgYWdlbnRzIGFzIGEgd29ya2Zsb3cuIiAiVGVtcG9yYWwiCiAgICAgICAgICAgICAgICB0ZW1wb3JhbFVJID0gY29tcG9uZW50ICJUZW1wb3JhbCBXZWIgVUkiICJTaG93cyB0aGUgZW1iZWRkZWQgc2VydmVyJ3MgbmFtZXNwYWNlcywgd29ya2Zsb3dzLCBhbmQgaGlzdG9yaWVzLiIgIlRlbXBvcmFsIgogICAgICAgICAgICB9CiAgICAgICAgfQoKICAgICAgICBkZXZlbG9wZXIgLT4gY2xpICJSdW5zIGNvbW1hbmRzIiAiQ0xJIgogICAgICAgIGRldmVsb3BlciAtPiBkYXNoYm9hcmQgIlVzZXMgdGhlIGRhc2hib2FyZCIgIkhUVFAiCiAgICAgICAgZGV2ZWxvcGVyIC0+IHRlbXBvcmFsVUkgIkluc3BlY3RzIHdvcmtmbG93cyIgIkhUVFAiCiAgICAgICAgbmF0aXZlIC0+IGFwaSAiQ2FsbHMgdGhlIFJFU1QgQVBJIiAiSFRUUCIKICAgICAgICBjbGkgLT4gYXBpICJDYWxscyB0aGUgUkVTVCBBUEkiICJIVFRQIgogICAgICAgIGRhc2hib2FyZCAtPiBhcGkgIkNhbGxzIHRoZSBSRVNUIEFQSSIgIkhUVFAiCiAgICAgICAgZ2l0aHViIC0+IHdlYmhvb2sgIkRlbGl2ZXJzIHdlYmhvb2tzIiAiSFRUUCIKICAgICAgICB3ZWJob29rIC0+IGFwaSAiQ2FsbHMgdGhlIFJFU1QgQVBJIiAiSFRUUCIKICAgICAgICB3ZWJob29rIC0+IG9yY2hlc3RyYXRvciAiU3RhcnRzIHdvcmtmbG93cyBpbiBlbWJlZGRlZCBtb2RlIiAiVGVtcG9yYWwiCiAgICAgICAgd2ViaG9vayAtPiB0ZW1wb3JhbCAiU3RhcnRzIHdvcmtmbG93cyBpbiBleHRlcm5hbCBtb2RlIiAiVGVtcG9yYWwiCiAgICAgICAgYXBpIC0+IG9yY2hlc3RyYXRvciAiU3RhcnRzIHdvcmtmbG93cyBpbiBlbWJlZGRlZCBtb2RlIiAiVGVtcG9yYWwiCiAgICAgICAgYXBpIC0+IHRlbXBvcmFsICJTdGFydHMgd29ya2Zsb3dzIGluIGV4dGVybmFsIG1vZGUiICJUZW1wb3JhbCIKICAgICAgICBhcGkgLT4gZ2l0aHViICJDYWxscyB0aGUgR2l0SHViIEFQSSIgIkhUVFAiCiAgICAgICAgd29ya2Zsb3dzIC0+IGFwaSAiQ2FsbHMgdGhlIFJFU1QgQVBJIiAiSFRUUCIKICAgICAgICB3b3JrZmxvd3MgLT4gZ2l0aHViICJDYWxscyB0aGUgR2l0SHViIEFQSSIgIkhUVFAiCiAgICAgICAgd29ya2Zsb3dzIC0+IG9yY2hlc3RyYXRvciAiVXNlcyBkdXJhYmxlIGV4ZWN1dGlvbiBpbiBlbWJlZGRlZCBtb2RlIiAiVGVtcG9yYWwiCiAgICAgICAgd29ya2Zsb3dzIC0+IHRlbXBvcmFsICJVc2VzIGR1cmFibGUgZXhlY3V0aW9uIGluIGV4dGVybmFsIG1vZGUiICJUZW1wb3JhbCIKICAgICAgICB3b3JrZmxvd3MgLT4gcnVubmVyICJTdGFydHMgYWdlbnQgd29yayIgIlRlbXBvcmFsIgogICAgICAgIHJ1bm5lciAtPiBhZ2VudHMgIlJ1bnMgY29kaW5nIGFnZW50cyIgIlByb2Nlc3MiCiAgICAgICAgdGVtcG9yYWxVSSAtPiBvcmNoZXN0cmF0b3IgIlJlYWRzIG5hbWVzcGFjZXMgYW5kIHdvcmtmbG93IGhpc3RvcmllcyIgIlRlbXBvcmFsIgogICAgfQoKICAgIHZpZXdzIHsKICAgICAgICBwcm9wZXJ0aWVzIHsKICAgICAgICAgICAgcGxhbnR1bWwuc2tpbnBhcmFtcyAibm9kZXNlcD04MCxyYW5rc2VwPTE2MCIKICAgICAgICB9CiAgICAgICAgc3lzdGVtQ29udGV4dCBhZmFrdCAiYWZha3QtY29udGV4dCIgImFmYWt0IGFuZCB0aGUgcGVvcGxlIGFuZCBzeXN0ZW1zIGl0IGludGVyYWN0cyB3aXRoLiIgewogICAgICAgICAgICBpbmNsdWRlICoKICAgICAgICAgICAgYXV0b0xheW91dCBscgogICAgICAgIH0KICAgICAgICBjb250YWluZXIgYWZha3QgImFmYWt0LWNvbnRhaW5lcnMiICJUaGUgYWZha3QgcHJvY2VzcyBhbmQgaXRzIGV4dGVybmFsIGRlcGVuZGVuY2llcy4iIHsKICAgICAgICAgICAgaW5jbHVkZSAqCiAgICAgICAgICAgIGF1dG9MYXlvdXQgbHIKICAgICAgICB9CiAgICAgICAgY29tcG9uZW50IHJ1bnRpbWUgImFmYWt0LWNvbXBvbmVudHMiICJUaGUgcm9sZXMgaW5zaWRlIHRoZSBjb21iaW5lZCBhZmFrdCBwcm9jZXNzLiIgewogICAgICAgICAgICBpbmNsdWRlICoKICAgICAgICAgICAgYXV0b0xheW91dCBscgogICAgICAgIH0KICAgIH0KCiAgICBjb25maWd1cmF0aW9uIHsKICAgICAgICBzY29wZSBzb2Z0d2FyZXN5c3RlbQogICAgfQp9",
+    "structurizr.inspection.model.softwaresystem.decisions": "ignore",
+    "structurizr.inspection.info": "0",
+    "structurizr.inspection.ignore": "2",
+    "structurizr.inspection.warning": "0"
+  },
+  "views": {
+    "componentViews": [
+      {
+        "automaticLayout": {
+          "edgeSeparation": 50,
+          "nodeSeparation": 50,
+          "rankDirection": "LeftRight",
+          "rankSeparation": 100,
+          "vertices": true
+        },
+        "containerId": "7",
+        "description": "The roles inside the combined afakt process.",
+        "elements": [
+          {
+            "id": "1",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "2",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "3",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "4",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "5",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "8",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "9",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "10",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "11",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "12",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "13",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "14",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "15",
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "externalContainerBoundariesVisible": false,
+        "key": "afakt-components",
+        "name": "Component View: afakt - afakt process",
+        "order": 3,
+        "relationships": [
+          {
+            "id": "16"
+          },
+          {
+            "id": "19"
+          },
+          {
+            "id": "20"
+          },
+          {
+            "id": "21"
+          },
+          {
+            "id": "24"
+          },
+          {
+            "id": "25"
+          },
+          {
+            "id": "26"
+          },
+          {
+            "id": "29"
+          },
+          {
+            "id": "30"
+          },
+          {
+            "id": "31"
+          },
+          {
+            "id": "34"
+          },
+          {
+            "id": "35"
+          },
+          {
+            "id": "36"
+          },
+          {
+            "id": "39"
+          },
+          {
+            "id": "40"
+          },
+          {
+            "id": "41"
+          },
+          {
+            "id": "42"
+          },
+          {
+            "id": "43"
+          },
+          {
+            "id": "44"
+          },
+          {
+            "id": "47"
+          }
+        ]
+      }
+    ],
+    "configuration": {
+      "properties": {
+        "plantuml.skinparams": "nodesep=80,ranksep=160"
+      },
+      "styles": {},
+      "terminology": {}
+    },
+    "containerViews": [
+      {
+        "automaticLayout": {
+          "edgeSeparation": 50,
+          "nodeSeparation": 50,
+          "rankDirection": "LeftRight",
+          "rankSeparation": 100,
+          "vertices": true
+        },
+        "description": "The afakt process and its external dependencies.",
+        "elements": [
+          {
+            "id": "1",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "2",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "3",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "4",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "5",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "7",
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "externalSoftwareSystemBoundariesVisible": false,
+        "key": "afakt-containers",
+        "name": "Container View: afakt",
+        "order": 2,
+        "relationships": [
+          {
+            "id": "17"
+          },
+          {
+            "id": "22"
+          },
+          {
+            "id": "27"
+          },
+          {
+            "id": "32"
+          },
+          {
+            "id": "37"
+          },
+          {
+            "id": "45"
+          }
+        ],
+        "softwareSystemId": "6"
+      }
+    ],
+    "systemContextViews": [
+      {
+        "automaticLayout": {
+          "edgeSeparation": 50,
+          "nodeSeparation": 50,
+          "rankDirection": "LeftRight",
+          "rankSeparation": 100,
+          "vertices": true
+        },
+        "description": "afakt and the people and systems it interacts with.",
+        "elements": [
+          {
+            "id": "1",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "2",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "3",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "4",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "5",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "6",
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "enterpriseBoundaryVisible": true,
+        "key": "afakt-context",
+        "name": "System Context View: afakt",
+        "order": 1,
+        "relationships": [
+          {
+            "id": "18"
+          },
+          {
+            "id": "23"
+          },
+          {
+            "id": "28"
+          },
+          {
+            "id": "33"
+          },
+          {
+            "id": "38"
+          },
+          {
+            "id": "46"
+          }
+        ],
+        "softwareSystemId": "6"
+      }
+    ]
+  }
+}

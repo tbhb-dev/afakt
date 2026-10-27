@@ -45,6 +45,34 @@ url_api = "https://api.github.com/repos/bats-core/bats-core/tarball/v1.14.0"
 url = "https://github.com/bats-core/bats-core/archive/refs/tags/v1.14.0.tar.gz"
 url_api = "https://api.github.com/repos/bats-core/bats-core/tarball/v1.14.0"
 
+[[tools."github:plantuml/plantuml"]]
+version = "1.2026.9"
+backend = "github:plantuml/plantuml"
+specifiers = ["1.2026.9"]
+
+[tools."github:plantuml/plantuml".options]
+asset_pattern = "plantuml-1.2026.9.jar"
+
+[tools."github:plantuml/plantuml"."platforms.linux-arm64"]
+checksum = "sha256:aa4a1d06f8911c4b842beff4828dd955be431692b631a312d04c0e9fab9581de"
+url = "https://github.com/plantuml/plantuml/releases/download/v1.2026.9/plantuml-1.2026.9.jar"
+url_api = "https://api.github.com/repos/plantuml/plantuml/releases/assets/649980472"
+
+[tools."github:plantuml/plantuml"."platforms.linux-x64"]
+checksum = "sha256:aa4a1d06f8911c4b842beff4828dd955be431692b631a312d04c0e9fab9581de"
+url = "https://github.com/plantuml/plantuml/releases/download/v1.2026.9/plantuml-1.2026.9.jar"
+url_api = "https://api.github.com/repos/plantuml/plantuml/releases/assets/649980472"
+
+[tools."github:plantuml/plantuml"."platforms.macos-arm64"]
+checksum = "sha256:aa4a1d06f8911c4b842beff4828dd955be431692b631a312d04c0e9fab9581de"
+url = "https://github.com/plantuml/plantuml/releases/download/v1.2026.9/plantuml-1.2026.9.jar"
+url_api = "https://api.github.com/repos/plantuml/plantuml/releases/assets/649980472"
+
+[tools."github:plantuml/plantuml"."platforms.macos-x64"]
+checksum = "sha256:aa4a1d06f8911c4b842beff4828dd955be431692b631a312d04c0e9fab9581de"
+url = "https://github.com/plantuml/plantuml/releases/download/v1.2026.9/plantuml-1.2026.9.jar"
+url_api = "https://api.github.com/repos/plantuml/plantuml/releases/assets/649980472"
+
 [[tools."go:github.com/tbhb-dev/devtools/cmd/agentrepo"]]
 version = "0.21.0"
 backend = "go:github.com/tbhb-dev/devtools/cmd/agentrepo"
@@ -64,6 +92,51 @@ specifiers = ["v0.21.0"]
 version = "0.21.0"
 backend = "go:github.com/tbhb-dev/devtools/cmd/guard-markdown"
 specifiers = ["v0.21.0"]
+
+[[tools."http:structurizr"]]
+version = "2026.09.19"
+backend = "http:structurizr"
+specifiers = ["2026.09.19"]
+
+[tools."http:structurizr".options]
+format = "raw"
+
+[tools."http:structurizr"."platforms.linux-arm64"]
+checksum = "sha256:ac1a2806e246364b88261a542a36ca7f3006ef48e5de68830afa8672f58690f1"
+url = "https://download.structurizr.com/structurizr-2026.09.19.war"
+
+[tools."http:structurizr"."platforms.linux-x64"]
+checksum = "sha256:ac1a2806e246364b88261a542a36ca7f3006ef48e5de68830afa8672f58690f1"
+url = "https://download.structurizr.com/structurizr-2026.09.19.war"
+
+[tools."http:structurizr"."platforms.macos-arm64"]
+checksum = "sha256:ac1a2806e246364b88261a542a36ca7f3006ef48e5de68830afa8672f58690f1"
+url = "https://download.structurizr.com/structurizr-2026.09.19.war"
+
+[tools."http:structurizr"."platforms.macos-x64"]
+checksum = "sha256:ac1a2806e246364b88261a542a36ca7f3006ef48e5de68830afa8672f58690f1"
+url = "https://download.structurizr.com/structurizr-2026.09.19.war"
+
+[[tools.java]]
+version = "temurin-21.0.13+9.0.LTS"
+backend = "core:java"
+specifiers = ["temurin-21.0.13+9.0.LTS"]
+
+[tools.java."platforms.linux-arm64"]
+checksum = "sha256:e3522e707fc7dbe2a72c30746b1e7068301a0213ecd213d4491f35a14eb55578"
+url = "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.13%2B9/OpenJDK21U-jdk_aarch64_linux_hotspot_21.0.13_9.tar.gz"
+
+[tools.java."platforms.linux-x64"]
+checksum = "sha256:d7f5d5cf865a2902b70ff549b97586a7d3f234e016f041ab447ea740c7d66d1c"
+url = "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.13%2B9/OpenJDK21U-jdk_x64_linux_hotspot_21.0.13_9.tar.gz"
+
+[tools.java."platforms.macos-arm64"]
+checksum = "sha256:bf036b35b071bfb2f54f2c0af8ee8d88afa95ee6eb3dce02c0f94cfc2524d04a"
+url = "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.13%2B9/OpenJDK21U-jdk_aarch64_mac_hotspot_21.0.13_9.tar.gz"
+
+[tools.java."platforms.macos-x64"]
+checksum = "sha256:9aa1d1c17ae5467a022679e7e0af5c00797d94ac462ed1a46f4db07a8a34a6dd"
+url = "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.13%2B9/OpenJDK21U-jdk_x64_mac_hotspot_21.0.13_9.tar.gz"
 
 [[tools.jq]]
 version = "1.8.2"

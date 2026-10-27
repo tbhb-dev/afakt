@@ -21,8 +21,14 @@ vacuum = "0.33.2"
 # it must stay equal to the payload's.
 node = "24.21.0"
 pnpm = "12.14.0"
+# Java archives keep the diagram tools portable across Linux and macOS.
+# Neither project has an aqua entry; Structurizr publishes its WAR separately.
+java = "temurin-21.0.13+9.0.LTS"
+"github:plantuml/plantuml" = { version = "1.2026.9", asset_pattern = "plantuml-1.2026.9.jar", format = "raw", bin = "plantuml.jar" }
+"http:structurizr" = { version = "2026.09.19", url = "https://download.structurizr.com/structurizr-{{ version }}.war", checksum = "sha256:ac1a2806e246364b88261a542a36ca7f3006ef48e5de68830afa8672f58690f1", format = "raw", bin = "structurizr.war" }
 
 [env]
+_.path = ["{{config_root}}/scripts/architecture-bin"]
 DEVTOOLS_LOCK_PLATFORMS = "linux-x64,macos-arm64"
 DEVTOOLS_GO_MODULES_MODE = "vendor"
 DEVTOOLS_GENERATED_PATHS = ".devtools/\n.config/mise/\nbin/\ncoverage/\ntmp/\nspikes/\n.vale/"
@@ -154,7 +160,56 @@ run = [
   "mise run lint-ast-grep",
   "mise run lint-openapi",
   "mise run check-openapi-bundle",
+  "mise run validate-workspace",
+  "mise run lint-workspace",
+  "mise run check-workspace",
+  "mise run check-diagrams",
 ]
+
+# WORKSPACE_ROOT allows checks against temporary copies of docs/.
+[tasks.validate-workspace]
+description = "Validate the Structurizr workspace"
+run = 'structurizr validate -workspace "${WORKSPACE_ROOT:-docs}/workspace.dsl"'
+
+[tasks.lint-workspace]
+description = "Fail on workspace inspection violations"
+# Only the documentation and decisions rules have ignore severity in the DSL.
+run = 'structurizr inspect -workspace "${WORKSPACE_ROOT:-docs}/workspace.dsl" -severity error,warning,info'
+
+[tasks.generate-workspace]
+description = "Generate workspace JSON from the DSL"
+shell = "bash -c"
+run = '''
+set -euo pipefail
+root=${WORKSPACE_ROOT:-docs}
+dir=$(mktemp -d)
+trap 'rm -rf "$dir"' EXIT
+structurizr export -workspace "$root/workspace.dsl" -format json -output "$dir"
+biome format --stdin-file-path docs/workspace.json <"$dir/workspace.json" >"${WORKSPACE_JSON:-$root/workspace.json}"
+'''
+
+[tasks.check-workspace]
+description = "Check workspace JSON freshness"
+shell = "bash -c"
+run = '''
+set -euo pipefail
+root=${WORKSPACE_ROOT:-docs}
+dir=$(mktemp -d)
+trap 'rm -rf "$dir"' EXIT
+WORKSPACE_JSON=$dir/workspace.json mise run generate-workspace
+if ! diff -u "$root/workspace.json" "$dir/workspace.json"; then
+  echo "error: workspace JSON is out of date; run 'mise run generate-workspace' and commit the result" >&2
+  exit 1
+fi
+'''
+
+[tasks.export-diagrams]
+description = "Render workspace views as PNG and SVG with PlantUML"
+run = "bash scripts/workspace-diagrams.sh export"
+
+[tasks.check-diagrams]
+description = "Check diagram sources and rendering hashes"
+run = "bash scripts/workspace-diagrams.sh check"
 
 # The REST contract is the multi-file OpenAPI document under api/openapi/, and
 # api/openapi.bundle.yaml is its committed single-file bundle. OPENAPI_ROOT points

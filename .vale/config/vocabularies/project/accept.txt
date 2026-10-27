@@ -83,3 +83,11 @@ vminitd
 VMs
 vsock
 Zot
+[Nn]amespaces?
+[Ll]oopback
+[Ll]iveness
+Structurizr
+PlantUML
+Smetana
+Temurin
+Graphviz

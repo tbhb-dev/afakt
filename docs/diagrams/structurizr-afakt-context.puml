@@ -1,0 +1,57 @@
+@startuml
+title <size:24>System Context View: afakt</size>\n<size:24>afakt and the people and systems it interacts with.</size>
+
+set separator none
+left to right direction
+skinparam ranksep 20
+skinparam nodesep 5
+hide stereotype
+
+skinparam {
+  nodesep 80
+  ranksep 160
+}
+
+<style>
+  root {
+    BackgroundColor: #ffffff;
+    FontColor: #444444;
+  }
+  // Element
+  .Element-RWxlbWVudA== {
+    BackgroundColor: #ffffff;
+    LineColor: #444444;
+    LineStyle: 0;
+    LineThickness: 2;
+    FontColor: #444444;
+    FontSize: 24;
+    HorizontalAlignment: center;
+    Shadowing: 0;
+    MaximumWidth: 450;
+  }
+  // Relationship
+  .Relationship-UmVsYXRpb25zaGlw {
+    LineThickness: 2;
+    LineStyle: 10-10;
+    LineColor: #444444;
+    FontColor: #444444;
+    FontSize: 24;
+    MaximumWidth: 200;
+  }
+</style>
+
+rectangle "==Developer or tester\n<size:16>[Person]</size>\n\nRuns afakt and inspects its workflows." <<Element-RWxlbWVudA==>> as Developerortester
+rectangle "==GitHub\n<size:16>[Software System]</size>\n\nDelivers webhooks and exposes the GitHub API." <<Element-RWxlbWVudA==>> as GitHub
+rectangle "==Native apps\n<size:16>[Software System]</size>\n\nClients of afakt's REST API." <<Element-RWxlbWVudA==>> as Nativeapps
+rectangle "==AI coding agents\n<size:16>[Software System]</size>\n\nPerform coding work started by Agent runner." <<Element-RWxlbWVudA==>> as AIcodingagents
+rectangle "==External Temporal\n<size:16>[Software System]</size>\n\nProvides durable execution when workers use an external server." <<Element-RWxlbWVudA==>> as ExternalTemporal
+rectangle "==afakt\n<size:16>[Software System]</size>\n\nCoordinates coding work through its API and workflows." <<Element-RWxlbWVudA==>> as afakt
+
+Developerortester --> afakt <<Relationship-UmVsYXRpb25zaGlw>> : "Runs commands\n<size:16>[CLI]</size>"
+Nativeapps --> afakt <<Relationship-UmVsYXRpb25zaGlw>> : "Calls the REST API\n<size:16>[HTTP]</size>"
+GitHub --> afakt <<Relationship-UmVsYXRpb25zaGlw>> : "Delivers webhooks\n<size:16>[HTTP]</size>"
+afakt --> ExternalTemporal <<Relationship-UmVsYXRpb25zaGlw>> : "Starts workflows in external mode\n<size:16>[Temporal]</size>"
+afakt --> GitHub <<Relationship-UmVsYXRpb25zaGlw>> : "Calls the GitHub API\n<size:16>[HTTP]</size>"
+afakt --> AIcodingagents <<Relationship-UmVsYXRpb25zaGlw>> : "Runs coding agents\n<size:16>[Process]</size>"
+
+@enduml
