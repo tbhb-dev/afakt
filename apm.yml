@@ -2,10 +2,11 @@
 name: afakt
 version: 0.1.0
 description: Shared agent tools for afakt
-target: [claude, codex]
+target: [claude, codex, antigravity]
 dependencies:
   apm:
     - tbhb-dev/devtools/packages/agents/claude#v0.21.0
     - tbhb-dev/devtools/packages/agents/codex#v0.21.0
     - tbhb-dev/devtools/packages/agents/common#v0.21.0
+    - ./scripts/apm/diagrams
   mcp: []

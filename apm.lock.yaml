@@ -1,6 +1,12 @@
 lockfile_version: '1'
 apm_version: 0.34.0
 dependencies:
+- repo_url: _local/diagrams
+  name: afakt-diagrams
+  version: 0.1.0
+  package_type: apm_package
+  source: local
+  local_path: ./scripts/apm/diagrams
 - repo_url: tbhb-dev/devtools
   name: devtools-agents-claude
   host: github.com
@@ -585,12 +591,1292 @@ dependencies:
   is_virtual: true
   package_type: apm_package
   deployed_files:
+  - .agents/rules/worktree-wip.md
   - .claude/rules/worktree-wip.md
   deployed_file_hashes:
+    .agents/rules/worktree-wip.md: sha256:88c46fe1f064de83c89c7cd6f833fc5e312b63e1d479c80b7d48bf26adbe63fc
     .claude/rules/worktree-wip.md: sha256:cd5ab694ce595f611a5793627606f96a8d346ee9fd067f24578c3a86232a8200
   content_hash: sha256:dbb05c8341d325afc3570512e8592e97c9e0b522ac8a4ef69d7cabbac0d91f3a
   declared_license: Apache-2.0
 deployments:
+- kind: project-relative
+  target: antigravity
+  value: .agents/rules/worktree-wip.md
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/common
+  active_owner: tbhb-dev/devtools/packages/agents/common
+  content_hash: sha256:88c46fe1f064de83c89c7cd6f833fc5e312b63e1d479c80b7d48bf26adbe63fc
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/agent-commit
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: null
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/agent-commit/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:af1eeb4163d80a33edf57518ace932295236d812988c0f2a961c05e6e6be1288
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/agent-commit/scripts/commit.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:3a379c838192d4e0ea7c3efafa4d8a9ea6a39a4bfed52f2ecc79df48fbba278b
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/agent-commit/scripts/preflight.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:150577c193b70fb169147eb619b8a715d37327fa7cd4b502b556cd5a87e8f0a8
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/agent-commit/scripts/review.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:561b69d7c0892c14deb1d1946a9ebefea817d64ff066a17dc02b8311b3711039
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/agent-commit/tokens.json
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:66b6ac3e90f560ae5d3a87f395aa4965ff305acc9821912d972e3ae587489fe2
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/agent-merge-pr
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: null
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/agent-merge-pr/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:2958e32035f16927276b4a2fe69adcdc7913fd2165994deaf9019b2c1095ab65
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/agent-merge-pr/scripts/lint-squash-msg.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:3c5c3cf4694dbb291dada2279ffbf8312707e6025078ac0c38c2a829c60e5097
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/agent-merge-pr/scripts/merge.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:eed8c25ee35205e750192aa8ae6cd06cc5efd3ba8ff8adb3b8eb44fd07803142
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/agent-merge-pr/scripts/preflight.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:6556e7396f94e9f3241769f1f795145070a0ebdb3c411dac68decde5daff7e35
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/agent-merge-pr/scripts/review.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:6808c9db9267d93ff1a6eb3f205fbb80ed072ef5ccd97726efae9cc5b43e7956
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/agent-merge-pr/scripts/squash-message.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:5e114db1fc7354da7d5a1f94e2f124cdae950c1215763c0eb6ae6fff1eca278c
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/agent-merge-pr/tokens.json
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:9027f8a0a6bbc38a9a61537b4d8a80fffa540d4c8e0c454f8d7a23b166243c81
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/agent-pr
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: null
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/agent-pr/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:be6daa524458c1dc0df1137da01621c437849c6327063ef91a8d260cdeb182f3
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/agent-pr/scripts/check.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:d31964cbb5ae85554820983c3b6e5904790a152a17696f2cddb8b2f76d692cd3
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/agent-pr/scripts/preflight.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:fa23bac0cf361bd68eedd361bdf88c825f33dd512df3631fdf275069fa07dbb4
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/agent-pr/scripts/publish.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:b8df7373247a0be0dde24669a715936d27f0ae0ee29eb0357f99686a0dcc0e79
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/agent-pr/scripts/review.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:4ec3592d688f48b939a1a5996835e504fb07006e689b0ec76ac4279f810b6886
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/agent-pr/tokens.json
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:f67a6a9e11528caf8c60b01832bbbb538c46a3d1da1282343dad36c1bd45004b
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/analyze-session
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: null
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/analyze-session/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:5811bcb4fd5601ec94fa7ca8584057d03167cb1f145b832eeb87338d9b30878e
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/analyze-session/references/DISPATCH.md
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:646dc014af74f0f2cdf66b85f1e43ff3eae159908d22f84e19440414f09320fe
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/analyze-session/references/FIX_SURFACES.md
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:4dbb24328fae4f1140d8a3652d47618ea541fa41dba44a7eb853fea97167b440
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/analyze-session/references/LOCATE_SESSION.md
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:48d949bf80057a059ae9fc288292486cf5a0e8d4aacd315574770d14ebbadc9d
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/analyze-session/references/SESSION_CLI.md
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:4a2f4a39e95ee7e46d5b1d06369c4e9777dd220874f6d28c79e4de24ded22ad2
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/analyze-session/references/VERIFY_FIGURES.md
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:95526362483d368cc06974cf1d254a9d2811f7df7079ca1d0475ee4c691ca741
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/analyze-session/references/WRITING_THE_RETRO.md
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:13853f367e1eced082323ea80d741b98e502f49c8287b4647df9754a65a751e0
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/analyze-session/scripts/agent.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:6d3a31863a535b4225f974dd361b45b1d7a5b590e94bf7aed3706e88066258d7
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/analyze-session/scripts/gates.py
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:f49d8d33c3b5d4d0cf7f0b8c06cfe61ae72e6215b78d3e1e83fe931a5a03a3a1
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/analyze-session/scripts/lib.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:565412f754c6cf76d12d5d0dbeb2bf321b22761bcbb07e37f91dfdd6fe737a2a
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/analyze-session/scripts/new-retro.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:72e79c127954623bd7efddb80ad797dee9bb4cb6e1bd16bca770dab8bf900041
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/analyze-session/scripts/preflight.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:2e74ccb12e3b067bbf6f16f0fe8b1def6c1dd501364ae8128f36b37991153cb2
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/analyze-session/scripts/session.py
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:e13d29bc8bbbbfa55f1d059ddbc1ec655dcca98648d75d57fe00567bf6ff6d1f
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/analyze-session/scripts/signing.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:683201ce6ea252f7345269f2cf7c766c887190ab8a8095da01dd4795ef5d79a6
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/analyze-session/templates/RETRO.md
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:370e324ac6c5e971d1a0b28e1329b3e1c20c26107f3a3af49c046219c9a204b4
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/analyze-session/tokens.json
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:a754f9fb13b90f33e17a7a921e6aad421d45c4753dc603fbd9cbff28b2693e4c
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/commit
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: null
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/commit/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:1095d91fb383f11a495c2da651478bf540d0f4fda894e1c09259753b63481494
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/commit/references/PRECONDITIONS.md
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:776768efbfd69a12eb9dba9bc476ee9eef9c0ceea841999bfbad154b59f22c01
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/commit/scripts/agent.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:6d3a31863a535b4225f974dd361b45b1d7a5b590e94bf7aed3706e88066258d7
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/commit/scripts/commit.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:eae6cacf228ad89c6a843f1735a9cd1f9a923c8bd09a8e19feb2cba4ad66257a
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/commit/scripts/gates.py
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:f49d8d33c3b5d4d0cf7f0b8c06cfe61ae72e6215b78d3e1e83fe931a5a03a3a1
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/commit/scripts/lib.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:565412f754c6cf76d12d5d0dbeb2bf321b22761bcbb07e37f91dfdd6fe737a2a
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/commit/scripts/preflight.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:8cd176d02d0359f47c7c2d314464f8b04018d6b8239ade8bd7f814c7108f0604
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/commit/scripts/review.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:809b56b6d38148f498c769ab3c383c45adc772a36671f62ea7ac6423e540a740
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/commit/scripts/signing.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:683201ce6ea252f7345269f2cf7c766c887190ab8a8095da01dd4795ef5d79a6
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/commit/scripts/worktree-ready.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:8323a36ec25731a8a9f99dde74b8d24c1d6f536d8ebebe29b53dcfab4b51fc44
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/commit/tokens.json
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:0c7d0a2b73f7f252204e64b426c6d451824c27640d430da1a8756b2d07fc2780
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/fix-pr
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: null
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/fix-pr/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:1ce23ba50c41d45e5dc854d7ac80a0eea4ab58ee76a14a456a32cdb6785f6123
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/fix-pr/scripts/diagnose.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:26046384b56242bd2e45e8742a855e1962546bc81bf8b07495bfa0ffd67e15d3
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/fix-pr/scripts/populate-description.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:ed9688d83433ff7e1700255ae02e3dc912faf34dc34bdd9edb22eb02b8032d3a
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/fix-pr/tokens.json
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:f8390c69343a06d8db0903444e19857404b91b7dfeee9be2633ae33f213f5225
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/fix-prose
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: null
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/fix-prose/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:6ee4a1f771504936ea8b02c9de3f8defef58e95279047d366b8ea8db3dba30b0
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/fix-prose/scripts/check-suppressions.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:375c5b7f6a7782696d664d24a771b8df35b3dd72e90742fd25071852b90d98b3
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/fix-prose/scripts/preflight.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:513ec77a957b7e37ed8c9690133e114f37f8a3f98995a1427c8f8d8924b23272
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/fix-prose/tokens.json
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:d04e26efd8df0fc86eeb2200742ed17d8b02415d31d39361c880703f7869f2e4
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/merge-pr
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: null
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/merge-pr/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:34439e46cc5cf909c98c222f177f1b81fd4134582de9a19aad526a84e443e2f6
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/merge-pr/scripts/agent.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:6d3a31863a535b4225f974dd361b45b1d7a5b590e94bf7aed3706e88066258d7
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/merge-pr/scripts/gates.py
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:f49d8d33c3b5d4d0cf7f0b8c06cfe61ae72e6215b78d3e1e83fe931a5a03a3a1
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/merge-pr/scripts/lib.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:565412f754c6cf76d12d5d0dbeb2bf321b22761bcbb07e37f91dfdd6fe737a2a
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/merge-pr/scripts/lint-squash-msg.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:910879475b0b3ae890734b0879a6e7c2298e8ff35335fc64efae600bc23ec199
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/merge-pr/scripts/merge-agent.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:0cf53ada529db8401c46bd6a4bca1cf015a915573e386890a53c7c9037867652
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/merge-pr/scripts/merge-policy.py
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:2f6fc6e2db6cf4bd558e344c4dc246dfca6dfda8abeb6a9a892746738e92d9c5
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/merge-pr/scripts/populate-description.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:ed9688d83433ff7e1700255ae02e3dc912faf34dc34bdd9edb22eb02b8032d3a
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/merge-pr/scripts/preflight.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:1e8c899e7db05cad6cd6acdba440ac2472c6d491b757770a8e391113a29b98cc
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/merge-pr/scripts/pull-request.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:24d1aea50d24fb0ca9f27b0d73d12964ffb247a99dfe9d43dad9287c9009fead
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/merge-pr/scripts/review.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:4718f4d6cbbd3487ca1abb973d32ad746ecd9f0d34c30d12d1a7febdd7832a5c
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/merge-pr/scripts/signing.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:683201ce6ea252f7345269f2cf7c766c887190ab8a8095da01dd4795ef5d79a6
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/merge-pr/scripts/squash-merge.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:f194e934740cec0a113fb5d77d71bf76b929cddc2ede9a8700ede6a63d7f3eb6
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/merge-pr/scripts/squash-message.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:9b512745a0ef14ab52cb6625460556ac62f2cf80afec89d021885679b674c683
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/merge-pr/scripts/worktree-ready.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:8323a36ec25731a8a9f99dde74b8d24c1d6f536d8ebebe29b53dcfab4b51fc44
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/merge-pr/tokens.json
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:b29065b218081651961014c7d1679ce794b0eae5284d4b9a0b399bde4d596263
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/pr
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: null
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/pr/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:17983492cd785e3cf6121d21449fcd976cbef11ec5a00f50db380991315c7da0
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/pr/scripts/agent.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:6d3a31863a535b4225f974dd361b45b1d7a5b590e94bf7aed3706e88066258d7
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/pr/scripts/check.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:447a4f1808090a20ac22750050c4f9fc05fd130d5bfe8e2621ff23957492677e
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/pr/scripts/create-pr.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:bad2cf9ff12f07b0d9c3e2889de4bad1182aadcdd600c44a736d815349adc1e3
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/pr/scripts/description.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:3c91741b1a46bf9b16dcc63d5272ad9aedfe1f95a5a24bd185b0ef90d89bf5b1
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/pr/scripts/gates.py
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:f49d8d33c3b5d4d0cf7f0b8c06cfe61ae72e6215b78d3e1e83fe931a5a03a3a1
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/pr/scripts/lib.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:565412f754c6cf76d12d5d0dbeb2bf321b22761bcbb07e37f91dfdd6fe737a2a
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/pr/scripts/pr-agent.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:4465bee1d44c31a231454c4514b0bd50bef66a54b6daff0ac6c4b5089daa21a9
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/pr/scripts/pr-checks.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:278dad410fc2dcf606e4572b34e987fd66267e9b20fc168aab55f2b8d162adb8
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/pr/scripts/preflight.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:93be957ff859a1a8de56661962366436f0b3abd8003fa4b44ec0e70c46203f78
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/pr/scripts/properties.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:a733e663929b6469ba15eee425f6b830d99592b6c0e9c3b18935e9ea9a329930
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/pr/scripts/publish.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:a7ef5acd7773bfb34bcafe232faf9b171ccc216a490970a448246e92587efede
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/pr/scripts/review.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:a2762e0f742ed6c9bd1c63bc0ddf00ae73a7e5bf7bf69fcd3a14ba3807c6db26
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/pr/scripts/scaffold-description.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:c36e762066de6cd3704d8cb8b854a6fece1b073a928b11572877947d04c8a436
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/pr/scripts/signing.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:683201ce6ea252f7345269f2cf7c766c887190ab8a8095da01dd4795ef5d79a6
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/pr/scripts/validate-description.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:10e670c16f8cb3daf2accadadafdf9e6c770077640635a8f70dc4edef841b426
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/pr/scripts/worktree-ready.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:8323a36ec25731a8a9f99dde74b8d24c1d6f536d8ebebe29b53dcfab4b51fc44
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/pr/tokens.json
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:df40b4dc77a4ddc9af6950a1c4301587dafcd0d136b0170e6179704929999ddc
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/rebase
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: null
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/rebase/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:a152c91fa42840ce0bc59be4b1d96a3b99df8114113e291d8a2f12aff6b77eda
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/rebase/scripts/continue-rebase.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:687639e93d4a2351768aaf7e094bbce01efb8e26bdff126f6d888a9519a76738
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/rebase/scripts/marker-scan.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:cd163ca281422161f4bdd55380838cf112d937b8d9a40319fc3eaf3db5ad9f5b
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/rebase/scripts/preflight.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:ac6daed2c15ea2e1a2b41fe851005ca99640f84b8ba6d864d0ebdc9e72d629f1
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/rebase/scripts/rebase-status.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:583b629dc3181b3f253b9c0cdb41b96774adf56660eb4b5ead0908b9a9e7847f
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/rebase/scripts/start-rebase.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:f340ca227afb70331f3f7f9d8f715bf15e6d107d6f1eef1cfc3e92926f887cdf
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/rebase/scripts/verify-rebase.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:6689036ed7fccc3a37dd6e561e0dfa324141091da8034185fe5b54f80dffc5c6
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/rebase/scripts/worktree-ready.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:8323a36ec25731a8a9f99dde74b8d24c1d6f536d8ebebe29b53dcfab4b51fc44
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/rebase/tokens.json
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:44755ffdb449e85863ff0aa4274bc54bcd6b4e9374c7b78014cccb427898e884
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/resolve-rebase-conflicts
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: null
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/resolve-rebase-conflicts/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:e1533de7c39192fac7d4aac95552019d473066c712c43ae9a82a825fcbfc8c75
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/resolve-rebase-conflicts/scripts/classify-conflicts.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:917e32e304a4153ff31cda95a51e4f7c442db66ce6c5a3db5e56f6ae9610883a
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/resolve-rebase-conflicts/scripts/conflict_shape.py
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:475e14911ff3a536ef52da1458a5302e96bb78ef341f4ab89425b632ca7b8b07
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/resolve-rebase-conflicts/scripts/resolve-union.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:7af3f64b7ccc8f59be5332d9116856fd0953b0b405453292c1f11894744a6c74
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/resolve-rebase-conflicts/scripts/take-side.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:086dfb3c08956d2a949878dba8478f1b46e1b978d728759bb5ec9d41cecd9ddc
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/resolve-rebase-conflicts/tokens.json
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:1e5babce102289afa1287f468e2cc0d806d08bc5dbadb05bbe86e67be06ef00f
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/review-commit-message
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: null
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/review-commit-message/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:9d7528773742309655d3c8e6fa35bf3cd3a053be67fd87624fe83cccd8425c0a
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/review-commit-message/tokens.json
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:3ecc6030d64574094a52dbfefcdbc9bde7a085eaf74574f6a06c05216728beab
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/review-pr-description
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: null
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/review-pr-description/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:c7a1d9774646eb24bba66de9fe5f3b38aaa235fcf6dd925d13d8e0a7b71578b8
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/review-pr-description/tokens.json
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:de803a6939cfc91471056787f69b69080d4d6cc4a4400968a7745bc77b064c34
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/review-prose-fix
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: null
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/review-prose-fix/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:a333d815305fc3644582fbe315887f7c5e9055eb5a0afa4576e5a82bba80d0f1
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/review-prose-fix/tokens.json
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:b52245abd00490eaae06992de849e854cf4a2f0212de9a51102495afbf02bd77
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/review-squash-message
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: null
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/review-squash-message/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:32959f0fe2ad50cbf57dca7b02036442eab50a0b7428684c3f7a7c94a018bca4
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/review-squash-message/tokens.json
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:fe69cebe32898c98fc7b0254adb4b3005ff11de58400f94f4ea33385cc3743f7
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/watch-pr
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: null
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/watch-pr/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:53bcdc2355b3a524f5da09a5c2b6a7073d01fe5a9bb06e96989601b8f7014f2c
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/watch-pr/scripts/agent.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:6d3a31863a535b4225f974dd361b45b1d7a5b590e94bf7aed3706e88066258d7
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/watch-pr/scripts/gates.py
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:f49d8d33c3b5d4d0cf7f0b8c06cfe61ae72e6215b78d3e1e83fe931a5a03a3a1
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/watch-pr/scripts/lib.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:565412f754c6cf76d12d5d0dbeb2bf321b22761bcbb07e37f91dfdd6fe737a2a
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/watch-pr/scripts/signing.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:683201ce6ea252f7345269f2cf7c766c887190ab8a8095da01dd4795ef5d79a6
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/watch-pr/scripts/watch-checks.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:9f33edd96a1faebb4fecd5096eb54584287e05a51c2bb2f2fd2f469725b0d45c
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/watch-pr/tokens.json
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:7d58a8a3d1b38ef480b49b54114a4f8129117c56038eb064624c797280938ce0
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/write-pr-description
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: null
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/write-pr-description/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:1040334a70181d824829100c891e49ecd41bb6bdea71eb675ff2c724d933ac35
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/write-pr-description/scripts/context.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:5b29e3fa84457f21b97d6dff94a75b7a21cd6200a574c18efc708580d134299a
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/write-pr-description/tokens.json
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:d4827b186ea5932a2ae64d75b581252866afece36f09fff58c283ae6c0dd0ed0
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/write-prose-fix
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: null
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/write-prose-fix/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:ecc77503e1b7d97cede340e0bead67aa368dbeb9845bda4dc1af39cb19b7c0ce
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/write-prose-fix/scripts/context.sh
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:a7596c70a486cbb2b2bcd9046d2b71880e42b5d3ed53075245968f1e3e5eb69c
+- kind: project-relative
+  target: antigravity
+  value: .agents/skills/write-prose-fix/tokens.json
+  runtime: null
+  scope: project
+  owners:
+  - tbhb-dev/devtools/packages/agents/codex
+  active_owner: tbhb-dev/devtools/packages/agents/codex
+  content_hash: sha256:dbaf2d84a26b7591900ba92f93e38411ee79181c0eda00ddfcf06e2d8aa0a08a
 - kind: project-relative
   target: claude
   value: .claude/rules/worktree-wip.md
@@ -1959,1272 +3245,3 @@ deployments:
   - tbhb-dev/devtools/packages/agents/claude
   active_owner: tbhb-dev/devtools/packages/agents/claude
   content_hash: sha256:c25aa515f0ce48e81b18be406fc99e2aa56376eab108831bd12c9fa32e5d5e86
-- kind: project-relative
-  target: codex
-  value: .agents/skills/agent-commit
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: null
-- kind: project-relative
-  target: codex
-  value: .agents/skills/agent-commit/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:af1eeb4163d80a33edf57518ace932295236d812988c0f2a961c05e6e6be1288
-- kind: project-relative
-  target: codex
-  value: .agents/skills/agent-commit/scripts/commit.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:3a379c838192d4e0ea7c3efafa4d8a9ea6a39a4bfed52f2ecc79df48fbba278b
-- kind: project-relative
-  target: codex
-  value: .agents/skills/agent-commit/scripts/preflight.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:150577c193b70fb169147eb619b8a715d37327fa7cd4b502b556cd5a87e8f0a8
-- kind: project-relative
-  target: codex
-  value: .agents/skills/agent-commit/scripts/review.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:561b69d7c0892c14deb1d1946a9ebefea817d64ff066a17dc02b8311b3711039
-- kind: project-relative
-  target: codex
-  value: .agents/skills/agent-commit/tokens.json
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:66b6ac3e90f560ae5d3a87f395aa4965ff305acc9821912d972e3ae587489fe2
-- kind: project-relative
-  target: codex
-  value: .agents/skills/agent-merge-pr
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: null
-- kind: project-relative
-  target: codex
-  value: .agents/skills/agent-merge-pr/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:2958e32035f16927276b4a2fe69adcdc7913fd2165994deaf9019b2c1095ab65
-- kind: project-relative
-  target: codex
-  value: .agents/skills/agent-merge-pr/scripts/lint-squash-msg.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:3c5c3cf4694dbb291dada2279ffbf8312707e6025078ac0c38c2a829c60e5097
-- kind: project-relative
-  target: codex
-  value: .agents/skills/agent-merge-pr/scripts/merge.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:eed8c25ee35205e750192aa8ae6cd06cc5efd3ba8ff8adb3b8eb44fd07803142
-- kind: project-relative
-  target: codex
-  value: .agents/skills/agent-merge-pr/scripts/preflight.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:6556e7396f94e9f3241769f1f795145070a0ebdb3c411dac68decde5daff7e35
-- kind: project-relative
-  target: codex
-  value: .agents/skills/agent-merge-pr/scripts/review.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:6808c9db9267d93ff1a6eb3f205fbb80ed072ef5ccd97726efae9cc5b43e7956
-- kind: project-relative
-  target: codex
-  value: .agents/skills/agent-merge-pr/scripts/squash-message.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:5e114db1fc7354da7d5a1f94e2f124cdae950c1215763c0eb6ae6fff1eca278c
-- kind: project-relative
-  target: codex
-  value: .agents/skills/agent-merge-pr/tokens.json
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:9027f8a0a6bbc38a9a61537b4d8a80fffa540d4c8e0c454f8d7a23b166243c81
-- kind: project-relative
-  target: codex
-  value: .agents/skills/agent-pr
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: null
-- kind: project-relative
-  target: codex
-  value: .agents/skills/agent-pr/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:be6daa524458c1dc0df1137da01621c437849c6327063ef91a8d260cdeb182f3
-- kind: project-relative
-  target: codex
-  value: .agents/skills/agent-pr/scripts/check.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:d31964cbb5ae85554820983c3b6e5904790a152a17696f2cddb8b2f76d692cd3
-- kind: project-relative
-  target: codex
-  value: .agents/skills/agent-pr/scripts/preflight.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:fa23bac0cf361bd68eedd361bdf88c825f33dd512df3631fdf275069fa07dbb4
-- kind: project-relative
-  target: codex
-  value: .agents/skills/agent-pr/scripts/publish.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:b8df7373247a0be0dde24669a715936d27f0ae0ee29eb0357f99686a0dcc0e79
-- kind: project-relative
-  target: codex
-  value: .agents/skills/agent-pr/scripts/review.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:4ec3592d688f48b939a1a5996835e504fb07006e689b0ec76ac4279f810b6886
-- kind: project-relative
-  target: codex
-  value: .agents/skills/agent-pr/tokens.json
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:f67a6a9e11528caf8c60b01832bbbb538c46a3d1da1282343dad36c1bd45004b
-- kind: project-relative
-  target: codex
-  value: .agents/skills/analyze-session
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: null
-- kind: project-relative
-  target: codex
-  value: .agents/skills/analyze-session/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:5811bcb4fd5601ec94fa7ca8584057d03167cb1f145b832eeb87338d9b30878e
-- kind: project-relative
-  target: codex
-  value: .agents/skills/analyze-session/references/DISPATCH.md
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:646dc014af74f0f2cdf66b85f1e43ff3eae159908d22f84e19440414f09320fe
-- kind: project-relative
-  target: codex
-  value: .agents/skills/analyze-session/references/FIX_SURFACES.md
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:4dbb24328fae4f1140d8a3652d47618ea541fa41dba44a7eb853fea97167b440
-- kind: project-relative
-  target: codex
-  value: .agents/skills/analyze-session/references/LOCATE_SESSION.md
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:48d949bf80057a059ae9fc288292486cf5a0e8d4aacd315574770d14ebbadc9d
-- kind: project-relative
-  target: codex
-  value: .agents/skills/analyze-session/references/SESSION_CLI.md
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:4a2f4a39e95ee7e46d5b1d06369c4e9777dd220874f6d28c79e4de24ded22ad2
-- kind: project-relative
-  target: codex
-  value: .agents/skills/analyze-session/references/VERIFY_FIGURES.md
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:95526362483d368cc06974cf1d254a9d2811f7df7079ca1d0475ee4c691ca741
-- kind: project-relative
-  target: codex
-  value: .agents/skills/analyze-session/references/WRITING_THE_RETRO.md
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:13853f367e1eced082323ea80d741b98e502f49c8287b4647df9754a65a751e0
-- kind: project-relative
-  target: codex
-  value: .agents/skills/analyze-session/scripts/agent.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:6d3a31863a535b4225f974dd361b45b1d7a5b590e94bf7aed3706e88066258d7
-- kind: project-relative
-  target: codex
-  value: .agents/skills/analyze-session/scripts/gates.py
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:f49d8d33c3b5d4d0cf7f0b8c06cfe61ae72e6215b78d3e1e83fe931a5a03a3a1
-- kind: project-relative
-  target: codex
-  value: .agents/skills/analyze-session/scripts/lib.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:565412f754c6cf76d12d5d0dbeb2bf321b22761bcbb07e37f91dfdd6fe737a2a
-- kind: project-relative
-  target: codex
-  value: .agents/skills/analyze-session/scripts/new-retro.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:72e79c127954623bd7efddb80ad797dee9bb4cb6e1bd16bca770dab8bf900041
-- kind: project-relative
-  target: codex
-  value: .agents/skills/analyze-session/scripts/preflight.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:2e74ccb12e3b067bbf6f16f0fe8b1def6c1dd501364ae8128f36b37991153cb2
-- kind: project-relative
-  target: codex
-  value: .agents/skills/analyze-session/scripts/session.py
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:e13d29bc8bbbbfa55f1d059ddbc1ec655dcca98648d75d57fe00567bf6ff6d1f
-- kind: project-relative
-  target: codex
-  value: .agents/skills/analyze-session/scripts/signing.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:683201ce6ea252f7345269f2cf7c766c887190ab8a8095da01dd4795ef5d79a6
-- kind: project-relative
-  target: codex
-  value: .agents/skills/analyze-session/templates/RETRO.md
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:370e324ac6c5e971d1a0b28e1329b3e1c20c26107f3a3af49c046219c9a204b4
-- kind: project-relative
-  target: codex
-  value: .agents/skills/analyze-session/tokens.json
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:a754f9fb13b90f33e17a7a921e6aad421d45c4753dc603fbd9cbff28b2693e4c
-- kind: project-relative
-  target: codex
-  value: .agents/skills/commit
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: null
-- kind: project-relative
-  target: codex
-  value: .agents/skills/commit/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:1095d91fb383f11a495c2da651478bf540d0f4fda894e1c09259753b63481494
-- kind: project-relative
-  target: codex
-  value: .agents/skills/commit/references/PRECONDITIONS.md
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:776768efbfd69a12eb9dba9bc476ee9eef9c0ceea841999bfbad154b59f22c01
-- kind: project-relative
-  target: codex
-  value: .agents/skills/commit/scripts/agent.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:6d3a31863a535b4225f974dd361b45b1d7a5b590e94bf7aed3706e88066258d7
-- kind: project-relative
-  target: codex
-  value: .agents/skills/commit/scripts/commit.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:eae6cacf228ad89c6a843f1735a9cd1f9a923c8bd09a8e19feb2cba4ad66257a
-- kind: project-relative
-  target: codex
-  value: .agents/skills/commit/scripts/gates.py
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:f49d8d33c3b5d4d0cf7f0b8c06cfe61ae72e6215b78d3e1e83fe931a5a03a3a1
-- kind: project-relative
-  target: codex
-  value: .agents/skills/commit/scripts/lib.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:565412f754c6cf76d12d5d0dbeb2bf321b22761bcbb07e37f91dfdd6fe737a2a
-- kind: project-relative
-  target: codex
-  value: .agents/skills/commit/scripts/preflight.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:8cd176d02d0359f47c7c2d314464f8b04018d6b8239ade8bd7f814c7108f0604
-- kind: project-relative
-  target: codex
-  value: .agents/skills/commit/scripts/review.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:809b56b6d38148f498c769ab3c383c45adc772a36671f62ea7ac6423e540a740
-- kind: project-relative
-  target: codex
-  value: .agents/skills/commit/scripts/signing.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:683201ce6ea252f7345269f2cf7c766c887190ab8a8095da01dd4795ef5d79a6
-- kind: project-relative
-  target: codex
-  value: .agents/skills/commit/scripts/worktree-ready.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:8323a36ec25731a8a9f99dde74b8d24c1d6f536d8ebebe29b53dcfab4b51fc44
-- kind: project-relative
-  target: codex
-  value: .agents/skills/commit/tokens.json
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:0c7d0a2b73f7f252204e64b426c6d451824c27640d430da1a8756b2d07fc2780
-- kind: project-relative
-  target: codex
-  value: .agents/skills/fix-pr
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: null
-- kind: project-relative
-  target: codex
-  value: .agents/skills/fix-pr/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:1ce23ba50c41d45e5dc854d7ac80a0eea4ab58ee76a14a456a32cdb6785f6123
-- kind: project-relative
-  target: codex
-  value: .agents/skills/fix-pr/scripts/diagnose.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:26046384b56242bd2e45e8742a855e1962546bc81bf8b07495bfa0ffd67e15d3
-- kind: project-relative
-  target: codex
-  value: .agents/skills/fix-pr/scripts/populate-description.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:ed9688d83433ff7e1700255ae02e3dc912faf34dc34bdd9edb22eb02b8032d3a
-- kind: project-relative
-  target: codex
-  value: .agents/skills/fix-pr/tokens.json
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:f8390c69343a06d8db0903444e19857404b91b7dfeee9be2633ae33f213f5225
-- kind: project-relative
-  target: codex
-  value: .agents/skills/fix-prose
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: null
-- kind: project-relative
-  target: codex
-  value: .agents/skills/fix-prose/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:6ee4a1f771504936ea8b02c9de3f8defef58e95279047d366b8ea8db3dba30b0
-- kind: project-relative
-  target: codex
-  value: .agents/skills/fix-prose/scripts/check-suppressions.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:375c5b7f6a7782696d664d24a771b8df35b3dd72e90742fd25071852b90d98b3
-- kind: project-relative
-  target: codex
-  value: .agents/skills/fix-prose/scripts/preflight.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:513ec77a957b7e37ed8c9690133e114f37f8a3f98995a1427c8f8d8924b23272
-- kind: project-relative
-  target: codex
-  value: .agents/skills/fix-prose/tokens.json
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:d04e26efd8df0fc86eeb2200742ed17d8b02415d31d39361c880703f7869f2e4
-- kind: project-relative
-  target: codex
-  value: .agents/skills/merge-pr
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: null
-- kind: project-relative
-  target: codex
-  value: .agents/skills/merge-pr/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:34439e46cc5cf909c98c222f177f1b81fd4134582de9a19aad526a84e443e2f6
-- kind: project-relative
-  target: codex
-  value: .agents/skills/merge-pr/scripts/agent.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:6d3a31863a535b4225f974dd361b45b1d7a5b590e94bf7aed3706e88066258d7
-- kind: project-relative
-  target: codex
-  value: .agents/skills/merge-pr/scripts/gates.py
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:f49d8d33c3b5d4d0cf7f0b8c06cfe61ae72e6215b78d3e1e83fe931a5a03a3a1
-- kind: project-relative
-  target: codex
-  value: .agents/skills/merge-pr/scripts/lib.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:565412f754c6cf76d12d5d0dbeb2bf321b22761bcbb07e37f91dfdd6fe737a2a
-- kind: project-relative
-  target: codex
-  value: .agents/skills/merge-pr/scripts/lint-squash-msg.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:910879475b0b3ae890734b0879a6e7c2298e8ff35335fc64efae600bc23ec199
-- kind: project-relative
-  target: codex
-  value: .agents/skills/merge-pr/scripts/merge-agent.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:0cf53ada529db8401c46bd6a4bca1cf015a915573e386890a53c7c9037867652
-- kind: project-relative
-  target: codex
-  value: .agents/skills/merge-pr/scripts/merge-policy.py
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:2f6fc6e2db6cf4bd558e344c4dc246dfca6dfda8abeb6a9a892746738e92d9c5
-- kind: project-relative
-  target: codex
-  value: .agents/skills/merge-pr/scripts/populate-description.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:ed9688d83433ff7e1700255ae02e3dc912faf34dc34bdd9edb22eb02b8032d3a
-- kind: project-relative
-  target: codex
-  value: .agents/skills/merge-pr/scripts/preflight.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:1e8c899e7db05cad6cd6acdba440ac2472c6d491b757770a8e391113a29b98cc
-- kind: project-relative
-  target: codex
-  value: .agents/skills/merge-pr/scripts/pull-request.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:24d1aea50d24fb0ca9f27b0d73d12964ffb247a99dfe9d43dad9287c9009fead
-- kind: project-relative
-  target: codex
-  value: .agents/skills/merge-pr/scripts/review.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:4718f4d6cbbd3487ca1abb973d32ad746ecd9f0d34c30d12d1a7febdd7832a5c
-- kind: project-relative
-  target: codex
-  value: .agents/skills/merge-pr/scripts/signing.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:683201ce6ea252f7345269f2cf7c766c887190ab8a8095da01dd4795ef5d79a6
-- kind: project-relative
-  target: codex
-  value: .agents/skills/merge-pr/scripts/squash-merge.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:f194e934740cec0a113fb5d77d71bf76b929cddc2ede9a8700ede6a63d7f3eb6
-- kind: project-relative
-  target: codex
-  value: .agents/skills/merge-pr/scripts/squash-message.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:9b512745a0ef14ab52cb6625460556ac62f2cf80afec89d021885679b674c683
-- kind: project-relative
-  target: codex
-  value: .agents/skills/merge-pr/scripts/worktree-ready.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:8323a36ec25731a8a9f99dde74b8d24c1d6f536d8ebebe29b53dcfab4b51fc44
-- kind: project-relative
-  target: codex
-  value: .agents/skills/merge-pr/tokens.json
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:b29065b218081651961014c7d1679ce794b0eae5284d4b9a0b399bde4d596263
-- kind: project-relative
-  target: codex
-  value: .agents/skills/pr
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: null
-- kind: project-relative
-  target: codex
-  value: .agents/skills/pr/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:17983492cd785e3cf6121d21449fcd976cbef11ec5a00f50db380991315c7da0
-- kind: project-relative
-  target: codex
-  value: .agents/skills/pr/scripts/agent.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:6d3a31863a535b4225f974dd361b45b1d7a5b590e94bf7aed3706e88066258d7
-- kind: project-relative
-  target: codex
-  value: .agents/skills/pr/scripts/check.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:447a4f1808090a20ac22750050c4f9fc05fd130d5bfe8e2621ff23957492677e
-- kind: project-relative
-  target: codex
-  value: .agents/skills/pr/scripts/create-pr.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:bad2cf9ff12f07b0d9c3e2889de4bad1182aadcdd600c44a736d815349adc1e3
-- kind: project-relative
-  target: codex
-  value: .agents/skills/pr/scripts/description.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:3c91741b1a46bf9b16dcc63d5272ad9aedfe1f95a5a24bd185b0ef90d89bf5b1
-- kind: project-relative
-  target: codex
-  value: .agents/skills/pr/scripts/gates.py
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:f49d8d33c3b5d4d0cf7f0b8c06cfe61ae72e6215b78d3e1e83fe931a5a03a3a1
-- kind: project-relative
-  target: codex
-  value: .agents/skills/pr/scripts/lib.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:565412f754c6cf76d12d5d0dbeb2bf321b22761bcbb07e37f91dfdd6fe737a2a
-- kind: project-relative
-  target: codex
-  value: .agents/skills/pr/scripts/pr-agent.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:4465bee1d44c31a231454c4514b0bd50bef66a54b6daff0ac6c4b5089daa21a9
-- kind: project-relative
-  target: codex
-  value: .agents/skills/pr/scripts/pr-checks.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:278dad410fc2dcf606e4572b34e987fd66267e9b20fc168aab55f2b8d162adb8
-- kind: project-relative
-  target: codex
-  value: .agents/skills/pr/scripts/preflight.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:93be957ff859a1a8de56661962366436f0b3abd8003fa4b44ec0e70c46203f78
-- kind: project-relative
-  target: codex
-  value: .agents/skills/pr/scripts/properties.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:a733e663929b6469ba15eee425f6b830d99592b6c0e9c3b18935e9ea9a329930
-- kind: project-relative
-  target: codex
-  value: .agents/skills/pr/scripts/publish.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:a7ef5acd7773bfb34bcafe232faf9b171ccc216a490970a448246e92587efede
-- kind: project-relative
-  target: codex
-  value: .agents/skills/pr/scripts/review.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:a2762e0f742ed6c9bd1c63bc0ddf00ae73a7e5bf7bf69fcd3a14ba3807c6db26
-- kind: project-relative
-  target: codex
-  value: .agents/skills/pr/scripts/scaffold-description.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:c36e762066de6cd3704d8cb8b854a6fece1b073a928b11572877947d04c8a436
-- kind: project-relative
-  target: codex
-  value: .agents/skills/pr/scripts/signing.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:683201ce6ea252f7345269f2cf7c766c887190ab8a8095da01dd4795ef5d79a6
-- kind: project-relative
-  target: codex
-  value: .agents/skills/pr/scripts/validate-description.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:10e670c16f8cb3daf2accadadafdf9e6c770077640635a8f70dc4edef841b426
-- kind: project-relative
-  target: codex
-  value: .agents/skills/pr/scripts/worktree-ready.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:8323a36ec25731a8a9f99dde74b8d24c1d6f536d8ebebe29b53dcfab4b51fc44
-- kind: project-relative
-  target: codex
-  value: .agents/skills/pr/tokens.json
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:df40b4dc77a4ddc9af6950a1c4301587dafcd0d136b0170e6179704929999ddc
-- kind: project-relative
-  target: codex
-  value: .agents/skills/rebase
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: null
-- kind: project-relative
-  target: codex
-  value: .agents/skills/rebase/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:a152c91fa42840ce0bc59be4b1d96a3b99df8114113e291d8a2f12aff6b77eda
-- kind: project-relative
-  target: codex
-  value: .agents/skills/rebase/scripts/continue-rebase.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:687639e93d4a2351768aaf7e094bbce01efb8e26bdff126f6d888a9519a76738
-- kind: project-relative
-  target: codex
-  value: .agents/skills/rebase/scripts/marker-scan.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:cd163ca281422161f4bdd55380838cf112d937b8d9a40319fc3eaf3db5ad9f5b
-- kind: project-relative
-  target: codex
-  value: .agents/skills/rebase/scripts/preflight.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:ac6daed2c15ea2e1a2b41fe851005ca99640f84b8ba6d864d0ebdc9e72d629f1
-- kind: project-relative
-  target: codex
-  value: .agents/skills/rebase/scripts/rebase-status.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:583b629dc3181b3f253b9c0cdb41b96774adf56660eb4b5ead0908b9a9e7847f
-- kind: project-relative
-  target: codex
-  value: .agents/skills/rebase/scripts/start-rebase.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:f340ca227afb70331f3f7f9d8f715bf15e6d107d6f1eef1cfc3e92926f887cdf
-- kind: project-relative
-  target: codex
-  value: .agents/skills/rebase/scripts/verify-rebase.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:6689036ed7fccc3a37dd6e561e0dfa324141091da8034185fe5b54f80dffc5c6
-- kind: project-relative
-  target: codex
-  value: .agents/skills/rebase/scripts/worktree-ready.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:8323a36ec25731a8a9f99dde74b8d24c1d6f536d8ebebe29b53dcfab4b51fc44
-- kind: project-relative
-  target: codex
-  value: .agents/skills/rebase/tokens.json
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:44755ffdb449e85863ff0aa4274bc54bcd6b4e9374c7b78014cccb427898e884
-- kind: project-relative
-  target: codex
-  value: .agents/skills/resolve-rebase-conflicts
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: null
-- kind: project-relative
-  target: codex
-  value: .agents/skills/resolve-rebase-conflicts/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:e1533de7c39192fac7d4aac95552019d473066c712c43ae9a82a825fcbfc8c75
-- kind: project-relative
-  target: codex
-  value: .agents/skills/resolve-rebase-conflicts/scripts/classify-conflicts.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:917e32e304a4153ff31cda95a51e4f7c442db66ce6c5a3db5e56f6ae9610883a
-- kind: project-relative
-  target: codex
-  value: .agents/skills/resolve-rebase-conflicts/scripts/conflict_shape.py
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:475e14911ff3a536ef52da1458a5302e96bb78ef341f4ab89425b632ca7b8b07
-- kind: project-relative
-  target: codex
-  value: .agents/skills/resolve-rebase-conflicts/scripts/resolve-union.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:7af3f64b7ccc8f59be5332d9116856fd0953b0b405453292c1f11894744a6c74
-- kind: project-relative
-  target: codex
-  value: .agents/skills/resolve-rebase-conflicts/scripts/take-side.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:086dfb3c08956d2a949878dba8478f1b46e1b978d728759bb5ec9d41cecd9ddc
-- kind: project-relative
-  target: codex
-  value: .agents/skills/resolve-rebase-conflicts/tokens.json
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:1e5babce102289afa1287f468e2cc0d806d08bc5dbadb05bbe86e67be06ef00f
-- kind: project-relative
-  target: codex
-  value: .agents/skills/review-commit-message
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: null
-- kind: project-relative
-  target: codex
-  value: .agents/skills/review-commit-message/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:9d7528773742309655d3c8e6fa35bf3cd3a053be67fd87624fe83cccd8425c0a
-- kind: project-relative
-  target: codex
-  value: .agents/skills/review-commit-message/tokens.json
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:3ecc6030d64574094a52dbfefcdbc9bde7a085eaf74574f6a06c05216728beab
-- kind: project-relative
-  target: codex
-  value: .agents/skills/review-pr-description
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: null
-- kind: project-relative
-  target: codex
-  value: .agents/skills/review-pr-description/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:c7a1d9774646eb24bba66de9fe5f3b38aaa235fcf6dd925d13d8e0a7b71578b8
-- kind: project-relative
-  target: codex
-  value: .agents/skills/review-pr-description/tokens.json
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:de803a6939cfc91471056787f69b69080d4d6cc4a4400968a7745bc77b064c34
-- kind: project-relative
-  target: codex
-  value: .agents/skills/review-prose-fix
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: null
-- kind: project-relative
-  target: codex
-  value: .agents/skills/review-prose-fix/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:a333d815305fc3644582fbe315887f7c5e9055eb5a0afa4576e5a82bba80d0f1
-- kind: project-relative
-  target: codex
-  value: .agents/skills/review-prose-fix/tokens.json
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:b52245abd00490eaae06992de849e854cf4a2f0212de9a51102495afbf02bd77
-- kind: project-relative
-  target: codex
-  value: .agents/skills/review-squash-message
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: null
-- kind: project-relative
-  target: codex
-  value: .agents/skills/review-squash-message/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:32959f0fe2ad50cbf57dca7b02036442eab50a0b7428684c3f7a7c94a018bca4
-- kind: project-relative
-  target: codex
-  value: .agents/skills/review-squash-message/tokens.json
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:fe69cebe32898c98fc7b0254adb4b3005ff11de58400f94f4ea33385cc3743f7
-- kind: project-relative
-  target: codex
-  value: .agents/skills/watch-pr
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: null
-- kind: project-relative
-  target: codex
-  value: .agents/skills/watch-pr/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:53bcdc2355b3a524f5da09a5c2b6a7073d01fe5a9bb06e96989601b8f7014f2c
-- kind: project-relative
-  target: codex
-  value: .agents/skills/watch-pr/scripts/agent.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:6d3a31863a535b4225f974dd361b45b1d7a5b590e94bf7aed3706e88066258d7
-- kind: project-relative
-  target: codex
-  value: .agents/skills/watch-pr/scripts/gates.py
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:f49d8d33c3b5d4d0cf7f0b8c06cfe61ae72e6215b78d3e1e83fe931a5a03a3a1
-- kind: project-relative
-  target: codex
-  value: .agents/skills/watch-pr/scripts/lib.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:565412f754c6cf76d12d5d0dbeb2bf321b22761bcbb07e37f91dfdd6fe737a2a
-- kind: project-relative
-  target: codex
-  value: .agents/skills/watch-pr/scripts/signing.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:683201ce6ea252f7345269f2cf7c766c887190ab8a8095da01dd4795ef5d79a6
-- kind: project-relative
-  target: codex
-  value: .agents/skills/watch-pr/scripts/watch-checks.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:9f33edd96a1faebb4fecd5096eb54584287e05a51c2bb2f2fd2f469725b0d45c
-- kind: project-relative
-  target: codex
-  value: .agents/skills/watch-pr/tokens.json
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:7d58a8a3d1b38ef480b49b54114a4f8129117c56038eb064624c797280938ce0
-- kind: project-relative
-  target: codex
-  value: .agents/skills/write-pr-description
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: null
-- kind: project-relative
-  target: codex
-  value: .agents/skills/write-pr-description/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:1040334a70181d824829100c891e49ecd41bb6bdea71eb675ff2c724d933ac35
-- kind: project-relative
-  target: codex
-  value: .agents/skills/write-pr-description/scripts/context.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:5b29e3fa84457f21b97d6dff94a75b7a21cd6200a574c18efc708580d134299a
-- kind: project-relative
-  target: codex
-  value: .agents/skills/write-pr-description/tokens.json
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:d4827b186ea5932a2ae64d75b581252866afece36f09fff58c283ae6c0dd0ed0
-- kind: project-relative
-  target: codex
-  value: .agents/skills/write-prose-fix
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: null
-- kind: project-relative
-  target: codex
-  value: .agents/skills/write-prose-fix/SKILL.md
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:ecc77503e1b7d97cede340e0bead67aa368dbeb9845bda4dc1af39cb19b7c0ce
-- kind: project-relative
-  target: codex
-  value: .agents/skills/write-prose-fix/scripts/context.sh
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:a7596c70a486cbb2b2bcd9046d2b71880e42b5d3ed53075245968f1e3e5eb69c
-- kind: project-relative
-  target: codex
-  value: .agents/skills/write-prose-fix/tokens.json
-  runtime: null
-  scope: project
-  owners:
-  - tbhb-dev/devtools/packages/agents/codex
-  active_owner: tbhb-dev/devtools/packages/agents/codex
-  content_hash: sha256:dbaf2d84a26b7591900ba92f93e38411ee79181c0eda00ddfcf06e2d8aa0a08a

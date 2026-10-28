@@ -74,11 +74,19 @@ repos:
         files: ^docs/(workspace\.(dsl|json)$|diagrams/)
         pass_filenames: false
 
-      - id: check-diagrams
+      - id: check-workspace-diagrams
         name: Structurizr diagram freshness
-        entry: mise run check-diagrams
+        entry: mise run check-workspace-diagrams
         language: system
         files: ^docs/(workspace\.(dsl|json)$|diagrams/)
+        pass_filenames: false
+
+      # D2 renders sit beside their sources and must match them.
+      - id: check-d2
+        name: D2 diagram freshness
+        entry: mise run check-d2
+        language: system
+        files: \.d2(\.(svg|png|sha256))?$
         pass_filenames: false
 
       - id: go-fmt

@@ -40,3 +40,8 @@ api/openapi.bundle.yaml linguist-generated rebase-resolve=regenerate
 docs/workspace.json linguist-generated rebase-resolve=regenerate
 docs/diagrams/structurizr-* linguist-generated rebase-resolve=regenerate
 docs/diagrams/structurizr.sha256 linguist-generated rebase-resolve=regenerate
+
+# D2 renders are regenerated from the .d2 source beside them.
+*.d2.svg linguist-generated rebase-resolve=regenerate
+*.d2.png linguist-generated rebase-resolve=regenerate
+*.d2.sha256 linguist-generated rebase-resolve=regenerate

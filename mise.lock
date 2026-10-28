@@ -7,6 +7,11 @@ version = "0.34.0"
 backend = "github:microsoft/apm"
 specifiers = ["0.34.0"]
 
+[tools.apm."platforms.linux-arm64"]
+checksum = "sha256:bf355449cbb74b960e3a6ebe851a35ec2c1df6f5178fbb36b90c5a3a015d2c2a"
+url = "https://github.com/microsoft/apm/releases/download/v0.34.0/apm-linux-arm64.tar.gz"
+url_api = "https://api.github.com/repos/microsoft/apm/releases/assets/656151926"
+
 [tools.apm."platforms.linux-x64"]
 checksum = "sha256:4487af55604b4fa6f4587f3ee6e833b44ce99c491f11069790e4e13e297cde8c"
 url = "https://github.com/microsoft/apm/releases/download/v0.34.0/apm-linux-x86_64.tar.gz"
@@ -17,10 +22,20 @@ checksum = "sha256:030b381825799333ac60a369aaf021ffc9f9e92558b375feec656c42e50e8
 url = "https://github.com/microsoft/apm/releases/download/v0.34.0/apm-darwin-arm64.tar.gz"
 url_api = "https://api.github.com/repos/microsoft/apm/releases/assets/656151919"
 
+[tools.apm."platforms.macos-x64"]
+checksum = "sha256:55b4ab44eaca6f3a56f59a8e9ca84082c9ed3333a76fe255d6bc62c2a14678a9"
+url = "https://github.com/microsoft/apm/releases/download/v0.34.0/apm-darwin-x86_64.tar.gz"
+url_api = "https://api.github.com/repos/microsoft/apm/releases/assets/656151920"
+
 [[tools.ast-grep]]
 version = "0.51.0"
 backend = "aqua:ast-grep/ast-grep"
 specifiers = ["0.51.0"]
+
+[tools.ast-grep."platforms.linux-arm64"]
+checksum = "sha256:73af0ebe5958acee012754a5b2826a186580ef83333092408a7a01096fc30b8b"
+url = "https://github.com/ast-grep/ast-grep/releases/download/0.51.0/app-aarch64-unknown-linux-gnu.zip"
+url_api = "https://api.github.com/repos/ast-grep/ast-grep/releases/assets/644253212"
 
 [tools.ast-grep."platforms.linux-x64"]
 checksum = "sha256:a7eead5552d3a8daad70f5d50d935da44bd0c138e946b5b0a96b1d38169fa639"
@@ -32,10 +47,19 @@ checksum = "sha256:e18e13c27ed6c4b3ec4de00745b0755dee9dc26c035e226f4dd5d147dca99
 url = "https://github.com/ast-grep/ast-grep/releases/download/0.51.0/app-aarch64-apple-darwin.zip"
 url_api = "https://api.github.com/repos/ast-grep/ast-grep/releases/assets/644256001"
 
+[tools.ast-grep."platforms.macos-x64"]
+checksum = "sha256:8438fe549da59da28518c45bdaab5b851aabafe8fb4f8dc05c261a7649b4eca6"
+url = "https://github.com/ast-grep/ast-grep/releases/download/0.51.0/app-x86_64-apple-darwin.zip"
+url_api = "https://api.github.com/repos/ast-grep/ast-grep/releases/assets/644256580"
+
 [[tools.bats]]
 version = "1.14.0"
 backend = "aqua:bats-core/bats-core"
 specifiers = ["1.14.0"]
+
+[tools.bats."platforms.linux-arm64"]
+url = "https://github.com/bats-core/bats-core/archive/refs/tags/v1.14.0.tar.gz"
+url_api = "https://api.github.com/repos/bats-core/bats-core/tarball/v1.14.0"
 
 [tools.bats."platforms.linux-x64"]
 url = "https://github.com/bats-core/bats-core/archive/refs/tags/v1.14.0.tar.gz"
@@ -44,6 +68,35 @@ url_api = "https://api.github.com/repos/bats-core/bats-core/tarball/v1.14.0"
 [tools.bats."platforms.macos-arm64"]
 url = "https://github.com/bats-core/bats-core/archive/refs/tags/v1.14.0.tar.gz"
 url_api = "https://api.github.com/repos/bats-core/bats-core/tarball/v1.14.0"
+
+[tools.bats."platforms.macos-x64"]
+url = "https://github.com/bats-core/bats-core/archive/refs/tags/v1.14.0.tar.gz"
+url_api = "https://api.github.com/repos/bats-core/bats-core/tarball/v1.14.0"
+
+[[tools.d2]]
+version = "0.9.0"
+backend = "aqua:d2lang/d2"
+specifiers = ["0.9.0"]
+
+[tools.d2."platforms.linux-arm64"]
+checksum = "sha256:ac2c028697199479acb321db1e3d68caee9f2ba492ed73caa3cd13f3829bf913"
+url = "https://github.com/d2lang/d2/releases/download/v0.9.0/d2-v0.9.0-linux-arm64.tar.gz"
+url_api = "https://api.github.com/repos/d2lang/d2/releases/assets/549448988"
+
+[tools.d2."platforms.linux-x64"]
+checksum = "sha256:5669ddc46b99e942cc96078f4a4e36d5e62103348f4c05179ede27802fdd87a9"
+url = "https://github.com/d2lang/d2/releases/download/v0.9.0/d2-v0.9.0-linux-amd64.tar.gz"
+url_api = "https://api.github.com/repos/d2lang/d2/releases/assets/549448945"
+
+[tools.d2."platforms.macos-arm64"]
+checksum = "sha256:eaf6c0c143e56dd9fa97bfb6df25ea9c1ebce40245f056a0768cf1a6c15d3064"
+url = "https://github.com/d2lang/d2/releases/download/v0.9.0/d2-v0.9.0-macos-arm64.tar.gz"
+url_api = "https://api.github.com/repos/d2lang/d2/releases/assets/549449061"
+
+[tools.d2."platforms.macos-x64"]
+checksum = "sha256:cad39576a480d6bb02ea142fef1726647914b0d2da51ccc9b30b660a2b1babf0"
+url = "https://github.com/d2lang/d2/releases/download/v0.9.0/d2-v0.9.0-macos-amd64.tar.gz"
+url_api = "https://api.github.com/repos/d2lang/d2/releases/assets/549449033"
 
 [[tools."github:plantuml/plantuml"]]
 version = "1.2026.9"
@@ -92,6 +145,27 @@ specifiers = ["v0.21.0"]
 version = "0.21.0"
 backend = "go:github.com/tbhb-dev/devtools/cmd/guard-markdown"
 specifiers = ["v0.21.0"]
+
+[[tools."http:source-sans-pro"]]
+version = "2.045R"
+backend = "http:source-sans-pro"
+specifiers = ["2.045R"]
+
+[tools."http:source-sans-pro"."platforms.linux-arm64"]
+checksum = "sha256:5f090b821e117f452ef399c3c1b8b244c1647728a1e901c4d167cbf7fc298ab6"
+url = "https://github.com/adobe-fonts/source-sans/releases/download/2.045R-ro%2F1.095R-it/source-sans-pro-2.045R-ro-1.095R-it.zip"
+
+[tools."http:source-sans-pro"."platforms.linux-x64"]
+checksum = "sha256:5f090b821e117f452ef399c3c1b8b244c1647728a1e901c4d167cbf7fc298ab6"
+url = "https://github.com/adobe-fonts/source-sans/releases/download/2.045R-ro%2F1.095R-it/source-sans-pro-2.045R-ro-1.095R-it.zip"
+
+[tools."http:source-sans-pro"."platforms.macos-arm64"]
+checksum = "sha256:5f090b821e117f452ef399c3c1b8b244c1647728a1e901c4d167cbf7fc298ab6"
+url = "https://github.com/adobe-fonts/source-sans/releases/download/2.045R-ro%2F1.095R-it/source-sans-pro-2.045R-ro-1.095R-it.zip"
+
+[tools."http:source-sans-pro"."platforms.macos-x64"]
+checksum = "sha256:5f090b821e117f452ef399c3c1b8b244c1647728a1e901c4d167cbf7fc298ab6"
+url = "https://github.com/adobe-fonts/source-sans/releases/download/2.045R-ro%2F1.095R-it/source-sans-pro-2.045R-ro-1.095R-it.zip"
 
 [[tools."http:structurizr"]]
 version = "2026.09.19"
@@ -143,6 +217,12 @@ version = "1.8.2"
 backend = "aqua:jqlang/jq"
 specifiers = ["1.8.2"]
 
+[tools.jq."platforms.linux-arm64"]
+checksum = "sha256:8b85c817833814ddca00a144c33705546355afccf0cf39b188f3cdb48b852309"
+url = "https://github.com/jqlang/jq/releases/download/jq-1.8.2/jq-linux-arm64"
+url_api = "https://api.github.com/repos/jqlang/jq/releases/assets/453012756"
+provenance = "github-attestations"
+
 [tools.jq."platforms.linux-x64"]
 checksum = "sha256:b1c22172dd303f3be49e935aa56aa48a8b7a46e0bc838b4997d3bb451495870f"
 url = "https://github.com/jqlang/jq/releases/download/jq-1.8.2/jq-linux-amd64"
@@ -155,10 +235,20 @@ url = "https://github.com/jqlang/jq/releases/download/jq-1.8.2/jq-macos-arm64"
 url_api = "https://api.github.com/repos/jqlang/jq/releases/assets/453012783"
 provenance = "github-attestations"
 
+[tools.jq."platforms.macos-x64"]
+checksum = "sha256:e94b266e3c26690550006abe63152b782280f4e14374accdf04cbde844f00bc0"
+url = "https://github.com/jqlang/jq/releases/download/jq-1.8.2/jq-macos-amd64"
+url_api = "https://api.github.com/repos/jqlang/jq/releases/assets/453012782"
+provenance = "github-attestations"
+
 [[tools.node]]
 version = "24.21.0"
 backend = "core:node"
 specifiers = ["24.21.0"]
+
+[tools.node."platforms.linux-arm64"]
+checksum = "sha256:724282c3b43aec998aa9527380465b45d229e021b58035f5f4f63095eabfe5d5"
+url = "https://nodejs.org/dist/v24.21.0/node-v24.21.0-linux-arm64.tar.gz"
 
 [tools.node."platforms.linux-x64"]
 checksum = "sha256:6e1db87ef58b8819e5d5402eff1536491b18edd8eb7bee5ef7897876e88dc5ff"
@@ -168,10 +258,51 @@ url = "https://nodejs.org/dist/v24.21.0/node-v24.21.0-linux-x64.tar.gz"
 checksum = "sha256:bed7eea5325e1108f32ce5228ddd6a5f0f08a499ee42aa7442aea583702f6057"
 url = "https://nodejs.org/dist/v24.21.0/node-v24.21.0-darwin-arm64.tar.gz"
 
+[tools.node."platforms.macos-x64"]
+checksum = "sha256:1462cb3b3046b815cf8ea436d3da450ec1a9f11dac7e5a46b0ada5305d7e8097"
+url = "https://nodejs.org/dist/v24.21.0/node-v24.21.0-darwin-x64.tar.gz"
+
+[[tools."npm:svgo"]]
+version = "4.1.0"
+aube = { path = ".mise/locks/npm-svgo/4.1.0", digest = "sha256:fd1cc63e72fe11fe1c4c911053192e0d192b1f2fb40a7f67b2963063b9d3632e" }
+backend = "npm:svgo"
+specifiers = ["4.1.0"]
+
+[[tools.oxipng]]
+version = "10.2.1"
+backend = "aqua:oxipng/oxipng"
+specifiers = ["10.2.1"]
+
+[tools.oxipng."platforms.linux-arm64"]
+checksum = "sha256:f51bb7c9836202da52a8181549641940662aa87ec2e3ae68115d822d893015b3"
+url = "https://github.com/oxipng/oxipng/releases/download/v10.2.1/oxipng-10.2.1-aarch64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/oxipng/oxipng/releases/assets/541677736"
+
+[tools.oxipng."platforms.linux-x64"]
+checksum = "sha256:46e3c4beb9aae57290ad809dd3374b07153579d3322a3778c53900633618b7c6"
+url = "https://github.com/oxipng/oxipng/releases/download/v10.2.1/oxipng-10.2.1-x86_64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/oxipng/oxipng/releases/assets/541676037"
+
+[tools.oxipng."platforms.macos-arm64"]
+checksum = "sha256:7039fcfc78e8aa1ed2b57d848057a0296f082e92b3e1807ac65402d10d926764"
+url = "https://github.com/oxipng/oxipng/releases/download/v10.2.1/oxipng-10.2.1-aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/oxipng/oxipng/releases/assets/541682884"
+
+[tools.oxipng."platforms.macos-x64"]
+checksum = "sha256:111883bbe42b25e01cb1ca41f39f8094e4830b173f0e42be342ecc4ca48f3131"
+url = "https://github.com/oxipng/oxipng/releases/download/v10.2.1/oxipng-10.2.1-x86_64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/oxipng/oxipng/releases/assets/541682093"
+
 [[tools.pnpm]]
 version = "12.14.0"
 backend = "aqua:pnpm/pnpm"
 specifiers = ["12.14.0"]
+
+[tools.pnpm."platforms.linux-arm64"]
+checksum = "sha256:cfc780b9e690549e6633e1045fb1fb6ef84e390711e2099e6ccbae91c32456ea"
+url = "https://github.com/pnpm/pnpm/releases/download/v12.14.0/pnpm-linux-arm64.tar.gz"
+url_api = "https://api.github.com/repos/pnpm/pnpm/releases/assets/643957409"
+provenance = "github-attestations"
 
 [tools.pnpm."platforms.linux-x64"]
 checksum = "sha256:3910c3852136bed5bc1511b9137a45fd4357ed6b3970d9d08893641e9005867e"
@@ -185,10 +316,41 @@ url = "https://github.com/pnpm/pnpm/releases/download/v12.14.0/pnpm-darwin-arm64
 url_api = "https://api.github.com/repos/pnpm/pnpm/releases/assets/643957413"
 provenance = "github-attestations"
 
+[tools.pnpm."platforms.macos-x64"]
+checksum = "sha256:2c412e07382049b4edb04fa6da78f3d4ef7810b75853c80544dcfb7c0ed79880"
+url = "https://github.com/pnpm/pnpm/releases/download/v12.14.0/pnpm-darwin-x64.tar.gz"
+url_api = "https://api.github.com/repos/pnpm/pnpm/releases/assets/643957411"
+provenance = "github-attestations"
+
+[[tools.resvg]]
+version = "0.49.0"
+backend = "aqua:linebender/resvg"
+specifiers = ["0.49.0"]
+
+[tools.resvg."platforms.linux-x64"]
+checksum = "sha256:216637e75e909e53e3098b0875cd5f7da2fdc8b4359771b4a29b539afff9d3f5"
+url = "https://github.com/linebender/resvg/releases/download/v0.49.0/resvg-linux-x86_64.tar.gz"
+url_api = "https://api.github.com/repos/linebender/resvg/releases/assets/672458584"
+
+[tools.resvg."platforms.macos-arm64"]
+checksum = "sha256:847acb5210c7c6244b5e8f07dd62fa1ce596108cce8193628ebfd5750504b259"
+url = "https://github.com/linebender/resvg/releases/download/v0.49.0/resvg-macos-aarch64.zip"
+url_api = "https://api.github.com/repos/linebender/resvg/releases/assets/672460044"
+
+[tools.resvg."platforms.macos-x64"]
+checksum = "sha256:7c92cba55348f0254707c8d2c61e71651296981f8ccfadf8477782e91db5e171"
+url = "https://github.com/linebender/resvg/releases/download/v0.49.0/resvg-macos-x86_64.zip"
+url_api = "https://api.github.com/repos/linebender/resvg/releases/assets/672463407"
+
 [[tools.shfmt]]
 version = "3.14.1"
 backend = "aqua:mvdan/sh"
 specifiers = ["3.14.1"]
+
+[tools.shfmt."platforms.linux-arm64"]
+checksum = "sha256:5f2db09dae91fca848f7adbdd014632e921a383863a2ad7e0450ad3aba0c6489"
+url = "https://github.com/mvdan/sh/releases/download/v3.14.1/shfmt_v3.14.1_linux_arm64"
+url_api = "https://api.github.com/repos/mvdan/sh/releases/assets/547320869"
 
 [tools.shfmt."platforms.linux-x64"]
 checksum = "sha256:76e77641faa025814b77f153b29796b8e6fa2fca03e0c76a691608b86c7ea7bf"
@@ -200,10 +362,21 @@ checksum = "sha256:b7c872db63553ccffc7253aba3ed7d4885a27d83f1ba567b1138c6315a584
 url = "https://github.com/mvdan/sh/releases/download/v3.14.1/shfmt_v3.14.1_darwin_arm64"
 url_api = "https://api.github.com/repos/mvdan/sh/releases/assets/547320930"
 
+[tools.shfmt."platforms.macos-x64"]
+checksum = "sha256:d33eee0da0f92835b3562e9767a05cee7e4eaeef47daa03bfd09da17b4b590a6"
+url = "https://github.com/mvdan/sh/releases/download/v3.14.1/shfmt_v3.14.1_darwin_amd64"
+url_api = "https://api.github.com/repos/mvdan/sh/releases/assets/547320946"
+
 [[tools.vacuum]]
 version = "0.33.2"
 backend = "aqua:daveshanley/vacuum"
 specifiers = ["0.33.2"]
+
+[tools.vacuum."platforms.linux-arm64"]
+checksum = "sha256:03ebd836193530d2b153964fa208ac69587105ca065e33f9fbd89b2bedf06f23"
+url = "https://github.com/daveshanley/vacuum/releases/download/v0.33.2/vacuum_0.33.2_linux_arm64.tar.gz"
+url_api = "https://api.github.com/repos/daveshanley/vacuum/releases/assets/657394046"
+provenance = "cosign"
 
 [tools.vacuum."platforms.linux-x64"]
 checksum = "sha256:f6986baeb4d50365fb620f68b2a450e54fc1c9c2d48b7524d330bf9476c29bf9"
@@ -217,10 +390,21 @@ url = "https://github.com/daveshanley/vacuum/releases/download/v0.33.2/vacuum_0.
 url_api = "https://api.github.com/repos/daveshanley/vacuum/releases/assets/657394110"
 provenance = "cosign"
 
+[tools.vacuum."platforms.macos-x64"]
+checksum = "sha256:dff936037f92af555239e767901ecdc2d52689c86f633e363aeab9dc70c4f6b0"
+url = "https://github.com/daveshanley/vacuum/releases/download/v0.33.2/vacuum_0.33.2_darwin_x86_64.tar.gz"
+url_api = "https://api.github.com/repos/daveshanley/vacuum/releases/assets/657394109"
+provenance = "cosign"
+
 [[tools.vendir]]
 version = "0.46.3"
 backend = "aqua:carvel-dev/vendir"
 specifiers = ["0.46.3"]
+
+[tools.vendir."platforms.linux-arm64"]
+checksum = "sha256:821a9da837a017270743597a2e9b796d2d256385ad85450d6c5d89f05dd5aac9"
+url = "https://github.com/carvel-dev/vendir/releases/download/v0.46.3/vendir-linux-arm64"
+url_api = "https://api.github.com/repos/carvel-dev/vendir/releases/assets/655447804"
 
 [tools.vendir."platforms.linux-x64"]
 checksum = "sha256:5af8823ecc67b3ce2359bb0b70e72a5dbd765135722ca0ff42c16bc4d7409847"
@@ -231,3 +415,8 @@ url_api = "https://api.github.com/repos/carvel-dev/vendir/releases/assets/655447
 checksum = "sha256:52b3c224329c11f7189847fc9687a7e9f319626f893dd9a8bcc3704dbc89cc25"
 url = "https://github.com/carvel-dev/vendir/releases/download/v0.46.3/vendir-darwin-arm64"
 url_api = "https://api.github.com/repos/carvel-dev/vendir/releases/assets/655447796"
+
+[tools.vendir."platforms.macos-x64"]
+checksum = "sha256:39b1025eb03142790d5b8d262edd1c9dd5987ae97a81d0c5c4affb13850caccb"
+url = "https://github.com/carvel-dev/vendir/releases/download/v0.46.3/vendir-darwin-amd64"
+url_api = "https://api.github.com/repos/carvel-dev/vendir/releases/assets/655447790"

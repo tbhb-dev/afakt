@@ -33,6 +33,11 @@
     "docs/workspace.json",
     "docs/diagrams/structurizr-*",
     "docs/diagrams/structurizr.sha256",
+    // D2 renders embed fonts and hashes; their sources are checked instead.
+    "**/*.d2.svg",
+    "**/*.d2.png",
+    "**/*.d2.sha256",
+    ".mise/locks/**/*",
     "pnpm-lock.yaml",
     "dist/**/*",
     "coverage.xml",

@@ -85,6 +85,7 @@ OpenAI
 OpenAI Agents API
 OpenID Connect
 Outbound Policy
+oxipng
 passthrough
 PAT
 PATs
@@ -100,6 +101,7 @@ qcow2
 reachability
 reflink
 reflinks
+resvg
 RustFS
 SAN
 Sandbox Connect Tokens
@@ -122,6 +124,7 @@ Stryker
 subgraphs
 subrequests?
 SVID
+svgo
 SVIDs
 systemd
 tailnets

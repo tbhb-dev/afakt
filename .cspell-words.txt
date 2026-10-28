@@ -103,6 +103,7 @@ nullglob
 OpenAI
 OpenID
 oserror
+oxipng
 passthrough
 PAT
 PATs
@@ -127,6 +128,7 @@ readyz
 reflink
 reflinks
 requestfailed
+resvg
 ringpop
 rumdl
 RustFS

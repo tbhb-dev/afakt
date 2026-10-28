@@ -26,6 +26,13 @@ pnpm = "12.14.0"
 java = "temurin-21.0.13+9.0.LTS"
 "github:plantuml/plantuml" = { version = "1.2026.9", asset_pattern = "plantuml-1.2026.9.jar", format = "raw", bin = "plantuml.jar" }
 "http:structurizr" = { version = "2026.09.19", url = "https://download.structurizr.com/structurizr-{{ version }}.war", checksum = "sha256:ac1a2806e246364b88261a542a36ca7f3006ef48e5de68830afa8672f58690f1", format = "raw", bin = "structurizr.war" }
+# D2 renders diagram sources to SVG, and svgo shrinks it. resvg renders the
+# SVG as a PNG with the Source Sans Pro release D2 embeds, and oxipng shrinks it.
+d2 = "0.9.0"
+"npm:svgo" = "4.1.0"
+resvg = "0.49.0"
+oxipng = "10.2.1"
+"http:source-sans-pro" = { version = "2.045R", url = "https://github.com/adobe-fonts/source-sans/releases/download/2.045R-ro%2F1.095R-it/source-sans-pro-2.045R-ro-1.095R-it.zip", checksum = "sha256:5f090b821e117f452ef399c3c1b8b244c1647728a1e901c4d167cbf7fc298ab6" }
 
 [env]
 _.path = ["{{config_root}}/scripts/architecture-bin"]
@@ -203,13 +210,46 @@ if ! diff -u "$root/workspace.json" "$dir/workspace.json"; then
 fi
 '''
 
-[tasks.export-diagrams]
+[tasks.export-workspace-diagrams]
 description = "Render workspace views as PNG and SVG with PlantUML"
 run = "bash scripts/workspace-diagrams.sh export"
 
-[tasks.check-diagrams]
-description = "Check diagram sources and rendering hashes"
+[tasks.check-workspace-diagrams]
+description = "Check workspace diagram sources and rendering hashes"
 run = "bash scripts/workspace-diagrams.sh check"
+
+# Pass D2 files to render only those; with none, every D2 file renders and
+# renders whose source is gone are removed.
+[tasks.render-d2]
+description = "Render D2 diagrams as SVG and PNG beside their sources"
+run = "bash scripts/d2-diagrams.sh render"
+
+[tasks.check-d2]
+description = "Check D2 renders and their hashes against their sources"
+run = "bash scripts/d2-diagrams.sh check"
+
+[tasks.export-diagrams]
+description = "Render workspace views and D2 diagrams"
+run = ["mise run export-workspace-diagrams", "mise run render-d2"]
+
+[tasks.check-diagrams]
+description = "Check workspace and D2 diagram renders"
+run = ["mise run check-workspace-diagrams", "mise run check-d2"]
+
+# Agent hooks run this after tool calls, so it renders only what is stale.
+[tasks.refresh-diagrams]
+description = "Render diagrams whose sources changed since their last render"
+shell = "bash -c"
+run = '''
+set -euo pipefail
+hash=$(cd docs && shasum -a 256 workspace.dsl)
+if [[ $(head -n 1 docs/diagrams/structurizr.sha256) != "$hash" ]]; then
+  mise run generate-workspace
+  mise run export-workspace-diagrams
+  echo "rendered docs/workspace.dsl"
+fi
+bash scripts/d2-diagrams.sh refresh
+'''
 
 # `structurizr local` writes layout and workspace.json beside the DSL it serves.
 # It serves a symlink in a temporary directory so docs/workspace.json stays the

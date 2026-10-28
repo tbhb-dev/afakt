@@ -1,0 +1,11 @@
+---
+# Local APM package: the agent hook that renders stale diagrams after each
+# tool call. apm-sync rebuilds every harness's hooks from packages, so the
+# hook lives here rather than in a harness settings file.
+name: afakt-diagrams
+version: 0.1.0
+description: Render stale diagrams after agent tool calls
+targets:
+  - claude
+  - codex
+  - antigravity

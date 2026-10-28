@@ -67,8 +67,11 @@ Read `mise.toml` before trusting it. In each fresh worktree, run `mise trust`, t
 | `mise run lint-workspace` | Check workspace inspections |
 | `mise run generate-workspace` | Generate workspace JSON |
 | `mise run check-workspace` | Check workspace JSON freshness |
-| `mise run export-diagrams` | Render workspace views as images |
-| `mise run check-diagrams` | Check diagram sources and rendering hashes |
+| `mise run export-diagrams` | Render workspace views and D2 diagrams as images |
+| `mise run check-diagrams` | Check workspace and D2 diagram renders |
+| `mise run render-d2` | Render D2 diagrams as images beside each `.d2` source, or only the files given |
+| `mise run check-d2` | Check D2 renders against their sources |
+| `mise run refresh-diagrams` | Render only the diagrams whose sources changed, as the agent hooks do |
 | `mise run serve-structurizr` | Serve the workspace in Structurizr's local web UI |
 | `mise run vuln` | Scan reachable Go vulnerabilities |
 | `mise run devtools:gomodscan` | Scan module dependencies |
