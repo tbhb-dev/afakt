@@ -48,7 +48,7 @@ STRIDE covers spoofing, tampering, repudiation, information disclosure, denial o
 | `P-CF-3` | Sandbox execution | Vendor sandbox. afakt-agent, afakt-sandbox, and harness. Compatibility unresolved |
 | `P-CF-4` | Workload proxy mediator | Required per launch. Remote placement unresolved |
 | `P-CF-5` | Workload proxy | Required outside sandbox. Remote placement unresolved |
-| `P-CF-6` | Overlay peers and global egress gateway | Workload peers and control plane gateway. Shared models apply |
+| `P-CF-6` | Overlay peers | Workload peers and control plane services. Shared models apply |
 | `P-CF-7` | Successor launch | New launch authority |
 | `P-CF-8` | Workspace command | afakt-sandbox placement unresolved |
 | `DS-CF-1` | Workspace and scratch | Launch data. Remote backing and separation unresolved |
@@ -79,7 +79,7 @@ flowchart LR
         P-CF-5["P-CF-5: Workload proxy"]
     end
     subgraph services["TB-CF-3 / overlay peers and afakt services"]
-        P-CF-6["P-CF-6: Overlay peers and global egress gateway"]
+        P-CF-6["P-CF-6: Overlay peers"]
     end
     subgraph files["TB-CF-4 / launch-controlled storage"]
         DS-CF-1["DS-CF-1: Workspace and scratch"]
@@ -112,6 +112,7 @@ flowchart LR
     P-CF-3 -.->|"F-CF-4"| P-CF-4
     P-CF-4 -.->|"F-CF-5"| P-CF-5
     P-CF-5 -.->|"F-CF-6"| P-CF-6
+    P-CF-5 -.->|"F-CF-6"| E-CF-4
     P-CF-3 -->|"F-CF-7"| E-CF-4
     P-CF-3 -->|"F-CF-8"| DS-CF-1
     P-CF-1 -.->|"F-CF-9"| DS-CF-1
@@ -134,7 +135,7 @@ flowchart LR
 - **`F-CF-3`.** untrusted runtime input, system calls, and execution output presented to vendor services. Crosses `TB-CF-2`.
 - **`F-CF-4`.** Required launch-bound network, name queries, control, ACP, MCP, and preview traffic. Crosses `TB-CF-1`, `TB-CF-3`.
 - **`F-CF-5`.** Permitted requests passed from the no-network mediator to its workload proxy. Crosses `TB-CF-3`.
-- **`F-CF-6`.** Direct authenticated overlay connections and inspected traffic to the global egress gateway. Session routing depends on [`OQ-SES-17`](agent-open-questions.md#%60OQ-SES-17%60). Published-port routing depends on [`OQ-PORT-14`](agent-open-questions.md#%60OQ-PORT-14%60). Common service controls apply. Crosses `TB-CF-3`.
+- **`F-CF-6`.** Direct authenticated overlay connections and permitted internet traffic through the workload proxy. Its placement and carrier remain under [`OQ-SBX-36`](agent-open-questions.md#%60OQ-SBX-36%60). Session routing depends on [`OQ-SES-17`](agent-open-questions.md#%60OQ-SES-17%60). Published-port routing depends on [`OQ-PORT-14`](agent-open-questions.md#%60OQ-PORT-14%60). Common service controls apply. Crosses `TB-CF-3`.
 - **`F-CF-7`.** Vendor-permitted external traffic, including potential direct paths outside afakt mediation. Crosses `TB-CF-1`, `TB-CF-3`.
 - **`F-CF-8`.** Workspace and scratch reads and writes. Crosses `TB-CF-4`.
 - **`F-CF-9`.** Remote workspace transfer, capture, materialization, and cleanup of hostile content. Crosses `TB-CF-1`, `TB-CF-4`.

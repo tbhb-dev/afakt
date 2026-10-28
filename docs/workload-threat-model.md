@@ -34,7 +34,7 @@ In-tree providers include [macOS VM](workload-provider-macos-vm.md), [Linux VM](
 | Agent workspace contents and source fetch credentials    | Workspace registry and workload host worker                                                               | [Workspace sources](agent-workspace.md#Workspace%20sources)                                                                                |
 | Session messages and message signing keys                | Session log owner (open) and API server                                                                               | [Message signatures](agent-session-attachment.md#Message%20signatures)                                                                     |
 | Workspace images and publication tokens                  | Image registry, object store, image builder, and worker caches                                         | [Registry authentication](agent-workspace-image.md#Registry%20authentication)                                                              |
-| Decision log and audit records                           | Workload proxy mediator, agent egress gateway, credential broker, and MCP gateway. Storage custody remains open | [Network policy](workload-proxy-mediator.md#Network%20policy) and [Audit and telemetry](agent-mcp-gateway.md#Audit%20and%20telemetry)                |
+| Decision log and audit records                           | Workload proxy mediator, workload proxy, credential broker, and MCP gateway. Storage custody remains open | [Network policy](workload-proxy-mediator.md#Network%20policy) and [Audit and telemetry](agent-mcp-gateway.md#Audit%20and%20telemetry)                |
 | afakt API authority and immutable agent launch specs     | API server and agent dispatcher workflow                                                               | [Agent launch authentication](workload-proxy.md#Agent%20launch%20authentication)                                                            |
 | Shared lifecycle authority and host capacity             | Workload host worker and reservation API                                                                  | [Virtual machine lifecycle](workload-lifecycle.md#Virtual%20machine%20lifecycle) and [Slot reservations](workload-placement.md#Slot%20reservations) |
 | Port publication routes and viewer grants                | Ingress gateway, preview server, mediator, and provider endpoint                                       | [Port discovery and records](workload-ports.md#Port%20discovery%20and%20records)                                                              |
@@ -52,11 +52,11 @@ In-tree providers include [macOS VM](workload-provider-macos-vm.md), [Linux VM](
 | Network attacker between components | Ability to observe, delay, drop, replay, or alter network packets | Workload mutual TLS authenticates host connections under [Workload identity](workload-host.md#Workload%20identity). Other transport details remain open where identified below. |
 | Authenticated user with limited roles | Valid sign-in and grants for some agents, sessions, profiles, or credentials | Authentication doesn't imply every target grant. See [Owned resources](agent.md#Owned%20resources). |
 | Compromised workload host | Supervisor control, mediator state, workspace disks, and locally held credentials | Host control, enforcement, and custody require trust under [Trust boundary](workload-host.md#Trust%20boundary). |
-| Compromised site gateway | Inspected traffic, gateway identity, certificate authority custody, and credentials available to its broker arrangement | The design gives it the host's policy trust under [Agent egress gateway](components.md#Agent%20egress%20gateway). |
+| Compromised workload proxy | Inspected traffic, launch identity, certificate authority custody, and credentials available to its broker arrangement | Enforcement and custody require trust under [Workload proxy](workload-proxy.md#Internet%20connections). |
 | Compromised central MCP server | Its shared server process and concurrent request data | A sandbox and request scoping apply. The permitted sharing boundary remains [open](agent-open-questions.md#%60OQ-MCP-1%60). |
 | Compromised storage or identity service | Retained blobs, log records, signing state, or registration authority within that service | Image digest checks don't establish log integrity or issuer recovery. [Storage access](agent-open-questions.md#%60OQ-IMG-13%60) and [issuer bootstrap](agent-open-questions.md#%60OQ-SBX-32%60) remain open. |
 
-A compromised workload host or site gateway starts beyond the trust the design places in that component. Mutual TLS proves possession of its identity, not honest enforcement. Agent-side checks can't restore that trust. Hooks don't enforce host custody, and model behavior doesn't enforce it either.
+A compromised workload host or workload proxy starts beyond the trust the design places in that component. Mutual TLS proves possession of its identity, not honest enforcement. Agent-side checks can't restore that trust. Hooks don't enforce host custody, and model behavior doesn't enforce it either.
 
 ## Trust boundaries
 
@@ -66,12 +66,11 @@ A trust boundary separates principals with different authority. Service authoriz
 | --- | --- | --- | --- |
 | `TB-3` | Workload host and control plane | Worker and workload proxy / workflow and API services | [Workload identity](workload-host.md#Workload%20identity). Receiving services authenticate workload TLS over the overlay. See [Overlay connections](workload-proxy.md#Overlay%20connections). |
 | `TB-4` | Client and control plane | User clients / ingress and app services | [Writer and readers](agent-acp.md#Writer%20and%20readers) and [Access and share links](workload-previews.md#Access%20and%20share%20links). |
-| `TB-5` | Workload host and site gateway | Workload proxy / standalone gateway | [Egress gateway routing](workload-proxy-mediator.md#Agent%20egress%20gateway). Mutual TLS authenticates each side. Broker placement remains [`OQ-SBX-23`](agent-open-questions.md#%60OQ-SBX-23%60). |
-| `TB-6` | Execution services and external services | Fetchers, resolver, gateways, and tunnel connector / upstream services | [Network policy](workload-proxy-mediator.md#Network%20policy) and [Public tunnel providers](workload-previews.md#Public%20tunnel%20providers). |
+| `TB-6` | Execution services and external services | Fetchers, resolver, workload proxy, MCP gateway, and tunnel connector / upstream services | [Network policy](workload-proxy-mediator.md#Network%20policy) and [Public tunnel providers](workload-previews.md#Public%20tunnel%20providers). |
 | `TB-7` | Source and destination agent authority | Source mediator / destination mediator | [Connections between agents](workload-ports.md#Connections%20between%20agents). Both ends require authorization. Endpoint binding remains [`OQ-SBX-13`](agent-open-questions.md#%60OQ-SBX-13%60). |
 | `TB-8` | Execution services and retained storage | Workers and control plane / registries, object store, and logs | [Registry authentication](agent-workspace-image.md#Registry%20authentication). Direct object and audit access remain unresolved. |
 | `TB-9` | MCP gateway and central server sandbox | Gateway authority / shared server process | [Server hosting and lifecycle](agent-mcp-gateway.md#Server%20hosting%20and%20lifecycle). Shared-process isolation remains [`OQ-MCP-1`](agent-open-questions.md#%60OQ-MCP-1%60). |
-| `TB-10` | Remote sandbox and global egress gateway | Remote platform / global gateway | [Workload proxy mediator](workload-proxy-mediator.md#Launch%20boundary). Remote traffic binding remains [`OQ-SBX-36`](agent-open-questions.md#%60OQ-SBX-36%60). |
+| `TB-10` | Remote sandbox and workload proxy | Remote platform / workload proxy with placement unresolved | [Workload proxy mediator](workload-proxy-mediator.md#Launch%20boundary). Remote traffic binding remains [`OQ-SBX-36`](agent-open-questions.md#%60OQ-SBX-36%60). |
 | `TB-11` | Workload identity consumer and signing authority | Host-side callers / Workload API and issuer | [Workload identity](workload-host.md#Workload%20identity). Attestation and bootstrap remain [`OQ-SBX-30`](agent-open-questions.md#%60OQ-SBX-30%60) and [`OQ-SBX-32`](agent-open-questions.md#%60OQ-SBX-32%60). |
 | `TB-12` | Agent requests and service authority | untrusted launch input / mediator policy and identity | [Control requests](workload-proxy-mediator.md#Control%20requests). This is the request authorization boundary. Provider-specific channels establish which launch sent the input. |
 | `TB-13` | Mediator policy and network authority | Workload proxy mediator and workload proxy for one launch | Local channel and framing ownership remain undecided. See [Workload overlay and names](workload-overlay.md). |
@@ -103,9 +102,6 @@ A data flow diagram shows processes, stores, external entities, and their exchan
 | `P-4` | Workload host worker and agent launcher workflow | Workload host |
 | `P-5` | Workspace preparation service | Workload host worker |
 | `P-8` | Workload proxy mediator and workload DNS | Workload host |
-| `P-9` | Agent egress gateway | Agent host |
-| `P-10` | Site gateway | Standalone gateway |
-| `P-11` | Global egress gateway | Control plane |
 | `P-12` | Ingress gateway | Control plane |
 | `P-13` | Session connection and log functions | Owner and placement open under [`OQ-SES-17`](agent-open-questions.md#%60OQ-SES-17%60) and [`OQ-SES-18`](agent-open-questions.md#%60OQ-SES-18%60) |
 | `P-14` | Preview server | Control plane |
@@ -208,7 +204,7 @@ flowchart LR
 
 ### Workload proxy mediator egress and telemetry
 
-The workload proxy receives guest traffic and asks the mediator for a decision. The mediator never transmits that traffic. Local and site gateways are alternatives for inspected destinations. passthrough remains subject to connection policy. Credential injection follows the custody paths below.
+The workload proxy receives guest traffic and asks the mediator for a decision. The mediator never transmits that traffic. The workload proxy ends TLS for inspected destinations under mediator decisions. Traffic without decryption remains subject to connection policy. Credential injection follows the custody paths below.
 
 ```mermaid
 flowchart LR
@@ -218,17 +214,10 @@ flowchart LR
     subgraph z1["TB-12 / workload host"]
         P-8["P-8: Workload proxy mediator and workload DNS"]
         P-33["P-33: Workload proxy"]
-        P-9["P-9: Agent egress gateway"]
         P-30["P-30: Telemetry endpoint"]
-    end
-    subgraph z2["TB-5 / site gateway"]
-        P-10["P-10: Site gateway"]
     end
     subgraph z3["TB-10 / remote platform"]
         E-5["E-5: Remote agent sandbox"]
-    end
-    subgraph z4["TB-10 / global gateway"]
-        P-11["P-11: Global egress gateway"]
     end
     subgraph z5["TB-6 / upstream"]
         E-3["E-3: Upstream service"]
@@ -240,30 +229,21 @@ flowchart LR
     end
     E-8 -->|"F-14"| P-33
     P-33 -->|"F-15"| E-4
-    P-33 -->|"F-16"| P-9
-    P-33 -->|"F-17"| P-10
-    P-9 -->|"F-18"| P-33
-    P-10 -->|"F-19"| E-3
+    P-33 -->|"F-16"| E-3
     P-33 -->|"F-20"| E-3
     E-5 -->|"F-21"| P-33
     P-8 <-->|"F-81: decisions"| P-33
-    P-33 -->|"F-91"| P-11
-    P-11 -->|"F-22"| E-3
     P-33 -->|"F-23"| P-30
     P-30 -->|"F-24"| DS-11
     P-8 -->|"F-25"| DS-6
+    P-33 -->|"F-25"| DS-6
 ```
 
 - **`F-14`.** untrusted name queries, destinations, and app bytes after provider transport. Crosses `TB-12`.
 - **`F-15`.** Upstream name queries and answers. Crosses `TB-6`.
-- **`F-16`.** Inspected connections requiring credential injection or HTTP policy. No separate boundary.
-- **`F-17`.** Launch identity over mutual TLS and inspected traffic. Crosses `TB-5`.
-- **`F-18`.** Locally inspected requests and responses. Crosses `TB-6`.
-- **`F-19`.** Site-inspected requests and responses. Crosses `TB-6`.
+- **`F-16`.** Inspected requests and responses over TLS after mediator admission and any credential injection at the workload proxy. Crosses `TB-6`.
 - **`F-20`.** Permitted passthrough streams without decryption. Crosses `TB-6`.
 - **`F-21`.** Remote egress through its per-launch mediator and workload proxy. Crosses `TB-10`.
-- **`F-91`.** Policy-permitted remote traffic to the global gateway through the workload proxy. Crosses `TB-10`.
-- **`F-22`.** Permitted global egress requests and responses. Crosses `TB-6`.
 - **`F-23`.** Telemetry and attributed launch context. No separate boundary.
 - **`F-24`.** Filtered telemetry with permitted attributes. Crosses `TB-8`.
 - **`F-25`.** Network, HTTP, ACP, and control decisions. Crosses `TB-8`.
@@ -374,10 +354,8 @@ flowchart LR
         P-8["P-8: Workload proxy mediator and workload DNS"]
         P-33["P-33: Workload proxy"]
     end
-    subgraph z4["TB-5 / broker placement unresolved"]
+    subgraph z4["Broker process placement unresolved"]
         P-19["P-19: Credential broker"]
-        P-9["P-9: Agent egress gateway"]
-        P-10["P-10: Site gateway"]
     end
     subgraph z5["TB-6 / upstream"]
         E-3["E-3: Upstream service"]
@@ -392,8 +370,8 @@ flowchart LR
     P-33 -->|"F-47"| P-2
     P-19 -->|"F-48"| P-22
     P-19 -->|"F-49"| P-33
-    P-9 -->|"F-78"| P-19
-    P-10 -->|"F-79"| P-19
+    P-33 -->|"F-16"| E-3
+    P-33 -->|"F-78"| P-19
 ```
 
 - **`F-42`.** Credential registration through authenticated ingress. Crosses `TB-4`.
@@ -404,10 +382,9 @@ flowchart LR
 - **`F-45`.** Signing authority and trust state. Crosses `TB-11`.
 - **`F-46`.** Workload proxy request for the launch SVID and private key outside the guest. Crosses `TB-11`.
 - **`F-47`.** Workload proxy request over mutual TLS on the overlay, ending at the API server. Crosses `TB-3`.
-- **`F-48`.** Credential reference and short-lived or static credential by type. Exchange carrier unresolved. Crosses `TB-3`, `TB-5`.
-- **`F-49`.** Credentialed request over TLS after identity and inject-domain checks. Crosses `TB-6`.
-- **`F-78`.** Locally inspected request for credential injection. Process arrangement unresolved. No separate boundary.
-- **`F-79`.** Site-inspected request for credential injection. Broker placement unresolved. Crosses `TB-5`.
+- **`F-48`.** Credential reference and short-lived or static credential by type. Exchange carrier unresolved. Crosses `TB-3`.
+- **`F-49`.** Credential injection at the workload proxy after identity and inject-domain checks. Process arrangement unresolved. No separate boundary.
+- **`F-78`.** Inspected request from the workload proxy for credential injection. Process arrangement unresolved. No separate boundary.
 
 ### Workspace images and registries
 
@@ -578,12 +555,12 @@ Spoofing and tampering of the local transport belong to each workload provider. 
 
 | Threat ID | Element | STRIDE category | Threat | Mitigation in the design | Status |
 | --- | --- | --- | --- | --- | --- |
-| `TM-27` | `F-14`, `F-16`, `E-8`, `P-8`, `P-33`, `P-9` | repudiation | Permitted traffic proceeds while durable storage can't receive its authorization decision. | [Network policy](workload-proxy-mediator.md#Network%20policy) requires every decision to enter the log. Action admission during logging failure remains open. See [Workload overlay and names](workload-overlay.md). | depends on an open question ([`OQ-OBS-7`](agent-open-questions.md#%60OQ-OBS-7%60)) |
-| `TM-28` | `F-14`, `F-16`, `E-8`, `P-8`, `P-33`, `P-9` | information disclosure | Traffic or parser state from one launch leaks through a shared mediator process. | [Per-launch services](workload-proxy.md#Launch%20boundary) requires separate mediators for launches. Process and user separation remain undecided, so the service count alone doesn't establish memory isolation. | depends on an open question ([`OQ-SBX-19`](agent-open-questions.md#%60OQ-SBX-19%60)) |
-| `TM-29` | `F-14`, `F-16`, `E-8`, `P-8`, `P-33`, `P-9` | denial of service | Malformed packets or many streams starve mediator control work. | [Network policy](workload-proxy-mediator.md#Network%20policy) denies unauthorized traffic. Overload and control service bounds remain open. [^provider-mediation] | depends on an open question ([`OQ-SBX-14`](agent-open-questions.md#%60OQ-SBX-14%60)) |
-| `TM-30` | `F-14`, `F-16`, `E-8`, `P-8`, `P-33`, `P-9` | elevation of privilege | Guest traffic exploits the mediator parser to gain host authority. | [Workload proxy mediator](workload-proxy-mediator.md#Launch%20boundary) leaves mediator confinement and kernel separation unresolved. [^provider-mediation] | depends on an open question ([`OQ-SBX-12`](agent-open-questions.md#%60OQ-SBX-12%60)) |
-| `TM-168` | `F-14`, `F-16`, `E-8`, `P-8`, `P-33`, `P-9` | tampering | A changed or revoked deployment policy leaves existing mediator flows under stale authority. | [Network policy](workload-proxy-mediator.md#Network%20policy) defines destination bounds. Revision installation and the treatment of admitted flows remain unresolved. | depends on an open question ([`OQ-SBX-25`](agent-open-questions.md#%60OQ-SBX-25%60)) |
-| `TM-167` | `F-14`, `F-16`, `E-8`, `P-8`, `P-33`, `P-9` | spoofing | A substituted deployment policy presents itself as the policy authorized for a launch. | [Network policy](workload-proxy-mediator.md#Network%20policy) requires policy evaluation. Authentication of deployment policy revisions remains unresolved. | depends on an open question ([`OQ-SBX-25`](agent-open-questions.md#%60OQ-SBX-25%60)) |
+| `TM-27` | `F-14`, `F-16`, `E-8`, `P-8`, `P-33` | repudiation | Permitted traffic proceeds while durable storage can't receive its authorization decision. | [Network policy](workload-proxy-mediator.md#Network%20policy) requires every decision to enter the log. Action admission during logging failure remains open. See [Workload overlay and names](workload-overlay.md). | depends on an open question ([`OQ-OBS-7`](agent-open-questions.md#%60OQ-OBS-7%60)) |
+| `TM-28` | `F-14`, `F-16`, `E-8`, `P-8`, `P-33` | information disclosure | Traffic or parser state from one launch leaks through a shared mediator process. | [Per-launch services](workload-proxy.md#Launch%20boundary) requires separate mediators for launches. Process and user separation remain undecided, so the service count alone doesn't establish memory isolation. | depends on an open question ([`OQ-SBX-19`](agent-open-questions.md#%60OQ-SBX-19%60)) |
+| `TM-29` | `F-14`, `F-16`, `E-8`, `P-8`, `P-33` | denial of service | Malformed packets or many streams starve mediator control work. | [Network policy](workload-proxy-mediator.md#Network%20policy) denies unauthorized traffic. Overload and control service bounds remain open. [^provider-mediation] | depends on an open question ([`OQ-SBX-14`](agent-open-questions.md#%60OQ-SBX-14%60)) |
+| `TM-30` | `F-14`, `F-16`, `E-8`, `P-8`, `P-33` | elevation of privilege | Guest traffic exploits the mediator parser to gain host authority. | [Workload proxy mediator](workload-proxy-mediator.md#Launch%20boundary) leaves mediator confinement and kernel separation unresolved. [^provider-mediation] | depends on an open question ([`OQ-SBX-12`](agent-open-questions.md#%60OQ-SBX-12%60)) |
+| `TM-168` | `F-14`, `F-16`, `E-8`, `P-8`, `P-33` | tampering | A changed or revoked deployment policy leaves existing mediator flows under stale authority. | [Network policy](workload-proxy-mediator.md#Network%20policy) defines destination bounds. Revision installation and the treatment of admitted flows remain unresolved. | depends on an open question ([`OQ-SBX-25`](agent-open-questions.md#%60OQ-SBX-25%60)) |
+| `TM-167` | `F-14`, `F-16`, `E-8`, `P-8`, `P-33` | spoofing | A substituted deployment policy presents itself as the policy authorized for a launch. | [Network policy](workload-proxy-mediator.md#Network%20policy) requires policy evaluation. Authentication of deployment policy revisions remains unresolved. | depends on an open question ([`OQ-SBX-25`](agent-open-questions.md#%60OQ-SBX-25%60)) |
 
 ### Agent name resolution
 
@@ -596,16 +573,16 @@ Spoofing and tampering of the local transport belong to each workload provider. 
 | `TM-35` | `F-15`, `P-8`, `P-33`, `E-4` | denial of service | A guest sends excessive name queries or forces expensive upstream resolution. | Mitigation unspecified. [Workload DNS](workload-proxy-mediator.md#Workload%20DNS). [^provider-mediation] | gap ([`OQ-SBX-35`](agent-open-questions.md#%60OQ-SBX-35%60)) |
 | `TM-36` | `F-15`, `P-8`, `P-33`, `E-4` | elevation of privilege | A false destination binding redirects traffic toward a more privileged service. | [Network policy](workload-proxy-mediator.md#Network%20policy) requires connection policy after resolution. Upstream trust remains open. [^provider-mediation] | depends on an open question ([`OQ-SBX-21`](agent-open-questions.md#%60OQ-SBX-21%60)) |
 
-### Inspected destinations and site gateway
+### Inspected destinations at the workload proxy
 
 | Threat ID | Element | STRIDE category | Threat | Mitigation in the design | Status |
 | --- | --- | --- | --- | --- | --- |
-| `TM-37` | `F-3`, `F-17`, `F-18`, `F-19`, `F-49`, `F-78`, `F-79`, `P-1`, `E-3`, `P-8`, `P-33`, `P-10`, `P-9`, `P-19` | spoofing | A network attacker impersonates the site gateway or injects a credential into an unauthenticated plaintext connection. | [Egress gateway routing](workload-proxy-mediator.md#Agent%20egress%20gateway) requires mutual TLS. [Credential brokering](workload-sandbox.md#Credential%20brokering) permits injection only on TLS requests. See [Workload overlay and names](workload-overlay.md). | mitigated by the design |
-| `TM-38` | `F-3`, `F-17`, `F-18`, `F-19`, `F-49`, `F-78`, `F-79`, `P-1`, `E-3`, `P-8`, `P-33`, `P-10`, `P-9`, `P-19` | tampering | An attacker installs a stale or unauthorized deployment policy revision. | [Network policy](workload-proxy-mediator.md#Network%20policy) applies policy. Policy authentication, atomic installation, and revocation remain open. | depends on an open question ([`OQ-SBX-25`](agent-open-questions.md#%60OQ-SBX-25%60)) |
-| `TM-39` | `F-3`, `F-17`, `F-18`, `F-19`, `F-49`, `F-78`, `F-79`, `P-1`, `E-3`, `P-8`, `P-33`, `P-10`, `P-9`, `P-19` | repudiation | An injected credential use lacks durable evidence after a logging failure. | [Credential brokering](workload-sandbox.md#Credential%20brokering) records each injected use. [Network policy](workload-proxy-mediator.md#Network%20policy) records decisions. Admission on log failure remains open. | depends on an open question ([`OQ-OBS-7`](agent-open-questions.md#%60OQ-OBS-7%60)) |
-| `TM-40` | `F-3`, `F-17`, `F-18`, `F-19`, `F-49`, `F-78`, `F-79`, `P-1`, `E-3`, `P-8`, `P-33`, `P-10`, `P-9`, `P-19` | information disclosure | A permitted upstream reflects or transforms a brokered secret into its response. | [Credential brokering](workload-sandbox.md#Credential%20brokering) keeps the injected header outside the guest but doesn't define safe response content. | depends on an open question ([`OQ-SBX-26`](agent-open-questions.md#%60OQ-SBX-26%60)) |
-| `TM-41` | `F-3`, `F-17`, `F-18`, `F-19`, `F-49`, `F-78`, `F-79`, `P-1`, `E-3`, `P-8`, `P-33`, `P-10`, `P-9`, `P-19` | denial of service | A streaming request monopolizes the mediator or egress service and delays control. | [Network policy](workload-proxy-mediator.md#Network%20policy) defines policy checks. Complete guarantees for streaming and resources remain unspecified. | depends on an open question ([`OQ-SBX-14`](agent-open-questions.md#%60OQ-SBX-14%60)) |
-| `TM-42` | `F-3`, `F-17`, `F-18`, `F-19`, `F-49`, `F-78`, `F-79`, `P-1`, `E-3`, `P-8`, `P-33`, `P-10`, `P-9`, `P-19` | elevation of privilege | With a broad inject domain, a repository profile can use credentials against an unintended service. | [Launch validation](agent-profile.md#Launch%20validation) checks domain consistency. The owner's credential domain ceiling remains on hold. | depends on an open question ([`OQ-PRF-5`](agent-open-questions.md#%60OQ-PRF-5%60)) |
+| `TM-37` | `F-3`, `F-16`, `F-49`, `F-78`, `P-1`, `E-3`, `P-8`, `P-33`, `P-19` | spoofing | A network attacker impersonates an inspected destination or injects a credential into an unauthenticated plaintext connection. | [Workload proxy inspection](workload-proxy.md#Internet%20connections) ends TLS with a per-workload certificate authority trusted by the guest. [Credential brokering](workload-sandbox.md#Credential%20brokering) permits injection only on TLS requests. See [Workload overlay and names](workload-overlay.md). | mitigated by the design |
+| `TM-38` | `F-3`, `F-16`, `F-49`, `F-78`, `P-1`, `E-3`, `P-8`, `P-33`, `P-19` | tampering | An attacker installs a stale or unauthorized deployment policy revision. | [Network policy](workload-proxy-mediator.md#Network%20policy) applies policy. Policy authentication, atomic installation, and revocation remain open. | depends on an open question ([`OQ-SBX-25`](agent-open-questions.md#%60OQ-SBX-25%60)) |
+| `TM-39` | `F-3`, `F-16`, `F-49`, `F-78`, `P-1`, `E-3`, `P-8`, `P-33`, `P-19` | repudiation | An injected credential use lacks durable evidence after a logging failure. | [Credential brokering](workload-sandbox.md#Credential%20brokering) records each injected use. [Network policy](workload-proxy-mediator.md#Network%20policy) records decisions. Admission on log failure remains open. | depends on an open question ([`OQ-OBS-7`](agent-open-questions.md#%60OQ-OBS-7%60)) |
+| `TM-40` | `F-3`, `F-16`, `F-49`, `F-78`, `P-1`, `E-3`, `P-8`, `P-33`, `P-19` | information disclosure | A permitted upstream reflects or transforms a brokered secret into its response. | [Credential brokering](workload-sandbox.md#Credential%20brokering) keeps the injected header outside the guest but doesn't define safe response content. | depends on an open question ([`OQ-SBX-26`](agent-open-questions.md#%60OQ-SBX-26%60)) |
+| `TM-41` | `F-3`, `F-16`, `F-49`, `F-78`, `P-1`, `E-3`, `P-8`, `P-33`, `P-19` | denial of service | A streaming request monopolizes the mediator or workload proxy and delays control. | [Network policy](workload-proxy-mediator.md#Network%20policy) defines policy checks. Complete guarantees for streaming and resources remain unspecified. | depends on an open question ([`OQ-SBX-14`](agent-open-questions.md#%60OQ-SBX-14%60)) |
+| `TM-42` | `F-3`, `F-16`, `F-49`, `F-78`, `P-1`, `E-3`, `P-8`, `P-33`, `P-19` | elevation of privilege | With a broad inject domain, a repository profile can use credentials against an unintended service. | [Launch validation](agent-profile.md#Launch%20validation) checks domain consistency. The owner's credential domain ceiling remains on hold. | depends on an open question ([`OQ-PRF-5`](agent-open-questions.md#%60OQ-PRF-5%60)) |
 
 ### Traffic to passthrough destinations
 
@@ -622,12 +599,12 @@ Spoofing and tampering of the local transport belong to each workload provider. 
 
 | Threat ID | Element | STRIDE category | Threat | Mitigation in the design | Status |
 | --- | --- | --- | --- | --- | --- |
-| `TM-49` | `F-4`, `F-21`, `F-22`, `E-5`, `P-1`, `P-11`, `E-3`, `P-8`, `P-33`, `F-91` | spoofing | A remote sandbox claims another launch at the global egress gateway. | Mitigation unspecified. [Workload proxy mediator](workload-proxy-mediator.md#Launch%20boundary). See [Per-launch services](workload-proxy.md#Launch%20boundary). | gap ([`OQ-SBX-36`](agent-open-questions.md#%60OQ-SBX-36%60)) |
-| `TM-50` | `F-4`, `F-21`, `F-22`, `E-5`, `P-1`, `P-11`, `E-3`, `P-8`, `P-33`, `F-91` | tampering | A remote provider bypasses its per-launch mediator when forwarding control or session traffic. | [Per-launch services](workload-proxy.md#Launch%20boundary) requires identity stamping and a launch-authenticated workload proxy on every workload provider. Remote integration remains unspecified. | gap ([`OQ-SBX-36`](agent-open-questions.md#%60OQ-SBX-36%60)) |
-| `TM-51` | `F-4`, `F-21`, `F-22`, `E-5`, `P-1`, `P-11`, `E-3`, `P-8`, `P-33`, `F-91` | repudiation | Remote requests lack a defined identity binding for decision attribution. | Mitigation unspecified. [Agent egress gateway](components.md#Agent%20egress%20gateway). See [Per-launch services](workload-proxy.md#Launch%20boundary). | gap ([`OQ-SBX-36`](agent-open-questions.md#%60OQ-SBX-36%60)) |
-| `TM-52` | `F-4`, `F-21`, `F-22`, `E-5`, `P-1`, `P-11`, `E-3`, `P-8`, `P-33`, `F-91` | information disclosure | A remote sandbox sends private content on a direct route that bypasses global egress. | Mitigation unspecified. [Workload proxy mediator](workload-proxy-mediator.md#Launch%20boundary) requires exclusive global egress but specifies no remote enforcement mechanism. See [Per-launch services](workload-proxy.md#Launch%20boundary). | gap ([`OQ-SBX-36`](agent-open-questions.md#%60OQ-SBX-36%60)) |
-| `TM-53` | `F-4`, `F-21`, `F-22`, `E-5`, `P-1`, `P-11`, `E-3`, `P-8`, `P-33`, `F-91` | denial of service | A remote provider's capacity or lifetime limits prevent completion and recovery. | [Workload host registry](workload-placement.md#Workload%20host%20registry) records placement metadata. Remote eligibility constraints remain open. See [Per-launch services](workload-proxy.md#Launch%20boundary). | depends on an open question ([`OQ-PLC-7`](agent-open-questions.md#%60OQ-PLC-7%60)) |
-| `TM-54` | `F-4`, `F-21`, `F-22`, `E-5`, `P-1`, `P-11`, `E-3`, `P-8`, `P-33`, `F-91` | elevation of privilege | A remote sandbox uses an undefined control attachment path to gain broader authority. | Mitigation unspecified. [Workload proxy mediator](workload-proxy-mediator.md#Launch%20boundary). See [Per-launch services](workload-proxy.md#Launch%20boundary). | gap ([`OQ-SBX-36`](agent-open-questions.md#%60OQ-SBX-36%60)) |
+| `TM-49` | `F-4`, `F-21`, `F-16`, `E-5`, `P-1`, `E-3`, `P-8`, `P-33` | spoofing | A remote sandbox claims another launch at its workload proxy. | Mitigation unspecified. [Workload proxy mediator](workload-proxy-mediator.md#Launch%20boundary). See [Per-launch services](workload-proxy.md#Launch%20boundary). | gap ([`OQ-SBX-36`](agent-open-questions.md#%60OQ-SBX-36%60)) |
+| `TM-50` | `F-4`, `F-21`, `F-16`, `E-5`, `P-1`, `E-3`, `P-8`, `P-33` | tampering | A remote provider bypasses its per-launch mediator when forwarding control or session traffic. | [Per-launch services](workload-proxy.md#Launch%20boundary) requires identity stamping and a launch-authenticated workload proxy on every workload provider. Remote integration remains unspecified. | gap ([`OQ-SBX-36`](agent-open-questions.md#%60OQ-SBX-36%60)) |
+| `TM-51` | `F-4`, `F-21`, `F-16`, `E-5`, `P-1`, `E-3`, `P-8`, `P-33` | repudiation | Remote requests lack a defined identity binding for decision attribution. | Mitigation unspecified. [Workload proxy](workload-proxy.md#Internet%20connections). See [Per-launch services](workload-proxy.md#Launch%20boundary). | gap ([`OQ-SBX-36`](agent-open-questions.md#%60OQ-SBX-36%60)) |
+| `TM-52` | `F-4`, `F-21`, `F-16`, `E-5`, `P-1`, `E-3`, `P-8`, `P-33` | information disclosure | A remote sandbox sends private content on a direct route that bypasses its workload proxy. | Mitigation unspecified. [Workload proxy mediator](workload-proxy-mediator.md#Launch%20boundary) requires traffic to pass through the workload proxy but specifies no remote enforcement mechanism. See [Per-launch services](workload-proxy.md#Launch%20boundary). | gap ([`OQ-SBX-36`](agent-open-questions.md#%60OQ-SBX-36%60)) |
+| `TM-53` | `F-4`, `F-21`, `F-16`, `E-5`, `P-1`, `E-3`, `P-8`, `P-33` | denial of service | A remote provider's capacity or lifetime limits prevent completion and recovery. | [Workload host registry](workload-placement.md#Workload%20host%20registry) records placement metadata. Remote eligibility constraints remain open. See [Per-launch services](workload-proxy.md#Launch%20boundary). | depends on an open question ([`OQ-PLC-7`](agent-open-questions.md#%60OQ-PLC-7%60)) |
+| `TM-54` | `F-4`, `F-21`, `F-16`, `E-5`, `P-1`, `E-3`, `P-8`, `P-33` | elevation of privilege | A remote sandbox uses an undefined control attachment path to gain broader authority. | Mitigation unspecified. [Workload proxy mediator](workload-proxy-mediator.md#Launch%20boundary). See [Per-launch services](workload-proxy.md#Launch%20boundary). | gap ([`OQ-SBX-36`](agent-open-questions.md#%60OQ-SBX-36%60)) |
 
 ### Telemetry and evidence export
 
@@ -725,12 +702,12 @@ Service grants and destination listener binding both affect disclosure. Each wor
 
 | Threat ID | Element | STRIDE category | Threat | Mitigation in the design | Status |
 | --- | --- | --- | --- | --- | --- |
-| `TM-103` | `F-48`, `F-78`, `F-79`, `P-19`, `P-22`, `P-9`, `P-10` | spoofing | An exchange accepts a credential request under the wrong audience or identity form. | [`OQ-SBX-17`](agent-open-questions.md#%60OQ-SBX-17%60) permits X.509 mutual TLS or an audience-bound identity document for exchange. The per-call choice remains open. | depends on an open question ([`OQ-SBX-17`](agent-open-questions.md#%60OQ-SBX-17%60)) |
-| `TM-104` | `F-48`, `F-78`, `F-79`, `P-19`, `P-22`, `P-9`, `P-10` | tampering | A compromised traffic parser changes the broker's credential selection or injection request. | [Credential brokering](workload-sandbox.md#Credential%20brokering) requires per-request identity and domain checks. Broker placement and parser privilege separation remain open. [^provider-mediation]| depends on an open question ([`OQ-SBX-23`](agent-open-questions.md#%60OQ-SBX-23%60)) |
-| `TM-105` | `F-48`, `F-78`, `F-79`, `P-19`, `P-22`, `P-9`, `P-10` | repudiation | A broker or site gateway removes injected-use records to hide its own credential access. | Mitigation unspecified. [Credential brokering](workload-sandbox.md#Credential%20brokering). | gap ([`OQ-OBS-10`](agent-open-questions.md#%60OQ-OBS-10%60)) |
-| `TM-106` | `F-48`, `F-78`, `F-79`, `P-19`, `P-22`, `P-9`, `P-10` | information disclosure | A compromised site gateway or host reads broker memory and steals a static credential. | Mitigation unspecified. [Trust boundary](workload-host.md#Trust%20boundary) trusts credential custody outside the guest. [^provider-observations]| gap ([`OQ-SBX-37`](agent-open-questions.md#%60OQ-SBX-37%60)) |
-| `TM-107` | `F-48`, `F-78`, `F-79`, `P-19`, `P-22`, `P-9`, `P-10` | denial of service | A stalled exchange prevents useful work or holds resources during teardown. | [Agent launch authentication](workload-proxy.md#Agent%20launch%20authentication) rejects terminal requests. Session-end and renewal bounds remain on hold. | depends on an open question ([`OQ-HOOK-18`](agent-open-questions.md#%60OQ-HOOK-18%60)) |
-| `TM-108` | `F-48`, `F-78`, `F-79`, `P-19`, `P-22`, `P-9`, `P-10` | elevation of privilege | An exchange yields a shared provider principal with broader rights than the launch. | [Credential types and custody](workload-sandbox.md#Credential%20types%20and%20custody) centralizes exchangeable material. Provider principal bounds remain open. | depends on an open question ([`OQ-SBX-34`](agent-open-questions.md#%60OQ-SBX-34%60)) |
+| `TM-103` | `F-48`, `F-78`, `P-19`, `P-22`, `P-33` | spoofing | An exchange accepts a credential request under the wrong audience or identity form. | [`OQ-SBX-17`](agent-open-questions.md#%60OQ-SBX-17%60) permits X.509 mutual TLS or an audience-bound identity document for exchange. The per-call choice remains open. | depends on an open question ([`OQ-SBX-17`](agent-open-questions.md#%60OQ-SBX-17%60)) |
+| `TM-104` | `F-48`, `F-78`, `P-19`, `P-22`, `P-33` | tampering | A compromised traffic parser changes the broker's credential selection or injection request. | [Credential brokering](workload-sandbox.md#Credential%20brokering) requires per-request identity and domain checks. Broker placement and parser privilege separation remain open. [^provider-mediation]| depends on an open question ([`OQ-SBX-23`](agent-open-questions.md#%60OQ-SBX-23%60)) |
+| `TM-105` | `F-48`, `F-78`, `P-19`, `P-22`, `P-33` | repudiation | A broker or workload proxy removes injected-use records to hide its own credential access. | Mitigation unspecified. [Credential brokering](workload-sandbox.md#Credential%20brokering). | gap ([`OQ-OBS-10`](agent-open-questions.md#%60OQ-OBS-10%60)) |
+| `TM-106` | `F-48`, `F-78`, `P-19`, `P-22`, `P-33` | information disclosure | A compromised workload proxy or host reads broker memory and steals a static credential. | Mitigation unspecified. [Trust boundary](workload-host.md#Trust%20boundary) trusts credential custody outside the guest. [^provider-observations]| gap ([`OQ-SBX-37`](agent-open-questions.md#%60OQ-SBX-37%60)) |
+| `TM-107` | `F-48`, `F-78`, `P-19`, `P-22`, `P-33` | denial of service | A stalled exchange prevents useful work or holds resources during teardown. | [Agent launch authentication](workload-proxy.md#Agent%20launch%20authentication) rejects terminal requests. Session-end and renewal bounds remain on hold. | depends on an open question ([`OQ-HOOK-18`](agent-open-questions.md#%60OQ-HOOK-18%60)) |
+| `TM-108` | `F-48`, `F-78`, `P-19`, `P-22`, `P-33` | elevation of privilege | An exchange yields a shared provider principal with broader rights than the launch. | [Credential types and custody](workload-sandbox.md#Credential%20types%20and%20custody) centralizes exchangeable material. Provider principal bounds remain open. | depends on an open question ([`OQ-SBX-34`](agent-open-questions.md#%60OQ-SBX-34%60)) |
 
 ### Workspace image transfer and materialization
 
@@ -926,7 +903,7 @@ flowchart TD
     choice --> leaf0["TM-34: Encode data in name queries"]
     choice --> leaf1["TM-44: Tunnel through a passthrough destination"]
     choice --> leaf2["TM-84: Use an authorized peer as a proxy"]
-    choice --> leaf3["TM-52: Bypass the global gateway"]
+    choice --> leaf3["TM-52: Bypass the workload proxy"]
 ```
 
 - Cheapest path and blocking controls. A permitted name query can contain data without becoming an inspected connection. Query authorization remains [`OQ-SBX-35`](agent-open-questions.md#%60OQ-SBX-35%60). Both peer grants constrain relay use but don't settle proxy behavior.
@@ -1032,12 +1009,12 @@ Hook protection, the scope of project configuration in repositories, repository 
 - `TM-35`. A guest sends excessive name queries or forces expensive upstream resolution. gap ([`OQ-SBX-35`](agent-open-questions.md#%60OQ-SBX-35%60)).
 - `TM-36`. A false destination binding redirects traffic toward a more privileged service. depends on an open question ([`OQ-SBX-21`](agent-open-questions.md#%60OQ-SBX-21%60)).
 
-### Inspected destinations and site gateway
+### Inspected destinations at the workload proxy
 
 - `TM-38`. An attacker installs a stale or unauthorized deployment policy revision. depends on an open question ([`OQ-SBX-25`](agent-open-questions.md#%60OQ-SBX-25%60)).
 - `TM-39`. An injected credential use lacks durable evidence after a logging failure. depends on an open question ([`OQ-OBS-7`](agent-open-questions.md#%60OQ-OBS-7%60)).
 - `TM-40`. A permitted upstream reflects or transforms a brokered secret into its response. depends on an open question ([`OQ-SBX-26`](agent-open-questions.md#%60OQ-SBX-26%60)).
-- `TM-41`. A streaming request monopolizes the mediator or egress service and delays control. depends on an open question ([`OQ-SBX-14`](agent-open-questions.md#%60OQ-SBX-14%60)).
+- `TM-41`. A streaming request monopolizes the mediator or workload proxy and delays control. depends on an open question ([`OQ-SBX-14`](agent-open-questions.md#%60OQ-SBX-14%60)).
 - `TM-42`. With a broad inject domain, a repository profile can use credentials against an unintended service. depends on an open question ([`OQ-PRF-5`](agent-open-questions.md#%60OQ-PRF-5%60)).
 
 ### Traffic to passthrough destinations
@@ -1051,10 +1028,10 @@ Hook protection, the scope of project configuration in repositories, repository 
 
 ### Remote agent sandbox routing
 
-- `TM-49`. A remote sandbox claims another launch at the global egress gateway. gap ([`OQ-SBX-36`](agent-open-questions.md#%60OQ-SBX-36%60)).
+- `TM-49`. A remote sandbox claims another launch at its workload proxy. gap ([`OQ-SBX-36`](agent-open-questions.md#%60OQ-SBX-36%60)).
 - `TM-50`. A remote provider bypasses its per-launch mediator when forwarding control or session traffic. gap ([`OQ-SBX-36`](agent-open-questions.md#%60OQ-SBX-36%60)).
 - `TM-51`. Remote requests lack a defined identity binding for decision attribution. gap ([`OQ-SBX-36`](agent-open-questions.md#%60OQ-SBX-36%60)).
-- `TM-52`. A remote sandbox sends private content on a direct route that bypasses global egress. gap ([`OQ-SBX-36`](agent-open-questions.md#%60OQ-SBX-36%60)).
+- `TM-52`. A remote sandbox sends private content on a direct route that bypasses its workload proxy. gap ([`OQ-SBX-36`](agent-open-questions.md#%60OQ-SBX-36%60)).
 - `TM-53`. A remote provider's capacity or lifetime limits prevent completion and recovery. depends on an open question ([`OQ-PLC-7`](agent-open-questions.md#%60OQ-PLC-7%60)).
 - `TM-54`. A remote sandbox uses an undefined control attachment path to gain broader authority. gap ([`OQ-SBX-36`](agent-open-questions.md#%60OQ-SBX-36%60)).
 
@@ -1124,8 +1101,8 @@ Hook protection, the scope of project configuration in repositories, repository 
 
 - `TM-103`. An exchange accepts a credential request under the wrong audience or identity form. depends on an open question ([`OQ-SBX-17`](agent-open-questions.md#%60OQ-SBX-17%60)).
 - `TM-104`. A compromised traffic parser changes the broker's credential selection or injection request. depends on an open question ([`OQ-SBX-23`](agent-open-questions.md#%60OQ-SBX-23%60)).
-- `TM-105`. A broker or site gateway removes injected-use records to hide its own credential access. gap ([`OQ-OBS-10`](agent-open-questions.md#%60OQ-OBS-10%60)).
-- `TM-106`. A compromised site gateway or host reads broker memory and steals a static credential. gap ([`OQ-SBX-37`](agent-open-questions.md#%60OQ-SBX-37%60)).
+- `TM-105`. A broker or workload proxy removes injected-use records to hide its own credential access. gap ([`OQ-OBS-10`](agent-open-questions.md#%60OQ-OBS-10%60)).
+- `TM-106`. A compromised workload proxy or host reads broker memory and steals a static credential. gap ([`OQ-SBX-37`](agent-open-questions.md#%60OQ-SBX-37%60)).
 - `TM-107`. A stalled exchange prevents useful work or holds resources during teardown. depends on an open question ([`OQ-HOOK-18`](agent-open-questions.md#%60OQ-HOOK-18%60)).
 - `TM-108`. An exchange yields a shared provider principal with broader rights than the launch. depends on an open question ([`OQ-SBX-34`](agent-open-questions.md#%60OQ-SBX-34%60)).
 

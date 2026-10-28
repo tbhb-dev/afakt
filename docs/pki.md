@@ -79,7 +79,7 @@ Key custody separates guest code, host-side components, central services, and re
 | Tier | Custody rule |
 | --- | --- |
 | Guest | Public inspection trust may enter the guest. Launch SVIDs, their private keys, brokered credentials, and message signing keys don't. |
-| Workload host or site gateway | Launch identity and authorized broker material stay outside the guest. Software storage, operating-system keychain, Trusted Platform Module (TPM), or Secure Enclave requirements are [undecided](agent-open-questions.md#%60OQ-SBX-42%60). |
+| Workload host | Launch identity and authorized broker material stay outside the guest. Software storage, operating-system keychain, Trusted Platform Module (TPM), or Secure Enclave requirements are [undecided](agent-open-questions.md#%60OQ-SBX-42%60). |
 | Control plane | Exchangeable credentials stay central. Secret-store protection and hardware security module (HSM) use remain [undecided](agent-open-questions.md#%60OQ-PKI-9%60). |
 | Root, release, and recovery authority | Operator separation, offline storage, HSM requirements, and backup custody remain [undecided](agent-open-questions.md#%60OQ-PKI-2%60). Release key custody has a separate [signing question](agent-open-questions.md#%60OQ-PKI-8%60). |
 

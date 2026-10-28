@@ -13,7 +13,7 @@ generated: { by: "codex:gpt-6", at: "2026-10-28T17:30:00Z" }
 
 Launch transitions follow the [agent launch lifecycle](workload-lifecycle.md#Agent%20launch%20lifecycle). Control requests use the Application Programming Interface (API) server. Agent Client Protocol (ACP) traffic uses the workload proxy under mediator decisions. Its [client connection owner and path](agent-open-questions.md#%60OQ-SES-17%60) remain open. The mediator stamps identity and enforces policy without opening network connections. Using the launch's X.509 SPIFFE Verifiable Identity Document (SVID), the workload proxy authenticates over mutual Transport Layer Security (TLS). TLS ends at the receiving service. App requests from the afakt command-line interface (CLI) enter through the ingress gateway. See [Overlay connections](workload-proxy.md#Overlay%20connections).
 
-From the peer certificate, the API server identifies the agent launch and reads its capabilities and scopes from the agent launch spec it already holds. After the agent launch enters a terminal state, the API server refuses requests from its identity. No SVID or private key enters the guest. The credential broker also stays outside the guest. Its placement relative to the mediator and egress gateway remains [open](agent-open-questions.md#%60OQ-SBX-23%60).
+From the peer certificate, the API server identifies the agent launch and reads its capabilities and scopes from the agent launch spec it already holds. After the agent launch enters a terminal state, the API server refuses requests from its identity. No SVID or private key enters the guest. The credential broker also stays outside the guest. Its placement relative to the mediator and workload proxy remains [open](agent-open-questions.md#%60OQ-SBX-23%60).
 
 ```mermaid
 sequenceDiagram
@@ -27,7 +27,6 @@ sequenceDiagram
         participant Worker as workload host worker and workload provider
         participant Network as Workload proxy
         participant Mediator as Workload proxy mediator
-        participant Egress as Agent egress gateway
         participant Credentials as Credential broker
         participant Relay as Guest relay inside workload guest
         participant Harness as Harness and adapter
@@ -113,14 +112,11 @@ sequenceDiagram
             Harness->>Network: Model request with the placeholder
             Network->>Mediator: Request connection and inspection decision
             Mediator-->>Network: Permit inspected destination
-            Note over Network,Egress: Proxy termination and egress decryption role open (OQ-SBX-72)
-            Network->>Egress: Inspected destination request
-            Egress->>Egress: Decrypt and apply HTTP policy
-            Egress->>Credentials: Permitted request
-            Credentials->>Model: Inject the brokered credential
-            Model-->>Credentials: Response
-            Credentials-->>Egress: Response
-            Egress-->>Network: Response
+            Network->>Network: End TLS and apply HTTP policy under mediator decisions
+            Network->>Credentials: Permitted request for credential injection
+            Credentials-->>Network: Inject the brokered credential outside the guest
+            Network->>Model: Credentialed request over TLS
+            Model-->>Network: Response
             Network-->>Harness: Response
         end
     and Hooks for harness events
@@ -206,7 +202,7 @@ sequenceDiagram
 - **Workflows.** Any afakt worker can run the agent dispatcher workflow. The agent launcher workflow runs on the placed host's worker, and each activity it schedules goes to that host's task queue.
 - **Placement** runs on the agent dispatcher workflow's task queue and asks the API server's reservation API for a slot. The agent launcher workflow then starts on the host task queue of the workload host that holds the reservation. See [Workload placement](workload-placement.md).
 - **Status before provision** is the reconciliation rule, so that a retried activity and a step run again after a worker restart both continue from the existing agent launch and never start a second agent. See [Reconciliation after restart or retry](agent-launch.md#Reconciliation%20after%20restart%20or%20retry).
-- **The agent sandbox** confines the agent harness, the afakt CLI, and every hook. Each network request from the workload guest goes through the proxy under mediator decisions. The agent egress gateway, for inspected destinations, applies Hypertext Transfer Protocol (HTTP) policy. The credential broker injects credentials into permitted requests outside the guest. The mediator allows or denies passthrough destinations under connection policy without decrypting them. See [Workload sandbox](workload-sandbox.md).
+- **The agent sandbox** confines the agent harness, the afakt CLI, and every hook. Each network request from the workload guest goes through the proxy under mediator decisions. The workload proxy, for inspected destinations, applies Hypertext Transfer Protocol (HTTP) policy. The credential broker injects credentials at the workload proxy into permitted requests outside the guest. The mediator allows or denies passthrough destinations under connection policy without decrypting them. See [Workload sandbox](workload-sandbox.md).
 - **Harness transport** follows the selected profile model entry and the [ACP launch connection rules](agent-acp.md#Launch%20connection). Headless starts the harness directly.
 - **Hook dispatch** runs the hooks for harness events through the harness's own hook system and the afakt CLI on both transports. See [Hook dispatch](agent-hooks.md#Hook%20dispatch).
 - **Telemetry** from the harness joins the trace of the agent launch through the telemetry endpoint. See [Trace context propagation](agent-observability.md#Trace%20context%20propagation).

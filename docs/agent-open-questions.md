@@ -897,7 +897,7 @@ How does each launch's own workload proxy mediator fit the process and user boun
 
 ### `OQ-SBX-20`
 
-How does agent egress gateway placement relate to [proxy TLS termination](#%60OQ-SBX-72%60)? The mediator decides connections without transmitting traffic. What disruption and recovery bounds must the agent egress gateway meet when its process restarts or drains? See [Agent egress gateway](components.md#Agent%20egress%20gateway).
+What disruption and recovery bounds must the workload proxy meet when its process restarts or drains? The mediator decides connections without transmitting traffic. See [Workload proxy](workload-proxy.md#Internet%20connections).
 
 ### `OQ-SBX-21`
 
@@ -909,7 +909,7 @@ Should the guest receive synthetic addresses for every name while real addresses
 
 ### `OQ-SBX-23`
 
-Where does the host-side credential broker sit relative to the agent egress gateway and workload proxy mediator? It remains outside the guest. Its placement may depend on the proxy software chosen for the agent egress gateway. See [Credential brokering](workload-sandbox.md#Credential%20brokering).
+Where does the host-side credential broker sit relative to the workload proxy and workload proxy mediator? It injects credentials at the workload proxy, outside the guest. Its process placement may depend on the software chosen for the workload proxy. See [Credential brokering](workload-sandbox.md#Credential%20brokering).
 
 ### `OQ-SBX-24`
 
@@ -961,15 +961,15 @@ Which name queries may leave the workload proxy mediator for upstream name servi
 
 ### `OQ-SBX-36`
 
-How does a remote agent sandbox integrate its per-launch mediator and workload proxy with the global egress gateway while preventing direct connections that bypass policy? How do its control requests, sessions, previews, and MCP calls use the launch-bound local channel and authenticated direct overlay connections? See [Workload proxy mediator](workload-proxy-mediator.md#Launch%20boundary).
+How does a remote workload sandbox reach its workload proxy and workload proxy mediator? Do they run in a provider sidecar or on a workload host, and how does the provider prevent direct connections that bypass policy? How do its control requests, sessions, previews, and MCP calls use the launch-bound local channel and authenticated direct overlay connections? See [Workload proxy mediator](workload-proxy-mediator.md#Launch%20boundary).
 
 ### `OQ-SBX-37`
 
-What contains the authority of a compromised workload host or site gateway, and which independent observations can detect false policy or lifecycle claims? How does afakt revoke that component and protect other agent launches while reconciling its active connections and credentials? Which container management operations may the worker on the workload host invoke under the on-hold [host isolation baseline](agent-open-questions.md#%60OQ-SBX-18%60), and what prevents it from controlling unrelated sandboxes? See [Trust boundary](workload-host.md#Trust%20boundary).
+What contains the authority of a compromised workload host or workload proxy, and which independent observations can detect false policy or lifecycle claims? How does afakt revoke that component and protect other agent launches while reconciling its active connections and credentials? Which container management operations may the worker on the workload host invoke under the on-hold [host isolation baseline](agent-open-questions.md#%60OQ-SBX-18%60), and what prevents it from controlling unrelated sandboxes? See [Trust boundary](workload-host.md#Trust%20boundary).
 
 ### `OQ-SBX-38`
 
-How should the agent egress gateway get destination certificates and replace them when permitted destinations change? The choice affects connection startup and removal of obsolete signing authority. It could receive certificates for an explicit destination inventory or request them as authorized connections arrive. See [Network policy](workload-proxy-mediator.md#Network%20policy).
+How should the workload proxy get destination certificates and replace them when permitted destinations change? The choice affects connection startup and removal of obsolete signing authority. It could receive certificates for an explicit destination inventory or request them as authorized connections arrive. See [Network policy](workload-proxy-mediator.md#Network%20policy).
 
 ### `OQ-SBX-39`
 
@@ -1102,10 +1102,6 @@ Which conditions must the private guest-to-proxy link meet on every platform? Th
 ### `OQ-SBX-71`
 
 Which component manages the workload lifecycle, and what are its states? A workload can exist without a launch or workspace. It runs exactly one agent launch, and afakt destroys it afterwards. A follow-up or relaunch uses a new workload. See [Lifecycle](workload.md#Lifecycle).
-
-### `OQ-SBX-72`
-
-Does TLS termination in the workload proxy take over the agent egress gateway's decryption role? How does that choice affect inspection and credential brokering at a standalone site gateway? See [Agent egress gateway](workload-proxy-mediator.md#Agent%20egress%20gateway).
 
 ## Agent MCP gateway
 

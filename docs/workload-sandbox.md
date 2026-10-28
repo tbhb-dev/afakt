@@ -72,7 +72,7 @@ The precedence rules match the sandbox runtime:
 - Reads start allowed. `allowRead` wins over `denyRead`, but a more specific `denyRead` entry still applies.
 - Writes start denied. `denyWrite` wins over `allowWrite`.
 
-Settings about the agent host rather than the agent launch belong to the agent host's own configuration. Examples are the paths to sandbox helper programs and the custody of the agent egress gateway's certificate authority. A sandbox configuration that sets them is invalid.
+Settings about the workload host rather than the agent launch belong to the workload host's own configuration. Examples are the paths to sandbox helper programs and the custody of the workload proxy's certificate authority. A sandbox configuration that sets them is invalid.
 
 Relative paths in filesystem rules resolve against the workspace root, because the agent starts there.
 
@@ -114,13 +114,13 @@ After it combines the two configurations, the provider adds the rules that the a
 
 - With `read-write` workspace access, `allowWrite` gains `${workspace}`. With `read-only` access, `denyWrite` gains `${workspace}`.
 - `allowWrite` gains `${scratch}`.
-- The agent egress gateway's per-agent certificate authority joins the sandbox's trusted certificates. Mediator connections to control plane services use the workload proxy under its fixed [control plane rules](workload-proxy-mediator.md#Control%20plane%20connections).
+- The workload proxy's per-workload certificate authority joins the sandbox's trusted certificates. Mediator connections to control plane services use the workload proxy under its fixed [control plane rules](workload-proxy-mediator.md#Control%20plane%20connections).
 
 After variable replacement, the provider publishes the sandbox configuration built from the profile and launch spec as evidence with its digest. Both the configuration digest and the provenance record include that digest.
 
 ## Credential brokering
 
-The credential broker is a host-side component outside the guest. Its placement relative to the agent egress gateway and workload proxy mediator remains [open](agent-open-questions.md#%60OQ-SBX-23%60). It takes credential references from both the profile and the agent launch. Brokering entries in the profile describe the requests that receive each credential. Whether agent launch references must stay within those the profile permits remains [on hold](agent-open-questions.md#Agent%20sandbox). Each credential type defines which material the control plane keeps and which material the host-side credential broker receives.
+The credential broker is a host-side component outside the guest. Its placement relative to the workload proxy and workload proxy mediator remains [open](agent-open-questions.md#%60OQ-SBX-23%60). It takes credential references from both the profile and the agent launch. Brokering entries in the profile describe the requests that receive each credential. Whether agent launch references must stay within those the profile permits remains [on hold](agent-open-questions.md#Agent%20sandbox). Each credential type defines which material the control plane keeps and which material the host-side credential broker receives.
 
 ```yaml
 credentials:

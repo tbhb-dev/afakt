@@ -21,12 +21,6 @@ Enforcement doesn't depend on tools honoring proxy environment variables. A conf
 
 The mediator's own connections to secrets, policy bundles, and the API server pass through its proxy under a fixed rule set built into the workload. Neither the launch's policy nor the guest can change those rules. Control plane pushes arrive on a long-lived stream the mediator opens. The control plane never opens a connection to a workload.
 
-## Agent egress gateway
-
-The agent egress gateway runs on the agent host by default. An agent host worker setting can select a standalone site gateway instead. Over mutual Transport Layer Security (TLS), the workload proxy connects to that gateway with its agent launch's identity. The site gateway has its own workload identity and the same trust boundary for policy enforcement as an agent host. See [Agent egress gateway](components.md#Agent%20egress%20gateway).
-
-Inspected TLS connections end at the agent egress gateway after mediator admission. That gateway decrypts traffic for HTTP-level policy. The credential broker injects credentials into permitted requests outside the guest. Inside the guest, trusted certificates include the gateway's per-agent certificate authority. A destination requiring HTTP policy or credentials can't use passthrough. [Credential brokering](workload-sandbox.md#Credential%20brokering) defines the injection rules. Whether proxy TLS termination takes over the gateway's decryption role remains [open](agent-open-questions.md#%60OQ-SBX-72%60).
-
 ## Workload DNS
 
 The workload proxy mediator is the guest's only Domain Name System (DNS) resolver and controls resolution. The workload proxy forwards guest queries to it. It records name-to-address bindings and never falls back to the workload host's resolver. Permitted upstream requests pass through its workload proxy. Names under `afakt.internal` follow the [overlay naming scheme](workload-overlay.md#Names), including stable agent names, launch names, published ports, services, and previews.
@@ -39,7 +33,7 @@ Each workload's firewall has ingress and egress rules. Egress defaults to a clus
 
 A mediator decision can tell the proxy to end Transport Layer Security (TLS) on an outbound connection when the server name matches a domain with a Hypertext Transfer Protocol (HTTP) rule or credential injection. For passthrough destinations, the proxy opens permitted connections without decryption. These connections remain subject to the firewall.
 
-Network, HTTP, Agent Client Protocol (ACP), and control decisions from the mediator and agent egress gateway enter one decision log for the workload, which excludes secrets and request and response content.
+Network, HTTP, Agent Client Protocol (ACP), and control decisions from the mediator and workload proxy enter one decision log for the workload, which excludes secrets and request and response content.
 
 ## Rule changes
 
