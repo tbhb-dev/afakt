@@ -11,7 +11,7 @@ generated: { by: "codex:gpt-6", at: "2026-10-28T17:30:00Z" }
 
 [Public key infrastructure](pki.md).
 
-The `AgentLaunch` resource represents one agent launch. `metadata.name` is its agent launch ID, `spec` contains its immutable [agent launch spec](agent-launch-contract.md#Agent%20launch%20spec), and `status` records the agent sandbox provider's observations. Provision takes the resource without `status`. Status and result return it with `status`.
+The `AgentLaunch` resource represents one agent launch. `metadata.name` is its agent launch ID, `spec` contains its immutable [agent launch spec](agent-launch-contract.md#Agent%20launch%20spec), and `status` records the workload provider's observations. Provision takes the resource without `status`. Status and result return it with `status`.
 
 The public fields that bind this resource to its durable agent and session remain [open](agent-open-questions.md#%60OQ-AGT-10%60).
 
@@ -19,7 +19,7 @@ The public fields that bind this resource to its durable agent and session remai
 
 | Key | Meaning | Who sets it |
 | --- | --- | --- |
-| `apiVersion` | The schema version of the resource, `afakt/v1alpha1`. The provider rejects any other with `invalid-specification`. | The agent dispatcher workflow |
+| `apiVersion` | The schema version of the resource, `afakt/v1alpha1`. The workload provider rejects any other with `invalid-specification`. | The agent dispatcher workflow |
 | `kind` | `AgentLaunch`. | The agent dispatcher workflow |
 | `metadata.name` | The [agent launch ID](agent-launch-model.md#Agent%20launch%20ID%20format). | afakt, when it creates the agent launch |
 | `metadata.creationTimestamp` | When afakt created the agent launch. | afakt, when it creates the agent launch |
@@ -35,9 +35,9 @@ One resource represents one agent launch. Status addresses an earlier launch by 
 | --- | --- |
 | Generation | `generation`, the agent spec revision recorded at finalization. |
 | Predecessor | `predecessor_agent_launch_id`, absent for the first agent launch. |
-| Agent sandbox provider | `agent_sandbox_provider` |
+| Workload provider | `agent_sandbox_provider` |
 | Agent profile | `profile`, with `source`, `name`, `version`, and `digest`. `version` takes the form of `metadata.version` in the profile resource. |
-| Credential references | `credentials`, with `service` naming each credential in afakt's credential store. See [Credential brokering](agent-sandbox.md#Credential%20brokering). |
+| Credential references | `credentials`, with `service` naming each credential in afakt's credential store. See [Credential brokering](workload-sandbox.md#Credential%20brokering). |
 | Workspace access | `workspace_access` |
 | Agent harness | `harness`, with `name` and an optional `version` |
 | Model provider | `model_provider` |
@@ -59,7 +59,7 @@ One resource represents one agent launch. Status addresses an earlier launch by 
 | Placement requirements | `placement`, a map of names to values |
 | Retention | `retention` |
 
-Credential references appear in `spec.credentials` and in the pinned profile. Their bounds remain [on hold](agent-open-questions.md#Agent%20sandbox). Neither the specification nor the provider's record contains secret values. The Application Programming Interface (API) server reads capabilities and scopes from the spec it already stores after identifying the agent launch from the agent proxy's peer certificate. See [Agent launch authentication](agent-workload-proxy.md#Agent%20launch%20authentication).
+Credential references appear in `spec.credentials` and in the pinned profile. Their bounds remain [on hold](agent-open-questions.md#Agent%20sandbox). Neither the specification nor the provider's record contains secret values. The Application Programming Interface (API) server reads capabilities and scopes from the spec it already stores after identifying the agent launch from the workload proxy's peer certificate. See [Agent launch authentication](workload-proxy.md#Agent%20launch%20authentication).
 
 ## Status keys
 
@@ -204,8 +204,8 @@ status:
   specification_digest: sha256:5d2c…
   configuration_digest: sha256:b7e9…
   placement:
-    agent_host: example-agent-host
-    task_queue: agent-example-agent-host
+    agent_host: example-workload-host
+    task_queue: agent-example-workload-host
   workspace:
     path: /var/lib/afakt/workspaces/019a1a2b-3c4d-7e5f-8a6b-7c8d9e0f1a2b/2
   configuration:
@@ -247,7 +247,7 @@ status:
     - { id: ev-03, name: rendered-instructions, media_type: text/markdown, digest: sha256:c3d1… }
     - { id: ev-04, name: sandbox-configuration, media_type: application/json, digest: sha256:8e12… }
     - { id: ev-05, name: sandbox-violations, media_type: application/x-ndjson, digest: sha256:4f6b… }
-    - { id: ev-06, name: agent-environment, media_type: application/json, digest: sha256:a9c0… }
+    - { id: ev-06, name: workload-environment, media_type: application/json, digest: sha256:a9c0… }
     - { id: ev-07, name: hooks, media_type: application/json, digest: sha256:17de… }
     - { id: ev-08, name: hook-runs, media_type: application/x-ndjson, digest: sha256:66f3… }
     - { id: ev-09, name: project-hook-configuration, media_type: application/json, digest: sha256:d24a… }
@@ -328,7 +328,7 @@ status:
           - { file: app/.example-harness/settings.json, event: PostToolUse, command: [./scripts/format-changed] }
     agent_host:
       requested: { operating_system: linux, architecture: arm64, harness: example-harness }
-      observed: { agent_host: example-agent-host, worker_version: example-release }
+      observed: { agent_host: example-workload-host, worker_version: example-release }
     conflicting: false
   result:
     reason: agent-exit

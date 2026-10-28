@@ -82,13 +82,13 @@ rectangle "afakt\n<size:16>[Software System]</size>" <<Boundary-YWZha3Q=>> {
   }
 
   rectangle "Host management boundary" <<Group-SG9zdCBtYW5hZ2VtZW50IGJvdW5kYXJ5>> as group2 {
-    rectangle "==Agent host worker\n<size:16>[Container: Host service]</size>\n\nControls launch lifecycle as a dedicated user; stays outside every launch data path." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Agenthostworker
+    rectangle "==Workload host worker\n<size:16>[Container: Host service]</size>\n\nControls launch lifecycle as a dedicated user; stays outside every launch data path." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Workloadhostworker
     rectangle "==Privileged helper\n<size:16>[Container: Host privilege boundary]</size>\n\nPerforms narrowly authorized setup and launch operations; caller binding is undecided." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Privilegedhelper
   }
 
 }
 
-afakt.Agenthostworker --> afakt.Privilegedhelper <<Relationship-UmVsYXRpb25zaGlw>> : "Requests authorized setup and launch operations\n<size:16>[Authenticated local control]</size>"
+afakt.Workloadhostworker --> afakt.Privilegedhelper <<Relationship-UmVsYXRpb25zaGlw>> : "Requests authorized setup and launch operations\n<size:16>[Authenticated local control]</size>"
 afakt.MCPgateway --> afakt.APIserverandwebdashboard <<Relationship-UmVsYXRpb25zaGlw>> : "Calls permitted operations with launch context\n<size:16>[Authenticated service connection]</size>"
 
 @enduml

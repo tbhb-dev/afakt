@@ -82,17 +82,6 @@ skinparam {
     HorizontalAlignment: center;
     Shadowing: 0;
   }
-  // Launch agent proxy boundary
-  .Group-TGF1bmNoIGFnZW50IHByb3h5IGJvdW5kYXJ5 {
-    BackgroundColor: #ffffff;
-    LineColor: #536b7e;
-    LineStyle: 2-2;
-    LineThickness: 2;
-    FontColor: #182c3e;
-    FontSize: 24;
-    HorizontalAlignment: center;
-    Shadowing: 0;
-  }
   // Launch guest boundary
   .Group-TGF1bmNoIGd1ZXN0IGJvdW5kYXJ5 {
     BackgroundColor: #ffffff;
@@ -115,6 +104,17 @@ skinparam {
     HorizontalAlignment: center;
     Shadowing: 0;
   }
+  // Launch workload proxy boundary
+  .Group-TGF1bmNoIHdvcmtsb2FkIHByb3h5IGJvdW5kYXJ5 {
+    BackgroundColor: #ffffff;
+    LineColor: #536b7e;
+    LineStyle: 2-2;
+    LineThickness: 2;
+    FontColor: #182c3e;
+    FontSize: 24;
+    HorizontalAlignment: center;
+    Shadowing: 0;
+  }
 </style>
 
 rectangle "afakt\n<size:16>[Software System]</size>" <<Boundary-YWZha3Q=>> {
@@ -127,29 +127,29 @@ rectangle "afakt\n<size:16>[Software System]</size>" <<Boundary-YWZha3Q=>> {
   }
 
   rectangle "Destination launch network boundary" <<Group-RGVzdGluYXRpb24gbGF1bmNoIG5ldHdvcmsgYm91bmRhcnk=>> as group22 {
-    rectangle "==Destination agent proxy\n<size:16>[Container: Network proxy]</size>\n\nCarries destination workload traffic under mediator decisions; own overlay node and launch X.509-SVID." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Destinationagentproxy
+    rectangle "==Destination workload proxy\n<size:16>[Container: Network proxy]</size>\n\nCarries destination workload traffic under mediator decisions; own overlay node and launch X.509-SVID." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Destinationworkloadproxy
   }
 
-  rectangle "Launch agent proxy boundary" <<Group-TGF1bmNoIGFnZW50IHByb3h5IGJvdW5kYXJ5>> as group23 {
-    rectangle "==Agent proxy\n<size:16>[Container: Network proxy]</size>\n\nCarries workload traffic in both directions; own overlay node and launch X.509-SVID; asks the mediator to decide each connection." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Agentproxy
-  }
-
-  rectangle "Launch guest boundary" <<Group-TGF1bmNoIGd1ZXN0IGJvdW5kYXJ5>> as group24 {
+  rectangle "Launch guest boundary" <<Group-TGF1bmNoIGd1ZXN0IGJvdW5kYXJ5>> as group23 {
     rectangle "==Guest context\n<size:16>[Container: Provider confinement]</size>\n\nUntrusted harness, relay and loopback listeners; no overlay membership or workload keys." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Guestcontext
   }
 
-  rectangle "Launch mediation boundary" <<Group-TGF1bmNoIG1lZGlhdGlvbiBib3VuZGFyeQ==>> as group25 {
-    rectangle "==Agent mediator\n<size:16>[Container: Local policy enforcement]</size>\n\nDecides every inbound and outbound connection and stamps identity; never carries traffic." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Agentmediator
+  rectangle "Launch mediation boundary" <<Group-TGF1bmNoIG1lZGlhdGlvbiBib3VuZGFyeQ==>> as group24 {
+    rectangle "==Workload proxy mediator\n<size:16>[Container: Local policy enforcement]</size>\n\nDecides every inbound and outbound connection and stamps identity; never carries traffic." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Workloadproxymediator
+  }
+
+  rectangle "Launch workload proxy boundary" <<Group-TGF1bmNoIHdvcmtsb2FkIHByb3h5IGJvdW5kYXJ5>> as group25 {
+    rectangle "==Workload proxy\n<size:16>[Container: Network proxy]</size>\n\nCarries workload traffic in both directions; own overlay node and launch X.509-SVID; asks the mediator to decide each connection." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Workloadproxy
   }
 
 }
 
-afakt.Guestcontext --> afakt.Agentproxy <<Relationship-UmVsYXRpb25zaGlw>> : "1: Source launch requests published destination\n<size:16>[Private workload link]</size>"
-afakt.Agentproxy --> afakt.Agentmediator <<Relationship-UmVsYXRpb25zaGlw>> : "2: Request egress decision\n<size:16>[Local channel]</size>"
-afakt.Agentmediator --> afakt.Agentproxy <<Relationship-UmVsYXRpb25zaGlw>> : "3: Source policy permits destination name and port\n<size:16>[Local channel]</size>"
-afakt.Agentproxy --> afakt.Destinationagentproxy <<Relationship-UmVsYXRpb25zaGlw>> : "4: Direct overlay connection with mutual SPIFFE authentication\n<size:16>[SPIFFE mutual TLS over overlay]</size>"
-afakt.Destinationagentproxy --> afakt.Destinationmediator <<Relationship-UmVsYXRpb25zaGlw>> : "5: Authenticated source launch and destination grant\n<size:16>[Local channel]</size>"
-afakt.Destinationmediator --> afakt.Destinationagentproxy <<Relationship-UmVsYXRpb25zaGlw>> : "6: Return ingress decision\n<size:16>[Local channel]</size>"
-afakt.Destinationagentproxy --> afakt.Destinationguest <<Relationship-UmVsYXRpb25zaGlw>> : "7: Permitted ingress; listener binding open (OQ-PORT-14)\n<size:16>[Private workload link]</size>"
+afakt.Guestcontext --> afakt.Workloadproxy <<Relationship-UmVsYXRpb25zaGlw>> : "1: Source launch requests published destination\n<size:16>[Private workload link]</size>"
+afakt.Workloadproxy --> afakt.Workloadproxymediator <<Relationship-UmVsYXRpb25zaGlw>> : "2: Request egress decision\n<size:16>[Local channel]</size>"
+afakt.Workloadproxymediator --> afakt.Workloadproxy <<Relationship-UmVsYXRpb25zaGlw>> : "3: Source policy permits destination name and port\n<size:16>[Local channel]</size>"
+afakt.Workloadproxy --> afakt.Destinationworkloadproxy <<Relationship-UmVsYXRpb25zaGlw>> : "4: Direct overlay connection with mutual SPIFFE authentication\n<size:16>[SPIFFE mutual TLS over overlay]</size>"
+afakt.Destinationworkloadproxy --> afakt.Destinationmediator <<Relationship-UmVsYXRpb25zaGlw>> : "5: Authenticated source launch and destination grant\n<size:16>[Local channel]</size>"
+afakt.Destinationmediator --> afakt.Destinationworkloadproxy <<Relationship-UmVsYXRpb25zaGlw>> : "6: Return ingress decision\n<size:16>[Local channel]</size>"
+afakt.Destinationworkloadproxy --> afakt.Destinationguest <<Relationship-UmVsYXRpb25zaGlw>> : "7: Permitted ingress; listener binding open (OQ-PORT-14)\n<size:16>[Private workload link]</size>"
 
 @enduml

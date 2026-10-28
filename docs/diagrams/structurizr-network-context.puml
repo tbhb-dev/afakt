@@ -64,17 +64,17 @@ rectangle "Cluster trust domain\n<size:16>[Deployment Node: Private cluster]</si
     rectangle "==External ingress gateway\n<size:16>[Infrastructure Node: Application proxy]</size>\n\nPublic and user-tailnet application traffic; no packet routing." <<Element-RWxlbWVudA==>> as Topologycontext.Clustertrustdomain.Externalingressboundary.Externalingressgateway
   }
 
-  rectangle "==Control plane and agent hosts\n<size:16>[Infrastructure Node: Isolated Headscale overlay]</size>\n\nPer-service, per-host and per-launch nodes; guests have no overlay membership." <<Element-RWxlbWVudA==>> as Topologycontext.Clustertrustdomain.Controlplaneandagenthosts
+  rectangle "==Control plane and workload hosts\n<size:16>[Infrastructure Node: Isolated Headscale overlay]</size>\n\nPer-service, per-host and per-launch nodes; guests have no overlay membership." <<Element-RWxlbWVudA==>> as Topologycontext.Clustertrustdomain.Controlplaneandworkloadhosts
 }
 
 rectangle "Internet boundary\n<size:16>[Deployment Node: External network]</size>" <<DeploymentNode-RWxlbWVudCxEZXBsb3ltZW50IE5vZGU=>> as Topologycontext.Internetboundary {
-  rectangle "==Internet services\n<size:16>[Infrastructure Node: Destination services]</size>\n\nOnly permitted egress leaves an agent host." <<Element-RWxlbWVudA==>> as Topologycontext.Internetboundary.Internetservices
+  rectangle "==Internet services\n<size:16>[Infrastructure Node: Destination services]</size>\n\nOnly permitted egress leaves a workload host." <<Element-RWxlbWVudA==>> as Topologycontext.Internetboundary.Internetservices
 }
 
 Topologycontext.Operatordeviceboundary.Browserphonetabletandnativeapps --> Topologycontext.Usertailnetboundary.Attachedusertailnets <<Relationship-UmVsYXRpb25zaGlw>> : "Device identity\n<size:16>[User tailnet]</size>"
 Topologycontext.Operatordeviceboundary.Browserphonetabletandnativeapps --> Topologycontext.Clustertrustdomain.Externalingressboundary.Externalingressgateway <<Relationship-UmVsYXRpb25zaGlw>> : "Signed-in user\n<size:16>[Public application request]</size>"
 Topologycontext.Usertailnetboundary.Attachedusertailnets --> Topologycontext.Clustertrustdomain.Externalingressboundary.Externalingressgateway <<Relationship-UmVsYXRpb25zaGlw>> : "User context; no packet routing\n<size:16>[Private application request]</size>"
-Topologycontext.Clustertrustdomain.Externalingressboundary.Externalingressgateway --> Topologycontext.Clustertrustdomain.Controlplaneandagenthosts <<Relationship-UmVsYXRpb25zaGlw>> : "Authenticated application request\n<size:16>[Cluster overlay]</size>"
-Topologycontext.Clustertrustdomain.Controlplaneandagenthosts --> Topologycontext.Internetboundary.Internetservices <<Relationship-UmVsYXRpb25zaGlw>> : "Permitted destination request\n<size:16>[Agent proxy egress]</size>"
+Topologycontext.Clustertrustdomain.Externalingressboundary.Externalingressgateway --> Topologycontext.Clustertrustdomain.Controlplaneandworkloadhosts <<Relationship-UmVsYXRpb25zaGlw>> : "Authenticated application request\n<size:16>[Cluster overlay]</size>"
+Topologycontext.Clustertrustdomain.Controlplaneandworkloadhosts --> Topologycontext.Internetboundary.Internetservices <<Relationship-UmVsYXRpb25zaGlw>> : "Permitted destination request\n<size:16>[Workload proxy egress]</size>"
 
 @enduml

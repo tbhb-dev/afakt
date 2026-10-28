@@ -51,17 +51,6 @@ hide stereotype
     HorizontalAlignment: center;
     Shadowing: 0;
   }
-  // Launch agent proxy boundary
-  .Group-TGF1bmNoIGFnZW50IHByb3h5IGJvdW5kYXJ5 {
-    BackgroundColor: #ffffff;
-    LineColor: #536b7e;
-    LineStyle: 2-2;
-    LineThickness: 2;
-    FontColor: #182c3e;
-    FontSize: 24;
-    HorizontalAlignment: center;
-    Shadowing: 0;
-  }
   // Launch guest boundary
   .Group-TGF1bmNoIGd1ZXN0IGJvdW5kYXJ5 {
     BackgroundColor: #ffffff;
@@ -75,6 +64,17 @@ hide stereotype
   }
   // Launch mediation boundary
   .Group-TGF1bmNoIG1lZGlhdGlvbiBib3VuZGFyeQ== {
+    BackgroundColor: #ffffff;
+    LineColor: #536b7e;
+    LineStyle: 2-2;
+    LineThickness: 2;
+    FontColor: #182c3e;
+    FontSize: 24;
+    HorizontalAlignment: center;
+    Shadowing: 0;
+  }
+  // Launch workload proxy boundary
+  .Group-TGF1bmNoIHdvcmtsb2FkIHByb3h5IGJvdW5kYXJ5 {
     BackgroundColor: #ffffff;
     LineColor: #536b7e;
     LineStyle: 2-2;

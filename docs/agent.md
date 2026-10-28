@@ -13,7 +13,7 @@ generated: { by: "codex:gpt-6", at: "2026-10-28T17:30:00Z" }
 
 An agent is a durable entity that represents the identity, configuration, and history of an artificial intelligence (AI) model capable of reasoning, planning, and interacting with its environment. Its lifecycle has one or more [agent launches](agent-launch.md), with at most one agent launch running at a time.
 
-An agent launch instantiates the agent in an agent sandbox on an agent host. Retry, resume, migration, and crash recovery create a new agent launch linked to its predecessor. The agent's conversation forms a [session](agent-session.md). Its transcript remains after an agent launch ends, and the agent retains its current session and past session transcripts.
+An agent launch instantiates the agent in an agent sandbox on a workload host. Retry, resume, migration, and crash recovery create a new agent launch linked to its predecessor. The agent's conversation forms a [session](agent-session.md). Its transcript remains after an agent launch ends, and the agent retains its current session and past session transcripts.
 
 [Forks, archives, and transfer](agent-workspace-lifecycle.md#Forks,%20archives,%20and%20transfer).
 
@@ -40,7 +40,7 @@ An agent launch request asks to use an agent to perform a task. An agent, human,
 | Current session and past session transcripts | Hold the conversation and its retained history, independent of agent harness process lifetime. |
 | Agent checkpoints | Mark positions to which the current session can rewind. |
 | Agent launches | Record agent launches, their outcomes, evidence, and provenance. |
-| Credentials loaded into its broker | Bind authorized credential references to [brokered use](agent-sandbox.md#Credential%20types%20and%20custody), with reflected response content unresolved. |
+| Credentials loaded into its broker | Bind authorized credential references to [brokered use](workload-sandbox.md#Credential%20types%20and%20custody), with reflected response content unresolved. |
 | Hooks | Add commands at [hook events](agent-hooks.md#Hook%20events), subject to profile rules. |
 | MCP servers | Attach Model Context Protocol (MCP) services to the agent within its permitted access. |
 | Skills | Supply reusable instructions and supporting resources to the harness. |
@@ -52,7 +52,7 @@ An agent launch request asks to use an agent to perform a task. An agent, human,
 | Budget | Bounds allowed usage across the agent's work. |
 | Labels and annotations | Store metadata for selection and reporting or descriptive context. Neither grants authority. |
 
-Ownership of a reference doesn't grant access to its target. Profile capabilities, agent sandbox rules, and service authorization still bound each agent launch. The API server identifies the agent launch from the agent proxy's peer certificate and reads capabilities and scopes from the agent launch spec it already holds. See [Agent launch authentication](agent-workload-proxy.md#Agent%20launch%20authentication). The agent's durable identity doesn't extend that authority past a terminal state.
+Ownership of a reference doesn't grant access to its target. Profile capabilities, agent sandbox rules, and service authorization still bound each agent launch. The API server identifies the agent launch from the workload proxy's peer certificate and reads capabilities and scopes from the agent launch spec it already holds. See [Agent launch authentication](workload-proxy.md#Agent%20launch%20authentication). The agent's durable identity doesn't extend that authority past a terminal state.
 
 [Agent states](agent-lifecycle.md#Agent%20states).
 
@@ -72,9 +72,9 @@ Ownership of a reference doesn't grant access to its target. Profile capabilitie
 
 A fork copies an agent into a separate agent. `fork create` leaves the copy created without starting the agent harness. `fork start` starts the copy, and `fork run` also waits for its session to end and outputs the final message. `fork list` lists an agent's forks. The copy has its own identity. The scope of copied resources and authority remains open.
 
-## Agent snapshots and the snapshot registry
+## Workload snapshots and the snapshot registry
 
-An agent snapshot is a snapshot of the VM an agent sandbox runs in, used to restore it. Agent snapshots exist only where the agent runs in a VM. Host modes and container managers have none. `snapshot create` captures VM state and uploads it to the snapshot registry. The snapshot commands list, inspect, download, upload, tag, label, annotate, delete, and prune agent snapshots. An agent snapshot is separate from an agent checkpoint and a workspace image.
+A workload snapshot is a snapshot of the VM an agent sandbox runs in, used to restore it. Workload snapshots exist only where the agent runs in a VM. Host modes and container managers have none. `snapshot create` captures VM state and uploads it to the snapshot registry. The snapshot commands list, inspect, download, upload, tag, label, annotate, delete, and prune workload snapshots. A workload snapshot is separate from an agent checkpoint and a workspace image.
 
 [Archive and restore](agent-lifecycle.md#Archive%20and%20restore).
 
@@ -82,7 +82,7 @@ An agent snapshot is a snapshot of the VM an agent sandbox runs in, used to rest
 
 `export` packages an agent and its agent workspace as an Open Container Initiative (OCI) artifact. `import` creates an agent from that artifact. The transfer format doesn't imply permission to copy credentials or identity. Which owned resources travel in the artifact remains open.
 
-`migrate` moves an agent to another agent host. The durable agent remains the same resource. Whether migration restores a compatible agent snapshot or reconstructs the transcript and workspace from portable state, and how it relates to agent launch placement, remain open.
+`migrate` moves an agent to another workload host. The durable agent remains the same resource. Whether migration restores a compatible workload snapshot or reconstructs the transcript and workspace from portable state, and how it relates to agent launch placement, remain open.
 
 [Delete and prune](agent-lifecycle.md#Delete%20and%20prune).
 
@@ -118,7 +118,7 @@ A role groups associations with policies and authorizations for credentials. Wit
 
 ## Secrets, credentials, and trust material
 
-A secret stores a sensitive value. Using secret material and authorization rules, a credential describes authenticated access. Credential references are fields on both the [agent profile](agent-profile.md#Profile%20fields) and the [agent launch](agent-launch-contract.md#Agent%20launch%20spec). Each reference specifies a credential in afakt's credential store. Attaching a credential to an agent permits brokered use without exposing its value to the agent harness. [Credential brokering](agent-sandbox.md#Credential%20brokering) takes references from the profile and agent launch. Attachments change the agent spec and take effect through a new agent launch at a turn boundary. Reference bounds remain [open](agent-open-questions.md#Agents).
+A secret stores a sensitive value. Using secret material and authorization rules, a credential describes authenticated access. Credential references are fields on both the [agent profile](agent-profile.md#Profile%20fields) and the [agent launch](agent-launch-contract.md#Agent%20launch%20spec). Each reference specifies a credential in afakt's credential store. Attaching a credential to an agent permits brokered use without exposing its value to the agent harness. [Credential brokering](workload-sandbox.md#Credential%20brokering) takes references from the profile and agent launch. Attachments change the agent spec and take effect through a new agent launch at a turn boundary. Reference bounds remain [open](agent-open-questions.md#Agents).
 
 On their own workstation, the operator runs `afakt credential add TYPE CREDENTIAL_NAME` from the command-line interface (CLI), with the credential type selecting the authentication flow. Acting as a client of the Application Programming Interface (API) server, which may run on another machine, the CLI runs any harness authentication command and sends its result to the server for storage. The server never runs that command. Interactive authentication requires the operator and never runs headless, and disabling interaction doesn't turn an interactive flow into a headless one. The verb `add` registers an object that originates outside afakt, as with credentials. With `create`, afakt makes an object that it originates, as with `afakt agent create`.
 
@@ -137,7 +137,7 @@ Secure Shell (SSH) keys authenticate SSH connections or sign content, while SSH 
 
 ## Sandboxes
 
-The [agent sandbox](agent-sandbox.md) confines the agent harness or its tools under the selected provider. Managed-loop placement remains [`OQ-SBX-63`](agent-open-questions.md#%60OQ-SBX-63%60). `afakt agent sandbox` views that configuration. `afakt sandbox` manages agent sandbox configurations and standalone sandboxes, including command execution, network rules, and credential authorizations. A standalone sandbox runs commands without requiring an agent conversation. Its identity and lifecycle remain open, as does its relationship to agent launch authority.
+The [agent sandbox](workload-sandbox.md) confines the agent harness or its tools under the selected provider. Managed-loop placement remains [`OQ-SBX-63`](agent-open-questions.md#%60OQ-SBX-63%60). `afakt agent sandbox` views that configuration. `afakt sandbox` manages agent sandbox configurations and standalone sandboxes, including command execution, network rules, and credential authorizations. A standalone sandbox runs commands without requiring an agent conversation. Its identity and lifecycle remain open, as does its relationship to agent launch authority.
 
 ## Budgets and usage
 

@@ -9,7 +9,7 @@ generated: { by: "codex:gpt-6", at: "2026-10-28T17:30:00Z" }
 
 # Agent observability
 
-Each agent launch of a durable [agent](agent.md) produces agent launch-level OpenTelemetry traces and metrics. The history across these agent launches belongs to the agent. The trace shows each step of the [lifecycle](agent-sandbox-lifecycle.md#Agent%20launch%20lifecycle) as a span, from placement to the result, with the agent harness's own spans nested under the agent harness span when the harness accepts a trace context. The metrics count agent launches and measure their durations, hooks, usage, and agent host capacity without one series per agent launch.
+Each agent launch of a durable [agent](agent.md) produces agent launch-level OpenTelemetry traces and metrics. The history across these agent launches belongs to the agent. The trace shows each step of the [lifecycle](workload-lifecycle.md#Agent%20launch%20lifecycle) as a span, from placement to the result, with the agent harness's own spans nested under the agent harness span when the harness accepts a trace context. The metrics count agent launches and measure their durations, hooks, usage, and workload host capacity without one series per agent launch.
 
 [Operations and telemetry](agent-workspace-lifecycle.md#Operations%20and%20telemetry).
 
@@ -24,12 +24,12 @@ Each agent launch of a durable [agent](agent.md) produces agent launch-level Ope
 
 Headless transport integration and the observations available through it remain [`OQ-SES-16`](agent-open-questions.md#%60OQ-SES-16%60).
 
-An agent launch's spans join its parent workflow's trace. Trace context passes from the workflow orchestrator through the agent dispatcher workflow to the agent launcher workflow, then from each workflow to its activities. Provider operations run inside their calling activities on the agent host worker, with a child span under the activity span in the same trace.
+An agent launch's spans join its parent workflow's trace. Trace context passes from the workflow orchestrator through the agent dispatcher workflow to the agent launcher workflow, then from each workflow to its activities. Provider operations run inside their calling activities on the workload host worker, with a child span under the activity span in the same trace.
 
 - **Agent launch.** Each agent dispatcher run handles one agent launch and has one `afakt.agent_launch` span. Without a trace context from the parent, that span starts a new trace.
 - **Successor agent launches.** A successor agent launch's `afakt.agent_launch` span links to the predecessor agent launch's `afakt.agent_launch` span, with the link attribute `afakt.link.relation` set to `supersedes` when the predecessor agent launch was still active and `follows` otherwise. Spans of different agent launches share a trace only when the parent starts both from one trace.
 - **Retries.** A retried activity is a new activity span under the same parent span, and a repeated provision request that returns the existing agent launch doesn't start a new `afakt.agent_launch.lifecycle` span. Replay of workflow history never emits a span again.
-- **Restarts.** For recovery, the provider records the trace ID and span ID of each open span in the agent launch record. A restart of the agent host worker loses each span that was open, because the worker never exports a span before it ends. For the rest of each such step, the provider starts a recovery span with the same name and parent. Each recovery span links to the recorded span and has `afakt.recovered` set to true. Reconciliation runs in an `afakt.agent_launch.reconcile` span that links to each recovery span it starts.
+- **Restarts.** For recovery, the provider records the trace ID and span ID of each open span in the agent launch record. A restart of the workload host worker loses each span that was open, because the worker never exports a span before it ends. For the rest of each such step, the provider starts a recovery span with the same name and parent. Each recovery span links to the recorded span and has `afakt.recovered` set to true. Reconciliation runs in an `afakt.agent_launch.reconcile` span that links to each recovery span it starts.
 - **Cleanup.** Cleanup runs after retention, long after the trace ends, so each `afakt.cleanup` span starts a new trace and links to the `afakt.agent_launch.lifecycle` span of the agent launch it removes.
 - **Sampling.** Every afakt span follows its parent's sampling decision. The trace flags in `TRACEPARENT` pass that decision to the agent harness.
 
@@ -41,13 +41,13 @@ The provenance record gives the trace ID and the span ID of the agent launch's `
 | --- | --- | --- | --- |
 | `afakt.agent_launch` | `INTERNAL` | The parent workflow's span that starts the agent dispatcher | One agent dispatcher run, from placement until it returns the result. |
 | `afakt.agent_launch.placement` | `INTERNAL` | `afakt.agent_launch` | The placement activity, from the request until the reservation Application Programming Interface (API) reserves a slot. |
-| `afakt.agent_launcher` | `INTERNAL` | `afakt.agent_launch` | One agent launcher run on the agent host, from its start until it returns the result. |
-| `afakt.provider.provision`, `afakt.provider.status`, `afakt.provider.cancel`, and `afakt.provider.result` | `INTERNAL` | The calling activity's span, under `afakt.agent_launcher` | One provider operation on the agent host. |
+| `afakt.agent_launcher` | `INTERNAL` | `afakt.agent_launch` | One agent launcher run on the workload host, from its start until it returns the result. |
+| `afakt.provider.provision`, `afakt.provider.status`, `afakt.provider.cancel`, and `afakt.provider.result` | `INTERNAL` | The calling activity's span, under `afakt.agent_launcher` | One provider operation on the workload host. |
 | `afakt.agent_launch.lifecycle` | `INTERNAL` | The `afakt.provider.provision` span that accepted the launch | The provider's work on one agent launch, from the accepted launch until evidence publication and removal of the agent sandbox finish. It can end after its parent ends. |
 | `afakt.workspace.build` | `INTERNAL` | `afakt.agent_launch.lifecycle` | Building the agent workspace. |
 | `afakt.workspace.source` | `INTERNAL` | `afakt.workspace.build` | Placing one workspace source. This covers repository fetches and image materialization as well as copies of earlier workspaces. |
 | `afakt.workspace.image.build` | `INTERNAL` | The activity span that runs the image build | One image build, from source preparation through sandboxed steps and snapshotting to publication. |
-| `afakt.sandbox.configure` | `INTERNAL` | `afakt.agent_launch.lifecycle` | Combining the sandbox configurations and the agent environment and rendering the instructions. |
+| `afakt.sandbox.configure` | `INTERNAL` | `afakt.agent_launch.lifecycle` | Combining the sandbox configurations and the workload environment and rendering the instructions. |
 | `afakt.harness.configure` | `INTERNAL` | `afakt.agent_launch.lifecycle` | Writing the agent harness settings, with the harness permissions, the tools, the hooks for harness events, and the harness's telemetry export. |
 | `afakt.hook` | `INTERNAL` | `afakt.stop` for `stop-requested`, `afakt.agent_launch.lifecycle` for every other provider event, and `afakt.hook.dispatch` for a harness event | One run of one hook. |
 | `invoke_agent {gen_ai.agent.name}` | `INTERNAL` | `afakt.agent_launch.lifecycle` | The agent harness activity, from harness or Agent Client Protocol (ACP) adapter startup until the provider observes that the harness, adapter, and their helpers have exited. Control services remain available for later hooks under [Running hooks](agent-hooks.md#Running%20hooks). |
@@ -58,7 +58,7 @@ The provenance record gives the trace ID and the span ID of the agent launch's `
 | `afakt.evidence.publish` | `INTERNAL` | `afakt.agent_launch.lifecycle` | Publishing one evidence item. |
 | `afakt.stop` | `INTERNAL` | `afakt.agent_launch.lifecycle` | Stopping a hook or the agent after a cancellation, a supersession, or a reached limit, until the provider observes that every process it started for the stopped hook or agent has exited. |
 | `afakt.sandbox.teardown` | `INTERNAL` | `afakt.agent_launch.lifecycle` | Ending the credential broker's use of credentials and the agent launch's authority, then removing the sandbox. |
-| `afakt.agent_launch.reconcile` | `INTERNAL` | The span of the agent host worker's startup | Loading the agent launch records after a restart and observing each agent again. |
+| `afakt.agent_launch.reconcile` | `INTERNAL` | The span of the workload host worker's startup | Loading the agent launch records after a restart and observing each agent again. |
 | `afakt.preview.request` | `SERVER` | The incoming request context, or a new trace | One preview request or streaming connection, linked to its agent launch. |
 | `afakt.cleanup` | `INTERNAL` | None, a new trace | Cleanup of one agent launch. |
 
@@ -75,7 +75,7 @@ Each span from `afakt.agent_launch` down includes the agent launch attributes. O
 | `afakt.profile.source` | string | All agent launch spans | `catalog` or `repository`. |
 | `afakt.profile.name` | string | All agent launch spans | The profile name. |
 | `afakt.profile.version` | string | All agent launch spans | The profile version, in the form of `AFAKT_PROFILE_VERSION`. |
-| `afakt.agent_host` | string | All spans from placement on | The agent host's name. |
+| `afakt.agent_host` | string | All spans from placement on | The workload host's name. |
 | `afakt.label.task_class`, `afakt.label.variant`, and `afakt.label.role` | string | `afakt.agent_launch` and `afakt.agent_launch.lifecycle` | The agent launch's labels, when set. |
 | `afakt.specification.digest` | string | `afakt.agent_launch.lifecycle` | The specification digest. |
 | `afakt.agent_launch.state` | string | `afakt.agent_launch` and `afakt.agent_launch.lifecycle` | The terminal state, set when the span ends. |
@@ -149,19 +149,19 @@ Each span from `afakt.agent_launch` down includes the agent launch attributes. O
 
 The provider passes the trace context into the agent sandbox through the [trace context variables](agent-workspace.md#Trace%20context). The agent receives the agent harness span's context, and each hook receives its own span's context, so a hook's child processes can add spans under it.
 
-- Through the agent mediator and agent proxy, the agent harness sends telemetry to the agent host's endpoint at `${telemetry}`. The sandbox's network rules block every other telemetry destination.
-- The telemetry endpoint identifies the launch from the authenticated agent-proxy connection and the context stamped by its mediator. See [Per-launch services](agent-workload-proxy.md#Launch%20boundary). It adds `afakt.agent_launch.id` and `afakt.agent_spec.generation` to each span and log record but never to a metric. Then it forwards the data to the deployment's collector.
+- Through the workload proxy mediator and workload proxy, the agent harness sends telemetry to the workload host's endpoint at `${telemetry}`. The sandbox's network rules block every other telemetry destination.
+- The telemetry endpoint identifies the launch from the authenticated workload-proxy connection and the context stamped by its mediator. See [Per-launch services](workload-proxy.md#Launch%20boundary). It adds `afakt.agent_launch.id` and `afakt.agent_spec.generation` to each span and log record but never to a metric. Then it forwards the data to the deployment's collector.
 - For each harness, the telemetry endpoint keeps only the attributes on its list of permitted names and drops the rest. It also drops any log record that [What telemetry never records](#What%20telemetry%20never%20records) excludes, even when the harness's own settings fail to leave it out.
 - A harness that accepts an inbound `TRACEPARENT` nests its spans under the agent harness span, while any other harness starts its own traces, which join the agent launch through the attributes that the telemetry endpoint adds.
 - When the harness doesn't export telemetry, the trace still contains every afakt span, including the hook dispatch spans, because the afakt CLI emits those.
 
 ### Resource attributes
 
-The agent host worker, the API server, and the afakt CLI set `service.name` to `afakt` and `service.version` to the afakt version. The provider passes `afakt.profile.source`, `afakt.profile.name`, and `afakt.harness.name` to the agent harness through `OTEL_RESOURCE_ATTRIBUTES`, and the harness sets its own `service.name`. The agent launch ID and recorded agent spec generation never become resource attributes, because the harness attaches its resource attributes to its metrics as well.
+The workload host worker, the API server, and the afakt CLI set `service.name` to `afakt` and `service.version` to the afakt version. The provider passes `afakt.profile.source`, `afakt.profile.name`, and `afakt.harness.name` to the agent harness through `OTEL_RESOURCE_ATTRIBUTES`, and the harness sets its own `service.name`. The agent launch ID and recorded agent spec generation never become resource attributes, because the harness attaches its resource attributes to its metrics as well.
 
 ## Metrics
 
-afakt publishes these metrics from the agent host worker and, for gateway, preview, and tunnel traffic, the control plane, with the units of the OpenTelemetry conventions.
+afakt publishes these metrics from the workload host worker and, for gateway, preview, and tunnel traffic, the control plane, with the units of the OpenTelemetry conventions.
 
 | Metric | Instrument | Unit | Description | Attributes |
 | --- | --- | --- | --- | --- |
@@ -207,11 +207,11 @@ Workspace build timing splits into `fetch` for image manifests, config blobs, an
 
 ### Slot accounting
 
-The worker publishes the counts of reserved and claimed slots from the reservation API separately. Their sum gives the slots that block new reservations. After a decrease, it can exceed `afakt.agent_host.slot.limit`. The counter for capacity changes increments once for each change, with the reason that [Slot capacity](agent-placement.md#Slot%20capacity) defines.
+The worker publishes the counts of reserved and claimed slots from the reservation API separately. Their sum gives the slots that block new reservations. After a decrease, it can exceed `afakt.agent_host.slot.limit`. The counter for capacity changes increments once for each change, with the reason that [Slot capacity](workload-placement.md#Slot%20capacity) defines.
 
 ### Ports and previews
 
-The agent mediator publishes forwarded port counts. Preview, share-link, and tunnel metrics come from the control plane. Each request emits an `afakt.preview.request` server span that follows the incoming request context or starts a trace and links to its agent launch's `afakt.agent_launch.lifecycle` span. Its attributes include the agent launch attributes and `afakt.port.protocol` as `http`, plus `afakt.preview.outcome` as `allowed`, `denied`, `unavailable`, or `error`. A streaming span lasts until the stream closes. Transport failures set status `ERROR` and a bounded `error.type`. Normal closure leaves status unset. A denied request links to an agent launch only after its preview route identifies the owner.
+The proxy mediator publishes forwarded port counts. Preview, share-link, and tunnel metrics come from the control plane. Each request emits an `afakt.preview.request` server span that follows the incoming request context or starts a trace and links to its agent launch's `afakt.agent_launch.lifecycle` span. Its attributes include the agent launch attributes and `afakt.port.protocol` as `http`, plus `afakt.preview.outcome` as `allowed`, `denied`, `unavailable`, or `error`. A streaming span lasts until the stream closes. Transport failures set status `ERROR` and a bounded `error.type`. Normal closure leaves status unset. A denied request links to an agent launch only after its preview route identifies the owner.
 
 | Metric | Instrument | Unit | Description | Attributes |
 | --- | --- | --- | --- | --- |
@@ -237,7 +237,7 @@ The [Model Context Protocol (MCP) gateway](agent-mcp-gateway.md#Audit%20and%20te
 | `afakt.mcp.approvals.resolved` | Counter | `{approval}` | Approval requests answered or canceled. | `afakt.mcp.server`, `afakt.mcp.tool`, `afakt.profile.name`, `afakt.mcp.approval.outcome`, and `afakt.mcp.approval.source` when answered |
 | `afakt.mcp.server.health` | Gauge | `1` | Upstream ready state: 1 when ready to serve calls, 0 when unavailable. | `afakt.mcp.server` and `afakt.mcp.hosting`, `remote`, `agent-host`, or `control-plane` |
 
-MCP call metric attributes are `afakt.mcp.server`, `afakt.mcp.tool`, `afakt.mcp.outcome`, and `afakt.profile.name`. Approval outcomes are `allowed`, `denied`, or `canceled`. Answer sources are `writer` or `profile`. Every completed call and every resolved approval counts once. Central services report health from supervision and remote services from connection readiness. For an agent-host server, health is 1 only when all active instances of that configured server are ready. A failed instance makes the health value 0. With no active instance, the gateway doesn't emit an agent-host health observation.
+MCP call metric attributes are `afakt.mcp.server`, `afakt.mcp.tool`, `afakt.mcp.outcome`, and `afakt.profile.name`. Approval outcomes are `allowed`, `denied`, or `canceled`. Answer sources are `writer` or `profile`. Every completed call and every resolved approval counts once. Central services report health from supervision and remote services from connection readiness. For a workload-host server, health is 1 only when all active instances of that configured server are ready. A failed instance makes the health value 0. With no active instance, the gateway doesn't emit a workload-host health observation.
 
 Deployment configuration bounds server identities and namespaced tool names for metrics. Values outside those sets become `other`. Profile names follow the catalog bounds and repository `other` rule. Agent launch and session IDs, call and approval IDs, upstream URLs, credential references, arguments, and results never become metric attributes. Audit and telemetry exclude secrets and authentication material. By default, telemetry omits arguments and results under [What telemetry never records](#What%20telemetry%20never%20records).
 
@@ -261,7 +261,7 @@ afakt records an attribute value outside its enumerated set as `other`. Labels c
 No span, event, metric, or log record from afakt or from the telemetry endpoint contains any of these:
 
 - A secret, a credential value, or authentication material, including SPIFFE Verifiable Identity Documents (SVIDs) and their [private keys](pki.md)
-- An environment value, from the agent environment or from a hook's own entries
+- An environment value, from the workload environment or from a hook's own entries
 - Hook input, standard output, or standard error, and file contents from the agent workspace
 
 With the profile's telemetry content set to `omit`, which is the default, telemetry also never records the prompt, the rendered instructions, the instruction inputs, model responses, the final answer, or tool arguments and results. The provider turns the agent harness's content logging off, and the telemetry endpoint drops any such content that arrives.

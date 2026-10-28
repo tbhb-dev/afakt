@@ -49,17 +49,6 @@ skinparam {
     HorizontalAlignment: center;
     Shadowing: 0;
   }
-  // Launch agent proxy boundary
-  .Group-TGF1bmNoIGFnZW50IHByb3h5IGJvdW5kYXJ5 {
-    BackgroundColor: #ffffff;
-    LineColor: #536b7e;
-    LineStyle: 2-2;
-    LineThickness: 2;
-    FontColor: #182c3e;
-    FontSize: 24;
-    HorizontalAlignment: center;
-    Shadowing: 0;
-  }
   // Launch guest boundary
   .Group-TGF1bmNoIGd1ZXN0IGJvdW5kYXJ5 {
     BackgroundColor: #ffffff;
@@ -82,28 +71,39 @@ skinparam {
     HorizontalAlignment: center;
     Shadowing: 0;
   }
+  // Launch workload proxy boundary
+  .Group-TGF1bmNoIHdvcmtsb2FkIHByb3h5IGJvdW5kYXJ5 {
+    BackgroundColor: #ffffff;
+    LineColor: #536b7e;
+    LineStyle: 2-2;
+    LineThickness: 2;
+    FontColor: #182c3e;
+    FontSize: 24;
+    HorizontalAlignment: center;
+    Shadowing: 0;
+  }
 </style>
 
 rectangle "afakt\n<size:16>[Software System]</size>" <<Boundary-YWZha3Q=>> {
-  rectangle "Launch agent proxy boundary" <<Group-TGF1bmNoIGFnZW50IHByb3h5IGJvdW5kYXJ5>> as group3 {
-    rectangle "==Agent proxy\n<size:16>[Container: Network proxy]</size>\n\nCarries workload traffic in both directions; own overlay node and launch X.509-SVID; asks the mediator to decide each connection." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Agentproxy
-  }
-
-  rectangle "Launch guest boundary" <<Group-TGF1bmNoIGd1ZXN0IGJvdW5kYXJ5>> as group4 {
+  rectangle "Launch guest boundary" <<Group-TGF1bmNoIGd1ZXN0IGJvdW5kYXJ5>> as group3 {
     rectangle "==Guest context\n<size:16>[Container: Provider confinement]</size>\n\nUntrusted harness, relay and loopback listeners; no overlay membership or workload keys." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Guestcontext
   }
 
-  rectangle "Launch mediation boundary" <<Group-TGF1bmNoIG1lZGlhdGlvbiBib3VuZGFyeQ==>> as group5 {
-    rectangle "==Agent mediator\n<size:16>[Container: Local policy enforcement]</size>\n\nDecides every inbound and outbound connection and stamps identity; never carries traffic." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Agentmediator
+  rectangle "Launch mediation boundary" <<Group-TGF1bmNoIG1lZGlhdGlvbiBib3VuZGFyeQ==>> as group4 {
+    rectangle "==Workload proxy mediator\n<size:16>[Container: Local policy enforcement]</size>\n\nDecides every inbound and outbound connection and stamps identity; never carries traffic." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Workloadproxymediator
+  }
+
+  rectangle "Launch workload proxy boundary" <<Group-TGF1bmNoIHdvcmtsb2FkIHByb3h5IGJvdW5kYXJ5>> as group5 {
+    rectangle "==Workload proxy\n<size:16>[Container: Network proxy]</size>\n\nCarries workload traffic in both directions; own overlay node and launch X.509-SVID; asks the mediator to decide each connection." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Workloadproxy
   }
 
 }
 
 rectangle "==Internet services\n<size:16>[Software System]</size>\n\nPermitted upstream destinations outside the cluster trust domain." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as Internetservices
 
-afakt.Guestcontext --> afakt.Agentproxy <<Relationship-UmVsYXRpb25zaGlw>> : "1: Traffic on private workload link; no guest workload key\n<size:16>[Private workload link]</size>"
-afakt.Agentproxy --> afakt.Agentmediator <<Relationship-UmVsYXRpb25zaGlw>> : "2: Request destination decision\n<size:16>[Local channel]</size>"
-afakt.Agentmediator --> afakt.Agentproxy <<Relationship-UmVsYXRpb25zaGlw>> : "3: Permit destination; instruct proxy TLS termination when required\n<size:16>[Local channel]</size>"
-afakt.Agentproxy --> Internetservices <<Relationship-UmVsYXRpb25zaGlw>> : "4: Permitted request; destination credentials when authorized\n<size:16>[Destination protocol]</size>"
+afakt.Guestcontext --> afakt.Workloadproxy <<Relationship-UmVsYXRpb25zaGlw>> : "1: Traffic on private workload link; no guest workload key\n<size:16>[Private workload link]</size>"
+afakt.Workloadproxy --> afakt.Workloadproxymediator <<Relationship-UmVsYXRpb25zaGlw>> : "2: Request destination decision\n<size:16>[Local channel]</size>"
+afakt.Workloadproxymediator --> afakt.Workloadproxy <<Relationship-UmVsYXRpb25zaGlw>> : "3: Permit destination; instruct proxy TLS termination when required\n<size:16>[Local channel]</size>"
+afakt.Workloadproxy --> Internetservices <<Relationship-UmVsYXRpb25zaGlw>> : "4: Permitted request; destination credentials when authorized\n<size:16>[Destination protocol]</size>"
 
 @enduml

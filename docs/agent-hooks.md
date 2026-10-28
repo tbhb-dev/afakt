@@ -11,11 +11,11 @@ generated: { by: "codex:gpt-6", at: "2026-10-28T17:30:00Z" }
 
 [Public key infrastructure](pki.md).
 
-A hook is a command that runs inside the agent launch's agent sandbox when a hook event happens. Agent profiles and agent launch specs define hooks with the same fields and the same events. Some events happen around the agent, where the agent sandbox provider runs their hooks. The rest happen inside the agent harness while the agent works, and their hooks can steer the agent through a decision such as `deny`.
+A hook is a command that runs inside the agent launch's agent sandbox when a hook event happens. Agent profiles and agent launch specs define hooks with the same fields and the same events. Some events happen around the agent, where the workload provider runs their hooks. The rest happen inside the agent harness while the agent works, and their hooks can steer the agent through a decision such as `deny`.
 
 ## Hook events
 
-Provider events happen around the agent. The provider runs their hooks itself. Agent harness events happen inside the harness while the agent works, and the agent harness runs their hooks through the afakt command-line interface (CLI), as [Hook dispatch](#Hook%20dispatch) describes.
+Provider events happen around the agent. The workload provider runs their hooks itself. Agent harness events happen inside the harness while the agent works, and the agent harness runs their hooks through the afakt command-line interface (CLI), as [Hook dispatch](#Hook%20dispatch) describes.
 
 | Event                  | Runs it  | When the hooks run                                                                                                                                                         | Matcher        | Decisions                     |
 | ---------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- | ----------------------------- |
@@ -51,17 +51,17 @@ A matcher uses the tool names from the profile's tools, and the provider maps ea
 | Matcher           | Events with a matcher     | The tool names, subagent types, stop causes, or violation kinds the hook applies to. Without it, the hook applies to every occurrence of the event.                                                                                                                              |
 | Command           | All                       | The program and its arguments, as a list. The program runs directly, without a shell. A hook that needs a shell lists the shell as its program.                                                                                                   |
 | Working directory | All                       | `.` for the workspace root, or the target path of a workspace source. Without it, the hook starts in the workspace root.                                                                                                                          |
-| Environment       | All                       | Names and values for this hook alone, on top of the agent environment. See [Hook environment](#Hook%20environment).                                                                                                                                 |
+| Environment       | All                       | Names and values for this hook alone, on top of the workload environment. See [Hook environment](#Hook%20environment).                                                                                                                                 |
 | Timeout           | All                       | The longest one run of the hook may take. It must be shorter than the agent launch's time limit. Without it, 60 seconds applies.                                                                                                                     |
 | Decisions         | Events with decisions     | The decisions the hook may return, from those its event allows. Without it, the hook only observes, and its output has no effect.                                                                                                                 |
 | On failure        | Agent harness events            | `continue` or `block`. With `continue`, the event goes on as if the failed hook hadn't run. With `block`, a failed hook acts as a `deny` or `block` decision whose reason gives the hook's name, and the hook's decisions must include `deny` or `block`. Without it, `continue` applies. |
 | When              | `after-agent`             | With `success`, the hook runs only after the agent completes with success and a valid final answer. With `exit`, it runs after any completion of the agent on its own. Without it, `success` applies.                                                      |
 
-Arguments, the working directory, and environment values accept [agent sandbox variables](agent-sandbox.md#Sandbox%20variables) in the same `${name}` form as sandbox rules. Hooks aren't Go templates, and the instruction inputs aren't available to them.
+Arguments, the working directory, and environment values accept [agent sandbox variables](workload-sandbox.md#Sandbox%20variables) in the same `${name}` form as sandbox rules. Hooks aren't Go templates, and the instruction inputs aren't available to them.
 
 ## Combining hooks
 
-An agent launch specification can't remove or change the agent profile's hooks. Their execution follows [Harness support](agent-hooks.md#Harness%20support) and [Hook failures](agent-hooks.md#Hook%20failures). A specification may always add its own hooks, for any event. The provider combines the two lists at launch:
+An agent launch specification can't remove or change the agent profile's hooks. Their execution follows [Harness support](agent-hooks.md#Harness%20support) and [Hook failures](agent-hooks.md#Hook%20failures). A specification may always add its own hooks, for any event. The workload provider combines the two lists at launch:
 
 - Names are unique across the combined list.
 - At `before-agent`, `sandbox-violation`, and each agent harness event, the profile's hooks run first. A `deny`, `block`, or `terminate` from a profile hook then ends the event before any specification hook runs.
@@ -84,7 +84,7 @@ A hook for an agent harness event or for `sandbox-violation` returns a decision 
 | `replace` | The agent sees the hook's text in place of the tool's result. The tool has already run. | `result` |
 | `continue` | The agent or subagent keeps working, with the reason as its next instruction. | `reason` |
 | `stop` | The agent finishes its work after the current response. | `reason` |
-| `terminate` | The provider stops the agent as it does after a cancellation, and the agent launch ends `failed` with agent sandbox violation as its reason. | `reason` |
+| `terminate` | The workload provider stops the agent as it does after a cancellation, and the agent launch ends `failed` with agent sandbox violation as its reason. | `reason` |
 
 No decision widens what the agent may do. Hooks can't approve an action that the harness permissions deny, and `permission-request` offers only `deny`. The afakt CLI never returns an approval to the harness, such as `permissionDecision` set to `allow`.
 
@@ -108,10 +108,10 @@ On standard input, each command reads one JSON object with these fields.
 
 ## Running hooks
 
-- Each hook runs inside the agent launch's agent sandbox under the [sandbox configuration built from the profile and launch spec](agent-sandbox.md#Combining%20configurations), with the agent's workspace access and mediated agent launch authority. Its network traffic passes through the agent proxy under mediator decisions like the agent's. The guest never receives authentication material from the agent proxy, including the launch's SPIFFE Verifiable Identity Document (SVID) or private key. A hook never has wider access than the agent. Under `read-only` workspace access, a hook can't change the agent workspace either.
+- Each hook runs inside the agent launch's agent sandbox under the [sandbox configuration built from the profile and launch spec](workload-sandbox.md#Combining%20configurations), with the agent's workspace access and mediated agent launch authority. Its network traffic passes through the workload proxy under mediator decisions like the agent's. The guest never receives authentication material from the workload proxy, including the launch's SPIFFE Verifiable Identity Document (SVID) or private key. A hook never has wider access than the agent. Under `read-only` workspace access, a hook can't change the agent workspace either.
 - Agent harness permissions and tools apply to the agent, and they don't limit hooks.
 - The time limit and resource limits cover the hooks and the agent together, apart from the `stop-requested`, `session-end`, and `before-teardown` hooks. For hooks within the time limit, a hook's timeout ends early when that limit would end first.
-- The `session-end` hooks share a session-end budget of their own, 10 seconds in total. It starts when the provider observes a headless harness exit or ACP session closure, after any stop grace period the agent launch used, and the time limit doesn't count it. A `session-end` hook's timeout ends early when the budget would end first. Once the budget runs out, the provider skips the `session-end` hooks still to come.
+- The `session-end` hooks share a session-end budget of their own, 10 seconds in total. It starts when the workload provider observes a headless harness exit or ACP session closure, after any stop grace period the agent launch used, and the time limit doesn't count it. A `session-end` hook's timeout ends early when the budget would end first. Once the budget runs out, the provider skips the `session-end` hooks still to come.
 - The `stop-requested` hooks share a stop budget of 10 seconds in total, outside the time limit. It starts when a cancellation, a supersession, or the time limit ends the agent harness activity, and the agent keeps running until these hooks end or the budget runs out. They run only while the agent runs, so a stop during a `before-agent` or `after-agent` hook goes straight to that hook. A resource limit stops the agent without them.
 - The `before-teardown` hooks share a teardown budget of 10 seconds in total, outside the time limit, in the same way as the `session-end` hooks.
 - When a hook runs out its timeout, the process that started it signals it to stop, waits the stop grace period, and then stops it by force. For a provider event, the next step starts only after the provider observes that every process of the hook has exited.
@@ -123,7 +123,7 @@ Any hook fails on a nonzero exit status, a timeout, or a failed start. For an ag
 
 | Situation | Outcome |
 | --- | --- |
-| A `before-agent` hook fails | The provider skips the remaining `before-agent` hooks and never starts the agent. The agent launch ends `failed` with hook failure as its reason. |
+| A `before-agent` hook fails | The workload provider skips the remaining `before-agent` hooks and never starts the agent. The agent launch ends `failed` with hook failure as its reason. |
 | A hook for a harness event fails | The hook's on-failure rule applies. The failure never ends the agent launch by itself. |
 | A `stop-requested`, `session-end`, or `before-teardown` hook fails | The provider records the failure and goes on. The agent launch's outcome stays the same. |
 | A `sandbox-violation` hook fails | The provider records the failure, and the agent keeps working. |
@@ -139,7 +139,7 @@ After each of these outcomes, the `before-teardown` hooks run once the provider 
 
 On both transports, agent harness events run through the harness's own hook system inside the agent sandbox. The harness support tables apply to ACP and headless agent launches alike. ACP messages don't replace the native hooks. Hooks for harness events go in during the same launch step as the harness permissions and tools, after the workspace build and before the first `before-agent` hook.
 
-- For each harness event that has hooks, the provider writes one entry into the harness's global hook configuration. That's the user-level configuration under `${home}`, the agent launch's home directory inside the sandbox. Each entry runs the afakt CLI.
+- For each harness event that has hooks, the workload provider writes one entry into the harness's global hook configuration. That's the user-level configuration under `${home}`, the agent launch's home directory inside the sandbox. Each entry runs the afakt CLI.
 - This configuration lies outside the agent workspace. Protection of provider-installed hooks and dispatch remains [on hold](agent-open-questions.md#%60OQ-HOOK-16%60).
 - The harness stops a hook entry that runs past the entry's own timeout. The provider sets each entry's timeout to the sum of the timeouts of the hooks that the entry dispatches, plus a margin for the afakt CLI itself, because the harness defaults can be shorter, such as 30 seconds for `UserPromptSubmit` in Claude Code.
 - Before it starts the agent, the provider checks that the written configuration contains an entry for each event with installed hooks.
@@ -171,7 +171,7 @@ sequenceDiagram
 
 Headless agent harness integration remains [`OQ-SES-16`](agent-open-questions.md#%60OQ-SES-16%60).
 
-At launch, the provider assesses agent harness support only for what the combined hook list uses: the event of each hook for a harness event, and each decision that hook may return. It looks up each one in the [harness capability matrix](#Harness%20capability%20matrix) for the selected harness and version. Events and decisions that no hook uses play no part. A harness never counts against an agent launch for them. Hooks for provider events run on every harness.
+At launch, the workload provider assesses agent harness support only for what the combined hook list uses: the event of each hook for a harness event, and each decision that hook may return. It looks up each one in the [harness capability matrix](#Harness%20capability%20matrix) for the selected harness and version. Events and decisions that no hook uses play no part. A harness never counts against an agent launch for them. Hooks for provider events run on every harness.
 
 - **Supported.** The harness fires the event at every occurrence the event defines and honors each of the hook's decisions. The provider installs the hook.
 - **Partial.** The harness fires the event at only some of its occurrences, or honors a decision with a limit that the matrix notes. The provider installs the hook and records a `hook-partial` warning.
@@ -183,7 +183,7 @@ When an agent launch has hooks on Codex, the provider does whatever Codex requir
 
 ### Workspace repository hooks
 
-A workspace repository can bring its own hooks through the agent harness's project configuration at the workspace root: `.claude/settings.json` for Claude Code, `.codex/hooks.json` or `.codex/config.toml` for Codex, and `.agents/hooks.json` for Antigravity. Codex loads project hooks only once a person marks the project's `.codex/` layer as trusted. The agent harness runs those hooks alongside the entries that the provider writes, inside the same agent sandbox, in the harness's own order. The provider leaves them in place and unchanged.
+A workspace repository can bring its own hooks through the agent harness's project configuration at the workspace root: `.claude/settings.json` for Claude Code, `.codex/hooks.json` or `.codex/config.toml` for Codex, and `.agents/hooks.json` for Antigravity. Codex loads project hooks only once a person marks the project's `.codex/` layer as trusted. The agent harness runs those hooks alongside the entries that the workload provider writes, inside the same agent sandbox, in the harness's own order. The provider leaves them in place and unchanged.
 
 - Before it starts the agent, the provider reads the project hook configuration that the selected harness reads from the agent workspace. For each entry it finds, it records the file, the native event, and the command.
 - The provenance record lists those entries as repository hooks, and the provider publishes the configuration files as evidence.
@@ -232,7 +232,7 @@ The matrix rests on each harness's own hook reference. A cell marked unverified 
 
 ## Hook environment
 
-Each hook starts from the agent's environment, which combines the [agent launch environment](agent-workspace.md#Agent%20launch%20environment) and the [agent environment](agent-workspace.md#Agent%20environment) with the trace context. The hook's own environment entries apply on top, for that hook alone. They may replace an agent environment entry without `locked`, but they can't replace a locked entry or set a [reserved name](agent-workspace.md#Reserved%20names).
+Each hook starts from the agent's environment, which combines the [agent launch environment](agent-workspace.md#Agent%20launch%20environment) and the [workload environment](agent-workspace.md#Workload%20environment) with the trace context. The hook's own environment entries apply on top, for that hook alone. They may replace a workload environment entry without `locked`, but they can't replace a locked entry or set a [reserved name](agent-workspace.md#Reserved%20names).
 
 For a `before-agent`, `after-agent`, or `before-teardown` hook, `AFAKT_PHASE` is its event. Every other hook, `session-end` included, sees `agent`. Hooks also see these variables.
 
@@ -249,7 +249,7 @@ For a `before-agent`, `after-agent`, or `before-teardown` hook, `AFAKT_PHASE` is
 
 ## Hook evidence
 
-The provider publishes a record of each hook as evidence, with the standard output and standard error logs of each run.
+The workload provider publishes a record of each hook as evidence, with the standard output and standard error logs of each run.
 
 - Each record gives the hook's name, event, and source in the profile or the specification. It also gives the command, the hook's own environment entries after variable replacement, and the working directory.
 - For each run, the record gives the tool name or subagent type when the event has one, the decision, the exit status, whether the hook failed, and the start and end times.

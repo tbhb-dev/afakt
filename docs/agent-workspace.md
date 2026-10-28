@@ -1,7 +1,7 @@
 ---
 type: Design
 title: Agent workspace
-description: The workspace sources an agent sandbox provider builds an agent workspace from, and the environment variables that the agent and its hooks see.
+description: The workspace sources a workload provider builds an agent workspace from, and the environment variables that the agent and its hooks see.
 tags: [afakt, agents, agent-launch, workspace]
 status: draft
 generated: { by: "codex:gpt-6", at: "2026-10-28T17:30:00Z" }
@@ -11,13 +11,13 @@ generated: { by: "codex:gpt-6", at: "2026-10-28T17:30:00Z" }
 
 [Public key infrastructure](pki.md).
 
-An agent workspace is the filesystem mounted into an agent sandbox. It belongs to a durable [agent](agent.md#Workspace%20revisions%20and%20the%20workspace%20registry). Each agent launch has an independent workspace materialization built from its agent launch spec before the agent harness starts. Guest paths describe the filesystem the harness sees. The agent launch environment identifies the launch, the agent environment supplies configured variables, and trace context joins telemetry to the launch trace.
+An agent workspace is the filesystem mounted into an agent sandbox. It belongs to a durable [agent](agent.md#Workspace%20revisions%20and%20the%20workspace%20registry). Each agent launch has an independent workspace materialization built from its agent launch spec before the agent harness starts. Guest paths describe the filesystem the harness sees. The agent launch environment identifies the launch, the workload environment supplies configured variables, and trace context joins telemetry to the launch trace.
 
 How agent launch copies map to the agent's revision history and survive agent launch cleanup remains an [open question](agent-open-questions.md#Agents).
 
 ## Workspace sources
 
-| Kind | Fields | What the provider places at the target path |
+| Kind | Fields | What the workload provider places at the target path |
 | --- | --- | --- |
 | `repository` | Repository uniform resource locator (URL), full commit ID, and an optional new branch name | A checkout of the repository at that commit. With a new branch name, the provider creates that branch at the checked-out commit and switches to it. Without one, the checkout has no branch. |
 | `image` | Image reference with a repository and tag or manifest digest | The directory tree from a prebuilt workspace image. See [Agent workspace image](agent-workspace-image.md). |
@@ -26,8 +26,8 @@ How agent launch copies map to the agent's revision history and survive agent la
 
 Each source has a target path relative to the workspace root. A target path uses `/` between segments, and none of its segments is empty, `.`, or `..`. The target path `.` means the workspace root itself. No two target paths are the same, and none lies inside another, so a source at `.` is the only source. One workspace can contain more than one repository, such as one at `app` and another at `deps/library`.
 
-- **Fetching.** The provider fetches each repository outside the agent's agent sandbox. A repository that needs credentials to fetch uses a fetch credential, which the agent host's configuration gives for each repository host. Fetch credentials are separate from the profile's [brokered credentials](agent-sandbox.md#Credential%20brokering), and they never enter the sandbox.
-- **Images.** [Image sources and digest pinning](agent-workspace-lifecycle.md#Image%20sources%20and%20digest%20pinning) and [Agent host caches and startup](agent-workspace-lifecycle.md#Agent%20host%20caches%20and%20startup). Worker pulls before boot are the leading option, while guest pulls remain [open](agent-open-questions.md#%60OQ-IMG-8%60).
+- **Fetching.** The provider fetches each repository outside the agent's agent sandbox. A repository that needs credentials to fetch uses a fetch credential, which the workload host's configuration gives for each repository host. Fetch credentials are separate from the profile's [brokered credentials](workload-sandbox.md#Credential%20brokering), and they never enter the sandbox.
+- **Images.** [Image sources and digest pinning](agent-workspace-lifecycle.md#Image%20sources%20and%20digest%20pinning) and [Workload host caches and startup](agent-workspace-lifecycle.md#Workload%20host%20caches%20and%20startup). Worker pulls before boot are the leading option, while guest pulls remain [open](agent-open-questions.md#%60OQ-IMG-8%60).
 - **Copies and agent launches.** [Creation and pinned inputs](agent-workspace-lifecycle.md#Creation%20and%20pinned%20inputs).
 - **Access.** Workspace access applies to the whole workspace once the provider has built it.
 
@@ -39,9 +39,9 @@ Each source has a target path relative to the workspace root. A target path uses
 
 ## Agent launch environment
 
-For the agent and for each hook, the provider sets environment variables with information about the agent launch. Each name starts with `AFAKT_`. Values are plain text without a trailing newline, and none of them contains a secret.
+The workload provider supplies the agent and each hook with environment variables describing the agent launch. Each name starts with `AFAKT_`. Values are plain text without a trailing newline, and none of them contains a secret.
 
-At launch the provider resolves the [agent sandbox variables](agent-sandbox.md#Sandbox%20variables), and the environment variables take their values from them. An environment variable and its sandbox variable always have identical text. Some environment variables, such as the commit of a repository source, have no sandbox variable.
+At launch the provider resolves the [agent sandbox variables](workload-sandbox.md#Sandbox%20variables), and the environment variables take their values from them. An environment variable and its sandbox variable always have identical text. Some environment variables, such as the commit of a repository source, have no sandbox variable.
 
 | Variable                           | Sandbox variable                   | Value                                                                                                                                                                         |
 | ---------------------------------- | ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -68,25 +68,25 @@ At launch the provider resolves the [agent sandbox variables](agent-sandbox.md#S
 
 `HOME` gets the value of `${home}`. Hooks see a few more variables, which [Hook environment](agent-hooks.md#Hook%20environment) lists.
 
-The CLI sends control requests through the guest relay. The agent mediator stamps the agent's identity. The agent proxy authenticates with the launch's X.509 SPIFFE Verifiable Identity Document (SVID) over mutual Transport Layer Security (TLS) on the overlay. TLS ends at the API server. See [Per-launch services](agent-workload-proxy.md#Launch%20boundary). Neither an SVID nor its private key enters the guest. Only the provider sets an `AFAKT_` variable, and no profile, specification, or hook entry can add or replace one.
+The CLI sends control requests through the guest relay. The workload proxy mediator stamps the agent's identity. The workload proxy authenticates with the launch's X.509 SPIFFE Verifiable Identity Document (SVID) over mutual Transport Layer Security (TLS) on the overlay. TLS ends at the API server. See [Per-launch services](workload-proxy.md#Launch%20boundary). Neither an SVID nor its private key enters the guest. Only the provider sets an `AFAKT_` variable, and no profile, specification, or hook entry can add or replace one.
 
-## Agent environment
+## Workload environment
 
-An agent profile and the specification for an agent launch add environment variables, such as `GOFLAGS` or `NODE_ENV`, to the agent environment. Both the profile and the specification have an environment field, a list of entries.
+An agent profile and the specification for an agent launch add environment variables, such as `GOFLAGS` or `NODE_ENV`, to the workload environment. Both the profile and the specification have an environment field, a list of entries.
 
 | Entry field | Meaning |
 | --- | --- |
 | Name | Starts with an uppercase letter or `_`, followed by uppercase letters, digits, and `_`, up to 128 characters. It isn't a [reserved name](#Reserved%20names). |
-| Value | The variable's text, up to 32,768 bytes. It accepts [agent sandbox variables](agent-sandbox.md#Sandbox%20variables), which the provider inserts literally, and `$$` stands for a literal `$`. |
+| Value | The variable's text, up to 32,768 bytes. It accepts [agent sandbox variables](workload-sandbox.md#Sandbox%20variables), which the workload provider inserts literally, and `$$` stands for a literal `$`. |
 | Locked | For a profile entry only. Neither the specification nor a hook may replace a locked entry. |
 
 A locked entry guarantees only a start value. The agent and every hook start with the profile's value, but a running process can still change the variable for the processes it starts, or ignore it.
 
-Environment values never contain secrets, because the configuration digest and the provenance record show the values, and so does evidence. A profile that needs a secret lists it under [credential brokering](agent-sandbox.md#Credential%20brokering) instead.
+Environment values never contain secrets, because the configuration digest and the provenance record show the values, and so does evidence. A profile that needs a secret lists it under [credential brokering](workload-sandbox.md#Credential%20brokering) instead.
 
 ### Combining environment entries
 
-At agent launch, the agent sandbox provider combines the two lists into the agent environment:
+At agent launch, the workload provider combines the two lists into the workload environment:
 
 - Each name appears at most once in each list.
 - A profile entry applies unless the specification lists the same name.
@@ -94,13 +94,13 @@ At agent launch, the agent sandbox provider combines the two lists into the agen
 - A specification entry with the name of a locked profile entry fails the launch with `environment-locked`.
 - A specification entry with a new name adds that variable.
 
-The agent sees the agent environment together with the agent launch environment and the trace context, and so does every hook. A hook's own entries apply on top for that hook alone, as [Hook environment](agent-hooks.md#Hook%20environment) describes.
+The agent sees the workload environment together with the agent launch environment and the trace context, and so does every hook. A hook's own entries apply on top for that hook alone, as [Hook environment](agent-hooks.md#Hook%20environment) describes.
 
-After variable replacement, the agent environment has one canonical encoding, sorted by name, which the configuration digest includes. The provenance record lists each name and value with its source in the profile or the specification. The provider also publishes the agent environment as evidence. The agent launch environment and the trace context aren't part of it, because the provider derives them for each attempt.
+After variable replacement, the workload environment has one canonical encoding, sorted by name, which the configuration digest includes. The provenance record lists each name and value with its source in the profile or the specification. The provider also publishes the workload environment as evidence. The agent launch environment and the trace context aren't part of it, because the provider derives them for each attempt.
 
 ### Reserved names
 
-The provider sets these names itself or keeps them as the agent host provides them, so no environment entry may use them. An entry with a reserved name fails the launch with `environment-name-reserved`, and the error gives the entry and the name.
+The workload provider sets these names itself or keeps them as the workload host provides them, so no environment entry may use them. An entry with a reserved name fails the launch with `environment-name-reserved`, and the error gives the entry and the name.
 
 | Reserved name | Why |
 | --- | --- |
@@ -108,7 +108,7 @@ The provider sets these names itself or keeps them as the agent host provides th
 | `HOME` | The provider sets it to `${home}`. |
 | `PATH` | It decides which programs the agent, the hooks, and the afakt CLI run. |
 | Any name that starts with `LD_` or `DYLD_`, and `NODE_OPTIONS` | They load code into each process that starts. |
-| `HTTP_PROXY`, `HTTPS_PROXY`, `ALL_PROXY`, and `NO_PROXY` | The provider reserves these routing settings. Network enforcement still routes every guest flow through the agent proxy under mediator decisions even if a tool ignores them. |
+| `HTTP_PROXY`, `HTTPS_PROXY`, `ALL_PROXY`, and `NO_PROXY` | The provider reserves these routing settings. Network enforcement still routes every guest flow through the workload proxy under mediator decisions even if a tool ignores them. |
 | `SSL_CERT_FILE`, `SSL_CERT_DIR`, `NODE_EXTRA_CA_CERTS`, `REQUESTS_CA_BUNDLE`, `CURL_CA_BUNDLE`, and `GIT_SSL_CAINFO` | They decide which certificate authorities the agent sandbox trusts, including the [inspection authority](pki-transport.md#Inspection%20certificates). |
 | Any name that starts with `CLAUDE_`, `ANTHROPIC_`, `CODEX_`, `OPENAI_`, `GEMINI_`, or `GOOGLE_` | The harnesses read them as settings, and the provider writes the agent harness settings itself. An `apiKey.name` may still use one of these names. |
 | `XDG_CONFIG_HOME`, `GIT_CONFIG_GLOBAL`, and `GIT_CONFIG_SYSTEM` | They move the configuration that the harness and its tools read. |
@@ -117,7 +117,7 @@ The provider sets these names itself or keeps them as the agent host provides th
 
 ### Trace context
 
-The provider sets the trace context variables for the agent and for each hook, and the agent harness's own telemetry joins the [trace of the agent launch](agent-observability.md) through them.
+The workload provider sets the trace context variables for the agent and for each hook, and the agent harness's own telemetry joins the [trace of the agent launch](agent-observability.md) through them.
 
 | Variable | Value |
 | --- | --- |
