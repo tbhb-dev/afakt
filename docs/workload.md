@@ -11,6 +11,12 @@ generated: { by: "codex:gpt-6", at: "2026-10-28T17:30:00Z" }
 
 A workload consists of its execution context, the workload proxy mediator, the workload proxy, and `afakt-agent`. On a virtual machine (VM) provider, the execution context is a workload guest. Other workload providers use a host or container context. A workload can exist without an agent launch and without a workspace. In afakt, workload means this boundary. Mediators, gateways, and workers are workloads in the Secure Production Identity Framework for Everyone (SPIFFE) sense, a distinct use of the term.
 
+## Creation-time fields
+
+A workload records its type, role, workload image, execution mode, shape, workload host, namespace, and workload template version at creation. The `type` field classifies it as agent, app, or worker. A role groups Identity and Access Management (IAM) policies under a name. The workload gets its role at creation and pins it as an immutable parameter, like an IAM instance profile on an EC2 instance.
+
+A workload template stores the creation-time fields. Workload template commands live under `afakt workload template`. An agent profile supplies the configuration for an agent launch.
+
 ## Components
 
 - Within the execution context, including the [workload guest](workload-guest.md) on a VM provider, the harness and workspace commands run alongside routing components that don't make policy decisions.

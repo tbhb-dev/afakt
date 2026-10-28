@@ -17,7 +17,7 @@ For one agent launch, the workload provider manages provisioning, restoration, a
 
 ## Agent launch lifecycle
 
-Each agent launch goes through these steps in order. A confirmed failure ends the agent launch in a terminal state only after the required [provider observations](workload-lifecycle.md#Workload%20provider%20observations), and the later steps up to the result don't run, with three exceptions. Once the agent harness has started, the `session-end` hooks run after a headless exit or ACP session closure, whatever the reason. When the agent completes on its own with a failure or invalid output, the `after-agent` hooks with `exit` still run. Once the workload provider has opened the agent sandbox, the `before-teardown` hooks run at every end.
+Each agent launch goes through these steps in order. A confirmed failure ends the agent launch in a terminal state only after the required [workload provider observations](workload-lifecycle.md#Workload%20provider%20observations), and the later steps up to the result don't run, with three exceptions. Once the agent harness has started, the `session-end` hooks run after a headless exit or ACP session closure, whatever the reason. When the agent completes on its own with a failure or invalid output, the `after-agent` hooks with `exit` still run. Once the workload provider has opened the agent sandbox, the `before-teardown` hooks run at every end.
 
 1. **Request.** The parent workflow submits an agent launch request. The agent dispatcher authorizes it, and afakt assigns the agent launch ID.
 2. **Placement and finalization.** The agent dispatcher picks a host task queue and reserves an agent launch slot. It then finalizes the agent launch spec from the agent spec generation. See [Workload placement](workload-placement.md).
@@ -108,7 +108,7 @@ Terminal transitions require [provider observations](workload-lifecycle.md#Workl
 
 ## Startup and readiness
 
-For the hypervisor provider, native start reaches the agent sandbox-ready stage. Agent harness startup follows separately. Suspend, resume, stop, `kill`, and workload snapshot operations go through the workload host's supervisor and hypervisor. They never go through ACP or the guest. No guest or session policy can block lifecycle control. Filesystem freezing keeps VM state consistent with the workspace disk delta when afakt takes a workload snapshot and an agent checkpoint together at an idle turn boundary. The agent harness takes its agent checkpoint of session state. Capture doesn't grant the guest authority over host lifecycle operations. Host modes and container managers have no workload snapshot.
+For the hypervisor workload provider, native start reaches the agent sandbox-ready stage. Agent harness startup follows separately. Suspend, resume, stop, `kill`, and workload snapshot operations go through the workload host's supervisor and hypervisor. They never go through ACP or the guest. No guest or session policy can block lifecycle control. Filesystem freezing keeps VM state consistent with the workspace disk delta when afakt takes a workload snapshot and an agent checkpoint together at an idle turn boundary. The agent harness takes its agent checkpoint of session state. Capture doesn't grant the guest authority over host lifecycle operations. Host modes and container managers have no workload snapshot.
 
 ## Workload provider observations
 

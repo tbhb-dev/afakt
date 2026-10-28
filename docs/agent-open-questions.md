@@ -163,7 +163,7 @@ Beyond authorization rules, what enforcement assumptions must a policy proposal'
 
 ### `OQ-AGT-39`
 
-What stream and signal behavior must `agent exec` and `agent shell` provide across sandbox modes? Differences in terminal handling or end-of-input behavior can change command results and prevent graceful shutdown. The commands could expose byte streams with explicit signal operations or a terminal interface or both with declared provider support. See [Sandboxes](agent.md#Sandboxes).
+What stream and signal behavior must `agent exec` and `agent shell` provide across sandbox modes? Differences in terminal handling or end-of-input behavior can change command results and prevent graceful shutdown. The commands could expose byte streams with explicit signal operations or a terminal interface or both with declared workload provider support. See [Sandboxes](agent.md#Sandboxes).
 
 ### `OQ-AGT-40`
 
@@ -231,7 +231,7 @@ Which afakt command starts a worker that runs the agent dispatcher or the agent 
 
 ### `OQ-EXE-7`
 
-Which identifier selects the deterministic test provider through the workload provider field in the [agent launch spec](agent-launch-contract.md#Agent%20launch%20spec), and how does placement find hosts that supply it?
+Which identifier selects the deterministic test workload provider through the workload provider field in the [agent launch spec](agent-launch-contract.md#Agent%20launch%20spec), and how does placement find hosts that supply it?
 
 ### `OQ-EXE-8`
 
@@ -287,7 +287,7 @@ What canonical representation defines the digest of an agent launch spec for num
 
 ### `OQ-CON-1`
 
-Should cleanup become a separate provider operation? Cleanup runs as an activity on the host task queue, outside provision, restore, release, status, cancel, and result. See [Provider operations](agent-launch-contract.md#Workload%20provider%20operations).
+Should cleanup become a separate workload provider operation? Cleanup runs as an activity on the task queue of the workload host, outside provision, restore, release, status, cancel, and result. See [Provider operations](agent-launch-contract.md#Workload%20provider%20operations).
 
 ### `OQ-CON-3`
 
@@ -319,7 +319,7 @@ Should the abstract operation for restoring a workload snapshot be restore or re
 
 ### `OQ-CON-11`
 
-Which single meaning should the abstract verb start have? Reserving it for the agent harness reaching its running stage is the leading option for distinguishing it from agent sandbox readiness, at the cost of mapping provider-native start operations separately. The abstract meaning remains open. See [Provider operations](agent-launch-contract.md#Workload%20provider%20operations).
+Which single meaning should the abstract verb start have? Reserving it for the agent harness reaching its running stage is the leading option for distinguishing it from agent sandbox readiness, at the cost of mapping workload provider-native start operations separately. The abstract meaning remains open. See [Provider operations](agent-launch-contract.md#Workload%20provider%20operations).
 
 ### `OQ-CON-12`
 
@@ -445,7 +445,7 @@ What transaction binds a workspace disk, native harness state, memory, and devic
 
 ### `OQ-WSP-23`
 
-How should detachment and deletion follow the capture and hook order in [Hook events](agent-hooks.md#Hook%20events)? Which provider observations prove that no launch-owned process, mount, disk, directory, remote resource, or active credential authority remains? How should cleanup report missing retained content or partial removal, and which workspace and snapshot API operations and events expose these outcomes? See [Deletion and teardown](agent-workspace-lifecycle.md#Deletion%20and%20teardown) and [Operations and telemetry](agent-workspace-lifecycle.md#Operations%20and%20telemetry).
+How should detachment and deletion follow the capture and hook order in [Hook events](agent-hooks.md#Hook%20events)? Which workload provider observations prove that no launch-owned process, mount, disk, directory, remote resource, or active credential authority remains? How should cleanup report missing retained content or partial removal, and which workspace and snapshot API operations and events expose these outcomes? See [Deletion and teardown](agent-workspace-lifecycle.md#Deletion%20and%20teardown) and [Operations and telemetry](agent-workspace-lifecycle.md#Operations%20and%20telemetry).
 
 ## Agent workspace image
 
@@ -525,11 +525,11 @@ Which decision applies when hooks at `model-request-after` return both `continue
 
 ### `OQ-HOOK-16`
 
-What protects provider-installed hooks from changes by the agent, including hooks that share its agent sandbox and identity? Protection of hook configuration and dispatch remains open. See [Hook dispatch](agent-hooks.md#Hook%20dispatch).
+What protects hooks installed by the workload provider from changes by the agent, including hooks that share its agent sandbox and identity? Protection of hook configuration and dispatch remains open. See [Hook dispatch](agent-hooks.md#Hook%20dispatch).
 
 ### `OQ-HOOK-17`
 
-Which repository project settings may the agent harness load beyond hooks, and how do they interact with provider settings? The scope of repository project configuration remains open. Which runtime trust-bundle settings must remain under the workload provider's exclusive control, and what precedence applies when repository configuration also sets them? See [Workspace repository hooks](agent-hooks.md#Workspace%20repository%20hooks).
+Which repository project settings may the agent harness load beyond hooks, and how do they interact with workload provider settings? The scope of repository project configuration remains open. Which runtime trust-bundle settings must remain under the workload provider's exclusive control, and what precedence applies when repository configuration also sets them? See [Workspace repository hooks](agent-hooks.md#Workspace%20repository%20hooks).
 
 ### `OQ-HOOK-18`
 
@@ -893,7 +893,7 @@ Should each agent launch run under its own User Identifier (UID), separate from 
 
 ### `OQ-SBX-19`
 
-How does each launch's own workload proxy mediator fit the process and user boundaries of its provider? Each launch has one mediator and one workload proxy, with separate network state. One process per agent launch is the leading option if [per-launch user identifiers](#%60OQ-SBX-18%60) work, because each mediator can run under its launch's UID. It costs more memory and startup time per agent launch. See [Workload proxy mediator](workload-proxy-mediator.md#Launch%20boundary).
+How does each launch's own workload proxy mediator fit the process and user boundaries of its workload provider? Each launch has one mediator and one workload proxy, with separate network state. One process per agent launch is the leading option if [per-launch user identifiers](#%60OQ-SBX-18%60) work, because each mediator can run under its launch's UID. It costs more memory and startup time per agent launch. See [Workload proxy mediator](workload-proxy-mediator.md#Launch%20boundary).
 
 ### `OQ-SBX-20`
 
@@ -961,7 +961,7 @@ Which name queries may leave the workload proxy mediator for upstream name servi
 
 ### `OQ-SBX-36`
 
-How does a remote workload sandbox reach its workload proxy and workload proxy mediator? Do they run in a provider sidecar or on a workload host, and how does the provider prevent direct connections that bypass policy? How do its control requests, sessions, previews, and MCP calls use the launch-bound local channel and authenticated direct overlay connections? See [Workload proxy mediator](workload-proxy-mediator.md#Launch%20boundary).
+How does a remote workload sandbox reach its workload proxy and workload proxy mediator? Do they run in a workload provider sidecar or on a workload host, and how does the workload provider prevent direct connections that bypass policy? How do its control requests, sessions, previews, and MCP calls use the launch-bound local channel and authenticated direct overlay connections? See [Workload proxy mediator](workload-proxy-mediator.md#Launch%20boundary).
 
 ### `OQ-SBX-37`
 
@@ -1065,7 +1065,7 @@ How does each operating system restrict a host-mode mediator's connections to it
 
 ### `OQ-SBX-63`
 
-How does a workload provider with a vendor-managed agent loop map its harness, session, tool execution, and model requests to an afakt agent launch? Which afakt-agent, afakt-sandbox, guest relay, Agent Client Protocol (ACP), and hook responsibilities can run in the vendor sandbox, and which require an external adapter or rejection of the launch? How are server-side tools and app-run tools bound to the same launch when they execute outside that sandbox? See [Process placement for Claude Managed Agents](workload-provider-claude-managed-agents.md#Process%20placement%20and%20startup) and [Process placement for OpenAI Agents API](workload-provider-openai-agents-api.md#Process%20placement%20and%20startup).
+How does a workload provider with a hosted agent loop map its harness, session, tool execution, and model requests to an afakt agent launch? Which afakt-agent, afakt-sandbox, guest relay, Agent Client Protocol (ACP), and hook responsibilities can run in the vendor sandbox, and which require an external adapter or rejection of the launch? How are server-side tools and app-run tools bound to the same launch when they execute outside that sandbox? See [Process placement for Claude Managed Agents](workload-provider-claude-managed-agents.md#Process%20placement%20and%20startup) and [Process placement for OpenAI Agents API](workload-provider-openai-agents-api.md#Process%20placement%20and%20startup).
 
 ### `OQ-SBX-64`
 
@@ -1077,7 +1077,7 @@ Which remote runtime, execution-user privileges, kernel boundary, and host privi
 
 ### `OQ-SBX-66`
 
-For each remote provider, which observation proves that every process and detached operation started for an agent launch has stopped before afakt releases its slot or starts a successor? How do session cancellation, shared environment lifetime, asynchronous deletion, provider unavailability, and late requests that recreate execution affect that proof? Which authority prevents further work under retired vendor handles? See [OpenAI termination](workload-provider-openai-agents-api.md#Cancellation%20and%20teardown) and [Cloudflare termination](workload-provider-cloudflare.md#Cancellation%20and%20teardown).
+For each remote workload provider, which observation proves that every process and detached operation started for an agent launch has stopped before afakt releases its slot or starts a successor? How do session cancellation, shared environment lifetime, asynchronous deletion, provider unavailability, and late requests that recreate execution affect that proof? Which authority prevents further work under retired vendor handles? See [OpenAI termination](workload-provider-openai-agents-api.md#Cancellation%20and%20teardown) and [Cloudflare termination](workload-provider-cloudflare.md#Cancellation%20and%20teardown).
 
 ### `OQ-SBX-67`
 

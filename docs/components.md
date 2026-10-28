@@ -69,7 +69,7 @@ The GitHub webhook receiver accepts webhook deliveries from GitHub.
 
 ## Guest relay
 
-The guest relay handles session traffic, control requests, and authorized listener streams under [Relay behavior](agent-acp.md#Relay%20behavior) and [Port discovery and records](workload-ports.md#Port%20discovery%20and%20records). Its carrier and local authentication follow the selected provider, with the shared choice under [`OQ-SES-5`](agent-open-questions.md#%60OQ-SES-5%60).
+The guest relay handles session traffic, control requests, and authorized listener streams under [Relay behavior](agent-acp.md#Relay%20behavior) and [Port discovery and records](workload-ports.md#Port%20discovery%20and%20records). Its carrier and local authentication follow the selected workload provider, with the shared choice under [`OQ-SES-5`](agent-open-questions.md#%60OQ-SES-5%60).
 
 ## Host-level network service
 
@@ -115,7 +115,7 @@ A workload guest is the isolation boundary, with a guest kernel, read-only opera
 
 ## Snapshot registry
 
-The snapshot registry stores and serves workload snapshots of VM state for restoration and transfer. Workload snapshot scope and retention remain [open](agent-open-questions.md#Agents). See [Workload snapshots and the snapshot registry](agent.md#Workload%20snapshots%20and%20the%20snapshot%20registry). [Workspace disk deltas and portable revisions](agent-workspace-lifecycle.md#Workspace%20disk%20deltas%20and%20portable%20revisions).
+The snapshot registry stores and serves workload snapshots of VM memory and disk for restoration and transfer. Workload snapshot scope and retention remain [open](agent-open-questions.md#Agents). See [Workload snapshots and the snapshot registry](agent.md#Workload%20snapshots%20and%20the%20snapshot%20registry). [Workspace disk deltas and portable revisions](agent-workspace-lifecycle.md#Workspace%20disk%20deltas%20and%20portable%20revisions).
 
 ## Tailnet attachment
 

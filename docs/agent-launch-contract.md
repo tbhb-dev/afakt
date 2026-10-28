@@ -15,7 +15,7 @@ The agent launcher workflow takes a finalized agent launch spec and obtains an a
 
 The representation of durable agent and session ownership remains [open](agent-open-questions.md#%60OQ-AGT-10%60).
 
-[Attachment and provider storage](agent-workspace-lifecycle.md#Attachment%20and%20provider%20storage).
+[Attachment and provider storage](agent-workspace-lifecycle.md#Attachment%20and%20workload%20provider%20storage).
 
 ## Agent launch spec
 

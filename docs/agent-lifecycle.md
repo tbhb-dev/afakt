@@ -46,7 +46,7 @@ stateDiagram-v2
     end note
 ```
 
-The agent state transitions require successful completion. A signal or request alone doesn't prove the harness stopped. Before afakt treats an agent launch as ended, the provider [observes that every process it started for the launch has exited](workload-lifecycle.md#Agent%20launch%20states). Launch failures leave an agent without an active agent launch. Mapping intermediate provider states to agent status remains an open question.
+The agent state transitions require successful completion. A signal or request alone doesn't prove the harness stopped. Before afakt treats an agent launch as ended, the workload provider [observes that every process it started for the launch has exited](workload-lifecycle.md#Agent%20launch%20states). Launch failures leave an agent without an active agent launch. Mapping intermediate provider states to agent status remains an open question.
 
 ## Create, start, and run
 
@@ -64,7 +64,7 @@ At most one agent launch runs for an agent at a time. Each replacement gets its 
 
 A change to the agent spec creates a new generation. At a turn boundary, that change ends the active agent launch and starts a new one. Work in flight and session continuation remain [open](agent-open-questions.md#%60OQ-AGT-27%60).
 
-A successor waits until its predecessor is terminal before running. The provider builds its agent workspace only after a predecessor used as a workspace source becomes terminal. Whether to accept and cancel an active predecessor or reject a competing request remains [open](agent-open-questions.md#%60OQ-EXE-3%60). Admission rules for ordering competing requests and granting supersession authority also remain [open](agent-open-questions.md#%60OQ-EXE-8%60).
+A successor waits until its predecessor is terminal before running. The workload provider builds its agent workspace only after a predecessor used as a workspace source becomes terminal. Whether to accept and cancel an active predecessor or reject a competing request remains [open](agent-open-questions.md#%60OQ-EXE-3%60). Admission rules for ordering competing requests and granting supersession authority also remain [open](agent-open-questions.md#%60OQ-EXE-8%60).
 
 ## Launch sequence
 
@@ -76,7 +76,7 @@ The agent session lifecycle controls an interactive conversation and its active 
 
 1. **Creation.** When a client creates a session for an agent through the ingress gateway and API server with a profile, workspace sources, and an optional first prompt, the API server starts the agent session workflow with the new session ID.
 2. **Placement.** The agent dispatcher workflow places the session on a workload host, as for an agent launch.
-3. **Start.** The provider builds the agent workspace and starts the guest relay before the `before-agent` hooks. Their CLI control requests use the workload proxy mediator. After the hooks, the adapter starts in the agent sandbox and the relay sends `initialize` and `session/new`. Startup ownership remains [`OQ-SES-15`](agent-open-questions.md#%60OQ-SES-15%60). Session registration uses the workload proxy under mediator decisions. Its [endpoint owner and connection path](agent-open-questions.md#%60OQ-SES-17%60) remain open.
+3. **Start.** The workload provider builds the agent workspace and starts the guest relay before the `before-agent` hooks. Their CLI control requests use the workload proxy mediator. After the hooks, the adapter starts in the agent sandbox and the relay sends `initialize` and `session/new`. Startup ownership remains [`OQ-SES-15`](agent-open-questions.md#%60OQ-SES-15%60). Session registration uses the workload proxy under mediator decisions. Its [endpoint owner and connection path](agent-open-questions.md#%60OQ-SES-17%60) remain open.
 4. **Turns.** The agent receives prompts under the [ACP turn rules](agent-acp.md#Turns).
 5. **Suspend.** After the idle timeout, the agent session workflow suspends the session. For a VM provider that supports paired capture, afakt takes a workload snapshot and an agent checkpoint together at an idle turn boundary, with the guest filesystem frozen. The supervisor captures VM state, and the agent harness captures its session state. After the `before-teardown` hooks, it stops the VM and frees the slot.
 6. **Resume.** A prompt or an attach request for a suspended session resumes it. For a VM provider that supports paired capture, the supervisor restores the workload snapshot under the same guest paths, and the harness restores session state from the agent checkpoint. afakt reacquires credentials outside the guest. The guest relay reconnects through the proxy under mediator decisions. A restarted adapter receives `session/resume`. Which process and transport state survives restoration remains [open](agent-open-questions.md#Agents). Restoration in host modes and container managers remains [open](agent-open-questions.md#%60OQ-AGT-28%60).
@@ -88,7 +88,7 @@ Agent session states control the conversation, separate from the durable agent l
 
 | State | Meaning |
 | --- | --- |
-| `starting` | The provider is building the agent workspace or starting the relay. |
+| `starting` | The workload provider is building the agent workspace or starting the relay. |
 | `running` | The agent is working on a turn. |
 | `requires-action` | The agent waits on a permission or elicitation answer from the writer. |
 | `idle` | The agent has no turn in progress and waits for a prompt. |

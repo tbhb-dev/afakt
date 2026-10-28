@@ -47,7 +47,7 @@ Everything the specification contains is immutable, and so is everything the pro
 
 ## Relations
 
-- **Agent.** Each agent launch belongs to one durable agent. The representation of this ownership in provider records remains [open](agent-open-questions.md#Agents).
+- **Agent.** Each agent launch belongs to one durable agent. The representation of this ownership in workload provider records remains [open](agent-open-questions.md#Agents).
 - **Session.** The conversation belongs to the agent. An agent launch publishes its transcript as evidence. Retaining the conversation beyond evidence cleanup remains [open](agent-open-questions.md#Agents).
 - **Agent profile.** Each agent launch pins one exact profile version by source, name, version, and digest, and the workload provider stores a copy of that version with the agent launch. Many agent launches can pin the same version. A successor agent launch may pin a different version. See [Pinning a profile version](agent-profile.md#Pinning%20a%20profile%20version).
 - **Workspace sources.** Each agent launch builds its own agent workspace from its specification's sources. An `agent-launch` source refers to an ended agent launch on the same workload host, including its predecessor. An agent launch that the new one supersedes qualifies too, because the provider builds the new workspace only after that agent launch becomes terminal. Cleanup skips a workspace that a `pending` agent launch lists as a source.
@@ -59,7 +59,7 @@ Everything the specification contains is immutable, and so is everything the pro
 
 ## Agent launch identity
 
-An agent launch ID identifies one instantiation. Each replacement receives a new ID linked to its predecessor, while repeated provider operations for an existing ID reconcile that launch without creating another instantiation.
+An agent launch ID identifies one instantiation. Each replacement receives a new ID linked to its predecessor, while repeated workload provider operations for an existing ID reconcile that launch without creating another instantiation.
 
 | Provision with | Outcome |
 | --- | --- |
@@ -71,7 +71,7 @@ The specification digest covers the fields of the finalized agent launch spec, i
 
 ### Agent launch ID format
 
-An agent launch ID is a UUIDv7 in the canonical text form of Request for Comments (RFC) 9562: 32 lowercase hexadecimal digits in groups of 8, 4, 4, 4, and 12, separated by hyphens. Its version digit is `7`, and its variant digit is one of `8`, `9`, `a`, or `b`. afakt assigns it when it creates the agent launch and records it in workflow history before provision. Callers never choose an agent launch ID, and providers never assign one. The exact afakt component that assigns it remains [open](agent-open-questions.md#%60OQ-MOD-1%60).
+An agent launch ID is a UUIDv7 in the canonical text form of Request for Comments (RFC) 9562: 32 lowercase hexadecimal digits in groups of 8, 4, 4, 4, and 12, separated by hyphens. Its version digit is `7`, and its variant digit is one of `8`, `9`, `a`, or `b`. afakt assigns it when it creates the agent launch and records it in workflow history before provision. Callers never choose an agent launch ID, and workload providers never assign one. The exact afakt component that assigns it remains [open](agent-open-questions.md#%60OQ-MOD-1%60).
 
 Every place that passes or records an agent launch ID uses that form, including provider operations, results, provenance, evidence, the agent-launch-ended event, the [agent launch environment](agent-workspace.md#Agent%20launch%20environment), and `${agent-launch-id}`. A workload provider rejects an ID outside the canonical form with `invalid-specification`.
 

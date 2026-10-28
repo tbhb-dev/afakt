@@ -24,12 +24,12 @@ Each agent launch of a durable [agent](agent.md) produces agent launch-level Ope
 
 Headless transport integration and the observations available through it remain [`OQ-SES-16`](agent-open-questions.md#%60OQ-SES-16%60).
 
-An agent launch's spans join its parent workflow's trace. Trace context passes from the workflow orchestrator through the agent dispatcher workflow to the agent launcher workflow, then from each workflow to its activities. Provider operations run inside their calling activities on the workload host worker, with a child span under the activity span in the same trace.
+An agent launch's spans join its parent workflow's trace. Trace context passes from the workflow orchestrator through the agent dispatcher workflow to the agent launcher workflow, then from each workflow to its activities. Workload provider operations run inside their calling activities on the workload host worker, with a child span under the activity span in the same trace.
 
 - **Agent launch.** Each agent dispatcher run handles one agent launch and has one `afakt.agent_launch` span. Without a trace context from the parent, that span starts a new trace.
 - **Successor agent launches.** A successor agent launch's `afakt.agent_launch` span links to the predecessor agent launch's `afakt.agent_launch` span, with the link attribute `afakt.link.relation` set to `supersedes` when the predecessor agent launch was still active and `follows` otherwise. Spans of different agent launches share a trace only when the parent starts both from one trace.
 - **Retries.** A retried activity is a new activity span under the same parent span, and a repeated provision request that returns the existing agent launch doesn't start a new `afakt.agent_launch.lifecycle` span. Replay of workflow history never emits a span again.
-- **Restarts.** For recovery, the provider records the trace ID and span ID of each open span in the agent launch record. A restart of the workload host worker loses each span that was open, because the worker never exports a span before it ends. For the rest of each such step, the provider starts a recovery span with the same name and parent. Each recovery span links to the recorded span and has `afakt.recovered` set to true. Reconciliation runs in an `afakt.agent_launch.reconcile` span that links to each recovery span it starts.
+- **Restarts.** For recovery, the workload provider records the trace ID and span ID of each open span in the agent launch record. A restart of the workload host worker loses each span that was open, because the worker never exports a span before it ends. For the rest of each such step, the provider starts a recovery span with the same name and parent. Each recovery span links to the recorded span and has `afakt.recovered` set to true. Reconciliation runs in an `afakt.agent_launch.reconcile` span that links to each recovery span it starts.
 - **Cleanup.** Cleanup runs after retention, long after the trace ends, so each `afakt.cleanup` span starts a new trace and links to the `afakt.agent_launch.lifecycle` span of the agent launch it removes.
 - **Sampling.** Every afakt span follows its parent's sampling decision. The trace flags in `TRACEPARENT` pass that decision to the agent harness.
 
@@ -42,8 +42,8 @@ The provenance record gives the trace ID and the span ID of the agent launch's `
 | `afakt.agent_launch` | `INTERNAL` | The parent workflow's span that starts the agent dispatcher | One agent dispatcher run, from placement until it returns the result. |
 | `afakt.agent_launch.placement` | `INTERNAL` | `afakt.agent_launch` | The placement activity, from the request until the reservation Application Programming Interface (API) reserves a slot. |
 | `afakt.agent_launcher` | `INTERNAL` | `afakt.agent_launch` | One agent launcher run on the workload host, from its start until it returns the result. |
-| `afakt.provider.provision`, `afakt.provider.status`, `afakt.provider.cancel`, and `afakt.provider.result` | `INTERNAL` | The calling activity's span, under `afakt.agent_launcher` | One provider operation on the workload host. |
-| `afakt.agent_launch.lifecycle` | `INTERNAL` | The `afakt.provider.provision` span that accepted the launch | The provider's work on one agent launch, from the accepted launch until evidence publication and removal of the agent sandbox finish. It can end after its parent ends. |
+| `afakt.provider.provision`, `afakt.provider.status`, `afakt.provider.cancel`, and `afakt.provider.result` | `INTERNAL` | The calling activity's span, under `afakt.agent_launcher` | One workload provider operation on the workload host. |
+| `afakt.agent_launch.lifecycle` | `INTERNAL` | The `afakt.provider.provision` span that accepted the launch | The workload provider's work on one agent launch, from the accepted launch until evidence publication and removal of the agent sandbox finish. It can end after its parent ends. |
 | `afakt.workspace.build` | `INTERNAL` | `afakt.agent_launch.lifecycle` | Building the agent workspace. |
 | `afakt.workspace.source` | `INTERNAL` | `afakt.workspace.build` | Placing one workspace source. This covers repository fetches and image materialization as well as copies of earlier workspaces. |
 | `afakt.workspace.image.build` | `INTERNAL` | The activity span that runs the image build | One image build, from source preparation through sandboxed steps and snapshotting to publication. |
@@ -119,7 +119,7 @@ Each span from `afakt.agent_launch` down includes the agent launch attributes. O
 
 - A span that ends in a failure has status `ERROR` with `error.type` set. For `afakt.agent_launch` and `afakt.agent_launch.lifecycle`, that means the terminal states `failed` and `terminated`.
 - A `canceled` agent launch leaves the status unset, because the caller asked for the stop. Its `afakt.agent_launch.reason` is `cancellation` or `supersession`.
-- A provider operation span has status `ERROR` for each provider operation error except `not-found` during the first status call of reconciliation and `not-terminal`, which the agent launcher expects as answers.
+- A span for a workload provider operation has status `ERROR` for each error from a workload provider operation except `not-found` during the first status call of reconciliation and `not-terminal`, which the agent launcher expects as answers.
 - An `afakt.hook` span has status `ERROR` when the hook fails, even when its on-failure rule lets the event go on.
 - Every other span leaves the status unset on success.
 
@@ -131,7 +131,7 @@ Each span from `afakt.agent_launch` down includes the agent launch attributes. O
 | `afakt.cancel_acknowledged` | `afakt.agent_launch.lifecycle` | `afakt.agent_launch.reason` |
 | `afakt.stop.signal` | `afakt.stop` | `afakt.stop.signal_name`, such as `SIGTERM` |
 | `afakt.stop.force` | `afakt.stop` | None |
-| `afakt.termination.verified` | `afakt.stop`, the agent harness span, and each `afakt.hook` span for a provider event | `afakt.process.count`, the number of processes the provider saw exit |
+| `afakt.termination.verified` | `afakt.stop`, the agent harness span, and each `afakt.hook` span for a workload provider event | `afakt.process.count`, the number of processes the workload provider saw exit |
 | `afakt.hook.warning` | `afakt.harness.configure` | `afakt.hook.name`, `afakt.hook.event`, `afakt.hook.decision` for an unsupported decision, `afakt.harness.name`, and `afakt.hook.warning.kind`, `hook-partial` or `hook-unsupported` |
 | `afakt.sandbox.violation` | Agent harness span or hook span | `afakt.sandbox.violation.kind`, `network` or `filesystem` |
 | `afakt.observation.conflict` | `afakt.agent_launch.lifecycle` | The provenance field whose observations disagree, as `afakt.provenance.field` |
@@ -147,7 +147,7 @@ Each span from `afakt.agent_launch` down includes the agent launch attributes. O
 
 ## Trace context propagation
 
-The provider passes the trace context into the agent sandbox through the [trace context variables](agent-workspace.md#Trace%20context). The agent receives the agent harness span's context, and each hook receives its own span's context, so a hook's child processes can add spans under it.
+The workload provider passes the trace context into the agent sandbox through the [trace context variables](agent-workspace.md#Trace%20context). The agent receives the agent harness span's context, and each hook receives its own span's context, so a hook's child processes can add spans under it.
 
 - Through the workload proxy mediator and workload proxy, the agent harness sends telemetry to the workload host's endpoint at `${telemetry}`. The sandbox's network rules block every other telemetry destination.
 - The telemetry endpoint identifies the launch from the authenticated workload-proxy connection and the context stamped by its mediator. See [Per-launch services](workload-proxy.md#Launch%20boundary). It adds `afakt.agent_launch.id` and `afakt.agent_spec.generation` to each span and log record but never to a metric. Then it forwards the data to the deployment's collector.
@@ -157,7 +157,7 @@ The provider passes the trace context into the agent sandbox through the [trace 
 
 ### Resource attributes
 
-The workload host worker, the API server, and the afakt CLI set `service.name` to `afakt` and `service.version` to the afakt version. The provider passes `afakt.profile.source`, `afakt.profile.name`, and `afakt.harness.name` to the agent harness through `OTEL_RESOURCE_ATTRIBUTES`, and the harness sets its own `service.name`. The agent launch ID and recorded agent spec generation never become resource attributes, because the harness attaches its resource attributes to its metrics as well.
+The workload host worker, the API server, and the afakt CLI set `service.name` to `afakt` and `service.version` to the afakt version. The workload provider passes `afakt.profile.source`, `afakt.profile.name`, and `afakt.harness.name` to the agent harness through `OTEL_RESOURCE_ATTRIBUTES`, and the harness sets its own `service.name`. The agent launch ID and recorded agent spec generation never become resource attributes, because the harness attaches its resource attributes to its metrics as well.
 
 ## Metrics
 
@@ -183,7 +183,7 @@ afakt publishes these metrics from the workload host worker and, for gateway, pr
 | `afakt.workspace.build.duration` | Histogram | `s` | Elapsed workspace construction time spent in each step category. | `afakt.workspace.build.step`, `fetch`, `unpack`, or `repository`, `afakt.profile.name`, and `error.type` on failure |
 | `afakt.hook.duration` | Histogram | `s` | Duration of one hook run. | Hook metric attributes |
 | `afakt.hook.decisions` | Counter | `{decision}` | Decisions returned by hooks for harness events and `sandbox-violation`. | `afakt.hook.event`, `afakt.hook.decision`, `afakt.hook.source`, and `afakt.profile.name` |
-| `afakt.hook.warnings` | Counter | `{warning}` | Hooks that the provider installed with a `hook-partial` warning or skipped with a `hook-unsupported` warning. | `afakt.hook.event`, `afakt.hook.warning.kind`, `afakt.harness.name`, and `afakt.profile.name` |
+| `afakt.hook.warnings` | Counter | `{warning}` | Hooks that the workload provider installed with a `hook-partial` warning or skipped with a `hook-unsupported` warning. | `afakt.hook.event`, `afakt.hook.warning.kind`, `afakt.harness.name`, and `afakt.profile.name` |
 | `afakt.agent_launch.stops` | Counter | `{stop}` | Stops of a hook or the agent. | `afakt.stop.cause`, `afakt.profile.name`, and `afakt.stop.forced`, true for a forced stop |
 | `afakt.sandbox.violations` | Counter | `{violation}` | Violations that the agent sandbox reported. | `afakt.sandbox.violation.kind` and `afakt.profile.name` |
 | `afakt.agent_launch.usage.input_tokens` | Counter | `{token}` | Observed input tokens per agent launch, when reported. | Usage metric attributes |
@@ -264,6 +264,6 @@ No span, event, metric, or log record from afakt or from the telemetry endpoint 
 - An environment value, from the workload environment or from a hook's own entries
 - Hook input, standard output, or standard error, and file contents from the agent workspace
 
-With the profile's telemetry content set to `omit`, which is the default, telemetry also never records the prompt, the rendered instructions, the instruction inputs, model responses, the final answer, or tool arguments and results. The provider turns the agent harness's content logging off, and the telemetry endpoint drops any such content that arrives.
+With the profile's telemetry content set to `omit`, which is the default, telemetry also never records the prompt, the rendered instructions, the instruction inputs, model responses, the final answer, or tool arguments and results. The workload provider turns the agent harness's content logging off, and the telemetry endpoint drops any such content that arrives.
 
 With telemetry content set to `include`, the agent harness span may include the opt-in GenAI attributes `gen_ai.input.messages`, `gen_ai.output.messages`, and `gen_ai.system_instructions`, and the harness may log prompt and response content. The preceding list still applies in every case. Evidence holds the full transcript and the final answer either way, under the agent launch's retention.

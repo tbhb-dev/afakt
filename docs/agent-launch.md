@@ -142,7 +142,7 @@ sequenceDiagram
 
 [Agent launch states](workload-lifecycle.md#Agent%20launch%20states).
 
-[Provider observations](workload-lifecycle.md#Workload%20provider%20observations). [Cancellation and limits](workload-lifecycle.md#Cancellation%20and%20limits).
+[Workload provider observations](workload-lifecycle.md#Workload%20provider%20observations). [Cancellation and limits](workload-lifecycle.md#Cancellation%20and%20limits).
 
 ## Reconciliation after restart or retry
 
@@ -155,7 +155,7 @@ Before provision, the agent launcher checks whether the agent launch exists. A f
 3. On any state, adopt the existing agent launch and continue from that state without provisioning again. `pending`, `launch-unknown`, and `running` mean wait. A terminal state means fetch the result.
 4. On `unavailable`, call status again after a delay. The agent launcher never reads `unavailable` as `not-found`, and it never provisions that agent launch on another workload host instead.
 
-A retried provider activity reconciles the same agent launch ID. Retrying the agent itself creates a new agent launch linked to its predecessor. If provision repeats despite these steps, the [identity rules](agent-launch-model.md#Agent%20launch%20identity) still return the existing agent launch, and the workload provider doesn't start a second agent.
+A retried workload provider activity reconciles the same agent launch ID. Retrying the agent itself creates a new agent launch linked to its predecessor. If provision repeats despite these steps, the [identity rules](agent-launch-model.md#Agent%20launch%20identity) still return the existing agent launch, and the workload provider doesn't start a second agent.
 
 When the worker on a workload host restarts, the supervisor keeps its virtual machine monitors and workload proxy mediators running. The agents keep running inside their VMs. Agent launch records persist on the workload host across the restart. After it starts again, the worker loads those records and observes each agent launch's agent again before it answers status. Each agent launcher on the host then goes on from its workflow history, and its next status call follows the preceding steps.
 

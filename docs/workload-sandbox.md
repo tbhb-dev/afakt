@@ -23,7 +23,7 @@ The VM provider is the workload provider used by default. It provisions, restore
 
 Each harness integration defines its launch settings. Profile tool grants and harness permissions still apply. For ACP agent launches, the relay answers permission requests from those grants. For interactive sessions, the writer answers them under the [session attachment rules](agent-acp.md#Requests%20from%20the%20agent).
 
-[Attachment and provider storage](agent-workspace-lifecycle.md#Attachment%20and%20provider%20storage).
+[Attachment and provider storage](agent-workspace-lifecycle.md#Attachment%20and%20workload%20provider%20storage).
 
 ## Enforcement
 
@@ -39,7 +39,7 @@ Each workload guest has its own guest kernel and disks. Linux uses a Kernel-base
 
 ### Runtime privileges
 
-The workload host worker uses a dedicated user. It never runs as root. Host-mode agents use a dedicated user separate from the worker, under [Workload host access](workload-overlay.md#Workload%20host%20access). Runtime privileges follow the selected [provider boundary](workload-provider-linux-host.md#Platforms%20and%20privileges). Privileged setup and platform capture services remain provider-specific. Container manager deployments use rootless Docker. afakt uses a systemd user unit on Linux and a launchd agent on macOS. Setup privileges and service survival after logout remain [open](agent-open-questions.md#Agent%20sandbox). Running each agent launch under its own User Identifier (UID), separate from the worker user, remains [open](agent-open-questions.md#%60OQ-SBX-18%60).
+The workload host worker uses a dedicated user. It never runs as root. Host-mode agents use a dedicated user separate from the worker, under [Workload host access](workload-overlay.md#Workload%20host%20access). Runtime privileges follow the selected [workload provider boundary](workload-provider-linux-host.md#Platforms%20and%20privileges). Privileged setup and platform capture services remain provider-specific. Container manager deployments use rootless Docker. afakt uses a systemd user unit on Linux and a launchd agent on macOS. Setup privileges and service survival after logout remain [open](agent-open-questions.md#Agent%20sandbox). Running each agent launch under its own User Identifier (UID), separate from the worker user, remains [open](agent-open-questions.md#%60OQ-SBX-18%60).
 
 ### Host process sandbox
 
@@ -47,7 +47,7 @@ afakt-agent is afakt's cross-harness runner. For locally controlled harness exec
 
 ### Guest layout and lifecycle control
 
-In a Linux guest, afakt's init runs as process ID (`PID`) 1, then the guest relay runs under its own user. Access to the relay carrier follows the selected [provider boundary](workload-provider-linux-vm.md#Mediator%20connection%20and%20name%20resolution). The general carrier choice remains [`OQ-SES-5`](agent-open-questions.md#%60OQ-SES-5%60). A separate agent user runs the ACP adapter and agent harness. Its writable paths are the permitted workspace, scratch, and cache paths under [Combining configurations](workload-sandbox.md#Combining%20configurations). No long-lived secrets enter guest storage. On macOS, the init integration remains [open](agent-open-questions.md#Agent%20sandbox).
+In a Linux guest, afakt's init runs as process ID (`PID`) 1, then the guest relay runs under its own user. Access to the relay carrier follows the selected [workload provider boundary](workload-provider-linux-vm.md#Mediator%20connection%20and%20name%20resolution). The general carrier choice remains [`OQ-SES-5`](agent-open-questions.md#%60OQ-SES-5%60). A separate agent user runs the ACP adapter and agent harness. Its writable paths are the permitted workspace, scratch, and cache paths under [Combining configurations](workload-sandbox.md#Combining%20configurations). No long-lived secrets enter guest storage. On macOS, the init integration remains [open](agent-open-questions.md#Agent%20sandbox).
 
 The guest relay handles the ACP session channel, the command-line interface (CLI) and MCP control channel from inside the agent, port discovery, and preview connections to guest loopback listeners. It advertises no ACP file system or terminal capabilities. [Agent session](agent-acp.md#Relay%20behavior) defines permission answers, buffering, and reconnect behavior.
 
