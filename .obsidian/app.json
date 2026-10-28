@@ -1,0 +1,22 @@
+{
+  "defaultViewMode": "preview",
+  "showInlineTitle": false,
+  "vimMode": true,
+  "userIgnoreFilters": [
+    "tmp/drafts/dev/",
+    "tmp/drafts/itsm/",
+    "tmp/drafts/paas/",
+    "tmp/drafts/work/",
+    "tmp/drafts/agents/",
+    "tmp/drafts/context/",
+    "apm_modules/",
+    "apps/",
+    "cmd/",
+    "internal/",
+    "scripts/",
+    "api/",
+    "vendor/",
+    "tmp/drafts/workflows/",
+    "tmp/drafts/clients/"
+  ]
+}
