@@ -45,7 +45,7 @@ workspace "afakt" "Architecture of the afakt modular monolith." {
                 hostNetwork = container "Host-level connectivity" "Host authorization for agent and cluster services; connection mechanism undecided; optional user tailnet attachment." "Host access role" "Topology"
             }
             group "Launch guest boundary" {
-                guest = container "Guest context" "Untrusted harness, relay and loopback listeners; no overlay membership or workload keys." "Provider confinement" "Topology"
+                guest = container "Guest context" "Untrusted harness, relay and loopback listeners; no overlay membership or workload keys." "Workload provider confinement" "Topology"
             }
             group "Launch mediation boundary" {
                 mediator = container "Workload proxy mediator" "Decides every inbound and outbound connection and stamps identity; never carries traffic." "Local policy enforcement" "Topology"
@@ -54,7 +54,7 @@ workspace "afakt" "Architecture of the afakt modular monolith." {
                 workload-proxy = container "Workload proxy" "Carries workload traffic in both directions; own overlay node and launch X.509-SVID; asks the mediator to decide each connection." "Network proxy" "Topology"
             }
             group "Destination launch guest boundary" {
-                destinationGuest = container "Destination guest" "Untrusted harness and published loopback listener; no overlay membership or workload keys." "Provider confinement" "Topology"
+                destinationGuest = container "Destination guest" "Untrusted harness and published loopback listener; no overlay membership or workload keys." "Workload provider confinement" "Topology"
             }
             group "Destination launch mediation boundary" {
                 destinationMediator = container "Destination mediator" "Checks the source grant and current destination launch before listener access; no independent network." "Local policy enforcement" "Topology"
@@ -255,7 +255,7 @@ workspace "afakt" "Architecture of the afakt modular monolith." {
         deploymentEnvironment "Topology launch" {
             launch_agentHostTrustBoundaryNode = deploymentNode "Workload host trust boundary" "Worker stays outside this data path; service users undecided." "Workload host" {
                 launch_agentLaunchBoundaryNode = deploymentNode "Agent launch boundary" "Launch-bound local carriers; private keys stay outside the guest." "Launch isolation" {
-                    launch_guestTrustBoundaryNode = deploymentNode "Guest trust boundary" "Guest has no overlay node or workload key." "Provider confinement" {
+                    launch_guestTrustBoundaryNode = deploymentNode "Guest trust boundary" "Guest has no overlay node or workload key." "Workload provider confinement" {
                         launch_guest = containerInstance guest
                     }
                     launch_mediationTrustBoundaryNode = deploymentNode "Mediation trust boundary" "Enforces connection and message policy; no independent network." "Local confinement; user undecided" {

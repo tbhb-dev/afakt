@@ -1,7 +1,7 @@
 ---
 type: Design
 title: Agent launch resource
-description: The AgentLaunch resource, the resource form of one agent launch, with its specification in spec and the provider's record in status, and a full example.
+description: The AgentLaunch resource, the resource form of one agent launch, with its specification in spec and the workload provider's record in status, and a full example.
 tags: [afakt, agents, agent-launch, resources]
 status: draft
 generated: { by: "codex:gpt-6", at: "2026-10-28T17:30:00Z" }

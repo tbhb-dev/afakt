@@ -44,7 +44,7 @@ The API server's reservation API matches placement requirements against the regi
 
 ## Image locality
 
-Workers report cached layer digests as advisory workload host metadata for [workspace images](agent-workspace-image.md#Placement%20and%20preheating). Placement can use known layer digests from a request as a preference. The provider resolves tags during workspace construction. Until that resolution, a tag alone can't supply fixed digests for locality, and placement leaves resolution to the provider.
+Workers report cached layer digests as advisory workload host metadata for [workspace images](agent-workspace-image.md#Placement%20and%20preheating). Placement can use known layer digests from a request as a preference. The workload provider resolves tags during workspace construction. Until that resolution, a tag alone can't supply fixed digests for locality, and placement leaves resolution to the provider.
 
 Locality applies only to hosts with free slots and live registration leases that meet all placement requirements. The reservation API preserves each agent launch's host binding. An `agent-launch` source requires the host holding that agent workspace. Every preference follows the slot capacity and reservation rules. An agent launch keeps its chosen host. The general choice among matching hosts remains open.
 
@@ -55,5 +55,5 @@ A stale cache report is an ordinary cache miss on the chosen host. After publica
 - A reservation belongs to one agent launch ID. A repeated request for that ID returns the existing reservation and never reserves a second slot.
 - Provision claims the reservation through the reservation API. The order of reservation claiming and recording the pending agent launch remains [`OQ-PLC-11`](agent-open-questions.md#%60OQ-PLC-11%60). A provision request that doesn't find a reservation, such as after the reservation expired, requests a slot on its own workload host. Without a free slot, the agent launch waits in `pending` until one frees.
 - If no provision request claims a reservation within a bounded time, the reservation expires and the slot returns to the pool.
-- When an agent launch enters a terminal state, the provider frees its slot through the reservation API. The reservation API also frees each slot that a lease renewal no longer reports, so a lost request to free a slot doesn't keep it in use.
+- When an agent launch enters a terminal state, the workload provider frees its slot through the reservation API. The reservation API also frees each slot that a lease renewal no longer reports, so a lost request to free a slot doesn't keep it in use.
 - The reservation API counts reserved and claimed slots together. It reserves a new slot only when doing so keeps their total at or below the host's most recently reported capacity, even when concurrent requests arrive. A lower capacity leaves existing reservations and claimed slots intact.

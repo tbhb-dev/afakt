@@ -13,7 +13,7 @@ A workload guest is the virtual machine (VM) of a [workload](workload.md) on a V
 
 ## Containment
 
-External traffic, including Domain Name System (DNS) queries, exits the guest only through its proxy. For DNS, the mediator resolves queries forwarded by the proxy without falling back to the host resolver. Containment holds against a guest compromised to root.
+External traffic, including Domain Name System (DNS) queries, exits the guest only through its proxy. For DNS, the mediator resolves queries forwarded by the proxy without falling back to the workload host resolver. Containment holds against a guest compromised to root.
 
 Each workload's link to its proxy is private to that workload and doesn't require encryption. Platforms may use different links. The [conditions each platform must meet](agent-open-questions.md#%60OQ-SBX-70%60) remain a working draft.
 

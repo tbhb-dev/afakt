@@ -21,19 +21,19 @@ STRIDE covers spoofing, tampering, repudiation, information disclosure, denial o
 
 ### Workload proxy mediator access
 
-The engine doesn't select a mandatory mediator path. Internal networks, host services, and runtime management expose distinct authority. The carrier and its isolation remain unresolved. See [Provider mediation](workload-provider-docker-desktop-windows.md#Mediator%20connection%20and%20name%20resolution).
+The engine doesn't select a mandatory mediator path. Internal networks, host services, and runtime management expose distinct authority. The carrier and its isolation remain unresolved. See [Workload provider mediation](workload-provider-docker-desktop-windows.md#Mediator%20connection%20and%20name%20resolution).
 
 ### Workspace, scratch, and caches
 
-[Provider storage](workload-provider-docker-desktop-windows.md#Workspace,%20scratch,%20and%20caches) distinguishes launch state, shared named tool caches, and verified image caches. Provider storage mappings, scratch cleanup, shared cache trust, and hostile host-side repository processing remain unresolved. [Provider materialization](workload-provider-docker-desktop-windows.md#Workspace%20image%20materialization) separates verified extraction from later workspace capture.
+[Workload provider storage](workload-provider-docker-desktop-windows.md#Workspace,%20scratch,%20and%20caches) distinguishes launch state, shared named tool caches, and verified image caches. Provider storage mappings, scratch cleanup, shared cache trust, and hostile host-side repository processing remain unresolved. [Provider materialization](workload-provider-docker-desktop-windows.md#Workspace%20image%20materialization) separates verified extraction from later workspace capture.
 
 ### Workload snapshots and agent checkpoints
 
-[Provider capture](workload-provider-docker-desktop-windows.md#Workload%20snapshots%20and%20agent%20checkpoints) defines the capture boundary and unresolved restore contract. This workload provider has no workload snapshot. A native harness checkpoint doesn't capture its shared kernel or engine.
+[Workload provider capture](workload-provider-docker-desktop-windows.md#Workload%20snapshots%20and%20agent%20checkpoints) defines the capture boundary and unresolved restore contract. This workload provider has no workload snapshot. A native harness checkpoint doesn't capture its shared kernel or engine.
 
 ### Host visibility and workspace commands
 
-Host custody and its limits follow [Provider observations](workload-provider-docker-desktop-windows.md#Host%20observations). Termination authority and unresolved descendant cleanup follow [Provider teardown](workload-provider-docker-desktop-windows.md#Cancellation%20and%20teardown). Same-user process separation and the host isolation baseline remain on hold under [`OQ-SBX-18`](agent-open-questions.md#%60OQ-SBX-18%60).
+Host custody and its limits follow [Workload provider observations](workload-provider-docker-desktop-windows.md#Host%20observations). Termination authority and unresolved descendant cleanup follow [Provider teardown](workload-provider-docker-desktop-windows.md#Cancellation%20and%20teardown). Same-user process separation and the isolation baseline for workload hosts remain on hold under [`OQ-SBX-18`](agent-open-questions.md#%60OQ-SBX-18%60).
 
 Commands started by `afakt agent exec` use standalone afakt-sandbox. [Provider startup](workload-provider-docker-desktop-windows.md#Process%20placement%20and%20startup) leaves command placement, inherited state, and launch authority under [`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60). An unsandboxed invocation remains under [`OQ-AGT-26`](agent-open-questions.md#%60OQ-AGT-26%60).
 
@@ -41,7 +41,7 @@ Commands started by `afakt agent exec` use standalone afakt-sandbox. [Provider s
 
 | Boundary ID | Boundary | Two sides | Enforcement in the design |
 | --- | --- | --- | --- |
-| `TB-DDW-1` | Agent harness and provider control | untrusted process tree / provider lifecycle and platform authority | [Enforcement](workload-sandbox.md#Enforcement) defines the isolation tier. [Host visibility and workspace commands](#Host%20visibility%20and%20workspace%20commands) identifies platform exposure and missing confinement. |
+| `TB-DDW-1` | Agent harness and workload provider control | untrusted process tree / provider lifecycle and platform authority | [Enforcement](workload-sandbox.md#Enforcement) defines the isolation tier. [Host visibility and workspace commands](#Host%20visibility%20and%20workspace%20commands) identifies platform exposure and missing confinement. |
 | `TB-DDW-2` | Local transport and workload proxy mediator | Launch network and control endpoints / mediator identity and policy | [Workload proxy mediator](workload-proxy-mediator.md#Launch%20boundary) Local endpoint binding remains [`OQ-SBX-13`](agent-open-questions.md#%60OQ-SBX-13%60). |
 | `TB-DDW-3` | Agent workspace and host processing | Launch-controlled files / worker capture, materialization, and cleanup | [Agent workspace capture](agent-workspace.md#Agent%20workspace%20capture) Host-side handling of repository metadata remains [`OQ-WSP-18`](agent-open-questions.md#%60OQ-WSP-18%60). |
 | `TB-DDW-4` | Shared named tool cache | One launch / cache content consumed by another launch | [Sandbox variables](workload-sandbox.md#Sandbox%20variables) Access, provenance, and capacity controls remain [`OQ-WSP-19`](agent-open-questions.md#%60OQ-WSP-19%60). |
@@ -58,7 +58,7 @@ Commands started by `afakt agent exec` use standalone afakt-sandbox. [Provider s
 | `E-DDW-1` | Command caller | Authenticated client. Shared service grants apply |
 | `E-DDW-2` | Another agent launch | Separate launch authority |
 | `P-DDW-1` | Agent harness and afakt-sandbox | Container |
-| `P-DDW-2` | Workload host worker and provider lifecycle | Workload host |
+| `P-DDW-2` | Workload host worker and workload provider lifecycle | Workload host |
 | `P-DDW-3` | Host workspace processor | Worker capture and cleanup |
 | `P-DDW-9` | Workload proxy | Outside guest confinement. Launch identity custody |
 | `P-DDW-4` | Workload proxy mediator | Outside launch confinement. Process separation unresolved |
@@ -72,7 +72,7 @@ Commands started by `afakt agent exec` use standalone afakt-sandbox. [Provider s
 | `DS-DDW-5` | Checkpoint capture | Retained state. Access controls unresolved |
 | `P-DDW-8` | Docker Desktop backend | Shared Linux VM and host integration |
 
-### Level one provider flows
+### Level one workload provider flows
 
 Arrows identify exchanges and their return paths. Unspecified carriers and placements remain gaps. The shared named tool cache is outside individual launch confinement and has a separate crossing from another launch. The verified image cache has a different trust relationship.
 
@@ -157,7 +157,7 @@ flowchart LR
 
 ## Workload proxy
 
-Each workload has one workload proxy mediator and one workload proxy. The proxy transmits traffic in both directions and requests a mediator decision for every connection. The mediator never transmits traffic. Direct overlay peers authenticate with SPIFFE mutual Transport Layer Security (TLS), and both workload mediators check the connection. Service users and provider integration remain undecided under [Launch boundary](workload-proxy.md#Launch%20boundary).
+Each workload has one workload proxy mediator and one workload proxy. The proxy transmits traffic in both directions and requests a mediator decision for every connection. The mediator never transmits traffic. Direct overlay peers authenticate with SPIFFE mutual Transport Layer Security (TLS), and both workload mediators check the connection. Service users and workload provider integration remain undecided under [Launch boundary](workload-proxy.md#Launch%20boundary).
 
 ```mermaid
 flowchart LR
@@ -170,7 +170,7 @@ flowchart LR
 
 ## STRIDE analysis
 
-Each table covers the six categories for its listed flows and every participating endpoint. Shared service checks are in the [common STRIDE analysis](workload-threat-model.md#STRIDE%20analysis). They don't establish provider isolation. A mitigation applies only to the stated attack.
+Each table covers the six categories for its listed flows and every participating endpoint. Shared service checks are in the [common STRIDE analysis](workload-threat-model.md#STRIDE%20analysis). They don't establish workload provider isolation. A mitigation applies only to the stated attack.
 
 ### Isolation and lifecycle
 
@@ -188,7 +188,7 @@ Each table covers the six categories for its listed flows and every participatin
 
 | Threat ID | Element | STRIDE category | Threat | Mitigation in the design | Status |
 | --- | --- | --- | --- | --- | --- |
-| `TM-DDW-25` | `F-DDW-2`, `F-DDW-3`, `F-DDW-4`, `P-DDW-1`, `P-DDW-5`, `P-DDW-4` | spoofing | A process selects another launch's mediator endpoint and receives its authority. | [Workload proxy mediator](workload-proxy-mediator.md#Launch%20boundary) Endpoint authentication remains unresolved. [Provider mediation](workload-provider-docker-desktop-windows.md#Mediator%20connection%20and%20name%20resolution). See [Per-launch services](workload-proxy.md#Launch%20boundary). | depends on an open question ([`OQ-SBX-13`](agent-open-questions.md#%60OQ-SBX-13%60)) |
+| `TM-DDW-25` | `F-DDW-2`, `F-DDW-3`, `F-DDW-4`, `P-DDW-1`, `P-DDW-5`, `P-DDW-4` | spoofing | A process selects another launch's mediator endpoint and receives its authority. | [Workload proxy mediator](workload-proxy-mediator.md#Launch%20boundary) Endpoint authentication remains unresolved. [Workload provider mediation](workload-provider-docker-desktop-windows.md#Mediator%20connection%20and%20name%20resolution). See [Per-launch services](workload-proxy.md#Launch%20boundary). | depends on an open question ([`OQ-SBX-13`](agent-open-questions.md#%60OQ-SBX-13%60)) |
 | `TM-DDW-26` | `F-DDW-2`, `F-DDW-3`, `F-DDW-4`, `P-DDW-1`, `P-DDW-5`, `P-DDW-4` | tampering | A process changes proxy settings or uses an interface that bypasses the workload proxy mediator. | [Workload proxy mediator](workload-proxy-mediator.md#Launch%20boundary) Network and control traffic needs a bound mediator path. Its provider-specific mechanism remains unspecified. [Provider mediation](workload-provider-docker-desktop-windows.md#Mediator%20connection%20and%20name%20resolution). See [Per-launch services](workload-proxy.md#Launch%20boundary). | gap ([`OQ-SBX-54`](agent-open-questions.md#%60OQ-SBX-54%60)) |
 | `TM-DDW-27` | `F-DDW-2`, `F-DDW-3`, `F-DDW-4`, `P-DDW-1`, `P-DDW-5`, `P-DDW-4` | repudiation | Unbound local traffic acquires another launch's attribution before shared logging. | [Control requests](workload-proxy-mediator.md#Control%20requests) Stamping identity requires a trustworthy local sender binding. [Provider mediation](workload-provider-docker-desktop-windows.md#Mediator%20connection%20and%20name%20resolution). See [Per-launch services](workload-proxy.md#Launch%20boundary). | depends on an open question ([`OQ-SBX-13`](agent-open-questions.md#%60OQ-SBX-13%60)) |
 | `TM-DDW-28` | `F-DDW-2`, `F-DDW-3`, `F-DDW-4`, `P-DDW-1`, `P-DDW-5`, `P-DDW-4` | information disclosure | A control carrier or network view exposes another launch's session or loopback listener. | [Loopback listeners](workload-ports.md#Loopback%20listeners) The design requires separate network views. The workload provider binding remains unresolved. [Provider mediation](workload-provider-docker-desktop-windows.md#Mediator%20connection%20and%20name%20resolution). See [Per-launch services](workload-proxy.md#Launch%20boundary). | gap ([`OQ-SBX-54`](agent-open-questions.md#%60OQ-SBX-54%60)) |
@@ -200,7 +200,7 @@ Each table covers the six categories for its listed flows and every participatin
 
 | Threat ID | Element | STRIDE category | Threat | Mitigation in the design | Status |
 | --- | --- | --- | --- | --- | --- |
-| `TM-DDW-19` | `F-DDW-5`, `F-DDW-6`, `F-DDW-7`, `F-DDW-8`, `P-DDW-1`, `DS-DDW-1`, `DS-DDW-2`, `P-DDW-3`, `DS-DDW-4` | spoofing | A same-user process substitutes a workspace owner or capture helper. | [Agent workspace capture](agent-workspace.md#Agent%20workspace%20capture) Ownership and helper rights depend on launch identity. [Provider startup](workload-provider-docker-desktop-windows.md#Process%20placement%20and%20startup). | depends on an open question ([`OQ-SBX-27`](agent-open-questions.md#%60OQ-SBX-27%60)) |
+| `TM-DDW-19` | `F-DDW-5`, `F-DDW-6`, `F-DDW-7`, `F-DDW-8`, `P-DDW-1`, `DS-DDW-1`, `DS-DDW-2`, `P-DDW-3`, `DS-DDW-4` | spoofing | A same-user process substitutes a workspace owner or capture helper. | [Agent workspace capture](agent-workspace.md#Agent%20workspace%20capture) Ownership and helper rights depend on launch identity. [Workload provider startup](workload-provider-docker-desktop-windows.md#Process%20placement%20and%20startup). | depends on an open question ([`OQ-SBX-27`](agent-open-questions.md#%60OQ-SBX-27%60)) |
 | `TM-DDW-32` | `F-DDW-5`, `F-DDW-6`, `F-DDW-7`, `F-DDW-8`, `P-DDW-1`, `DS-DDW-1`, `DS-DDW-2`, `P-DDW-3`, `DS-DDW-4` | tampering | Hostile workspace metadata redirects workload host capture or cleanup outside the selected workspace. | [Agent workspace capture](agent-workspace.md#Agent%20workspace%20capture) Content capture supplies no safe metadata interpretation contract. [Provider storage](workload-provider-docker-desktop-windows.md#Workspace,%20scratch,%20and%20caches). | gap ([`OQ-WSP-18`](agent-open-questions.md#%60OQ-WSP-18%60)) |
 | `TM-DDW-33` | `F-DDW-5`, `F-DDW-6`, `F-DDW-7`, `F-DDW-8`, `P-DDW-1`, `DS-DDW-1`, `DS-DDW-2`, `P-DDW-3`, `DS-DDW-4` | repudiation | A workspace or scratch writer denies changes made through a shared local identity. | [Provider observations](workload-lifecycle.md#Workload%20provider%20observations) Host compromise has no independent evidence mechanism. [Provider observations](workload-provider-docker-desktop-windows.md#Host%20observations). | gap ([`OQ-SBX-37`](agent-open-questions.md#%60OQ-SBX-37%60)) |
 | `TM-DDW-22` | `F-DDW-5`, `F-DDW-6`, `F-DDW-7`, `F-DDW-8`, `P-DDW-1`, `DS-DDW-1`, `DS-DDW-2`, `P-DDW-3`, `DS-DDW-4` | information disclosure | Capture, scratch reuse, or path aliasing exposes another launch's files. | [Agent workspace capture](agent-workspace.md#Agent%20workspace%20capture) Capture rights and storage placement remain unresolved. [Provider storage](workload-provider-docker-desktop-windows.md#Workspace,%20scratch,%20and%20caches). | gap ([`OQ-WSP-20`](agent-open-questions.md#%60OQ-WSP-20%60)) |
@@ -213,7 +213,7 @@ Cache sharing has no stated authorization, provenance, capacity, or invalidation
 
 | Threat ID | Element | STRIDE category | Threat | Mitigation in the design | Status |
 | --- | --- | --- | --- | --- | --- |
-| `TM-DDW-127` | `F-DDW-9`, `F-DDW-10`, `P-DDW-1`, `DS-DDW-3`, `E-DDW-2` | spoofing | One launch places cache entries that another mistakes for trusted tool output. | [Sandbox variables](workload-sandbox.md#Sandbox%20variables). Unspecified. [Provider storage](workload-provider-docker-desktop-windows.md#Workspace,%20scratch,%20and%20caches). | gap ([`OQ-WSP-19`](agent-open-questions.md#%60OQ-WSP-19%60)) |
+| `TM-DDW-127` | `F-DDW-9`, `F-DDW-10`, `P-DDW-1`, `DS-DDW-3`, `E-DDW-2` | spoofing | One launch places cache entries that another mistakes for trusted tool output. | [Sandbox variables](workload-sandbox.md#Sandbox%20variables). Unspecified. [Workload provider storage](workload-provider-docker-desktop-windows.md#Workspace,%20scratch,%20and%20caches). | gap ([`OQ-WSP-19`](agent-open-questions.md#%60OQ-WSP-19%60)) |
 | `TM-DDW-128` | `F-DDW-9`, `F-DDW-10`, `P-DDW-1`, `DS-DDW-3`, `E-DDW-2` | tampering | A launch changes shared cache content consumed by another launch. | [Sandbox variables](workload-sandbox.md#Sandbox%20variables). Unspecified. [Provider storage](workload-provider-docker-desktop-windows.md#Workspace,%20scratch,%20and%20caches). | gap ([`OQ-WSP-19`](agent-open-questions.md#%60OQ-WSP-19%60)) |
 | `TM-DDW-129` | `F-DDW-9`, `F-DDW-10`, `P-DDW-1`, `DS-DDW-3`, `E-DDW-2` | repudiation | A cache writer denies modifying content because cache provenance has no stated record. | [Sandbox variables](workload-sandbox.md#Sandbox%20variables). Unspecified. [Provider storage](workload-provider-docker-desktop-windows.md#Workspace,%20scratch,%20and%20caches). | gap ([`OQ-WSP-19`](agent-open-questions.md#%60OQ-WSP-19%60)) |
 | `TM-DDW-130` | `F-DDW-9`, `F-DDW-10`, `P-DDW-1`, `DS-DDW-3`, `E-DDW-2` | information disclosure | A launch reads private data another launch left in a shared tool cache. | [Sandbox variables](workload-sandbox.md#Sandbox%20variables). Unspecified. [Provider storage](workload-provider-docker-desktop-windows.md#Workspace,%20scratch,%20and%20caches). | gap ([`OQ-WSP-19`](agent-open-questions.md#%60OQ-WSP-19%60)) |
@@ -237,18 +237,18 @@ This workload provider has no workload snapshot. Checkpoint capture, workspace b
 
 | Threat ID | Element | STRIDE category | Threat | Mitigation in the design | Status |
 | --- | --- | --- | --- | --- | --- |
-| `TM-DDW-40` | `F-DDW-13`, `F-DDW-14`, `F-DDW-15`, `E-DDW-1`, `P-DDW-7`, `DS-DDW-1`, `P-DDW-4` | spoofing | A workspace command uses the authority of a different agent launch. | [Host process sandbox](workload-sandbox.md#Host%20process%20sandbox) Standalone command confinement doesn't specify launch identity binding. [Provider startup](workload-provider-docker-desktop-windows.md#Process%20placement%20and%20startup). See [Per-launch services](workload-proxy.md#Launch%20boundary). | gap ([`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60)) |
+| `TM-DDW-40` | `F-DDW-13`, `F-DDW-14`, `F-DDW-15`, `E-DDW-1`, `P-DDW-7`, `DS-DDW-1`, `P-DDW-4` | spoofing | A workspace command uses the authority of a different agent launch. | [Host process sandbox](workload-sandbox.md#Host%20process%20sandbox) Standalone command confinement doesn't specify launch identity binding. [Workload provider startup](workload-provider-docker-desktop-windows.md#Process%20placement%20and%20startup). See [Per-launch services](workload-proxy.md#Launch%20boundary). | gap ([`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60)) |
 | `TM-DDW-41` | `F-DDW-13`, `F-DDW-14`, `F-DDW-15`, `E-DDW-1`, `P-DDW-7`, `DS-DDW-1`, `P-DDW-4` | tampering | A command races capture or changes files outside the selected workspace through a stale path. | [Agent workspace capture](agent-workspace.md#Agent%20workspace%20capture) Command placement and capture ordering remain unresolved. [Provider startup](workload-provider-docker-desktop-windows.md#Process%20placement%20and%20startup). See [Per-launch services](workload-proxy.md#Launch%20boundary). | gap ([`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60)) |
 | `TM-DDW-42` | `F-DDW-13`, `F-DDW-14`, `F-DDW-15`, `E-DDW-1`, `P-DDW-7`, `DS-DDW-1`, `P-DDW-4` | repudiation | A command runs without a record binding its caller, launch, and confinement settings. | [What telemetry never records](agent-observability.md#What%20telemetry%20never%20records) Command attribution and lifecycle records remain unspecified. [Provider observations](workload-provider-docker-desktop-windows.md#Host%20observations). See [Per-launch services](workload-proxy.md#Launch%20boundary). | gap ([`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60)) |
 | `TM-DDW-43` | `F-DDW-13`, `F-DDW-14`, `F-DDW-15`, `E-DDW-1`, `P-DDW-7`, `DS-DDW-1`, `P-DDW-4` | information disclosure | A command inherits another launch's environment, session data, or readable workspace paths. | [Host process sandbox](workload-sandbox.md#Host%20process%20sandbox) Execution identity, inherited state, and path ownership remain unresolved. [Provider startup](workload-provider-docker-desktop-windows.md#Process%20placement%20and%20startup). See [Per-launch services](workload-proxy.md#Launch%20boundary). | gap ([`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60)) |
 | `TM-DDW-44` | `F-DDW-13`, `F-DDW-14`, `F-DDW-15`, `E-DDW-1`, `P-DDW-7`, `DS-DDW-1`, `P-DDW-4` | denial of service | A command continues running after cancellation or blocks workspace capture and teardown. | [Cancellation and limits](workload-lifecycle.md#Cancellation%20and%20limits) Independent command lifetime and cancellation remain unspecified. [Provider teardown](workload-provider-docker-desktop-windows.md#Cancellation%20and%20teardown). See [Per-launch services](workload-proxy.md#Launch%20boundary). | gap ([`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60)) |
-| `TM-DDW-45` | `F-DDW-13`, `F-DDW-14`, `F-DDW-15`, `E-DDW-1`, `P-DDW-7`, `DS-DDW-1`, `P-DDW-4` | elevation of privilege | A command starts outside the selected provider confinement or obtains a relaxation without review. | [Host process sandbox](workload-sandbox.md#Host%20process%20sandbox) afakt-sandbox confines standalone commands. Authority for an unsandboxed invocation remains unresolved. [Provider startup](workload-provider-docker-desktop-windows.md#Process%20placement%20and%20startup). See [Per-launch services](workload-proxy.md#Launch%20boundary). | depends on an open question ([`OQ-AGT-26`](agent-open-questions.md#%60OQ-AGT-26%60)) |
+| `TM-DDW-45` | `F-DDW-13`, `F-DDW-14`, `F-DDW-15`, `E-DDW-1`, `P-DDW-7`, `DS-DDW-1`, `P-DDW-4` | elevation of privilege | A command starts outside the selected workload provider confinement or obtains a relaxation without review. | [Host process sandbox](workload-sandbox.md#Host%20process%20sandbox) afakt-sandbox confines standalone commands. Authority for an unsandboxed invocation remains unresolved. [Provider startup](workload-provider-docker-desktop-windows.md#Process%20placement%20and%20startup). See [Per-launch services](workload-proxy.md#Launch%20boundary). | depends on an open question ([`OQ-AGT-26`](agent-open-questions.md#%60OQ-AGT-26%60)) |
 
 ### Desktop virtual machine and host integration
 
 | Threat ID | Element | STRIDE category | Threat | Mitigation in the design | Status |
 | --- | --- | --- | --- | --- | --- |
-| `TM-DDW-50` | `F-DDW-17`, `P-DDW-8`, `P-DDW-2` | spoofing | A container substitutes a backend management peer or daemon endpoint. | [Sandbox modes](workload-sandbox.md#Sandbox%20modes). Backend restrictions remain unspecified. [Provider isolation](workload-provider-docker-desktop-windows.md#Isolation%20boundary). | gap ([`OQ-SBX-56`](agent-open-questions.md#%60OQ-SBX-56%60)) |
+| `TM-DDW-50` | `F-DDW-17`, `P-DDW-8`, `P-DDW-2` | spoofing | A container substitutes a backend management peer or daemon endpoint. | [Sandbox modes](workload-sandbox.md#Sandbox%20modes). Backend restrictions remain unspecified. [Workload provider isolation](workload-provider-docker-desktop-windows.md#Isolation%20boundary). | gap ([`OQ-SBX-56`](agent-open-questions.md#%60OQ-SBX-56%60)) |
 | `TM-DDW-51` | `F-DDW-17`, `P-DDW-8`, `P-DDW-2` | tampering | A compromised backend changes host-shared files or desktop management state. | [Sandbox modes](workload-sandbox.md#Sandbox%20modes). Backend restrictions remain unspecified. [Provider isolation](workload-provider-docker-desktop-windows.md#Isolation%20boundary). | gap ([`OQ-SBX-56`](agent-open-questions.md#%60OQ-SBX-56%60)) |
 | `TM-DDW-52` | `F-DDW-17`, `P-DDW-8`, `P-DDW-2` | repudiation | Backend activity loses launch attribution across shared desktop services. | [Sandbox modes](workload-sandbox.md#Sandbox%20modes). Backend restrictions remain unspecified. [Provider isolation](workload-provider-docker-desktop-windows.md#Isolation%20boundary). | gap ([`OQ-SBX-56`](agent-open-questions.md#%60OQ-SBX-56%60)) |
 | `TM-DDW-53` | `F-DDW-17`, `P-DDW-8`, `P-DDW-2` | information disclosure | A backend or host file share reveals another launch's workspace or session. | [Sandbox modes](workload-sandbox.md#Sandbox%20modes). Backend restrictions remain unspecified. [Provider isolation](workload-provider-docker-desktop-windows.md#Isolation%20boundary). | gap ([`OQ-SBX-56`](agent-open-questions.md#%60OQ-SBX-56%60)) |
@@ -310,7 +310,7 @@ flowchart TD
     choice --> leaf3["TM-DDW-30: Use a privileged control handle"]
 ```
 
-- Cheapest path and blocking controls. Use a network path whose proxy routing is unspecified. [`OQ-SBX-54`](agent-open-questions.md#%60OQ-SBX-54%60) covers missing provider routing. [`OQ-SBX-13`](agent-open-questions.md#%60OQ-SBX-13%60) covers sender binding. The [common egress tree](workload-threat-model.md#Send%20traffic%20past%20egress%20policy) covers permitted name queries, passthrough, and relay proxy use.
+- Cheapest path and blocking controls. Use a network path whose proxy routing is unspecified. [`OQ-SBX-54`](agent-open-questions.md#%60OQ-SBX-54%60) covers missing workload provider routing. [`OQ-SBX-13`](agent-open-questions.md#%60OQ-SBX-13%60) covers sender binding. The [common egress tree](workload-threat-model.md#Send%20traffic%20past%20egress%20policy) covers permitted name queries, passthrough, and relay proxy use.
 
 ### Persist hostile state across agent launches
 
@@ -382,7 +382,7 @@ Host isolation remains on hold. The [common residual risks](workload-threat-mode
 - `TM-DDW-42`. A command runs without a record binding its caller, launch, and confinement settings. gap ([`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60)).
 - `TM-DDW-43`. A command inherits another launch's environment, session data, or readable workspace paths. gap ([`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60)).
 - `TM-DDW-44`. A command continues running after cancellation or blocks workspace capture and teardown. gap ([`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60)).
-- `TM-DDW-45`. A command starts outside the selected provider confinement or obtains a relaxation without review. depends on an open question ([`OQ-AGT-26`](agent-open-questions.md#%60OQ-AGT-26%60)).
+- `TM-DDW-45`. A command starts outside the selected workload provider confinement or obtains a relaxation without review. depends on an open question ([`OQ-AGT-26`](agent-open-questions.md#%60OQ-AGT-26%60)).
 
 ### Desktop virtual machine and host integration
 

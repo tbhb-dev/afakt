@@ -13,21 +13,21 @@ generated: { by: "codex:gpt-6", at: "2026-10-28T17:30:00Z" }
 
 ## Scope
 
-The Modal Sandboxes provider follows its [provider design](workload-provider-modal.md).
+The Modal Sandboxes workload provider follows its [provider design](workload-provider-modal.md).
 
-Vendor lifecycle authority, sandbox isolation, workspace and session storage, network paths, and retained state fall within this model, as do commands requested through `afakt agent exec`. The [common workload threat model](workload-threat-model.md) covers shared control plane authorization, credential exchange, session access, registries, and audit storage because their controls don't depend on this vendor.
+Vendor lifecycle authority, remote sandbox isolation, workspace and session storage, network paths, and retained state fall within this model, as do commands requested through `afakt agent exec`. The [common workload threat model](workload-threat-model.md) covers shared control plane authorization, credential exchange, session access, registries, and audit storage because their controls don't depend on this vendor.
 
 STRIDE covers spoofing, tampering, repudiation, information disclosure, denial of service, and elevation of privilege. A virtual machine (VM) can supply a private kernel. Domain Name System (DNS) queries and Agent Client Protocol (ACP) sessions require the launch's workload proxy mediator. Model Context Protocol (MCP) tools require afakt gateway authorization. An Application Programming Interface (API) exposes vendor management operations. Hypertext Transfer Protocol Secure (HTTPS) encrypts web traffic, while Hypertext Transfer Protocol (HTTP) names the underlying request protocol.
 
-[Platforms and privileges](workload-provider-modal.md#Platforms%20and%20privileges) and [Isolation boundary](workload-provider-modal.md#Isolation%20boundary) define the known runtime boundary and missing privilege contract. [Process placement and startup](workload-provider-modal.md#Process%20placement%20and%20startup) distinguishes harness placement from tool execution. [Mediator connection and name resolution](workload-provider-modal.md#Mediator%20connection%20and%20name%20resolution) leaves mandatory remote mediation unresolved. [Cancellation and teardown](workload-provider-modal.md#Cancellation%20and%20teardown) requires observed termination. Vendor idle state alone is insufficient. Adversaries include malicious sandbox code and hostile repository files. Another agent launch or a limited management caller can also attack. A compromised vendor service or administrator also threatens the launch. Vendor custody forms a separate trust boundary without an accepted residual risk for disclosure. Containment after an attacker compromises the runtime needs independent controls. The host isolation baseline remains on hold under [`OQ-SBX-18`](agent-open-questions.md#%60OQ-SBX-18%60).
+[Platforms and privileges](workload-provider-modal.md#Platforms%20and%20privileges) and [Isolation boundary](workload-provider-modal.md#Isolation%20boundary) define the known runtime boundary and missing privilege contract. [Process placement and startup](workload-provider-modal.md#Process%20placement%20and%20startup) distinguishes harness placement from tool execution. [Mediator connection and name resolution](workload-provider-modal.md#Mediator%20connection%20and%20name%20resolution) leaves mandatory remote mediation unresolved. [Cancellation and teardown](workload-provider-modal.md#Cancellation%20and%20teardown) requires observed termination. Vendor idle state alone is insufficient. Adversaries include malicious remote sandbox code and hostile repository files. Another agent launch or a limited management caller can also attack. A compromised vendor service or administrator also threatens the launch. Vendor custody forms a separate trust boundary without an accepted residual risk for disclosure. Containment after an attacker compromises the runtime needs independent controls. The isolation baseline for workload hosts remains on hold under [`OQ-SBX-18`](agent-open-questions.md#%60OQ-SBX-18%60).
 
 ## Trust boundaries
 
 | Boundary ID | Boundary | Two sides | Enforcement in the design |
 | --- | --- | --- | --- |
 | `TB-MOD-1` | Vendor custody | afakt authority / vendor management, runtime, storage, and administrators | [Host observations](workload-provider-modal.md#Host%20observations). Independent vendor evidence and custody controls remain [`OQ-SBX-64`](agent-open-questions.md#%60OQ-SBX-64%60). |
-| `TB-MOD-2` | Sandbox runtime | untrusted execution / vendor kernel, runtime, and management | [Isolation boundary](workload-provider-modal.md#Isolation%20boundary). Containment after runtime compromise remains [`OQ-SBX-65`](agent-open-questions.md#%60OQ-SBX-65%60). |
-| `TB-MOD-3` | Remote mediation | Sandbox and vendor network paths / launch policy and authenticated afakt services | [Mediator connection and name resolution](workload-provider-modal.md#Mediator%20connection%20and%20name%20resolution). Carrier and bypass prevention remain [`OQ-SBX-36`](agent-open-questions.md#%60OQ-SBX-36%60). |
+| `TB-MOD-2` | Remote sandbox runtime | untrusted execution / vendor kernel, runtime, and management | [Isolation boundary](workload-provider-modal.md#Isolation%20boundary). Containment after runtime compromise remains [`OQ-SBX-65`](agent-open-questions.md#%60OQ-SBX-65%60). |
+| `TB-MOD-3` | Remote mediation | Remote sandbox and vendor network paths / launch policy and authenticated afakt services | [Mediator connection and name resolution](workload-provider-modal.md#Mediator%20connection%20and%20name%20resolution). Carrier and bypass prevention remain [`OQ-SBX-36`](agent-open-questions.md#%60OQ-SBX-36%60). |
 | `TB-MOD-4` | Workspace processing | Launch-controlled files / privileged transfer, materialization, and capture | [Workspace, scratch, and caches](workload-provider-modal.md#Workspace,%20scratch,%20and%20caches). Storage mapping and hostile metadata remain [`OQ-WSP-20`](agent-open-questions.md#%60OQ-WSP-20%60), [`OQ-WSP-18`](agent-open-questions.md#%60OQ-WSP-18%60). |
 | `TB-MOD-5` | Shared named cache | One launch / state consumed by another launch | [Workspace, scratch, and caches](workload-provider-modal.md#Workspace,%20scratch,%20and%20caches). Cache access and provenance remain [`OQ-WSP-19`](agent-open-questions.md#%60OQ-WSP-19%60). |
 | `TB-MOD-6` | Retained state | Current launch / captured content and successor authority | [Workload snapshots and agent checkpoints](workload-provider-modal.md#Workload%20snapshots%20and%20agent%20checkpoints). Pairing and authorization remain [`OQ-AGT-3`](agent-open-questions.md#%60OQ-AGT-3%60), [`OQ-AGT-31`](agent-open-questions.md#%60OQ-AGT-31%60). |
@@ -45,19 +45,19 @@ STRIDE covers spoofing, tampering, repudiation, information disclosure, denial o
 | `E-MOD-4` | External destination | Outside afakt and the launch |
 | `P-MOD-1` | Workload host worker and workspace processor | afakt management. Remote storage mapping unresolved |
 | `P-MOD-2` | Vendor management and runtime services | Vendor custody outside untrusted execution |
-| `P-MOD-3` | Sandbox execution | Vendor sandbox. afakt-agent, afakt-sandbox, and harness. Compatibility unresolved |
+| `P-MOD-3` | Remote sandbox execution | Remote sandbox. afakt-agent, afakt-sandbox, and harness. Compatibility unresolved |
 | `P-MOD-4` | Workload proxy mediator | Required per launch. Remote placement unresolved |
-| `P-MOD-5` | Workload proxy | Required outside sandbox. Remote placement unresolved |
+| `P-MOD-5` | Workload proxy | Required outside remote sandbox. Remote placement unresolved |
 | `P-MOD-6` | Overlay peers | Workload peers and control plane services. Shared models apply |
 | `P-MOD-7` | Successor launch | New launch authority |
 | `P-MOD-8` | Workspace command | afakt-sandbox placement unresolved |
 | `DS-MOD-1` | Workspace and scratch | Launch data. Remote backing and separation unresolved |
-| `DS-MOD-2` | Shared named tool cache | Cross-launch sharing. Provider mapping unresolved |
+| `DS-MOD-2` | Shared named tool cache | Cross-launch sharing. Workload provider mapping unresolved |
 | `DS-MOD-3` | Verified image cache | Outside launch-writable storage. Remote mapping unresolved |
 | `DS-MOD-4` | Retained workspace and session state | Vendor copies or afakt captures. Paired capture unresolved |
 | `DS-MOD-5` | Vendor-held credentials and observations | Vendor custody. Access and retention unresolved |
 
-### Level one provider flows
+### Level one workload provider flows
 
 Arrows show requests and responses, with dashed arrows marking afakt exchanges that need a provider carrier or placement decision. Vendor network paths remain visible because they can bypass that intended path. Shared caches and retained state have separate boundaries because neither belongs implicitly to one launch. Physical placement for the mediator and workload proxy remains undecided.
 
@@ -67,8 +67,8 @@ flowchart LR
         P-MOD-2["P-MOD-2: Vendor management and runtime"]
         E-MOD-3["E-MOD-3: Vendor administrator"]
         DS-MOD-5["DS-MOD-5: Vendor credentials and observations"]
-        subgraph execution["TB-MOD-2 / sandbox execution"]
-            P-MOD-3["P-MOD-3: Untrusted sandbox execution"]
+        subgraph execution["TB-MOD-2 / remote sandbox execution"]
+            P-MOD-3["P-MOD-3: Untrusted remote sandbox execution"]
         end
     end
     subgraph afakt["TB-MOD-1 / afakt authority"]
@@ -131,7 +131,7 @@ flowchart LR
 ```
 
 - **`F-MOD-1`.** Creation, configuration, status, and stop operations, including managed session control where present. Crosses `TB-MOD-1`.
-- **`F-MOD-2`.** Execution requests, process control, and observed outcomes across the sandbox boundary. Crosses `TB-MOD-2`.
+- **`F-MOD-2`.** Execution requests, process control, and observed outcomes across the remote sandbox boundary. Crosses `TB-MOD-2`.
 - **`F-MOD-3`.** untrusted runtime input, system calls, and execution output presented to vendor services. Crosses `TB-MOD-2`.
 - **`F-MOD-4`.** Required launch-bound network, name queries, control, ACP, MCP, and preview traffic. Crosses `TB-MOD-1`, `TB-MOD-3`.
 - **`F-MOD-5`.** Permitted requests passed from the no-network mediator to its workload proxy. Crosses `TB-MOD-3`.
@@ -154,7 +154,7 @@ flowchart LR
 
 ## STRIDE analysis
 
-Each table covers the six categories for its listed flows and endpoints. A mitigation of ordinary cross-sandbox access doesn't mitigate an exploit of the runtime itself. No vendor mechanism substitutes for an unresolved afakt integration.
+Each table covers the six categories for its listed flows and endpoints. A mitigation of ordinary access between remote sandboxes doesn't mitigate an exploit of the runtime itself. No vendor mechanism substitutes for an unresolved afakt integration.
 
 ### Remote lifecycle and harness control
 
@@ -163,22 +163,22 @@ Modal exposes remote lifecycle and command operations. afakt still needs launch 
 | Threat ID | Element | STRIDE category | Threat | Mitigation in the design | Status |
 | --- | --- | --- | --- | --- | --- |
 | `TM-MOD-1` | `F-MOD-1`, `F-MOD-2`, `P-MOD-1`, `P-MOD-2`, `P-MOD-3` | spoofing | A management caller selects another launch through a reused vendor object identifier. | Vendor object binding to the current launch remains undecided under [Process placement and startup](workload-provider-modal.md#Process%20placement%20and%20startup). | depends on an open question ([`OQ-SBX-52`](agent-open-questions.md#%60OQ-SBX-52%60)) |
-| `TM-MOD-2` | `F-MOD-1`, `F-MOD-2`, `P-MOD-1`, `P-MOD-2`, `P-MOD-3` | tampering | A live network-policy update or reused sandbox name breaks the configuration bound to the launch. | Enforcement of the pinned configuration across vendor changes remains undecided under [Process placement and startup](workload-provider-modal.md#Process%20placement%20and%20startup). | depends on an open question ([`OQ-SBX-65`](agent-open-questions.md#%60OQ-SBX-65%60)) |
+| `TM-MOD-2` | `F-MOD-1`, `F-MOD-2`, `P-MOD-1`, `P-MOD-2`, `P-MOD-3` | tampering | A live network-policy update or reused remote sandbox name breaks the configuration bound to the launch. | Enforcement of the pinned configuration across vendor changes remains undecided under [Process placement and startup](workload-provider-modal.md#Process%20placement%20and%20startup). | depends on an open question ([`OQ-SBX-65`](agent-open-questions.md#%60OQ-SBX-65%60)) |
 | `TM-MOD-3` | `F-MOD-1`, `F-MOD-2`, `P-MOD-1`, `P-MOD-2`, `P-MOD-3` | repudiation | A vendor service supplies a false startup, cancellation, or completion history. | Independent verification of vendor lifecycle observations has no stated mechanism under [Process placement and startup](workload-provider-modal.md#Process%20placement%20and%20startup). | gap ([`OQ-SBX-64`](agent-open-questions.md#%60OQ-SBX-64%60)) |
 | `TM-MOD-4` | `F-MOD-1`, `F-MOD-2`, `P-MOD-1`, `P-MOD-2`, `P-MOD-3` | information disclosure | A broad provider credential exposes another launch’s prompts, files, or session records. | The scope of management credentials across launch data remains unspecified under [Process placement and startup](workload-provider-modal.md#Process%20placement%20and%20startup). | gap ([`OQ-SBX-64`](agent-open-questions.md#%60OQ-SBX-64%60)) |
-| `TM-MOD-5` | `F-MOD-1`, `F-MOD-2`, `P-MOD-1`, `P-MOD-2`, `P-MOD-3` | denial of service | Account limits or unavailable remote capacity prevent startup or reconciliation. | Account capacity and provider availability need placement rules under [Platform dependencies](workload-provider-modal.md#Platform%20dependencies). | depends on an open question ([`OQ-PLC-7`](agent-open-questions.md#%60OQ-PLC-7%60)) |
-| `TM-MOD-6` | `F-MOD-1`, `F-MOD-2`, `P-MOD-1`, `P-MOD-2`, `P-MOD-3` | elevation of privilege | afakt assumes a disconnected client or failed readiness check means the sandbox and its commands have stopped. | Remote stop evidence and safe replacement ordering remain undecided under [Cancellation and teardown](workload-provider-modal.md#Cancellation%20and%20teardown). | depends on an open question ([`OQ-SBX-66`](agent-open-questions.md#%60OQ-SBX-66%60)) |
+| `TM-MOD-5` | `F-MOD-1`, `F-MOD-2`, `P-MOD-1`, `P-MOD-2`, `P-MOD-3` | denial of service | Account limits or unavailable remote capacity prevent startup or reconciliation. | Account capacity and workload provider availability need placement rules under [Platform dependencies](workload-provider-modal.md#Platform%20dependencies). | depends on an open question ([`OQ-PLC-7`](agent-open-questions.md#%60OQ-PLC-7%60)) |
+| `TM-MOD-6` | `F-MOD-1`, `F-MOD-2`, `P-MOD-1`, `P-MOD-2`, `P-MOD-3` | elevation of privilege | afakt assumes a disconnected client or failed readiness check means the remote sandbox and its commands have stopped. | Remote stop evidence and safe replacement ordering remain undecided under [Cancellation and teardown](workload-provider-modal.md#Cancellation%20and%20teardown). | depends on an open question ([`OQ-SBX-66`](agent-open-questions.md#%60OQ-SBX-66%60)) |
 
-### Sandbox runtime and vendor host
+### Remote sandbox runtime and vendor host
 
-gVisor and the private-kernel VM runtime separate sandboxes. Direct access to another sandbox without shared mounts or management authority fails. Post-exploit containment isn't stated. See [Isolation boundary](workload-provider-modal.md#Isolation%20boundary).
+gVisor and the private-kernel VM runtime separate remote sandboxes. Direct access to another remote sandbox without shared mounts or management authority fails. Post-exploit containment isn't stated. See [Isolation boundary](workload-provider-modal.md#Isolation%20boundary).
 
 | Threat ID | Element | STRIDE category | Threat | Mitigation in the design | Status |
 | --- | --- | --- | --- | --- | --- |
-| `TM-MOD-7` | `F-MOD-3`, `P-MOD-2`, `P-MOD-3` | spoofing | A sandbox process obtains Modal management authority through an exposed credential or sidecar interface. | Authentication of runtime management callers has no stated afakt mapping under [Isolation boundary](workload-provider-modal.md#Isolation%20boundary). | gap ([`OQ-SBX-65`](agent-open-questions.md#%60OQ-SBX-65%60)) |
-| `TM-MOD-8` | `F-MOD-3`, `P-MOD-2`, `P-MOD-3` | tampering | A process directly changes files in a separate sandbox without shared storage or management authority. | [Isolation boundary](workload-provider-modal.md#Isolation%20boundary) states separate sandbox filesystems under the vendor runtime boundary. This threat excludes shared mounts, management authority, and runtime exploits. | mitigated by the design |
+| `TM-MOD-7` | `F-MOD-3`, `P-MOD-2`, `P-MOD-3` | spoofing | A remote sandbox process obtains Modal management authority through an exposed credential or sidecar interface. | Authentication of runtime management callers has no stated afakt mapping under [Isolation boundary](workload-provider-modal.md#Isolation%20boundary). | gap ([`OQ-SBX-65`](agent-open-questions.md#%60OQ-SBX-65%60)) |
+| `TM-MOD-8` | `F-MOD-3`, `P-MOD-2`, `P-MOD-3` | tampering | A process directly changes files in a separate remote sandbox without shared storage or management authority. | [Isolation boundary](workload-provider-modal.md#Isolation%20boundary) states separate remote sandbox filesystems under the vendor runtime boundary. This threat excludes shared mounts, management authority, and runtime exploits. | mitigated by the design |
 | `TM-MOD-9` | `F-MOD-3`, `P-MOD-2`, `P-MOD-3` | repudiation | A runtime compromise suppresses evidence of activity on the vendor host. | The vendor boundary supplies no independent evidence after runtime compromise under [Isolation boundary](workload-provider-modal.md#Isolation%20boundary). | gap ([`OQ-SBX-64`](agent-open-questions.md#%60OQ-SBX-64%60)) |
-| `TM-MOD-10` | `F-MOD-3`, `P-MOD-2`, `P-MOD-3` | information disclosure | A runtime exploit exposes another sandbox’s memory or private workspace. | Containment of a runtime exploit can't rely on the compromised runtime under [Isolation boundary](workload-provider-modal.md#Isolation%20boundary). | gap ([`OQ-SBX-65`](agent-open-questions.md#%60OQ-SBX-65%60)) |
+| `TM-MOD-10` | `F-MOD-3`, `P-MOD-2`, `P-MOD-3` | information disclosure | A runtime exploit exposes another remote sandbox’s memory or private workspace. | Containment of a runtime exploit can't rely on the compromised runtime under [Isolation boundary](workload-provider-modal.md#Isolation%20boundary). | gap ([`OQ-SBX-65`](agent-open-questions.md#%60OQ-SBX-65%60)) |
 | `TM-MOD-11` | `F-MOD-3`, `P-MOD-2`, `P-MOD-3` | denial of service | A launch consumes shared runtime resources needed by other launches. | Resource limits need an account and runtime allocation policy under [Platform dependencies](workload-provider-modal.md#Platform%20dependencies). | depends on an open question ([`OQ-PLC-7`](agent-open-questions.md#%60OQ-PLC-7%60)) |
 | `TM-MOD-12` | `F-MOD-3`, `P-MOD-2`, `P-MOD-3` | elevation of privilege | Hostile system calls escape gVisor, or hostile guest input exploits the VM host after runtime selection. | Containment after an escape into the vendor host remains unspecified under [Isolation boundary](workload-provider-modal.md#Isolation%20boundary). | gap ([`OQ-SBX-65`](agent-open-questions.md#%60OQ-SBX-65%60)) |
 
@@ -188,8 +188,8 @@ DNS exceptions, sidecar bridge access, and secret-injection incompatibilities le
 
 | Threat ID | Element | STRIDE category | Threat | Mitigation in the design | Status |
 | --- | --- | --- | --- | --- | --- |
-| `TM-MOD-13` | `F-MOD-4`, `F-MOD-5`, `F-MOD-6`, `F-MOD-7`, `F-MOD-20`, `P-MOD-2`, `P-MOD-3`, `P-MOD-4`, `P-MOD-5`, `P-MOD-6`, `E-MOD-4` | spoofing | A vendor-side endpoint attributes traffic to another afakt launch. | Provider identity assertions need a binding to the current afakt launch under [Mediator connection and name resolution](workload-provider-modal.md#Mediator%20connection%20and%20name%20resolution). | depends on an open question ([`OQ-SBX-52`](agent-open-questions.md#%60OQ-SBX-52%60)) |
-| `TM-MOD-14` | `F-MOD-4`, `F-MOD-5`, `F-MOD-6`, `F-MOD-7`, `F-MOD-20`, `P-MOD-2`, `P-MOD-3`, `P-MOD-4`, `P-MOD-5`, `P-MOD-6`, `E-MOD-4` | tampering | A sidecar’s open egress or bridge connectivity bypasses restrictions on the main sandbox. | The required exclusive mediator route has no selected provider mechanism under [Mediator connection and name resolution](workload-provider-modal.md#Mediator%20connection%20and%20name%20resolution). | gap ([`OQ-SBX-36`](agent-open-questions.md#%60OQ-SBX-36%60)) |
+| `TM-MOD-13` | `F-MOD-4`, `F-MOD-5`, `F-MOD-6`, `F-MOD-7`, `F-MOD-20`, `P-MOD-2`, `P-MOD-3`, `P-MOD-4`, `P-MOD-5`, `P-MOD-6`, `E-MOD-4` | spoofing | A vendor-side endpoint attributes traffic to another afakt launch. | Workload provider identity assertions need a binding to the current afakt launch under [Mediator connection and name resolution](workload-provider-modal.md#Mediator%20connection%20and%20name%20resolution). | depends on an open question ([`OQ-SBX-52`](agent-open-questions.md#%60OQ-SBX-52%60)) |
+| `TM-MOD-14` | `F-MOD-4`, `F-MOD-5`, `F-MOD-6`, `F-MOD-7`, `F-MOD-20`, `P-MOD-2`, `P-MOD-3`, `P-MOD-4`, `P-MOD-5`, `P-MOD-6`, `E-MOD-4` | tampering | A sidecar’s open egress or bridge connectivity bypasses restrictions on the main remote sandbox. | The required exclusive mediator route has no selected workload provider mechanism under [Mediator connection and name resolution](workload-provider-modal.md#Mediator%20connection%20and%20name%20resolution). | gap ([`OQ-SBX-36`](agent-open-questions.md#%60OQ-SBX-36%60)) |
 | `TM-MOD-15` | `F-MOD-4`, `F-MOD-5`, `F-MOD-6`, `F-MOD-7`, `F-MOD-20`, `P-MOD-2`, `P-MOD-3`, `P-MOD-4`, `P-MOD-5`, `P-MOD-6`, `E-MOD-4` | repudiation | A vendor omits traffic on its network path from afakt’s decision history. | Independent accounting for vendor-side network actions remains unspecified under [Mediator connection and name resolution](workload-provider-modal.md#Mediator%20connection%20and%20name%20resolution). | gap ([`OQ-SBX-64`](agent-open-questions.md#%60OQ-SBX-64%60)) |
 | `TM-MOD-16` | `F-MOD-4`, `F-MOD-5`, `F-MOD-6`, `F-MOD-7`, `F-MOD-20`, `P-MOD-2`, `P-MOD-3`, `P-MOD-4`, `P-MOD-5`, `P-MOD-6`, `E-MOD-4` | information disclosure | Unrestricted DNS or domain fronting sends workspace data past a domain allowlist and afakt inspection. | Name queries and vendor egress lack a selected afakt inspection path under [Mediator connection and name resolution](workload-provider-modal.md#Mediator%20connection%20and%20name%20resolution). | gap ([`OQ-SBX-36`](agent-open-questions.md#%60OQ-SBX-36%60)) |
 | `TM-MOD-17` | `F-MOD-4`, `F-MOD-5`, `F-MOD-6`, `F-MOD-7`, `F-MOD-20`, `P-MOD-2`, `P-MOD-3`, `P-MOD-4`, `P-MOD-5`, `P-MOD-6`, `E-MOD-4` | denial of service | Blocked or stalled remote transport prevents control, session, or preview progress. | Control transport and its progress bounds need a provider mapping under [Mediator connection and name resolution](workload-provider-modal.md#Mediator%20connection%20and%20name%20resolution). | depends on an open question ([`OQ-SBX-36`](agent-open-questions.md#%60OQ-SBX-36%60)) |
@@ -205,8 +205,8 @@ Filesystem operations and shared mounts don't select afakt workspace ownership, 
 | `TM-MOD-20` | `F-MOD-8`, `F-MOD-9`, `F-MOD-10`, `P-MOD-1`, `P-MOD-3`, `DS-MOD-1`, `DS-MOD-3` | tampering | Hostile repository metadata changes how remote capture or extraction processes files. | Confinement of hostile metadata processing remains undecided under [Workspace image materialization](workload-provider-modal.md#Workspace%20image%20materialization). | depends on an open question ([`OQ-WSP-18`](agent-open-questions.md#%60OQ-WSP-18%60)) |
 | `TM-MOD-21` | `F-MOD-8`, `F-MOD-9`, `F-MOD-10`, `P-MOD-1`, `P-MOD-3`, `DS-MOD-1`, `DS-MOD-3` | repudiation | A vendor changes file content without independently attributable evidence. | Attribution of vendor file changes lacks independent evidence under [Workspace, scratch, and caches](workload-provider-modal.md#Workspace,%20scratch,%20and%20caches). | gap ([`OQ-SBX-64`](agent-open-questions.md#%60OQ-SBX-64%60)) |
 | `TM-MOD-22` | `F-MOD-8`, `F-MOD-9`, `F-MOD-10`, `P-MOD-1`, `P-MOD-3`, `DS-MOD-1`, `DS-MOD-3` | information disclosure | A shared Volume or CloudBucketMount exposes another launch’s files through an overly broad mount. | Storage reuse and deletion need a launch-specific ownership mapping under [Workspace, scratch, and caches](workload-provider-modal.md#Workspace,%20scratch,%20and%20caches). | depends on an open question ([`OQ-WSP-20`](agent-open-questions.md#%60OQ-WSP-20%60)) |
-| `TM-MOD-23` | `F-MOD-8`, `F-MOD-9`, `F-MOD-10`, `P-MOD-1`, `P-MOD-3`, `DS-MOD-1`, `DS-MOD-3` | denial of service | Workspace transfer or scratch growth exhausts storage before cleanup completes. | Workspace and scratch limits need a provider allocation and cleanup contract under [Workspace, scratch, and caches](workload-provider-modal.md#Workspace,%20scratch,%20and%20caches). | depends on an open question ([`OQ-WSP-20`](agent-open-questions.md#%60OQ-WSP-20%60)) |
-| `TM-MOD-24` | `F-MOD-8`, `F-MOD-9`, `F-MOD-10`, `P-MOD-1`, `P-MOD-3`, `DS-MOD-1`, `DS-MOD-3` | elevation of privilege | Hostile workspace metadata executes with vendor capture or materialization authority outside the sandbox. | The transfer and capture path lacks selected process confinement under [Workspace image materialization](workload-provider-modal.md#Workspace%20image%20materialization). | depends on an open question ([`OQ-WSP-18`](agent-open-questions.md#%60OQ-WSP-18%60)) |
+| `TM-MOD-23` | `F-MOD-8`, `F-MOD-9`, `F-MOD-10`, `P-MOD-1`, `P-MOD-3`, `DS-MOD-1`, `DS-MOD-3` | denial of service | Workspace transfer or scratch growth exhausts storage before cleanup completes. | Workspace and scratch limits need a workload provider allocation and cleanup contract under [Workspace, scratch, and caches](workload-provider-modal.md#Workspace,%20scratch,%20and%20caches). | depends on an open question ([`OQ-WSP-20`](agent-open-questions.md#%60OQ-WSP-20%60)) |
+| `TM-MOD-24` | `F-MOD-8`, `F-MOD-9`, `F-MOD-10`, `P-MOD-1`, `P-MOD-3`, `DS-MOD-1`, `DS-MOD-3` | elevation of privilege | Hostile workspace metadata executes with vendor capture or materialization authority outside the remote sandbox. | The transfer and capture path lacks selected process confinement under [Workspace image materialization](workload-provider-modal.md#Workspace%20image%20materialization). | depends on an open question ([`OQ-WSP-18`](agent-open-questions.md#%60OQ-WSP-18%60)) |
 
 ### Shared named tool caches
 
@@ -215,7 +215,7 @@ Shared mounts can supply cache backing but don't establish cache authorization, 
 | Threat ID | Element | STRIDE category | Threat | Mitigation in the design | Status |
 | --- | --- | --- | --- | --- | --- |
 | `TM-MOD-25` | `F-MOD-11`, `F-MOD-12`, `P-MOD-3`, `E-MOD-2`, `DS-MOD-2` | spoofing | A cache writer presents another launch’s cache namespace as its own. | Cache namespace authorization remains undecided under [Workspace, scratch, and caches](workload-provider-modal.md#Workspace,%20scratch,%20and%20caches). | depends on an open question ([`OQ-WSP-19`](agent-open-questions.md#%60OQ-WSP-19%60)) |
-| `TM-MOD-26` | `F-MOD-11`, `F-MOD-12`, `P-MOD-3`, `E-MOD-2`, `DS-MOD-2` | tampering | A launch writes a shared mounted cache that another sandbox later reloads as executable dependencies. | Writer trust and dependency integrity need a cache policy under [Workspace, scratch, and caches](workload-provider-modal.md#Workspace,%20scratch,%20and%20caches). | depends on an open question ([`OQ-WSP-19`](agent-open-questions.md#%60OQ-WSP-19%60)) |
+| `TM-MOD-26` | `F-MOD-11`, `F-MOD-12`, `P-MOD-3`, `E-MOD-2`, `DS-MOD-2` | tampering | A launch writes a shared mounted cache that another remote sandbox later reloads as executable dependencies. | Writer trust and dependency integrity need a cache policy under [Workspace, scratch, and caches](workload-provider-modal.md#Workspace,%20scratch,%20and%20caches). | depends on an open question ([`OQ-WSP-19`](agent-open-questions.md#%60OQ-WSP-19%60)) |
 | `TM-MOD-27` | `F-MOD-11`, `F-MOD-12`, `P-MOD-3`, `E-MOD-2`, `DS-MOD-2` | repudiation | A shared cache changes without a record identifying its writer. | Attribution of shared cache writes remains undecided under [Workspace, scratch, and caches](workload-provider-modal.md#Workspace,%20scratch,%20and%20caches). | depends on an open question ([`OQ-WSP-19`](agent-open-questions.md#%60OQ-WSP-19%60)) |
 | `TM-MOD-28` | `F-MOD-11`, `F-MOD-12`, `P-MOD-3`, `E-MOD-2`, `DS-MOD-2` | information disclosure | A shared cache exposes private dependency or build content to another launch. | Shared cache readership needs a confidentiality policy under [Workspace, scratch, and caches](workload-provider-modal.md#Workspace,%20scratch,%20and%20caches). | depends on an open question ([`OQ-WSP-19`](agent-open-questions.md#%60OQ-WSP-19%60)) |
 | `TM-MOD-29` | `F-MOD-11`, `F-MOD-12`, `P-MOD-3`, `E-MOD-2`, `DS-MOD-2` | denial of service | A launch fills a shared cache and prevents other launches from making progress. | Cache capacity and invalidation need allocation rules under [Workspace, scratch, and caches](workload-provider-modal.md#Workspace,%20scratch,%20and%20caches). | depends on an open question ([`OQ-WSP-19`](agent-open-questions.md#%60OQ-WSP-19%60)) |
@@ -240,7 +240,7 @@ Modal command execution doesn't itself confine an afakt agent exec command or bi
 
 | Threat ID | Element | STRIDE category | Threat | Mitigation in the design | Status |
 | --- | --- | --- | --- | --- | --- |
-| `TM-MOD-37` | `F-MOD-15`, `F-MOD-16`, `F-MOD-17`, `E-MOD-1`, `P-MOD-8`, `DS-MOD-1`, `P-MOD-4` | spoofing | A command request attaches to the wrong launch or recycled sandbox identifier. | Workspace command placement and target identity remain undecided under [Process placement and startup](workload-provider-modal.md#Process%20placement%20and%20startup). | depends on an open question ([`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60)) |
+| `TM-MOD-37` | `F-MOD-15`, `F-MOD-16`, `F-MOD-17`, `E-MOD-1`, `P-MOD-8`, `DS-MOD-1`, `P-MOD-4` | spoofing | A command request attaches to the wrong launch or recycled remote sandbox identifier. | Workspace command placement and target identity remain undecided under [Process placement and startup](workload-provider-modal.md#Process%20placement%20and%20startup). | depends on an open question ([`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60)) |
 | `TM-MOD-38` | `F-MOD-15`, `F-MOD-16`, `F-MOD-17`, `E-MOD-1`, `P-MOD-8`, `DS-MOD-1`, `P-MOD-4` | tampering | A workspace command races a checkpoint or changes the harness’s active files. | Command ordering relative to capture remains undecided under [Process placement and startup](workload-provider-modal.md#Process%20placement%20and%20startup). | depends on an open question ([`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60)) |
 | `TM-MOD-39` | `F-MOD-15`, `F-MOD-16`, `F-MOD-17`, `E-MOD-1`, `P-MOD-8`, `DS-MOD-1`, `P-MOD-4` | repudiation | A command result lacks binding to the requester, launch, and executed process. | Command evidence needs requester and process attribution under [Process placement and startup](workload-provider-modal.md#Process%20placement%20and%20startup). | depends on an open question ([`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60)) |
 | `TM-MOD-40` | `F-MOD-15`, `F-MOD-16`, `F-MOD-17`, `E-MOD-1`, `P-MOD-8`, `DS-MOD-1`, `P-MOD-4` | information disclosure | A command inherits provider credentials or another session’s environment. | Inherited command state and credential exclusions remain undecided under [Process placement and startup](workload-provider-modal.md#Process%20placement%20and%20startup). | depends on an open question ([`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60)) |
@@ -274,7 +274,7 @@ flowchart TD
     processing --> b1["TM-MOD-24: Reach privileged vendor file processing"]
 ```
 
-Runtime input already available to malicious sandbox code is the path requiring the least extra authority. The cited controls supply no containment after a runtime exploit. Reaching a privileged vendor file processor also requires that the unresolved transfer or capture path accept the hostile content.
+Runtime input already available to malicious remote sandbox code is the path requiring the least extra authority. The cited controls supply no containment after a runtime exploit. Reaching a privileged vendor file processor also requires that the unresolved transfer or capture path accept the hostile content.
 
 ### Read or change another agent launch’s workspace or session
 
@@ -287,7 +287,7 @@ flowchart TD
     alternatives --> a3["TM-MOD-31: Select another retained capture"]
 ```
 
-A shared environment, mount, cache, or broad object handle needs fewer capabilities than a runtime escape. Launch-specific storage and authorization mappings remain unresolved. Separate sandbox filesystems only block direct file access when there is no shared storage or management authority.
+A shared environment, mount, cache, or broad object handle needs fewer capabilities than a runtime escape. Launch-specific storage and authorization mappings remain unresolved. Separate remote sandbox filesystems only block direct file access when there is no shared storage or management authority.
 
 ### Send traffic past egress policy
 
@@ -299,7 +299,7 @@ flowchart TD
     alternatives --> a2["TM-MOD-18: Use vendor tool or proxy authority"]
 ```
 
-A malicious sandbox process can use a documented vendor network or tool path directly. Mandatory afakt mediation remains unresolved because destination allowlists leave the required carrier and request policy unspecified.
+A malicious remote sandbox process can use a documented vendor network or tool path directly. Mandatory afakt mediation remains unresolved because destination allowlists leave the required carrier and request policy unspecified.
 
 ### Disclose workspace or credentials through the vendor
 
@@ -316,29 +316,29 @@ A privileged vendor service already has custody of submitted data. The cited con
 
 ## Residual risks and gaps
 
-Provider-specific gaps don't settle the on-hold choices for hook protection, repository project configuration, profile self-grants and credential domains, host isolation, or session-end wait and identity lifetime. See [`OQ-HOOK-16`](agent-open-questions.md#%60OQ-HOOK-16%60), [`OQ-HOOK-17`](agent-open-questions.md#%60OQ-HOOK-17%60), [`OQ-PRF-5`](agent-open-questions.md#%60OQ-PRF-5%60), [`OQ-SBX-2`](agent-open-questions.md#%60OQ-SBX-2%60), [`OQ-SBX-18`](agent-open-questions.md#%60OQ-SBX-18%60), and [`OQ-HOOK-18`](agent-open-questions.md#%60OQ-HOOK-18%60).
+Workload provider-specific gaps don't settle the on-hold choices for hook protection, repository project configuration, profile self-grants and credential domains, host isolation, or session-end wait and identity lifetime. See [`OQ-HOOK-16`](agent-open-questions.md#%60OQ-HOOK-16%60), [`OQ-HOOK-17`](agent-open-questions.md#%60OQ-HOOK-17%60), [`OQ-PRF-5`](agent-open-questions.md#%60OQ-PRF-5%60), [`OQ-SBX-2`](agent-open-questions.md#%60OQ-SBX-2%60), [`OQ-SBX-18`](agent-open-questions.md#%60OQ-SBX-18%60), and [`OQ-HOOK-18`](agent-open-questions.md#%60OQ-HOOK-18%60).
 
 ### Remote lifecycle and harness control
 
 - `TM-MOD-1`. A management caller selects another launch through a reused vendor object identifier. depends on an open question ([`OQ-SBX-52`](agent-open-questions.md#%60OQ-SBX-52%60)).
-- `TM-MOD-2`. A live network-policy update or reused sandbox name breaks the configuration bound to the launch. depends on an open question ([`OQ-SBX-65`](agent-open-questions.md#%60OQ-SBX-65%60)).
+- `TM-MOD-2`. A live network-policy update or reused remote sandbox name breaks the configuration bound to the launch. depends on an open question ([`OQ-SBX-65`](agent-open-questions.md#%60OQ-SBX-65%60)).
 - `TM-MOD-3`. A vendor service supplies a false startup, cancellation, or completion history. gap ([`OQ-SBX-64`](agent-open-questions.md#%60OQ-SBX-64%60)).
 - `TM-MOD-4`. A broad provider credential exposes another launch’s prompts, files, or session records. gap ([`OQ-SBX-64`](agent-open-questions.md#%60OQ-SBX-64%60)).
 - `TM-MOD-5`. Account limits or unavailable remote capacity prevent startup or reconciliation. depends on an open question ([`OQ-PLC-7`](agent-open-questions.md#%60OQ-PLC-7%60)).
-- `TM-MOD-6`. afakt assumes a disconnected client or failed readiness check means the sandbox and its commands have stopped. depends on an open question ([`OQ-SBX-66`](agent-open-questions.md#%60OQ-SBX-66%60)).
+- `TM-MOD-6`. afakt assumes a disconnected client or failed readiness check means the remote sandbox and its commands have stopped. depends on an open question ([`OQ-SBX-66`](agent-open-questions.md#%60OQ-SBX-66%60)).
 
-### Sandbox runtime and vendor host
+### Remote sandbox runtime and vendor host
 
-- `TM-MOD-7`. A sandbox process obtains Modal management authority through an exposed credential or sidecar interface. gap ([`OQ-SBX-65`](agent-open-questions.md#%60OQ-SBX-65%60)).
+- `TM-MOD-7`. A remote sandbox process obtains Modal management authority through an exposed credential or sidecar interface. gap ([`OQ-SBX-65`](agent-open-questions.md#%60OQ-SBX-65%60)).
 - `TM-MOD-9`. A runtime compromise suppresses evidence of activity on the vendor host. gap ([`OQ-SBX-64`](agent-open-questions.md#%60OQ-SBX-64%60)).
-- `TM-MOD-10`. A runtime exploit exposes another sandbox’s memory or private workspace. gap ([`OQ-SBX-65`](agent-open-questions.md#%60OQ-SBX-65%60)).
+- `TM-MOD-10`. A runtime exploit exposes another remote sandbox’s memory or private workspace. gap ([`OQ-SBX-65`](agent-open-questions.md#%60OQ-SBX-65%60)).
 - `TM-MOD-11`. A launch consumes shared runtime resources needed by other launches. depends on an open question ([`OQ-PLC-7`](agent-open-questions.md#%60OQ-PLC-7%60)).
 - `TM-MOD-12`. Hostile system calls escape gVisor, or hostile guest input exploits the VM host after runtime selection. gap ([`OQ-SBX-65`](agent-open-questions.md#%60OQ-SBX-65%60)).
 
 ### Workload proxy mediator and vendor network paths
 
 - `TM-MOD-13`. A vendor-side endpoint attributes traffic to another afakt launch. depends on an open question ([`OQ-SBX-52`](agent-open-questions.md#%60OQ-SBX-52%60)).
-- `TM-MOD-14`. A sidecar’s open egress or bridge connectivity bypasses restrictions on the main sandbox. gap ([`OQ-SBX-36`](agent-open-questions.md#%60OQ-SBX-36%60)).
+- `TM-MOD-14`. A sidecar’s open egress or bridge connectivity bypasses restrictions on the main remote sandbox. gap ([`OQ-SBX-36`](agent-open-questions.md#%60OQ-SBX-36%60)).
 - `TM-MOD-15`. A vendor omits traffic on its network path from afakt’s decision history. gap ([`OQ-SBX-64`](agent-open-questions.md#%60OQ-SBX-64%60)).
 - `TM-MOD-16`. Unrestricted DNS or domain fronting sends workspace data past a domain allowlist and afakt inspection. gap ([`OQ-SBX-36`](agent-open-questions.md#%60OQ-SBX-36%60)).
 - `TM-MOD-17`. Blocked or stalled remote transport prevents control, session, or preview progress. depends on an open question ([`OQ-SBX-36`](agent-open-questions.md#%60OQ-SBX-36%60)).
@@ -351,12 +351,12 @@ Provider-specific gaps don't settle the on-hold choices for hook protection, rep
 - `TM-MOD-21`. A vendor changes file content without independently attributable evidence. gap ([`OQ-SBX-64`](agent-open-questions.md#%60OQ-SBX-64%60)).
 - `TM-MOD-22`. A shared Volume or CloudBucketMount exposes another launch’s files through an overly broad mount. depends on an open question ([`OQ-WSP-20`](agent-open-questions.md#%60OQ-WSP-20%60)).
 - `TM-MOD-23`. Workspace transfer or scratch growth exhausts storage before cleanup completes. depends on an open question ([`OQ-WSP-20`](agent-open-questions.md#%60OQ-WSP-20%60)).
-- `TM-MOD-24`. Hostile workspace metadata executes with vendor capture or materialization authority outside the sandbox. depends on an open question ([`OQ-WSP-18`](agent-open-questions.md#%60OQ-WSP-18%60)).
+- `TM-MOD-24`. Hostile workspace metadata executes with vendor capture or materialization authority outside the remote sandbox. depends on an open question ([`OQ-WSP-18`](agent-open-questions.md#%60OQ-WSP-18%60)).
 
 ### Shared named tool caches
 
 - `TM-MOD-25`. A cache writer presents another launch’s cache namespace as its own. depends on an open question ([`OQ-WSP-19`](agent-open-questions.md#%60OQ-WSP-19%60)).
-- `TM-MOD-26`. A launch writes a shared mounted cache that another sandbox later reloads as executable dependencies. depends on an open question ([`OQ-WSP-19`](agent-open-questions.md#%60OQ-WSP-19%60)).
+- `TM-MOD-26`. A launch writes a shared mounted cache that another remote sandbox later reloads as executable dependencies. depends on an open question ([`OQ-WSP-19`](agent-open-questions.md#%60OQ-WSP-19%60)).
 - `TM-MOD-27`. A shared cache changes without a record identifying its writer. depends on an open question ([`OQ-WSP-19`](agent-open-questions.md#%60OQ-WSP-19%60)).
 - `TM-MOD-28`. A shared cache exposes private dependency or build content to another launch. depends on an open question ([`OQ-WSP-19`](agent-open-questions.md#%60OQ-WSP-19%60)).
 - `TM-MOD-29`. A launch fills a shared cache and prevents other launches from making progress. depends on an open question ([`OQ-WSP-19`](agent-open-questions.md#%60OQ-WSP-19%60)).
@@ -373,7 +373,7 @@ Provider-specific gaps don't settle the on-hold choices for hook protection, rep
 
 ### Workspace command execution
 
-- `TM-MOD-37`. A command request attaches to the wrong launch or recycled sandbox identifier. depends on an open question ([`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60)).
+- `TM-MOD-37`. A command request attaches to the wrong launch or recycled remote sandbox identifier. depends on an open question ([`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60)).
 - `TM-MOD-38`. A workspace command races a checkpoint or changes the harness’s active files. depends on an open question ([`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60)).
 - `TM-MOD-39`. A command result lacks binding to the requester, launch, and executed process. depends on an open question ([`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60)).
 - `TM-MOD-40`. A command inherits provider credentials or another session’s environment. depends on an open question ([`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60)).

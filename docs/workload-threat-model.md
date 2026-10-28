@@ -13,7 +13,7 @@ Workload identity uses the provisional lifetimes and half-life renewal in [Certi
 
 ## Scope
 
-The threat model covers agent launches, the shared services handling their traffic, identity, credentials, sessions, and workspace images, including the Model Context Protocol (MCP) gateway, because each can change an agent launch's authority or expose its data. STRIDE names six threat categories: spoofing, tampering, repudiation, information disclosure, denial of service, and elevation of privilege. Provider isolation, local transport, workspace storage, and capture mechanisms have separate threat models below.
+The threat model covers agent launches, the shared services handling their traffic, identity, credentials, sessions, and workspace images, including the Model Context Protocol (MCP) gateway, because each can change an agent launch's authority or expose its data. STRIDE names six threat categories: spoofing, tampering, repudiation, information disclosure, denial of service, and elevation of privilege. Workload provider isolation, local transport, workspace storage, and capture mechanisms have separate threat models below.
 
 The Application Programming Interface (API), command-line interface (CLI), Agent Client Protocol (ACP), Hypertext Transfer Protocol (HTTP), Transport Layer Security (TLS), Domain Name System (DNS), and SPIFFE Verifiable Identity Document (SVID) names apply throughout. SPIFFE means Secure Production Identity Framework for Everyone. Open Container Initiative (OCI) images contain workspace content. Transmission Control Protocol (TCP) carries connection streams. Standard input and output are the stdio transport for local MCP servers.
 
@@ -37,7 +37,7 @@ In-tree providers include [macOS VM](workload-provider-macos-vm.md), [Linux VM](
 | Decision log and audit records                           | Workload proxy mediator, workload proxy, credential broker, and MCP gateway. Storage custody remains open | [Network policy](workload-proxy-mediator.md#Network%20policy) and [Audit and telemetry](agent-mcp-gateway.md#Audit%20and%20telemetry)                |
 | afakt API authority and immutable agent launch specs     | API server and agent dispatcher workflow                                                               | [Agent launch authentication](workload-proxy.md#Agent%20launch%20authentication)                                                            |
 | Shared lifecycle authority and host capacity             | Workload host worker and reservation API                                                                  | [Virtual machine lifecycle](workload-lifecycle.md#Virtual%20machine%20lifecycle) and [Slot reservations](workload-placement.md#Slot%20reservations) |
-| Port publication routes and viewer grants                | Ingress gateway, preview server, mediator, and provider endpoint                                       | [Port discovery and records](workload-ports.md#Port%20discovery%20and%20records)                                                              |
+| Port publication routes and viewer grants                | Ingress gateway, preview server, mediator, and workload provider endpoint                                       | [Port discovery and records](workload-ports.md#Port%20discovery%20and%20records)                                                              |
 | Profile content, hooks, and retained provenance          | Profile source and agent launch record                                                                 | [Pinning a profile version](agent-profile.md#Pinning%20a%20profile%20version)                                                              |
 
 ## Adversaries
@@ -60,7 +60,7 @@ A compromised workload host or workload proxy starts beyond the trust the design
 
 ## Trust boundaries
 
-A trust boundary separates principals with different authority. Service authorization assumes a correctly bound provider endpoint. It doesn't prove local isolation.
+A trust boundary separates principals with different authority. Service authorization assumes a correctly bound workload provider endpoint. It doesn't prove local isolation.
 
 | Boundary ID | Boundary | Two sides | Enforcement in the design |
 | --- | --- | --- | --- |
@@ -93,7 +93,7 @@ A data flow diagram shows processes, stores, external entities, and their exchan
 | `E-5` | Remote agent sandbox | Remote platform |
 | `E-6` | Remote MCP server | External service |
 | `E-7` | Operator credential client | Client |
-| `E-8` | Agent launch endpoint | Provider-specific confinement and local transport |
+| `E-8` | Agent launch endpoint | Workload provider-specific confinement and local transport |
 | `E-10` | Workspace MCP server endpoint | Provider-specific confinement |
 | `E-11` | Public tunnel service | External service |
 | `P-1` | Agent execution system | Context grouping |
@@ -239,7 +239,7 @@ flowchart LR
     P-33 -->|"F-25"| DS-6
 ```
 
-- **`F-14`.** untrusted name queries, destinations, and app bytes after provider transport. Crosses `TB-12`.
+- **`F-14`.** untrusted name queries, destinations, and app bytes after workload provider transport. Crosses `TB-12`.
 - **`F-15`.** Upstream name queries and answers. Crosses `TB-6`.
 - **`F-16`.** Inspected requests and responses over TLS after mediator admission and any credential injection at the workload proxy. Crosses `TB-6`.
 - **`F-20`.** Permitted passthrough streams without decryption. Crosses `TB-6`.
@@ -298,7 +298,7 @@ flowchart LR
 - **`F-29`.** Session traffic through the workload proxy. Connection ownership and routing remain [`OQ-SES-17`](agent-open-questions.md#%60OQ-SES-17%60). Crosses `TB-3`.
 - **`F-30`.** Remote-control and session attachment through the API endpoint. The accepting component and workload path remain [`OQ-SES-17`](agent-open-questions.md#%60OQ-SES-17%60).
 - **`F-31`.** Preview server dials the workload proxy directly over the overlay with mutual SPIFFE authentication. Published-port binding remains [`OQ-PORT-14`](agent-open-questions.md#%60OQ-PORT-14%60). Crosses `TB-3`.
-- **`F-32`.** Policy-checked session and control messages over provider transport. Crosses `TB-12`.
+- **`F-32`.** Policy-checked session and control messages over workload provider transport. Crosses `TB-12`.
 - **`F-35`.** Session messages and replay cursors. Crosses `TB-8`.
 - **`F-71`.** Current publication and launch identity for each forwarding stream. No separate boundary.
 - **`F-72`.** Authorized bytes to a workload provider-bound loopback listener. Crosses `TB-12`.
@@ -388,7 +388,7 @@ flowchart LR
 
 ### Workspace images and registries
 
-Workspace image builds run their commands within the selected provider. Registry and object-store authorization apply to every workload provider. Local workspace layout, shared named tool caches, workload snapshots, and agent checkpoints use the provider-specific paths.
+Workspace image builds run their commands within the selected workload provider. Registry and object-store authorization apply to every workload provider. Local workspace layout, shared named tool caches, workload snapshots, and agent checkpoints use the provider-specific paths.
 
 ```mermaid
 flowchart LR
@@ -416,7 +416,7 @@ flowchart LR
 
 ### MCP gateway calls
 
-Model Context Protocol requests use the workload proxy over the overlay. Workspace server streams use the workload proxy under mediator decisions. Their connection path remains [`OQ-SES-17`](agent-open-questions.md#%60OQ-SES-17%60). Replies travel on the same paths. Provider-specific relay access is separate from gateway allowlists and approvals.
+Model Context Protocol requests use the workload proxy over the overlay. Workspace server streams use the workload proxy under mediator decisions. Their connection path remains [`OQ-SES-17`](agent-open-questions.md#%60OQ-SES-17%60). Replies travel on the same paths. Workload provider-specific relay access is separate from gateway allowlists and approvals.
 
 ```mermaid
 flowchart LR
@@ -542,7 +542,7 @@ STRIDE covers spoofing, tampering, repudiation, information disclosure, denial o
 | Threat ID | Element | STRIDE category | Threat | Mitigation in the design | Status |
 | --- | --- | --- | --- | --- | --- |
 | `TM-13` | `F-2`, `F-11`, `P-1`, `E-2`, `P-5` | spoofing | A source substitutes different content for a pinned repository commit or profile digest. | [Workspace sources](agent-workspace.md#Workspace%20sources) pins commits. [Pinning a profile version](agent-profile.md#Pinning%20a%20profile%20version) checks profile digests. | mitigated by the design |
-| `TM-14` | `F-2`, `F-11`, `P-1`, `E-2`, `P-5` | tampering | Repository configuration changes provider settings or certificate trust at runtime. | [Workspace repository hooks](agent-hooks.md#Workspace%20repository%20hooks) preserves repository hooks. Project setting scope remains on hold. | depends on an open question ([`OQ-HOOK-17`](agent-open-questions.md#%60OQ-HOOK-17%60)) |
+| `TM-14` | `F-2`, `F-11`, `P-1`, `E-2`, `P-5` | tampering | Repository configuration changes workload provider settings or certificate trust at runtime. | [Workspace repository hooks](agent-hooks.md#Workspace%20repository%20hooks) preserves repository hooks. Project setting scope remains on hold. | depends on an open question ([`OQ-HOOK-17`](agent-open-questions.md#%60OQ-HOOK-17%60)) |
 | `TM-15` | `F-2`, `F-11`, `P-1`, `E-2`, `P-5` | repudiation | A repository hook performs an action without a record of that run. | [Workspace repository hooks](agent-hooks.md#Workspace%20repository%20hooks) captures configuration only. It supplies no record of each hook run. | gap ([Workspace repository hooks](agent-hooks.md#Workspace%20repository%20hooks)) |
 | `TM-16` | `F-2`, `F-11`, `P-1`, `E-2`, `P-5` | information disclosure | A checkout exposes its fetch credential to agent harness code. | [Workspace sources](agent-workspace.md#Workspace%20sources) keeps fetch credentials outside the sandbox. Image builds exclude them from stored repository configuration. [^provider-materialization]| mitigated by the design |
 | `TM-17` | `F-2`, `F-11`, `P-1`, `E-2`, `P-5` | denial of service | An oversize source or slow fetch exhausts preparation capacity before the harness starts. | [Workspace sources](agent-workspace.md#Workspace%20sources) fails unsuccessful construction. Preparation resource bounds remain open. | depends on an open question ([`OQ-HST-2`](agent-open-questions.md#%60OQ-HST-2%60)) |
@@ -600,7 +600,7 @@ Spoofing and tampering of the local transport belong to each workload provider. 
 | Threat ID | Element | STRIDE category | Threat | Mitigation in the design | Status |
 | --- | --- | --- | --- | --- | --- |
 | `TM-49` | `F-4`, `F-21`, `F-16`, `E-5`, `P-1`, `E-3`, `P-8`, `P-33` | spoofing | A remote sandbox claims another launch at its workload proxy. | Mitigation unspecified. [Workload proxy mediator](workload-proxy-mediator.md#Launch%20boundary). See [Per-launch services](workload-proxy.md#Launch%20boundary). | gap ([`OQ-SBX-36`](agent-open-questions.md#%60OQ-SBX-36%60)) |
-| `TM-50` | `F-4`, `F-21`, `F-16`, `E-5`, `P-1`, `E-3`, `P-8`, `P-33` | tampering | A remote provider bypasses its per-launch mediator when forwarding control or session traffic. | [Per-launch services](workload-proxy.md#Launch%20boundary) requires identity stamping and a launch-authenticated workload proxy on every workload provider. Remote integration remains unspecified. | gap ([`OQ-SBX-36`](agent-open-questions.md#%60OQ-SBX-36%60)) |
+| `TM-50` | `F-4`, `F-21`, `F-16`, `E-5`, `P-1`, `E-3`, `P-8`, `P-33` | tampering | A remote workload provider bypasses its per-launch mediator when forwarding control or session traffic. | [Per-launch services](workload-proxy.md#Launch%20boundary) requires identity stamping and a launch-authenticated workload proxy on every workload provider. Remote integration remains unspecified. | gap ([`OQ-SBX-36`](agent-open-questions.md#%60OQ-SBX-36%60)) |
 | `TM-51` | `F-4`, `F-21`, `F-16`, `E-5`, `P-1`, `E-3`, `P-8`, `P-33` | repudiation | Remote requests lack a defined identity binding for decision attribution. | Mitigation unspecified. [Workload proxy](workload-proxy.md#Internet%20connections). See [Per-launch services](workload-proxy.md#Launch%20boundary). | gap ([`OQ-SBX-36`](agent-open-questions.md#%60OQ-SBX-36%60)) |
 | `TM-52` | `F-4`, `F-21`, `F-16`, `E-5`, `P-1`, `E-3`, `P-8`, `P-33` | information disclosure | A remote sandbox sends private content on a direct route that bypasses its workload proxy. | Mitigation unspecified. [Workload proxy mediator](workload-proxy-mediator.md#Launch%20boundary) requires traffic to pass through the workload proxy but specifies no remote enforcement mechanism. See [Per-launch services](workload-proxy.md#Launch%20boundary). | gap ([`OQ-SBX-36`](agent-open-questions.md#%60OQ-SBX-36%60)) |
 | `TM-53` | `F-4`, `F-21`, `F-16`, `E-5`, `P-1`, `E-3`, `P-8`, `P-33` | denial of service | A remote provider's capacity or lifetime limits prevent completion and recovery. | [Workload host registry](workload-placement.md#Workload%20host%20registry) records placement metadata. Remote eligibility constraints remain open. See [Per-launch services](workload-proxy.md#Launch%20boundary). | depends on an open question ([`OQ-PLC-7`](agent-open-questions.md#%60OQ-PLC-7%60)) |
@@ -853,7 +853,7 @@ These other paths supplement the complete categories for preview access and gate
 
 ## Attack trees
 
-An attack tree decomposes a goal into alternatives or required steps. `OR` needs any child. `AND` needs every child. Leaves reference defined threats. Cheapest paths compare the available starting positions without estimating exploit cost. Provider escape and local persistence paths belong to the threat models for workload providers.
+An attack tree decomposes a goal into alternatives or required steps. `OR` needs any child. `AND` needs every child. Leaves reference defined threats. Cheapest paths compare the available starting positions without estimating exploit cost. Workload provider escape and local persistence paths belong to the threat models for workload providers.
 
 ### exfiltrate a brokered credential
 
@@ -893,7 +893,7 @@ flowchart TD
     choice --> leaf3["TM-158: Deliver traffic to a replacement listener"]
 ```
 
-- Cheapest path and blocking controls. Use an existing broad storage grant or ambiguous owner grant. Object authorization remains [`OQ-IMG-13`](agent-open-questions.md#%60OQ-IMG-13%60). Provider-local cache and capture access don't need a service grant and have separate trees.
+- Cheapest path and blocking controls. Use an existing broad storage grant or ambiguous owner grant. Object authorization remains [`OQ-IMG-13`](agent-open-questions.md#%60OQ-IMG-13%60). Workload provider-local cache and capture access don't need a service grant and have separate trees.
 
 ### Send traffic past egress policy
 
@@ -984,7 +984,7 @@ Hook protection, the scope of project configuration in repositories, repository 
 
 ### Repository and profile input
 
-- `TM-14`. Repository configuration changes provider settings or certificate trust at runtime. depends on an open question ([`OQ-HOOK-17`](agent-open-questions.md#%60OQ-HOOK-17%60)).
+- `TM-14`. Repository configuration changes workload provider settings or certificate trust at runtime. depends on an open question ([`OQ-HOOK-17`](agent-open-questions.md#%60OQ-HOOK-17%60)).
 - `TM-15`. A repository hook performs an action without a record of that run. gap ([Workspace repository hooks](agent-hooks.md#Workspace%20repository%20hooks)).
 - `TM-17`. An oversize source or slow fetch exhausts preparation capacity before the harness starts. depends on an open question ([`OQ-HST-2`](agent-open-questions.md#%60OQ-HST-2%60)).
 - `TM-18`. A malicious repository uses its profile to permit its own sensitive operations. depends on an open question ([`OQ-PRF-5`](agent-open-questions.md#%60OQ-PRF-5%60)).
@@ -1028,7 +1028,7 @@ Hook protection, the scope of project configuration in repositories, repository 
 ### Remote agent sandbox routing
 
 - `TM-49`. A remote sandbox claims another launch at its workload proxy. gap ([`OQ-SBX-36`](agent-open-questions.md#%60OQ-SBX-36%60)).
-- `TM-50`. A remote provider bypasses its per-launch mediator when forwarding control or session traffic. gap ([`OQ-SBX-36`](agent-open-questions.md#%60OQ-SBX-36%60)).
+- `TM-50`. A remote workload provider bypasses its per-launch mediator when forwarding control or session traffic. gap ([`OQ-SBX-36`](agent-open-questions.md#%60OQ-SBX-36%60)).
 - `TM-51`. Remote requests lack a defined identity binding for decision attribution. gap ([`OQ-SBX-36`](agent-open-questions.md#%60OQ-SBX-36%60)).
 - `TM-52`. A remote sandbox sends private content on a direct route that bypasses its workload proxy. gap ([`OQ-SBX-36`](agent-open-questions.md#%60OQ-SBX-36%60)).
 - `TM-53`. A remote provider's capacity or lifetime limits prevent completion and recovery. depends on an open question ([`OQ-PLC-7`](agent-open-questions.md#%60OQ-PLC-7%60)).

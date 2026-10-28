@@ -58,7 +58,7 @@ The workload proxy is the TLS endpoint for inspected connections after the workl
 | --- | --- | --- | --- |
 | `KT-16` Inspection CA certificate and key. Establish guest trust for inspected destinations. | Workload host outside the guest. | Guest clients trust the installed public inspection authority. | Exact process, storage, parent or self-issued anchor, and revocation or substitute. |
 | `KT-17` Per-SNI inspection leaf and key. Authenticate an admitted inspected destination. | Workload proxy outside the guest. | Inspection CA issues. Guest clients verify the chain and destination name against inspection trust. | Process and storage. |
-| `KT-18` Guest inspection trust bundle. Distribute public inspection trust to guest clients. | Public material only. No private key. Provider controls installation. | Provider supplies public CA material. Guest TLS clients verify destination certificates. | Runtime stores, authentic installation, and propagation bound. |
+| `KT-18` Guest inspection trust bundle. Distribute public inspection trust to guest clients. | Public material only. No private key. Workload provider controls installation. | Provider supplies public CA material. Guest TLS clients verify destination certificates. | Runtime stores, authentic installation, and propagation bound. |
 
 Algorithm, key size, lifetime, and rotation remain [undecided](agent-open-questions.md#%60OQ-PKI-6%60) for these entries, as do the fields in the last column. For `KT-18`, algorithm and size refer to the underlying public certificates. Revocation for `KT-18` removes retired roots and reloads client contexts. Destination removal and active connection retirement for `KT-17` remain [undecided](agent-open-questions.md#%60OQ-SBX-38%60).
 

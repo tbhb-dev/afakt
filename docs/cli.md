@@ -52,7 +52,7 @@ See [Agents](agent.md).
 | `afakt agent history` | Fetch or follow an agent's current and historical transcripts. |
 | `afakt agent import` | Create an agent from an Open Container Initiative (OCI) artifact. |
 | `afakt agent info` | View a summary or detailed information about an agent. |
-| `afakt agent kill` | Stop the agent sandbox through its provider under [Cancellation and limits](workload-lifecycle.md#Cancellation%20and%20limits). |
+| `afakt agent kill` | Stop the agent sandbox through its workload provider under [Cancellation and limits](workload-lifecycle.md#Cancellation%20and%20limits). |
 | `afakt agent label` | Update an agent's labels. |
 | `afakt agent limits` | View details about an agent's resource and usage limits. |
 | `afakt agent list` | List agents. |
@@ -486,7 +486,7 @@ See [Workload ports and previews](workload-ports.md).
 | Command | Description |
 | --- | --- |
 | `afakt port` | Manage port publications and authenticated client tunnels. |
-| `afakt port expose <port>` | Ask the policy engine for permission to publish a loopback listener through the workload proxy mediator and the provider’s control path. |
+| `afakt port expose <port>` | Ask the policy engine for permission to publish a loopback listener through the workload proxy mediator and the workload provider’s control path. |
 | `afakt port forward` | Open an authenticated tunnel to a forwarded port. |
 | `afakt port list` | List accessible forwarded ports. |
 | `afakt port unforward` | Close a client port tunnel. |

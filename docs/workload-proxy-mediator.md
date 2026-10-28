@@ -13,7 +13,7 @@ generated: { by: "codex:gpt-6", at: "2026-10-28T17:30:00Z" }
 
 ## Launch boundary
 
-Each [workload](workload.md) has one workload proxy mediator and one workload proxy on every provider. The proxy transmits guest traffic in both directions and requests a mediator decision for every inbound and outbound connection. The mediator never transmits traffic and has no independent network access. Container manager and host-mode mechanisms remain [undecided](agent-open-questions.md#%60OQ-HUB-15%60). Remote provider integration remains [undecided](agent-open-questions.md#%60OQ-SBX-36%60).
+Each [workload](workload.md) has one workload proxy mediator and one workload proxy on every workload provider. The proxy transmits guest traffic in both directions and requests a mediator decision for every inbound and outbound connection. The mediator never transmits traffic and has no independent network access. Container manager and host-mode mechanisms remain [undecided](agent-open-questions.md#%60OQ-HUB-15%60). Remote provider integration remains [undecided](agent-open-questions.md#%60OQ-SBX-36%60).
 
 Enforcement doesn't depend on tools honoring proxy environment variables. A confined process on the workload host is the leading option for the mediator. Whether it needs its own VM remains [open](agent-open-questions.md#%60OQ-SBX-12%60). afakt permits host modes as the weaker tier. The mediator and proxy run separately from the supervisor and virtual machine monitors. They communicate over a local channel bound to the workload. Service users remain [undecided](agent-open-questions.md#%60OQ-HST-8%60), and the [host isolation baseline](agent-open-questions.md#%60OQ-SBX-18%60) remains on hold.
 
@@ -51,4 +51,4 @@ Inside the VM, the agent harness connects to the [MCP gateway](agent-mcp-gateway
 
 ## Open questions
 
-The workload proxy mediator's [process or virtual machine boundary](agent-open-questions.md#%60OQ-SBX-12%60), [guest-link protection](agent-open-questions.md#%60OQ-SBX-13%60), [mandatory mediation across providers](agent-open-questions.md#%60OQ-SBX-54%60), [policy engine](agent-open-questions.md#%60OQ-SBX-61%60), and [network confinement](agent-open-questions.md#%60OQ-SBX-62%60) remain undecided. The [host isolation baseline](agent-open-questions.md#%60OQ-SBX-18%60) remains on hold.
+The workload proxy mediator's [process or virtual machine boundary](agent-open-questions.md#%60OQ-SBX-12%60), [guest-link protection](agent-open-questions.md#%60OQ-SBX-13%60), [mandatory mediation across workload providers](agent-open-questions.md#%60OQ-SBX-54%60), [policy engine](agent-open-questions.md#%60OQ-SBX-61%60), and [network confinement](agent-open-questions.md#%60OQ-SBX-62%60) remain undecided. The [host isolation baseline](agent-open-questions.md#%60OQ-SBX-18%60) remains on hold.

@@ -21,19 +21,19 @@ STRIDE covers spoofing, tampering, repudiation, information disclosure, denial o
 
 ### Workload proxy mediator access
 
-The only network device in the guest connects to the mediator. Control and preview carrier authentication remains unresolved. See [Provider mediation](workload-provider-macos-vm.md#Mediator%20connection%20and%20name%20resolution).
+The only network device in the guest connects to the mediator. Control and preview carrier authentication remains unresolved. See [Workload provider mediation](workload-provider-macos-vm.md#Mediator%20connection%20and%20name%20resolution).
 
 ### Workspace, scratch, and caches
 
-[Provider storage](workload-provider-macos-vm.md#Workspace,%20scratch,%20and%20caches) distinguishes launch state, shared named tool caches, and verified image caches. Provider storage mappings, scratch cleanup, shared cache trust, and hostile host-side repository processing remain unresolved. [Provider materialization](workload-provider-macos-vm.md#Workspace%20image%20materialization) separates verified extraction from later workspace capture.
+[Workload provider storage](workload-provider-macos-vm.md#Workspace,%20scratch,%20and%20caches) distinguishes launch state, shared named tool caches, and verified image caches. Provider storage mappings, scratch cleanup, shared cache trust, and hostile host-side repository processing remain unresolved. [Provider materialization](workload-provider-macos-vm.md#Workspace%20image%20materialization) separates verified extraction from later workspace capture.
 
 ### Workload snapshots and agent checkpoints
 
-[Provider capture](workload-provider-macos-vm.md#Workload%20snapshots%20and%20agent%20checkpoints) defines the capture boundary and unresolved restore contract. Machine state and native harness state need a consistent capture. Both leave external effects unchanged.
+[Workload provider capture](workload-provider-macos-vm.md#Workload%20snapshots%20and%20agent%20checkpoints) defines the capture boundary and unresolved restore contract. Machine state and native harness state need a consistent capture. Both leave external effects unchanged.
 
 ### Host visibility and workspace commands
 
-Host custody and its limits follow [Provider observations](workload-provider-macos-vm.md#Host%20observations). Termination authority and unresolved descendant cleanup follow [Provider teardown](workload-provider-macos-vm.md#Cancellation%20and%20teardown). Same-user process separation and the host isolation baseline remain on hold under [`OQ-SBX-18`](agent-open-questions.md#%60OQ-SBX-18%60).
+Host custody and its limits follow [Workload provider observations](workload-provider-macos-vm.md#Host%20observations). Termination authority and unresolved descendant cleanup follow [Provider teardown](workload-provider-macos-vm.md#Cancellation%20and%20teardown). Same-user process separation and the isolation baseline for workload hosts remain on hold under [`OQ-SBX-18`](agent-open-questions.md#%60OQ-SBX-18%60).
 
 Commands started by `afakt agent exec` use standalone afakt-sandbox. [Provider startup](workload-provider-macos-vm.md#Process%20placement%20and%20startup) leaves command placement, inherited state, and launch authority under [`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60). An unsandboxed invocation remains under [`OQ-AGT-26`](agent-open-questions.md#%60OQ-AGT-26%60).
 
@@ -41,7 +41,7 @@ Commands started by `afakt agent exec` use standalone afakt-sandbox. [Provider s
 
 | Boundary ID | Boundary | Two sides | Enforcement in the design |
 | --- | --- | --- | --- |
-| `TB-MVM-1` | Agent harness and provider control | untrusted process tree / provider lifecycle and platform authority | [Enforcement](workload-sandbox.md#Enforcement) Virtual devices and Virtualization.framework handle hostile guest input. Host-side confinement remains unspecified. |
+| `TB-MVM-1` | Agent harness and workload provider control | untrusted process tree / provider lifecycle and platform authority | [Enforcement](workload-sandbox.md#Enforcement) Virtual devices and Virtualization.framework handle hostile guest input. Host-side confinement remains unspecified. |
 | `TB-MVM-2` | Local transport and workload proxy mediator | Launch network and control endpoints / mediator identity and policy | [Workload proxy mediator](workload-proxy-mediator.md#Launch%20boundary) Local endpoint binding remains [`OQ-SBX-13`](agent-open-questions.md#%60OQ-SBX-13%60). |
 | `TB-MVM-3` | Agent workspace and host processing | Launch-controlled files / worker capture, materialization, and cleanup | [Agent workspace capture](agent-workspace.md#Agent%20workspace%20capture) Host-side handling of repository metadata remains [`OQ-WSP-18`](agent-open-questions.md#%60OQ-WSP-18%60). |
 | `TB-MVM-4` | Shared named tool cache | One launch / cache content consumed by another launch | [Sandbox variables](workload-sandbox.md#Sandbox%20variables) Access, provenance, and capacity controls remain [`OQ-WSP-19`](agent-open-questions.md#%60OQ-WSP-19%60). |
@@ -57,7 +57,7 @@ Commands started by `afakt agent exec` use standalone afakt-sandbox. [Provider s
 | `E-MVM-1` | Command caller | Authenticated client. Shared service grants apply |
 | `E-MVM-2` | Another agent launch | Separate launch authority |
 | `P-MVM-1` | Agent harness and afakt-sandbox | Guest |
-| `P-MVM-2` | Workload host worker and provider lifecycle | Workload host |
+| `P-MVM-2` | Workload host worker and workload provider lifecycle | Workload host |
 | `P-MVM-3` | Host workspace processor | Worker capture and cleanup |
 | `P-MVM-8` | Workload proxy | Outside guest confinement. Launch identity custody |
 | `P-MVM-4` | Workload proxy mediator | Outside launch confinement. Process separation unresolved |
@@ -70,7 +70,7 @@ Commands started by `afakt agent exec` use standalone afakt-sandbox. [Provider s
 | `DS-MVM-4` | Verified image cache | Workload host. Distinct from named tool cache |
 | `DS-MVM-5` | Snapshot and checkpoint capture | Retained state. Access controls unresolved |
 
-### Level one provider flows
+### Level one workload provider flows
 
 Arrows identify exchanges and their return paths. Unspecified carriers and placements remain gaps. The shared named tool cache is outside individual launch confinement and has a separate crossing from another launch. The verified image cache has a different trust relationship.
 
@@ -148,7 +148,7 @@ flowchart LR
 
 ## Workload proxy
 
-Each workload has one workload proxy mediator and one workload proxy. The proxy transmits traffic in both directions and requests a mediator decision for every connection. The mediator never transmits traffic. Direct overlay peers authenticate with SPIFFE mutual Transport Layer Security (TLS), and both workload mediators check the connection. Service users and provider integration remain undecided under [Launch boundary](workload-proxy.md#Launch%20boundary).
+Each workload has one workload proxy mediator and one workload proxy. The proxy transmits traffic in both directions and requests a mediator decision for every connection. The mediator never transmits traffic. Direct overlay peers authenticate with SPIFFE mutual Transport Layer Security (TLS), and both workload mediators check the connection. Service users and workload provider integration remain undecided under [Launch boundary](workload-proxy.md#Launch%20boundary).
 
 ```mermaid
 flowchart LR
@@ -161,7 +161,7 @@ flowchart LR
 
 ## STRIDE analysis
 
-Each table covers the six categories for its listed flows and every participating endpoint. Shared service checks are in the [common STRIDE analysis](workload-threat-model.md#STRIDE%20analysis). They don't establish provider isolation. A mitigation applies only to the stated attack.
+Each table covers the six categories for its listed flows and every participating endpoint. Shared service checks are in the [common STRIDE analysis](workload-threat-model.md#STRIDE%20analysis). They don't establish workload provider isolation. A mitigation applies only to the stated attack.
 
 ### Isolation and lifecycle
 
@@ -179,7 +179,7 @@ Each table covers the six categories for its listed flows and every participatin
 
 | Threat ID | Element | STRIDE category | Threat | Mitigation in the design | Status |
 | --- | --- | --- | --- | --- | --- |
-| `TM-MVM-25` | `F-MVM-2`, `F-MVM-3`, `F-MVM-4`, `P-MVM-1`, `P-MVM-5`, `P-MVM-4` | spoofing | A process selects another launch's mediator endpoint and receives its authority. | [Workload proxy mediator](workload-proxy-mediator.md#Launch%20boundary) Endpoint authentication remains unresolved. [Provider mediation](workload-provider-macos-vm.md#Mediator%20connection%20and%20name%20resolution). See [Per-launch services](workload-proxy.md#Launch%20boundary). | depends on an open question ([`OQ-SBX-13`](agent-open-questions.md#%60OQ-SBX-13%60)) |
+| `TM-MVM-25` | `F-MVM-2`, `F-MVM-3`, `F-MVM-4`, `P-MVM-1`, `P-MVM-5`, `P-MVM-4` | spoofing | A process selects another launch's mediator endpoint and receives its authority. | [Workload proxy mediator](workload-proxy-mediator.md#Launch%20boundary) Endpoint authentication remains unresolved. [Workload provider mediation](workload-provider-macos-vm.md#Mediator%20connection%20and%20name%20resolution). See [Per-launch services](workload-proxy.md#Launch%20boundary). | depends on an open question ([`OQ-SBX-13`](agent-open-questions.md#%60OQ-SBX-13%60)) |
 | `TM-MVM-26` | `F-MVM-2`, `F-MVM-3`, `F-MVM-4`, `P-MVM-1`, `P-MVM-5`, `P-MVM-4` | tampering | A process changes proxy settings or uses an interface that bypasses the workload proxy mediator. | [Workload proxy mediator](workload-proxy-mediator.md#Launch%20boundary) The guest's only network device connects to the workload proxy. The control carrier remains unresolved. [Provider mediation](workload-provider-macos-vm.md#Mediator%20connection%20and%20name%20resolution). See [Per-launch services](workload-proxy.md#Launch%20boundary). | mitigated by the design |
 | `TM-MVM-27` | `F-MVM-2`, `F-MVM-3`, `F-MVM-4`, `P-MVM-1`, `P-MVM-5`, `P-MVM-4` | repudiation | Unbound local traffic acquires another launch's attribution before shared logging. | [Control requests](workload-proxy-mediator.md#Control%20requests) Stamping identity requires a trustworthy local sender binding. [Provider mediation](workload-provider-macos-vm.md#Mediator%20connection%20and%20name%20resolution). See [Per-launch services](workload-proxy.md#Launch%20boundary). | depends on an open question ([`OQ-SBX-13`](agent-open-questions.md#%60OQ-SBX-13%60)) |
 | `TM-MVM-28` | `F-MVM-2`, `F-MVM-3`, `F-MVM-4`, `P-MVM-1`, `P-MVM-5`, `P-MVM-4` | information disclosure | A control carrier or network view exposes another launch's session or loopback listener. | [Loopback listeners](workload-ports.md#Loopback%20listeners) The design requires separate network views. The workload provider binding remains unresolved. [Provider mediation](workload-provider-macos-vm.md#Mediator%20connection%20and%20name%20resolution). See [Per-launch services](workload-proxy.md#Launch%20boundary). | depends on an open question ([`OQ-SES-5`](agent-open-questions.md#%60OQ-SES-5%60)) |
@@ -191,7 +191,7 @@ Each table covers the six categories for its listed flows and every participatin
 
 | Threat ID | Element | STRIDE category | Threat | Mitigation in the design | Status |
 | --- | --- | --- | --- | --- | --- |
-| `TM-MVM-19` | `F-MVM-5`, `F-MVM-6`, `F-MVM-7`, `F-MVM-8`, `P-MVM-1`, `DS-MVM-1`, `DS-MVM-2`, `P-MVM-3`, `DS-MVM-4` | spoofing | A same-user process substitutes a workspace owner or capture helper. | [Agent workspace capture](agent-workspace.md#Agent%20workspace%20capture) Ownership and helper rights depend on launch identity. [Provider startup](workload-provider-macos-vm.md#Process%20placement%20and%20startup). | depends on an open question ([`OQ-SBX-27`](agent-open-questions.md#%60OQ-SBX-27%60)) |
+| `TM-MVM-19` | `F-MVM-5`, `F-MVM-6`, `F-MVM-7`, `F-MVM-8`, `P-MVM-1`, `DS-MVM-1`, `DS-MVM-2`, `P-MVM-3`, `DS-MVM-4` | spoofing | A same-user process substitutes a workspace owner or capture helper. | [Agent workspace capture](agent-workspace.md#Agent%20workspace%20capture) Ownership and helper rights depend on launch identity. [Workload provider startup](workload-provider-macos-vm.md#Process%20placement%20and%20startup). | depends on an open question ([`OQ-SBX-27`](agent-open-questions.md#%60OQ-SBX-27%60)) |
 | `TM-MVM-32` | `F-MVM-5`, `F-MVM-6`, `F-MVM-7`, `F-MVM-8`, `P-MVM-1`, `DS-MVM-1`, `DS-MVM-2`, `P-MVM-3`, `DS-MVM-4` | tampering | Hostile workspace metadata redirects workload host capture or cleanup outside the selected workspace. | [Agent workspace capture](agent-workspace.md#Agent%20workspace%20capture) Content capture supplies no safe metadata interpretation contract. [Provider storage](workload-provider-macos-vm.md#Workspace,%20scratch,%20and%20caches). | gap ([`OQ-WSP-18`](agent-open-questions.md#%60OQ-WSP-18%60)) |
 | `TM-MVM-33` | `F-MVM-5`, `F-MVM-6`, `F-MVM-7`, `F-MVM-8`, `P-MVM-1`, `DS-MVM-1`, `DS-MVM-2`, `P-MVM-3`, `DS-MVM-4` | repudiation | A workspace or scratch writer denies changes made through a shared local identity. | [Provider observations](workload-lifecycle.md#Workload%20provider%20observations) Host compromise has no independent evidence mechanism. [Provider observations](workload-provider-macos-vm.md#Host%20observations). | gap ([`OQ-SBX-37`](agent-open-questions.md#%60OQ-SBX-37%60)) |
 | `TM-MVM-22` | `F-MVM-5`, `F-MVM-6`, `F-MVM-7`, `F-MVM-8`, `P-MVM-1`, `DS-MVM-1`, `DS-MVM-2`, `P-MVM-3`, `DS-MVM-4` | information disclosure | Capture, scratch reuse, or path aliasing exposes another launch's files. | [Agent workspace capture](agent-workspace.md#Agent%20workspace%20capture) Capture rights and storage placement remain unresolved. [Provider storage](workload-provider-macos-vm.md#Workspace,%20scratch,%20and%20caches). | gap ([`OQ-WSP-20`](agent-open-questions.md#%60OQ-WSP-20%60)) |
@@ -204,7 +204,7 @@ Cache sharing has no stated authorization, provenance, capacity, or invalidation
 
 | Threat ID | Element | STRIDE category | Threat | Mitigation in the design | Status |
 | --- | --- | --- | --- | --- | --- |
-| `TM-MVM-127` | `F-MVM-9`, `F-MVM-10`, `P-MVM-1`, `DS-MVM-3`, `E-MVM-2` | spoofing | One launch places cache entries that another mistakes for trusted tool output. | [Sandbox variables](workload-sandbox.md#Sandbox%20variables). Unspecified. [Provider storage](workload-provider-macos-vm.md#Workspace,%20scratch,%20and%20caches). | gap ([`OQ-WSP-19`](agent-open-questions.md#%60OQ-WSP-19%60)) |
+| `TM-MVM-127` | `F-MVM-9`, `F-MVM-10`, `P-MVM-1`, `DS-MVM-3`, `E-MVM-2` | spoofing | One launch places cache entries that another mistakes for trusted tool output. | [Sandbox variables](workload-sandbox.md#Sandbox%20variables). Unspecified. [Workload provider storage](workload-provider-macos-vm.md#Workspace,%20scratch,%20and%20caches). | gap ([`OQ-WSP-19`](agent-open-questions.md#%60OQ-WSP-19%60)) |
 | `TM-MVM-128` | `F-MVM-9`, `F-MVM-10`, `P-MVM-1`, `DS-MVM-3`, `E-MVM-2` | tampering | A launch changes shared cache content consumed by another launch. | [Sandbox variables](workload-sandbox.md#Sandbox%20variables). Unspecified. [Provider storage](workload-provider-macos-vm.md#Workspace,%20scratch,%20and%20caches). | gap ([`OQ-WSP-19`](agent-open-questions.md#%60OQ-WSP-19%60)) |
 | `TM-MVM-129` | `F-MVM-9`, `F-MVM-10`, `P-MVM-1`, `DS-MVM-3`, `E-MVM-2` | repudiation | A cache writer denies modifying content because cache provenance has no stated record. | [Sandbox variables](workload-sandbox.md#Sandbox%20variables). Unspecified. [Provider storage](workload-provider-macos-vm.md#Workspace,%20scratch,%20and%20caches). | gap ([`OQ-WSP-19`](agent-open-questions.md#%60OQ-WSP-19%60)) |
 | `TM-MVM-130` | `F-MVM-9`, `F-MVM-10`, `P-MVM-1`, `DS-MVM-3`, `E-MVM-2` | information disclosure | A launch reads private data another launch left in a shared tool cache. | [Sandbox variables](workload-sandbox.md#Sandbox%20variables). Unspecified. [Provider storage](workload-provider-macos-vm.md#Workspace,%20scratch,%20and%20caches). | gap ([`OQ-WSP-19`](agent-open-questions.md#%60OQ-WSP-19%60)) |
@@ -215,7 +215,7 @@ Cache sharing has no stated authorization, provenance, capacity, or invalidation
 
 | Threat ID | Element | STRIDE category | Threat | Mitigation in the design | Status |
 | --- | --- | --- | --- | --- | --- |
-| `TM-MVM-121` | `F-MVM-11`, `F-MVM-12`, `P-MVM-2`, `DS-MVM-5`, `P-MVM-6` | spoofing | A capture or restore request substitutes another agent's owner or launch. | [Workload snapshots and the snapshot registry](agent.md#Workload%20snapshots%20and%20the%20snapshot%20registry) defines stored VM state. Snapshot and checkpoint authorization remains unspecified. [Provider capture](workload-provider-macos-vm.md#Workload%20snapshots%20and%20agent%20checkpoints). | depends on an open question ([`OQ-AGT-31`](agent-open-questions.md#%60OQ-AGT-31%60)) |
+| `TM-MVM-121` | `F-MVM-11`, `F-MVM-12`, `P-MVM-2`, `DS-MVM-5`, `P-MVM-6` | spoofing | A capture or restore request substitutes another agent's owner or launch. | [Workload snapshots and the snapshot registry](agent.md#Workload%20snapshots%20and%20the%20snapshot%20registry) defines stored VM state. Snapshot and checkpoint authorization remains unspecified. [Workload provider capture](workload-provider-macos-vm.md#Workload%20snapshots%20and%20agent%20checkpoints). | depends on an open question ([`OQ-AGT-31`](agent-open-questions.md#%60OQ-AGT-31%60)) |
 | `TM-MVM-122` | `F-MVM-11`, `F-MVM-12`, `P-MVM-2`, `DS-MVM-5`, `P-MVM-6` | tampering | A mismatched snapshot, checkpoint, or workspace delta restores inconsistent or hostile state. | [Suspend and resume](workload-lifecycle.md#Suspend%20and%20resume) freezes capture at an idle boundary. Exact state binding remains open. [Provider capture](workload-provider-macos-vm.md#Workload%20snapshots%20and%20agent%20checkpoints). | depends on an open question ([`OQ-AGT-3`](agent-open-questions.md#%60OQ-AGT-3%60)) |
 | `TM-MVM-123` | `F-MVM-11`, `F-MVM-12`, `P-MVM-2`, `DS-MVM-5`, `P-MVM-6` | repudiation | Rewind hides an earlier external effect or presents it as undone. | [Agent checkpoints](agent.md#Agent%20checkpoints) retains the original branch. External-effect representation remains open. [Provider capture](workload-provider-macos-vm.md#Workload%20snapshots%20and%20agent%20checkpoints). | depends on an open question ([`OQ-AGT-4`](agent-open-questions.md#%60OQ-AGT-4%60)) |
 | `TM-MVM-124` | `F-MVM-11`, `F-MVM-12`, `P-MVM-2`, `DS-MVM-5`, `P-MVM-6` | information disclosure | Snapshot transfer exposes private session or workspace data to an unauthorized reader. | [Suspend and resume](workload-lifecycle.md#Suspend%20and%20resume) excludes credentials from capture. Storage and transfer confidentiality remain unspecified. [Provider capture](workload-provider-macos-vm.md#Workload%20snapshots%20and%20agent%20checkpoints). | depends on an open question ([`OQ-AGT-31`](agent-open-questions.md#%60OQ-AGT-31%60)) |
@@ -226,12 +226,12 @@ Cache sharing has no stated authorization, provenance, capacity, or invalidation
 
 | Threat ID | Element | STRIDE category | Threat | Mitigation in the design | Status |
 | --- | --- | --- | --- | --- | --- |
-| `TM-MVM-40` | `F-MVM-13`, `F-MVM-14`, `F-MVM-15`, `E-MVM-1`, `P-MVM-7`, `DS-MVM-1`, `P-MVM-4` | spoofing | A workspace command uses the authority of a different agent launch. | [Host process sandbox](workload-sandbox.md#Host%20process%20sandbox) Standalone command confinement doesn't specify launch identity binding. [Provider startup](workload-provider-macos-vm.md#Process%20placement%20and%20startup). See [Per-launch services](workload-proxy.md#Launch%20boundary). | gap ([`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60)) |
+| `TM-MVM-40` | `F-MVM-13`, `F-MVM-14`, `F-MVM-15`, `E-MVM-1`, `P-MVM-7`, `DS-MVM-1`, `P-MVM-4` | spoofing | A workspace command uses the authority of a different agent launch. | [Host process sandbox](workload-sandbox.md#Host%20process%20sandbox) Standalone command confinement doesn't specify launch identity binding. [Workload provider startup](workload-provider-macos-vm.md#Process%20placement%20and%20startup). See [Per-launch services](workload-proxy.md#Launch%20boundary). | gap ([`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60)) |
 | `TM-MVM-41` | `F-MVM-13`, `F-MVM-14`, `F-MVM-15`, `E-MVM-1`, `P-MVM-7`, `DS-MVM-1`, `P-MVM-4` | tampering | A command races capture or changes files outside the selected workspace through a stale path. | [Agent workspace capture](agent-workspace.md#Agent%20workspace%20capture) Command placement and capture ordering remain unresolved. [Provider startup](workload-provider-macos-vm.md#Process%20placement%20and%20startup). See [Per-launch services](workload-proxy.md#Launch%20boundary). | gap ([`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60)) |
 | `TM-MVM-42` | `F-MVM-13`, `F-MVM-14`, `F-MVM-15`, `E-MVM-1`, `P-MVM-7`, `DS-MVM-1`, `P-MVM-4` | repudiation | A command runs without a record binding its caller, launch, and confinement settings. | [What telemetry never records](agent-observability.md#What%20telemetry%20never%20records) Command attribution and lifecycle records remain unspecified. [Provider observations](workload-provider-macos-vm.md#Host%20observations). See [Per-launch services](workload-proxy.md#Launch%20boundary). | gap ([`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60)) |
 | `TM-MVM-43` | `F-MVM-13`, `F-MVM-14`, `F-MVM-15`, `E-MVM-1`, `P-MVM-7`, `DS-MVM-1`, `P-MVM-4` | information disclosure | A command inherits another launch's environment, session data, or readable workspace paths. | [Host process sandbox](workload-sandbox.md#Host%20process%20sandbox) Execution identity, inherited state, and path ownership remain unresolved. [Provider startup](workload-provider-macos-vm.md#Process%20placement%20and%20startup). See [Per-launch services](workload-proxy.md#Launch%20boundary). | gap ([`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60)) |
 | `TM-MVM-44` | `F-MVM-13`, `F-MVM-14`, `F-MVM-15`, `E-MVM-1`, `P-MVM-7`, `DS-MVM-1`, `P-MVM-4` | denial of service | A command continues running after cancellation or blocks workspace capture and teardown. | [Cancellation and limits](workload-lifecycle.md#Cancellation%20and%20limits) Independent command lifetime and cancellation remain unspecified. [Provider teardown](workload-provider-macos-vm.md#Cancellation%20and%20teardown). See [Per-launch services](workload-proxy.md#Launch%20boundary). | gap ([`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60)) |
-| `TM-MVM-45` | `F-MVM-13`, `F-MVM-14`, `F-MVM-15`, `E-MVM-1`, `P-MVM-7`, `DS-MVM-1`, `P-MVM-4` | elevation of privilege | A command starts outside the selected provider confinement or obtains a relaxation without review. | [Host process sandbox](workload-sandbox.md#Host%20process%20sandbox) afakt-sandbox confines standalone commands. Authority for an unsandboxed invocation remains unresolved. [Provider startup](workload-provider-macos-vm.md#Process%20placement%20and%20startup). See [Per-launch services](workload-proxy.md#Launch%20boundary). | depends on an open question ([`OQ-AGT-26`](agent-open-questions.md#%60OQ-AGT-26%60)) |
+| `TM-MVM-45` | `F-MVM-13`, `F-MVM-14`, `F-MVM-15`, `E-MVM-1`, `P-MVM-7`, `DS-MVM-1`, `P-MVM-4` | elevation of privilege | A command starts outside the selected workload provider confinement or obtains a relaxation without review. | [Host process sandbox](workload-sandbox.md#Host%20process%20sandbox) afakt-sandbox confines standalone commands. Authority for an unsandboxed invocation remains unresolved. [Provider startup](workload-provider-macos-vm.md#Process%20placement%20and%20startup). See [Per-launch services](workload-proxy.md#Launch%20boundary). | depends on an open question ([`OQ-AGT-26`](agent-open-questions.md#%60OQ-AGT-26%60)) |
 
 ### Per-launch network boundary
 
@@ -286,7 +286,7 @@ flowchart TD
     choice --> leaf3["TM-MVM-30: Use a privileged control handle"]
 ```
 
-- Cheapest path and blocking controls. Changing proxy variables can't bypass the only VM network device. [`OQ-SBX-54`](agent-open-questions.md#%60OQ-SBX-54%60) covers missing provider routing. [`OQ-SBX-13`](agent-open-questions.md#%60OQ-SBX-13%60) covers sender binding. The [common egress tree](workload-threat-model.md#Send%20traffic%20past%20egress%20policy) covers permitted name queries, passthrough, and relay proxy use.
+- Cheapest path and blocking controls. Changing proxy variables can't bypass the only VM network device. [`OQ-SBX-54`](agent-open-questions.md#%60OQ-SBX-54%60) covers missing workload provider routing. [`OQ-SBX-13`](agent-open-questions.md#%60OQ-SBX-13%60) covers sender binding. The [common egress tree](workload-threat-model.md#Send%20traffic%20past%20egress%20policy) covers permitted name queries, passthrough, and relay proxy use.
 
 ### Persist hostile state across agent launches
 
@@ -356,4 +356,4 @@ Host isolation remains on hold. The [common residual risks](workload-threat-mode
 - `TM-MVM-42`. A command runs without a record binding its caller, launch, and confinement settings. gap ([`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60)).
 - `TM-MVM-43`. A command inherits another launch's environment, session data, or readable workspace paths. gap ([`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60)).
 - `TM-MVM-44`. A command continues running after cancellation or blocks workspace capture and teardown. gap ([`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60)).
-- `TM-MVM-45`. A command starts outside the selected provider confinement or obtains a relaxation without review. depends on an open question ([`OQ-AGT-26`](agent-open-questions.md#%60OQ-AGT-26%60)).
+- `TM-MVM-45`. A command starts outside the selected workload provider confinement or obtains a relaxation without review. depends on an open question ([`OQ-AGT-26`](agent-open-questions.md#%60OQ-AGT-26%60)).

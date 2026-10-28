@@ -21,7 +21,7 @@ One component inside the guest's `afakt-agent` command runs and talks to the har
 
 ## Session connection
 
-For a locally controlled harness, the workload provider starts the guest relay inside the workload guest (VM). Managed-loop placement remains [`OQ-SBX-63`](agent-open-questions.md#%60OQ-SBX-63%60). The [component inside `afakt-agent`](agent-acp.md#Running%20the%20harness) runs the harness through its ACP adapter. ACP traffic from the guest relay passes through the workload proxy. The mediator authorizes which session messages the proxy may forward. Clients attach through the ingress gateway using the [session attachment](agent-session-attachment.md) Application Programming Interface (API).
+For a locally controlled harness, the workload provider starts the guest relay inside the workload guest (VM). Hosted agent loop placement remains [`OQ-SBX-63`](agent-open-questions.md#%60OQ-SBX-63%60). The [component inside `afakt-agent`](agent-acp.md#Running%20the%20harness) runs the harness through its ACP adapter. ACP traffic from the guest relay passes through the workload proxy. The mediator authorizes which session messages the proxy may forward. Clients attach through the ingress gateway using the [session attachment](agent-session-attachment.md) Application Programming Interface (API).
 
 ## Parts
 

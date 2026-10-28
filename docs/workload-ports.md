@@ -15,7 +15,7 @@ An agent can run development servers inside its [sandbox](workload-sandbox.md). 
 
 ## Loopback listeners
 
-The combined agent sandbox configuration's `allowLocalBinding` permits processes to listen on loopback ports in the sandbox's own network view. It never permits binding the workload host's external interfaces. With the setting false, processes can't open listeners. The provider rejects a launch when it can't enforce these restrictions. Listening doesn't widen the sandbox's outbound domain rules. Host-mode loopback isolation and listener attribution remain [`OQ-SBX-16`](agent-open-questions.md#%60OQ-SBX-16%60) and [`OQ-SBX-54`](agent-open-questions.md#%60OQ-SBX-54%60).
+The combined agent sandbox configuration's `allowLocalBinding` permits processes to listen on loopback ports in the sandbox's own network view. It never permits binding the workload host's external interfaces. With the setting false, processes can't open listeners. The workload provider rejects a launch when it can't enforce these restrictions. Listening doesn't widen the sandbox's outbound domain rules. Host-mode loopback isolation and listener attribution remain [`OQ-SBX-16`](agent-open-questions.md#%60OQ-SBX-16%60) and [`OQ-SBX-54`](agent-open-questions.md#%60OQ-SBX-54%60).
 
 ## Port discovery and records
 

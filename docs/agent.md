@@ -72,9 +72,19 @@ Ownership of a reference doesn't grant access to its target. Profile capabilitie
 
 A fork copies an agent into a separate agent. `fork create` leaves the copy created without starting the agent harness. `fork start` starts the copy, and `fork run` also waits for its session to end and outputs the final message. `fork list` lists an agent's forks. The copy has its own identity. The scope of copied resources and authority remains open.
 
+## Snapshot contents
+
+| Snapshot | Contents |
+| --- | --- |
+| Agent snapshot | Portable Open Container Initiative (OCI) image with workspace and harness layers |
+| Workspace snapshot | Disk only |
+| Harness snapshot | Harness configuration and state |
+
+Harness checkpoints remain [agent checkpoints](#Agent%20checkpoints).
+
 ## Workload snapshots and the snapshot registry
 
-A workload snapshot is a snapshot of the VM an agent sandbox runs in, used to restore it. Workload snapshots exist only where the agent runs in a VM. Host modes and container managers have none. `snapshot create` captures VM state and uploads it to the snapshot registry. The snapshot commands list, inspect, download, upload, tag, label, annotate, delete, and prune workload snapshots. A workload snapshot is separate from an agent checkpoint and a workspace image.
+A workload snapshot captures the memory and disk of the VM an agent sandbox runs in, used to restore it. Workload snapshots exist only where the agent runs in a VM. Host modes and container managers have none. `snapshot create` captures VM state and uploads it to the snapshot registry. The snapshot commands list, inspect, download, upload, tag, label, annotate, delete, and prune workload snapshots. A workload snapshot is separate from an agent checkpoint and a workspace image.
 
 [Archive and restore](agent-lifecycle.md#Archive%20and%20restore).
 
@@ -137,7 +147,7 @@ Secure Shell (SSH) keys authenticate SSH connections or sign content, while SSH 
 
 ## Sandboxes
 
-The [agent sandbox](workload-sandbox.md) confines the agent harness or its tools under the selected provider. Managed-loop placement remains [`OQ-SBX-63`](agent-open-questions.md#%60OQ-SBX-63%60). `afakt agent sandbox` views that configuration. `afakt sandbox` manages agent sandbox configurations and standalone sandboxes, including command execution, network rules, and credential authorizations. A standalone sandbox runs commands without requiring an agent conversation. Its identity and lifecycle remain open, as does its relationship to agent launch authority.
+The [agent sandbox](workload-sandbox.md) confines the agent harness or its tools under the selected workload provider. Hosted agent loop placement remains [`OQ-SBX-63`](agent-open-questions.md#%60OQ-SBX-63%60). `afakt agent sandbox` views that configuration. `afakt sandbox` manages agent sandbox configurations and standalone sandboxes, including command execution, network rules, and credential authorizations. A standalone sandbox runs commands without requiring an agent conversation. Its identity and lifecycle remain open, as does its relationship to agent launch authority.
 
 ## Budgets and usage
 

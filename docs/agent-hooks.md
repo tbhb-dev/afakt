@@ -15,7 +15,7 @@ A hook is a command that runs inside the agent launch's agent sandbox when a hoo
 
 ## Hook events
 
-Provider events happen around the agent. The workload provider runs their hooks itself. Agent harness events happen inside the harness while the agent works, and the agent harness runs their hooks through the afakt command-line interface (CLI), as [Hook dispatch](#Hook%20dispatch) describes.
+Workload provider events happen around the agent. The workload provider runs their hooks itself. Agent harness events happen inside the harness while the agent works, and the agent harness runs their hooks through the afakt command-line interface (CLI), as [Hook dispatch](#Hook%20dispatch) describes.
 
 | Event                  | Runs it  | When the hooks run                                                                                                                                                         | Matcher        | Decisions                     |
 | ---------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- | ----------------------------- |

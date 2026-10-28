@@ -13,7 +13,7 @@ generated: { by: "codex:gpt-6", at: "2026-10-28T17:30:00Z" }
 
 ## Launch boundary
 
-Each [workload](workload.md) has one workload proxy mediator and one workload proxy on every provider. This applies to container manager hosts and host modes. Traffic follows guest ⇄ workload proxy ⇄ network in both directions. For each inbound and outbound connection, the proxy requests the mediator's decision. The mediator never transmits traffic. TCP, User Datagram Protocol (UDP), and QUIC use the proxy, with the [domain rule for QUIC](agent-open-questions.md#%60OQ-SBX-68%60) still open.
+Each [workload](workload.md) has one workload proxy mediator and one workload proxy on every workload provider. This applies to container manager hosts and host modes. Traffic follows guest ⇄ workload proxy ⇄ network in both directions. For each inbound and outbound connection, the proxy requests the mediator's decision. The mediator never transmits traffic. TCP, User Datagram Protocol (UDP), and QUIC use the proxy, with the [domain rule for QUIC](agent-open-questions.md#%60OQ-SBX-68%60) still open.
 
 The workload proxy stores the launch's X.509 SPIFFE Verifiable Identity Document (SVID) and private key outside the guest. SPIFFE means Secure Production Identity Framework for Everyone. On control requests, the workload proxy mediator stamps the launch identity. Using the launch's SVID, the workload proxy authenticates those requests. A receiving service checks the peer identity and the immutable launch spec. Terminal launch identities can't start new authorized work. [Workload identity](workload-host.md#Workload%20identity) governs issuance and registration.
 
@@ -60,4 +60,4 @@ HTTP-level decisions enter the [one decision log for the workload](workload-prox
 
 ## Open questions
 
-The workload proxy's [program boundary](agent-open-questions.md#%60OQ-HUB-16%60), [provider mechanisms](agent-open-questions.md#%60OQ-HUB-15%60), and [guest-link conditions](agent-open-questions.md#%60OQ-SBX-70%60) remain undecided. [Local carrier binding](agent-open-questions.md#%60OQ-SBX-13%60) must bind the guest to its workload and launch.
+The workload proxy's [program boundary](agent-open-questions.md#%60OQ-HUB-16%60), [workload provider mechanisms](agent-open-questions.md#%60OQ-HUB-15%60), and [guest-link conditions](agent-open-questions.md#%60OQ-SBX-70%60) remain undecided. [Local carrier binding](agent-open-questions.md#%60OQ-SBX-13%60) must bind the guest to its workload and launch.
