@@ -12,6 +12,9 @@ SQUASH_AGENTMSG
 .claude/settings.local.json
 tmp/
 __pycache__/
+# Obsidian vault settings are shared; the open-pane layout is per session.
+!.obsidian/
+.obsidian/workspace*.json
 .vale/*
 !.vale/project/
 !.vale/config/

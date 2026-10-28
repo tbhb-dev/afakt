@@ -19,6 +19,7 @@ exclude: |
 # commit-msg, pre-commit, pre-push, and post-commit stages.
 
 repos:
+  # The fixers leave .obsidian/ as Obsidian and its plugin authors wrote it.
   - repo: builtin
     hooks:
       - id: check-case-conflict
@@ -30,13 +31,13 @@ repos:
       - id: check-symlinks
         exclude: ^vendor/
       - id: end-of-file-fixer
-        exclude: ^vendor/
+        exclude: ^(vendor|\.obsidian)/
       - id: fix-byte-order-marker
         exclude: ^vendor/
       - id: mixed-line-ending
-        exclude: ^vendor/
+        exclude: ^(vendor|\.obsidian)/
       - id: trailing-whitespace
-        exclude: ^vendor/
+        exclude: ^(vendor|\.obsidian)/
 
   # The shared hooks: the commit-msg gates, the post-commit hook that deletes
   # the COMMIT_AGENTMSG draft once a commit lands, guard-markdown, and the
