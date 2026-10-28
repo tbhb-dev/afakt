@@ -1047,10 +1047,6 @@ Which namespace, mount, capability, daemon socket, and host integration restrict
 
 For each host mode and container provider, which independent authority stops every launch descendant and proves termination when the harness, command process, or runtime refuses cancellation? How do worker failure, helper failure, runtime restart, and surviving children affect slot release and identity reuse? See [Cancellation and limits](workload-lifecycle.md#Cancellation%20and%20limits) and [Restart and recovery](workload-host.md#Restart%20and%20recovery).
 
-### `OQ-SBX-58`
-
-Which host operating systems and architectures does the `podman` provider support? How does Podman run without root privileges, and which setup privileges and services does it need? Is a Podman virtual machine part of the macOS or Windows deployment, and if so, where do the container kernel, runtime management, and physical host boundaries lie? How do the container and host integration restrictions in [`OQ-SBX-56`](#%60OQ-SBX-56%60) apply to Podman, and does its VM require the containment considered in [`OQ-SBX-53`](#%60OQ-SBX-53%60)? Setup and service survival remain under [`OQ-SBX-10`](#%60OQ-SBX-10%60), proxy routing under [`OQ-SBX-54`](#%60OQ-SBX-54%60), and storage placement under [`OQ-WSP-20`](#%60OQ-WSP-20%60). See [Runtime privileges and platforms](workload-host.md#Runtime%20privileges%20and%20platforms).
-
 ### `OQ-SBX-59`
 
 For each host mode, what authenticates registration of a launch with its traffic capture component and binds its tunnel or flows to the current proxy? The choice needs to preserve original destinations and reject stale registrations after identity reuse. Installation, updates, and removal also need an authority whose privileged components remain confined after hostile input. How do component failure, restart, and removal preserve isolation for existing flows as well as new connections? See [Workload proxy mediator](workload-proxy-mediator.md#Launch%20boundary).
