@@ -93,3 +93,5 @@ okf_version: "0.2"
 * [Workload template resource](workload-template-resource.md) - Template envelope, specification, and preparation questions.
 * [Workload image](workload-image.md) - Execution images for each workload provider kind.
 * [Workload image resource](workload-image-resource.md) - Image identity and open payload contracts.
+* [Workload host worker](workload-host-worker.md) - Registration, capacity, observations, and reclaim.
+* [Workload host worker resource](workload-host-worker-resource.md) - Desired configuration and worker observations.
