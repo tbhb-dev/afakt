@@ -29,7 +29,7 @@ Each harness integration defines its launch settings. Profile tool grants and ha
 
 ### Sandbox modes
 
-afakt permits all the [sandbox modes](workload-host.md#Runtime%20privileges%20and%20platforms). The local workload provider kinds are container manager providers (`docker-desktop`, `docker-engine`, and `podman`), VM providers (`macos-vm`, `windows-vm`, and `linux-vm`), and host providers (`macos-host`, `windows-host`, and `linux-host`). Docker Desktop uses the Docker VM on macOS and Windows, with WSL2 or Hyper-V on Windows. Docker Engine supports amd64 Linux bare metal and VMs, and arm64 Linux VMs.
+afakt permits all the [sandbox modes](workload-host.md#Runtime%20privileges%20and%20platforms). The local workload provider kinds are container manager providers (`docker-desktop` and `docker-engine`), VM providers (`macos-vm`, `windows-vm`, and `linux-vm`), and host providers (`macos-host`, `windows-host`, and `linux-host`). Docker Desktop uses the Docker VM on macOS and Windows, with WSL2 or Hyper-V on Windows. Docker Engine supports amd64 Linux bare metal and VMs, and arm64 Linux VMs.
 
 Hosted agent providers include [Claude Managed Agents](workload-provider-claude-managed-agents.md) and [OpenAI Agents API](workload-provider-openai-agents-api.md). Remote sandbox providers include [Modal Sandboxes](workload-provider-modal.md) and [Cloudflare Sandbox SDK](workload-provider-cloudflare.md).
 
@@ -39,7 +39,7 @@ Each workload guest has its own guest kernel and disks. Linux uses a Kernel-base
 
 ### Runtime privileges
 
-The workload host worker uses a dedicated user. It never runs as root. Host-mode agents use a dedicated user separate from the worker, under [Workload host access](workload-overlay.md#Workload%20host%20access). Runtime privileges follow the selected [provider boundary](workload-provider-linux-host.md#Platforms%20and%20privileges). Privileged setup and platform capture services remain provider-specific. Container manager deployments use rootless Docker or Podman. afakt uses a systemd user unit on Linux and a launchd agent on macOS. Setup privileges and service survival after logout remain [open](agent-open-questions.md#Agent%20sandbox). Running each agent launch under its own User Identifier (UID), separate from the worker user, remains [open](agent-open-questions.md#%60OQ-SBX-18%60).
+The workload host worker uses a dedicated user. It never runs as root. Host-mode agents use a dedicated user separate from the worker, under [Workload host access](workload-overlay.md#Workload%20host%20access). Runtime privileges follow the selected [provider boundary](workload-provider-linux-host.md#Platforms%20and%20privileges). Privileged setup and platform capture services remain provider-specific. Container manager deployments use rootless Docker. afakt uses a systemd user unit on Linux and a launchd agent on macOS. Setup privileges and service survival after logout remain [open](agent-open-questions.md#Agent%20sandbox). Running each agent launch under its own User Identifier (UID), separate from the worker user, remains [open](agent-open-questions.md#%60OQ-SBX-18%60).
 
 ### Host process sandbox
 

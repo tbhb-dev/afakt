@@ -51,7 +51,6 @@ afakt permits all the modes in this table: [workload providers](agent-launch-con
 | --- | --- | --- |
 | `docker-desktop` | Container manager | The Docker virtual machine (VM) on macOS and Windows. Windows uses Windows Subsystem for Linux (WSL2) or Hyper-V. |
 | `docker-engine` | Container manager | Docker Engine on amd64 Linux bare metal and VMs, and arm64 Linux VMs. |
-| `podman` | Container manager | Podman. |
 | `macos-vm` | Virtual machine | The macOS microVM design using Virtualization.framework. |
 | `windows-vm` | Virtual machine | The Linux microVM inside WSL2 by default. A Windows-native utility VM for an agent needing a Windows guest. |
 | `linux-vm` | Virtual machine | A Kernel-based Virtual Machine (KVM) microVM driven by Cloud Hypervisor. |
