@@ -89,3 +89,7 @@ okf_version: "0.2"
 ## Workload resources
 
 * [Workload resource](workload-resource.md) - Immutable creation fields and lifecycle observations.
+* [Workload template](workload-template.md) - Creation settings, versions, and claim selection.
+* [Workload template resource](workload-template-resource.md) - Template envelope, specification, and preparation questions.
+* [Workload image](workload-image.md) - Execution images for each workload provider kind.
+* [Workload image resource](workload-image-resource.md) - Image identity and open payload contracts.
