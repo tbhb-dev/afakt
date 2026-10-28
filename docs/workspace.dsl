@@ -13,8 +13,8 @@ workspace "afakt" "Architecture of the afakt modular monolith." {
         temporal = softwareSystem "External Temporal" "Provides durable execution when workers use an external server."
 
         afakt = softwareSystem "afakt" "Coordinates coding work through its API and workflows." {
-            runtime = container "afakt process" "Runs the selected runtime roles together or separately from the same binary." "Go" {
-                cli = component "Command-line interface" "Runs server roles and communicates with the API." "Go"
+            runtime = container "afakt process" "Runs the selected runtime services together or separately from the same binary." "Go" {
+                cli = component "Command-line interface" "Runs server services and communicates with the API." "Go"
                 api = component "API server" "Serves the REST API and starts workflows." "Go"
                 webhook = component "GitHub webhook receiver" "Accepts webhook deliveries and starts coordination work." "Go"
                 dashboard = component "Web dashboard" "Provides the web UI from the API's origin." "React"
@@ -42,7 +42,7 @@ workspace "afakt" "Architecture of the afakt modular monolith." {
             }
             group "Operator access on the workload host" {
                 loopbackProxy = container "Host access boundary" "Host-level authorization for services, previews and ports; local caller and connection mechanisms undecided." "Access mechanism undecided" "Topology"
-                hostNetwork = container "Host-level connectivity" "Host authorization for agent and cluster services; connection mechanism undecided; optional user tailnet attachment." "Host access role" "Topology"
+                hostNetwork = container "Host-level connectivity" "Host authorization for agent and cluster services; connection mechanism undecided; optional user tailnet attachment." "Host connectivity service" "Topology"
             }
             group "Launch guest boundary" {
                 guest = container "Guest context" "Untrusted harness, relay and loopback listeners; no overlay membership or workload keys." "Workload provider confinement" "Topology"
@@ -292,7 +292,7 @@ workspace "afakt" "Architecture of the afakt modular monolith." {
             exclude "element.tag==Topology"
             autoLayout lr
         }
-        component runtime "afakt-components" "The roles inside the combined afakt process." {
+        component runtime "afakt-components" "The components inside the combined afakt process." {
             include *
             exclude "element.tag==Topology"
             autoLayout lr
@@ -365,7 +365,7 @@ workspace "afakt" "Architecture of the afakt modular monolith." {
             destination-workload-proxy -> destinationGuest "Permitted ingress; listener binding open (OQ-PORT-14)"
             autoLayout tb
         }
-        container afakt "network-service-boundaries" "Service roles supporting the deployment topology; connections are control or transport dependencies." {
+        container afakt "network-service-boundaries" "Services supporting the deployment topology; connections are control or transport dependencies." {
             include hostWorker helper controlApi mcpGateway coordination overlayRelay
             exclude "relationship.tag==OverviewHidden"
             autoLayout tb

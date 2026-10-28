@@ -23,7 +23,7 @@ Service users remain [undecided](agent-open-questions.md#%60OQ-HST-8%60), as do 
 
 Over the overlay, the ingress gateway and other workloads dial the workload's proxy directly. Both ends authenticate with SPIFFE mutual Transport Layer Security (TLS). Connections between workloads require decisions from both mediators, and the destination proxy accepts only the ingress gateway and the peers its ingress rules name, and only for the ports those rules publish. The gateway never bypasses ingress rules. How the preview server binds a request to a guest listener remains part of the open [published-port path](agent-open-questions.md#%60OQ-PORT-14%60).
 
-Direct reachability doesn't assign responsibility for [client ACP and remote-control connections](agent-open-questions.md#%60OQ-SES-17%60) or [session roles, message logs, and replay](agent-open-questions.md#%60OQ-SES-18%60). Their owners remain open.
+Direct reachability doesn't assign responsibility for [client ACP and remote-control connections](agent-open-questions.md#%60OQ-SES-17%60) or [session access, message logs, and replay](agent-open-questions.md#%60OQ-SES-18%60). Their owners remain open.
 
 Cutting off an agent's traffic requires action at more than one point. Overlay node or Access Control List (ACL) revocation, together with a policy push, cuts off access. [Rule changes](workload-proxy-mediator.md#Rule%20changes) end existing connections the new rules deny.
 

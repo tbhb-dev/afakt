@@ -23,7 +23,7 @@ The public fields that bind this resource to its durable agent and session remai
 | `kind` | `AgentLaunch`. | The agent dispatcher workflow |
 | `metadata.name` | The [agent launch ID](agent-launch-model.md#Agent%20launch%20ID%20format). | afakt, when it creates the agent launch |
 | `metadata.creationTimestamp` | When afakt created the agent launch. | afakt, when it creates the agent launch |
-| `metadata.labels` | The specification's labels: `task-class`, `variant`, and `role`. | The agent dispatcher workflow |
+| `metadata.labels` | The specification's reporting labels: `task-class` and `variant`. | The agent dispatcher workflow |
 | `spec` | The other specification fields, under the keys in [Specification keys](#Specification%20keys). | The agent dispatcher workflow |
 | `status` | The provider's record of the agent launch, under the keys in [Status keys](#Status%20keys). | The provider |
 
@@ -33,6 +33,7 @@ One resource represents one agent launch. Status addresses an earlier launch by 
 
 | Specification field | Key |
 | --- | --- |
+| Role | `role`, the name of the launch's own Identity and Access Management (IAM) role. Its composition with the workload's role remains [open](agent-open-questions.md#%60OQ-CON-15%60). |
 | Generation | `generation`, the agent spec revision recorded at finalization. |
 | Predecessor | `predecessor_agent_launch_id`, absent for the first agent launch. |
 | Workload provider | `agent_sandbox_provider` |
@@ -97,8 +98,8 @@ metadata:
   labels:
     task-class: build
     variant: b
-    role: builder
 spec:
+  role: builder
   generation: 2
   predecessor_agent_launch_id: 019a1a2b-3c4d-7e5f-8a6b-7c8d9e0f1a2a
   agent_sandbox_provider: linux-vm

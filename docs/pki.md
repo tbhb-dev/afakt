@@ -87,6 +87,6 @@ Hardware-backed enrollment doesn't imply hardware-backed workload keys. A key he
 
 ## Compromised hosts and workers
 
-Trust in the workload host covers lifecycle control, mediation, and locally held credentials. Compromise can expose that authority. A valid identity doesn't prove honest enforcement, and the worker's shared lifecycle role doesn't grant it a place in launch data paths. See [Trust boundary](workload-host.md#Trust%20boundary) and [Workload host](network-topology.md#Workload%20host).
+Trust in the workload host covers lifecycle control, mediation, and locally held credentials. Compromise can expose that authority. A valid identity doesn't prove honest enforcement, and the worker's shared lifecycle responsibility doesn't grant it a place in launch data paths. See [Trust boundary](workload-host.md#Trust%20boundary) and [Workload host](network-topology.md#Workload%20host).
 
 What a compromised worker or host can issue depends on [registration authority](agent-open-questions.md#%60OQ-SBX-30%60) and [broker scope](agent-open-questions.md#%60OQ-SBX-31%60), both undecided. No bounded cross-launch issuance claim follows from keeping keys outside the guest. Host revocation, independent compromise detection, and containment remain under [host revocation](agent-open-questions.md#%60OQ-HST-6%60) and [compromise containment](agent-open-questions.md#%60OQ-SBX-37%60).

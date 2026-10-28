@@ -120,7 +120,7 @@ A data flow diagram shows processes, stores, external entities, and their exchan
 | `P-32` | Public tunnel connector | API server process |
 | `P-33` | Workload proxy | Outside the guest. Launch identity custody |
 | `P-34` | Destination workload proxy | Destination launch identity custody |
-| `P-35` | Host-level network service | Host connectivity role. Mechanism undecided |
+| `P-35` | Host-level network service | Host connectivity service. Mechanism undecided |
 | `P-36` | Cluster overlay | Isolated cluster transport |
 | `P-37` | Coordination interface | Control plane registration authority |
 | `P-38` | Coordination server | Isolated Headscale |
@@ -329,7 +329,7 @@ flowchart LR
 - **`F-36`.** Source mediator request and target grant to its workload proxy. Crosses `TB-13`.
 - **`F-37`.** Source proxy dials the destination proxy directly over the overlay with mutual SPIFFE authentication. Both mediators produce connection decisions. Crosses `TB-3`, `TB-7`.
 - **`F-38`.** Destination proxy returns permitted traffic directly to the source proxy over the authenticated overlay connection. Crosses `TB-3`, `TB-7`.
-- **`F-39`.** Not applicable: the worker has no same-host stream-joining role. Same-host launch traffic uses the overlay.
+- **`F-39`.** Not applicable: the worker doesn't join same-host streams. Same-host launch traffic uses the overlay.
 - **`F-40`.** Not applicable: there is no worker-to-mediator shortcut. Same-host launch traffic uses the overlay.
 
 ### Credential custody and exchange
@@ -506,7 +506,7 @@ flowchart LR
 - **`F-84`.** Host-authorized published-port or preview request. Crosses `TB-3`, `TB-15`.
 - **`F-85`.** Per-launch overlay membership and permitted service transport. Crosses `TB-14`.
 - **`F-86`.** Node registration using the presented launch SVID and single-use tagged enrollment key. Crosses `TB-14`.
-- **`F-87`.** Node registration, role tags, access rules, and deletion. Crosses the coordination authority boundary.
+- **`F-87`.** Node registration, service tags, access rules, and deletion. Crosses the coordination authority boundary.
 - **`F-88`.** Encrypted overlay transport through a relay node. Crosses `TB-14`.
 - **`F-89`.** User app access through an attached tailnet. afakt authentication remains required. Crosses `TB-16`.
 - **`F-90`.** Optional host-level attachment. Launch nodes never join user tailnets, and attachments never route packets into the cluster. Crosses `TB-16`.
@@ -833,22 +833,22 @@ These other paths supplement the complete categories for preview access and gate
 
 | Threat ID | Element | STRIDE category | Threat | Mitigation in the design | Status |
 | --- | --- | --- | --- | --- | --- |
-| `TM-191` | `P-37`, `P-38`, `F-86`, `F-87` | spoofing | A requester enrolls a node under another workload's identity. | [Coordination interface](workload-overlay.md#Coordination%20interface) checks a presented SVID before enrollment. Registration-to-role binding remains undecided. | depends on an open question ([`OQ-SBX-43`](agent-open-questions.md#%60OQ-SBX-43%60)) |
+| `TM-191` | `P-37`, `P-38`, `F-86`, `F-87` | spoofing | A requester enrolls a node under another workload's identity. | [Coordination interface](workload-overlay.md#Coordination%20interface) checks a presented SVID before enrollment. Registration-to-tag binding remains undecided. | depends on an open question ([`OQ-SBX-43`](agent-open-questions.md#%60OQ-SBX-43%60)) |
 | `TM-192` | `P-37`, `P-38`, `F-86`, `F-87` | tampering | A requester substitutes tags or access rules during node registration. | [Coordination interface](workload-overlay.md#Coordination%20interface) controls tags and access rules. Request authorization and update validation need service admission rules. | depends on an open question ([`OQ-SBX-43`](agent-open-questions.md#%60OQ-SBX-43%60)) |
-| `TM-193` | `P-37`, `P-38`, `F-86`, `F-87` | repudiation | Node deletion or a role change lacks durable attribution. | [Coordination interface](workload-overlay.md#Coordination%20interface) manages node deletion. Its durable audit contract remains unspecified. | depends on an open question ([`OQ-SBX-43`](agent-open-questions.md#%60OQ-SBX-43%60)) |
+| `TM-193` | `P-37`, `P-38`, `F-86`, `F-87` | repudiation | Node deletion or a tag change lacks durable attribution. | [Coordination interface](workload-overlay.md#Coordination%20interface) manages node deletion. Its durable audit contract remains unspecified. | depends on an open question ([`OQ-SBX-43`](agent-open-questions.md#%60OQ-SBX-43%60)) |
 | `TM-194` | `P-37`, `P-38`, `F-86`, `F-87` | information disclosure | An enrollment key or stable-node map escapes its intended custody. | [Coordination interface](workload-overlay.md#Coordination%20interface) issues single-use tagged keys. Delivery and storage protection remain unspecified. | depends on an open question ([`OQ-SBX-43`](agent-open-questions.md#%60OQ-SBX-43%60)) |
 | `TM-195` | `P-37`, `P-38`, `F-86`, `F-87` | denial of service | Repeated enrollment or deletion exhausts the coordination service. | [Coordination interface](workload-overlay.md#Coordination%20interface) centralizes registration operations. Enrollment rate and resource bounds are undecided. | depends on an open question ([`OQ-SBX-43`](agent-open-questions.md#%60OQ-SBX-43%60)) |
-| `TM-196` | `P-37`, `P-38`, `F-86`, `F-87` | elevation of privilege | A launch obtains a tag for a control plane role through the coordination interface. | [Coordination interface](workload-overlay.md#Coordination%20interface) assigns role tags. Limits on the requesting identity's registration authority remain undecided. | depends on an open question ([`OQ-SBX-43`](agent-open-questions.md#%60OQ-SBX-43%60)) |
+| `TM-196` | `P-37`, `P-38`, `F-86`, `F-87` | elevation of privilege | A launch obtains a tag for a control plane service through the coordination interface. | [Coordination interface](workload-overlay.md#Coordination%20interface) assigns service tags. Limits on the requesting identity's registration authority remain undecided. | depends on an open question ([`OQ-SBX-43`](agent-open-questions.md#%60OQ-SBX-43%60)) |
 
 ### User tailnet attachments
 
 | Threat ID | Element | STRIDE category | Threat | Mitigation in the design | Status |
 | --- | --- | --- | --- | --- | --- |
 | `TM-197` | `E-12`, `P-12`, `P-35`, `F-89`, `F-90` | spoofing | An attacker substitutes a tailnet device claim for the authenticated afakt user. | [User tailnet attachments](workload-overlay.md#User%20tailnet%20attachments) requires afakt sign-in. Binding an extra tailnet identity signal is undecided. | depends on an open question ([`OQ-HUB-17`](agent-open-questions.md#%60OQ-HUB-17%60)) |
-| `TM-198` | `E-12`, `P-12`, `P-35`, `F-89`, `F-90` | tampering | An attachment change directs user traffic to another cluster or service. | [User tailnet attachments](workload-overlay.md#User%20tailnet%20attachments) restricts attachments to gateway and optional host roles. Attachment update authentication remains undecided. | depends on an open question ([`OQ-HUB-17`](agent-open-questions.md#%60OQ-HUB-17%60)) |
+| `TM-198` | `E-12`, `P-12`, `P-35`, `F-89`, `F-90` | tampering | An attachment change directs user traffic to another cluster or service. | [User tailnet attachments](workload-overlay.md#User%20tailnet%20attachments) restricts attachments to gateway and optional host-level network services. Attachment update authentication remains undecided. | depends on an open question ([`OQ-HUB-17`](agent-open-questions.md#%60OQ-HUB-17%60)) |
 | `TM-199` | `E-12`, `P-12`, `P-35`, `F-89`, `F-90` | repudiation | Tailnet and app records can't attribute an access request to the same caller. | [User tailnet attachments](workload-overlay.md#User%20tailnet%20attachments) separates device and app identity. Cross-boundary audit attribution remains unspecified. | depends on an open question ([`OQ-HUB-17`](agent-open-questions.md#%60OQ-HUB-17%60)) |
 | `TM-200` | `E-12`, `P-12`, `P-35`, `F-89`, `F-90` | information disclosure | A user tailnet exposes cluster traffic beyond the selected app endpoint. | [User tailnet attachments](workload-overlay.md#User%20tailnet%20attachments) forbids launch membership. Attachment containment and certificate behavior remain undecided. | depends on an open question ([`OQ-HUB-17`](agent-open-questions.md#%60OQ-HUB-17%60)) |
-| `TM-201` | `E-12`, `P-12`, `P-35`, `F-89`, `F-90` | denial of service | An attached tailnet floods the gateway or host access role. | [User tailnet attachments](workload-overlay.md#User%20tailnet%20attachments) routes app requests through the gateway. Attachment admission limits remain unspecified. | depends on an open question ([`OQ-HUB-17`](agent-open-questions.md#%60OQ-HUB-17%60)) |
+| `TM-201` | `E-12`, `P-12`, `P-35`, `F-89`, `F-90` | denial of service | An attached tailnet floods the gateway or host-level network service. | [User tailnet attachments](workload-overlay.md#User%20tailnet%20attachments) routes app requests through the gateway. Attachment admission limits remain unspecified. | depends on an open question ([`OQ-HUB-17`](agent-open-questions.md#%60OQ-HUB-17%60)) |
 | `TM-202` | `E-12`, `P-12`, `P-35`, `F-89`, `F-90` | elevation of privilege | A tailnet attachment becomes a packet route into the cluster overlay. | [User tailnet attachments](workload-overlay.md#User%20tailnet%20attachments) forbids packet routing between tailnets and the cluster. | mitigated by the design |
 
 ## Attack trees

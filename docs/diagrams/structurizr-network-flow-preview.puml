@@ -140,7 +140,7 @@ rectangle "afakt\n<size:16>[Software System]</size>" <<Boundary-YWZha3Q=>> {
 
   rectangle "Operator access on the workload host" <<Group-T3BlcmF0b3IgYWNjZXNzIG9uIHRoZSB3b3JrbG9hZCBob3N0>> as group15 {
     rectangle "==Host access boundary\n<size:16>[Container: Access mechanism undecided]</size>\n\nHost-level authorization for services, previews and ports; local caller and connection mechanisms undecided." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Hostaccessboundary
-    rectangle "==Host-level connectivity\n<size:16>[Container: Host access role]</size>\n\nHost authorization for agent and cluster services; connection mechanism undecided; optional user tailnet attachment." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Hostlevelconnectivity
+    rectangle "==Host-level connectivity\n<size:16>[Container: Host connectivity service]</size>\n\nHost authorization for agent and cluster services; connection mechanism undecided; optional user tailnet attachment." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Hostlevelconnectivity
   }
 
 }

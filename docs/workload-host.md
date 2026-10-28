@@ -1,7 +1,7 @@
 ---
 type: Design
 title: Workload host
-description: A machine's role in the workload fleet, its launch services, trust boundary, and recovery behavior.
+description: A machine's responsibilities in the workload fleet, its launch services, trust boundary, and recovery behavior.
 tags: [afakt, agents, workload-host]
 status: draft
 generated: { by: "codex:gpt-6", at: "2026-10-28T17:30:00Z" }

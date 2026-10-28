@@ -124,7 +124,7 @@ Stored content that can serve as input or output forms an artifact. Agent artifa
 
 A policy defines authorization rules. It can attach to roles, credentials, or agent sandbox configurations. A policy proposal represents a proposed change with explicit approval or rejection. Neither a proposal nor an agent's request for a change grants authority by itself.
 
-A role groups associations with policies and authorizations for credentials. Within an organization, managed work shares an access scope. Projects group work within that scope. Requests record work to perform, complete or incomplete closure, and a reason for that closure. Agents work under these scopes without replacing their own profile or agent launch identity. Scope inheritance and the relationship between roles and the agent launch label named `role` remain open.
+A role groups associations with policies and authorizations for credentials. Within an organization, managed work shares an access scope. Projects group work within that scope. Requests record work to perform, complete or incomplete closure, and a reason for that closure. Agents work under these scopes without replacing their own profile or agent launch identity. Each agent launch has its own Identity and Access Management (IAM) role. Reporting labels are `task-class` and `variant`. Scope inheritance remains open, as does [composition of the launch and workload roles](agent-open-questions.md#%60OQ-CON-15%60).
 
 ## Secrets, credentials, and trust material
 

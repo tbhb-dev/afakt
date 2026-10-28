@@ -63,7 +63,7 @@ rectangle "Workload host trust boundary\n<size:16>[Deployment Node: Workload hos
   rectangle "==Host name resolver\n<size:16>[Container: Domain Name System]</size>\n\nResolves names under *.afakt.internal for host clients." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as Topologyhost.Workloadhosttrustboundary.Hostnameresolver_1
   rectangle "Operator access boundary\n<size:16>[Deployment Node: Host service]</size>" <<DeploymentNode-RWxlbWVudCxEZXBsb3ltZW50IE5vZGU=>> as Topologyhost.Workloadhosttrustboundary.Operatoraccessboundary {
     rectangle "==Host access boundary\n<size:16>[Container: Access mechanism undecided]</size>\n\nHost-level authorization for services, previews and ports; local caller and connection mechanisms undecided." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as Topologyhost.Workloadhosttrustboundary.Operatoraccessboundary.Hostaccessboundary_1
-    rectangle "==Host-level connectivity\n<size:16>[Container: Host access role]</size>\n\nHost authorization for agent and cluster services; connection mechanism undecided; optional user tailnet attachment." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as Topologyhost.Workloadhosttrustboundary.Operatoraccessboundary.Hostlevelconnectivity_1
+    rectangle "==Host-level connectivity\n<size:16>[Container: Host connectivity service]</size>\n\nHost authorization for agent and cluster services; connection mechanism undecided; optional user tailnet attachment." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as Topologyhost.Workloadhosttrustboundary.Operatoraccessboundary.Hostlevelconnectivity_1
   }
 
   rectangle "Agent launch A\n<size:16>[Deployment Node: Launch boundary]</size>" <<DeploymentNode-RWxlbWVudCxEZXBsb3ltZW50IE5vZGU=>> as Topologyhost.Workloadhosttrustboundary.AgentlaunchA {
