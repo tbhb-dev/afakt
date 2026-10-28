@@ -4,7 +4,7 @@ title: "Agent sandbox provider for Linux VM"
 description: Isolation, mediation, storage, and lifecycle for the linux-vm agent sandbox provider.
 tags: [afakt, agents, sandbox]
 status: draft
-generated: { by: "codex:gpt-6-astra", at: "2026-10-27T00:00:00Z" }
+generated: { by: "codex:gpt-6", at: "2026-10-28T17:30:00Z" }
 ---
 
 # Agent sandbox provider for Linux VM
@@ -29,13 +29,13 @@ Local helper authentication and binding to the intended launch remain under [`OQ
 
 ## Mediator connection and name resolution
 
-Each agent launch's agent mediator and agent proxy follow [Per-launch services](agent-proxy.md#Launch%20boundary) and the authenticated [hub connection](agent-proxy.md#Hub%20connection).
+Each workload's agent mediator and agent proxy follow [Launch boundary](agent-workload-proxy.md#Launch%20boundary) and the authenticated [overlay connections](agent-workload-proxy.md#Overlay%20connections).
 
-The only network device in the Linux guest connects to the agent mediator. No alternate device or host route sends external traffic. Domain Name System (DNS) queries go to the mediator with no host resolver fallback under [Agent DNS](agent-mediator.md#Agent%20DNS). The guest relay sends control requests and preview streams over a distinct control channel. A host socket that relays virtual-socket bytes is insufficient proof of guest identity. Binding the kernel peer and launch generation remains under [`OQ-SBX-13`](agent-open-questions.md#%60OQ-SBX-13%60).
+The workload proxy is the only external traffic path, including Domain Name System (DNS) queries. It requests a mediator decision for each inbound and outbound connection. The proxy forwards DNS queries to the mediator, with no host resolver fallback. The private link to the proxy doesn't require encryption. The [conditions each platform must meet](agent-open-questions.md#%60OQ-SBX-70%60) remain a working draft. Provider enforcement, including alternate interfaces, inherited descriptors, and indirect host services, remains under [`OQ-SBX-54`](agent-open-questions.md#%60OQ-SBX-54%60).
 
 [Workload identity](agent-host.md#Workload%20identity) keeps agent-proxy credentials outside this provider’s confinement. Kernel-attested local transport remains the leading option in [`OQ-SBX-13`](agent-open-questions.md#%60OQ-SBX-13%60). Current-launch binding and sender attribution remain unresolved under [`OQ-SES-6`](agent-open-questions.md#%60OQ-SES-6%60). Control capacity remains under [`OQ-SBX-14`](agent-open-questions.md#%60OQ-SBX-14%60), while mediator placement and confinement remain under [`OQ-SBX-12`](agent-open-questions.md#%60OQ-SBX-12%60), [`OQ-SBX-19`](agent-open-questions.md#%60OQ-SBX-19%60), [`OQ-SBX-20`](agent-open-questions.md#%60OQ-SBX-20%60), [`OQ-SBX-23`](agent-open-questions.md#%60OQ-SBX-23%60).
 
-[Egress gateway routing](agent-mediator.md#Egress%20gateway%20routing) selects host egress by default and a site gateway when configured. Resolver upstreams and synthetic name answers remain under [`OQ-SBX-21`](agent-open-questions.md#%60OQ-SBX-21%60), [`OQ-SBX-22`](agent-open-questions.md#%60OQ-SBX-22%60). Listener and publication binding remain under [`OQ-SES-5`](agent-open-questions.md#%60OQ-SES-5%60), [`OQ-PORT-6`](agent-open-questions.md#%60OQ-PORT-6%60). Workspace command routing remains under [`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60).
+[Egress gateway routing](agent-workload-mediator.md#Agent%20egress%20gateway) selects host egress by default and a site gateway when configured. Resolver upstreams and synthetic name answers remain under [`OQ-SBX-21`](agent-open-questions.md#%60OQ-SBX-21%60), [`OQ-SBX-22`](agent-open-questions.md#%60OQ-SBX-22%60). Listener and publication binding remain under [`OQ-SES-5`](agent-open-questions.md#%60OQ-SES-5%60), [`OQ-PORT-6`](agent-open-questions.md#%60OQ-PORT-6%60). Workspace command routing remains under [`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60).
 
 ## Workspace, scratch, and caches
 

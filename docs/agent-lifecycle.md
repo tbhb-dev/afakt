@@ -4,7 +4,7 @@ title: Agent lifecycle
 description: Agent, launch, and session states from creation through suspension, capture, restoration, and deletion.
 tags: [afakt, agents, lifecycle, sessions]
 status: draft
-generated: { by: "codex:gpt-6-astra", at: "2026-10-27T00:00:00Z" }
+generated: { by: "codex:gpt-6", at: "2026-10-28T17:30:00Z" }
 ---
 
 # Agent lifecycle
@@ -76,10 +76,10 @@ The agent session lifecycle controls an interactive conversation and its active 
 
 1. **Creation.** When a client creates a session for an agent through the ingress gateway and API server with a profile, workspace sources, and an optional first prompt, the API server starts the agent session workflow with the new session ID.
 2. **Placement.** The agent dispatcher workflow places the session on an agent host, as for an agent launch.
-3. **Start.** The provider builds the agent workspace and starts the guest relay before the `before-agent` hooks. Their CLI control requests use the agent mediator. After the hooks, the adapter starts in the agent sandbox and the relay sends `initialize` and `session/new`. Startup ownership remains [`OQ-SES-15`](agent-open-questions.md#%60OQ-SES-15%60). It registers the session through the mediator and the agent proxy's authenticated hub connection over the overlay.
+3. **Start.** The provider builds the agent workspace and starts the guest relay before the `before-agent` hooks. Their CLI control requests use the agent mediator. After the hooks, the adapter starts in the agent sandbox and the relay sends `initialize` and `session/new`. Startup ownership remains [`OQ-SES-15`](agent-open-questions.md#%60OQ-SES-15%60). Session registration uses the workload proxy under mediator decisions. Its [endpoint owner and connection path](agent-open-questions.md#%60OQ-SES-17%60) remain open.
 4. **Turns.** The agent receives prompts under the [ACP turn rules](agent-acp.md#Turns).
 5. **Suspend.** After the idle timeout, the agent session workflow suspends the session. For a VM provider that supports paired capture, afakt takes an agent snapshot and an agent checkpoint together at an idle turn boundary, with the guest filesystem frozen. The supervisor captures VM state, and the agent harness captures its session state. After the `before-teardown` hooks, it stops the VM and frees the slot.
-6. **Resume.** A prompt or an attach request for a suspended session resumes it. For a VM provider that supports paired capture, the supervisor restores the agent snapshot under the same guest paths, and the harness restores session state from the agent checkpoint. afakt reacquires credentials outside the guest. The guest relay reconnects through the mediator. A restarted adapter receives `session/resume`. Which process and transport state survives restoration remains [open](agent-open-questions.md#Agents). Restoration in host modes and container managers remains [open](agent-open-questions.md#%60OQ-AGT-28%60).
+6. **Resume.** A prompt or an attach request for a suspended session resumes it. For a VM provider that supports paired capture, the supervisor restores the agent snapshot under the same guest paths, and the harness restores session state from the agent checkpoint. afakt reacquires credentials outside the guest. The guest relay reconnects through the proxy under mediator decisions. A restarted adapter receives `session/resume`. Which process and transport state survives restoration remains [open](agent-open-questions.md#Agents). Restoration in host modes and container managers remains [open](agent-open-questions.md#%60OQ-AGT-28%60).
 7. **Close.** A close request, the session's lifetime limit, or a failure ends the session. The provider runs `session-end` hooks, records workspace changes, then runs `before-teardown` hooks and publishes the transcript as evidence, following [Hook events](agent-hooks.md#Hook%20events).
 
 ## Session states

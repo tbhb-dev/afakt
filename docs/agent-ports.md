@@ -4,7 +4,7 @@ title: Agent ports
 description: Loopback listeners, forwarded port records, connections between agents, and authenticated client tunnels.
 tags: [afakt, agents, agent-launch, sessions, ports, previews]
 status: draft
-generated: { by: "codex:gpt-6-astra", at: "2026-10-27T00:00:00Z" }
+generated: { by: "codex:gpt-6", at: "2026-10-28T17:30:00Z" }
 ---
 
 # Agent ports
@@ -42,16 +42,16 @@ The mediator closes forwarding and marks the record `closed` when the listener g
 
 ## Connections between agents
 
-An agent connects to another agent's exposed port by its [internal name](agent-mediator.md#Agent%20DNS). The policy engine checks both ends: source agent A's network policy must allow destination agent B's name and port, and B must have exposed that port to A. A listener alone doesn't grant access.
+An agent connects to another agent's exposed port by its [internal name](agent-workload-mediator.md#Agent%20DNS). The policy engine checks both ends: source agent A's network policy must allow destination agent B's name and port, and B must have exposed that port to A. A listener alone doesn't grant access.
 
-Across agent hosts, the [agent hub](agent-hub.md#Launch-to-launch%20traffic) joins streams over the source and destination launches' connections. Each agent proxy opens its connection with its launch's identity over mutual Transport Layer Security (TLS). Each mediator checks its side's authority before the destination guest relay reaches the exposed loopback listener.
+The source workload's proxy dials the destination workload's proxy directly over the [overlay](agent-overlay.md#Launch-to-launch%20traffic). SPIFFE mutual Transport Layer Security (TLS) authenticates both proxies. Each mediator checks the connection against its firewall rules: egress at the source and ingress from that peer at the destination. Binding a publication to its guest listener remains [open](agent-open-questions.md#%60OQ-PORT-14%60).
 
-On the same agent host, launch traffic uses the overlay like traffic between hosts. The worker stays outside the data path. A direct overlay path remains [undecided](agent-open-questions.md#%60OQ-PORT-8%60). It doesn't introduce a same-host shortcut.
+On the same agent host, launch traffic uses the overlay like traffic between hosts. Launch traffic bypasses the worker. Forwarding through a proxy to its guest listener remains [open](agent-open-questions.md#%60OQ-PORT-14%60). Same-host traffic has no shortcut.
 
 [Agent previews](agent-previews.md) use these publications under [viewer access and share-link rules](agent-previews.md#Access%20and%20share%20links). [Agent services](agent-services.md) publish names and port mappings across agent launches.
 
 ## TCP client tunnels
 
-For a person, raw TCP ports, such as databases, are reachable only through an authenticated afakt client tunnel. Agents use the separately authorized [connections between agents](#Connections%20between%20agents). The client signs in through the ingress gateway. Then it requests one forwarded port through the gateway and agent hub. It receives access only after the control plane checks its access to the agent launch or session. Traffic crosses the launch's agent-proxy connection to the agent hub. For each stream, the mediator checks the current publication and agent launch ID before the guest relay connects to its loopback listener. Raw TCP ports never receive public listeners, preview URLs, or public share links.
+For a person, raw TCP ports, such as databases, are reachable only through an authenticated afakt client tunnel. Agents use the separately authorized [connections between agents](#Connections%20between%20agents). After signing in through the ingress gateway, the client requests one forwarded port. The control plane authorizes access. That check applies to the agent launch or session, and the ingress gateway then dials the workload proxy over the overlay with SPIFFE mutual TLS. How the caller reaches a published port through that proxy remains [open](agent-open-questions.md#%60OQ-PORT-14%60). Raw TCP ports never receive public listeners, preview URLs, or public share links.
 
 [Public tunnel providers](agent-previews.md#Public%20tunnel%20providers) publish previews under the same access checks. [Session clients](agent-previews.md#Sessions%20and%20clients) display publications, and [preview telemetry](agent-previews.md#Telemetry) records requests and tunnel state.

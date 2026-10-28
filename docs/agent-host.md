@@ -4,7 +4,7 @@ title: Agent host
 description: A machine's role in the agent fleet, its agent launch services, trust boundary, and recovery behavior.
 tags: [afakt, agents, agent-host]
 status: draft
-generated: { by: "codex:gpt-6-astra", at: "2026-10-27T00:00:00Z" }
+generated: { by: "codex:gpt-6", at: "2026-10-28T17:30:00Z" }
 ---
 
 # Agent host
@@ -23,16 +23,16 @@ An agent host is a bare metal machine, virtual machine, container manager, or re
 | Agent sandbox provider | The [VM sandbox provider](agent-sandbox.md) is the default. It prepares and confines agent launches and supplies provision, restore, release, status, cancel, and result operations under the [provider operations](agent-launch-contract.md#Provider%20operations). |
 | Agent host supervisor | The supervisor controls virtual machine monitors independently of the worker, guest, and Agent Client Protocol (ACP). It starts, suspends, resumes, stops, and snapshots VMs and verifies forced stops. See [Virtual machine lifecycle](agent-sandbox-lifecycle.md#Virtual%20machine%20lifecycle). |
 | Sandbox VM | Each agent has a guest kernel, a read-only operating system disk, and an independent writable workspace disk. The guest contains the relay, agent harness, adapter when needed, hooks, and helpers. See [Guest layout and lifecycle control](agent-sandbox.md#Guest%20layout%20and%20lifecycle%20control) and [Image contents](agent-workspace-image.md#Image%20contents). |
-| Agent proxy | One per launch opens its hub and permitted service connections with the launch's identity. See [Per-launch services](agent-proxy.md#Launch%20boundary). |
-| Agent mediator | A mediator per agent launch controls the guest's only network route and resolver. It applies connection policy. Inspected destinations go to the agent egress gateway. Traffic to passthrough destinations remains mediated without decryption. See [Agent mediator](agent-mediator.md#Launch%20boundary). |
+| Agent proxy | One per workload transmits guest traffic and opens permitted connections with the launch's identity. See [Per-launch services](agent-workload-proxy.md#Launch%20boundary). |
+| Agent mediator | Each workload's mediator supplies DNS resolution and connection decisions to its proxy. The proxy transmits all guest traffic. Inspected destinations go to the agent egress gateway. Traffic to passthrough destinations remains mediated without decryption. See [Agent mediator](agent-workload-mediator.md#Launch%20boundary). |
 | Agent egress gateway | The gateway decrypts inspected destinations for Hypertext Transfer Protocol (HTTP) policy. It runs on the host by default. The worker can select a standalone site gateway instead. See [Agent egress gateway](components.md#Agent%20egress%20gateway). |
 | Credential broker | A host-side component that injects credentials into permitted requests outside the guest. Its placement relative to the agent egress gateway and agent mediator remains [open](agent-open-questions.md#%60OQ-SBX-23%60). |
-| Guest relay's host side | The mediator ends the guest relay's channel and checks ACP messages. It stamps identity on control requests. The relay itself runs inside the guest. See [Control requests](agent-mediator.md#Control%20requests) and [ACP message policy](agent-acp.md#ACP%20message%20policy). |
-| Telemetry endpoint | The endpoint receives harness telemetry through the mediator and adds agent launch identity. It filters content and forwards it to the deployment's collector. See [Trace context propagation](agent-observability.md#Trace%20context%20propagation). Whether it belongs to the worker or a separate component remains [open](agent-open-questions.md#Agent%20observability). |
-| Port forwarder | Authorized streams cross the mediator and guest relay to guest loopback listeners. Each stream requires publication and agent launch ID checks. See [Port forwarder](components.md#Port%20forwarder) and [HTTP previews](agent-previews.md#HTTP%20previews). |
+| Guest relay's host side | The proxy transmits guest relay traffic under the mediator's ACP message checks. It stamps identity on control requests. The relay itself runs inside the guest. See [Control requests](agent-workload-mediator.md#Control%20requests) and [ACP message policy](agent-acp.md#ACP%20message%20policy). |
+| Telemetry endpoint | The endpoint receives harness telemetry through the workload proxy under mediator decisions and adds agent launch identity. It filters content and forwards it to the deployment's collector. See [Trace context propagation](agent-observability.md#Trace%20context%20propagation). Whether it belongs to the worker or a separate component remains [open](agent-open-questions.md#Agent%20observability). |
+| Port forwarder | The [path from the workload proxy to guest listeners](agent-open-questions.md#%60OQ-PORT-14%60) remains open. Each stream requires publication and agent launch ID checks. See [Port forwarder](components.md#Port%20forwarder) and [HTTP previews](agent-previews.md#HTTP%20previews). |
 | Layer and image caches | The worker keeps verified layer blobs, unpacked layers, and reusable workspace base disks outside writable agent workspaces. Each agent gets an independent writable disk. See [Agent host caches and startup](agent-workspace-image.md#Agent%20host%20caches%20and%20startup). |
 
-Workspace-local Model Context Protocol (MCP) servers also run inside the sandbox VM when a configured server needs the workspace. The [MCP gateway](agent-mcp-gateway.md#Server%20hosting%20and%20lifecycle) connects to them through the guest relay and mediator. Central servers run on the control plane.
+Workspace-local Model Context Protocol (MCP) servers also run inside the sandbox VM when a configured server needs the workspace. The [MCP gateway](agent-mcp-gateway.md#Server%20hosting%20and%20lifecycle) connects to them through the workload proxy under mediator decisions. Central servers run on the control plane.
 
 ## Fleet membership and capacity
 
@@ -40,11 +40,11 @@ At startup, the worker registers its host, task queue, metadata, and slot capaci
 
 The [reservation Application Programming Interface (API)](agent-placement.md#Reservation%20API) selects an eligible host with a free slot. Reserved and claimed slots both count against capacity. Lowering capacity preserves running agent launches and existing reservations, blocking new reservations until capacity permits them. [Image locality](agent-placement.md#Image%20locality) is advisory and never overrides requirements, host binding, or slot accounting. [Preheating](agent-workspace-image.md#Placement%20and%20preheating) uses host task queues and respects disk pressure without reserving future slots.
 
-Each launch's agent proxy opens its own authenticated [agent hub connection](agent-proxy.md#Hub%20connection) over the overlay. It also opens permitted API and service connections using that launch's identity. The mediator enforces policy and has no network of its own. User-facing traffic enters through the ingress gateway. Traffic between launches on the same host uses the overlay, with no worker shortcut. Every host also supplies [host-level DNS resolution and authorized connectivity](agent-hub.md#Agent%20host%20access). The mechanism remains undecided.
+Each workload's agent proxy accepts direct authenticated [overlay connections](agent-workload-proxy.md#Overlay%20connections) from permitted peers. It also opens permitted API and service connections using that launch's identity. The mediator enforces policy and has no network of its own. User-facing traffic enters through the ingress gateway. Traffic between launches on the same host uses the overlay, with no worker shortcut. Every host also supplies [host-level DNS resolution and authorized connectivity](agent-overlay.md#Agent%20host%20access). The mechanism remains undecided.
 
 ## Runtime privileges and platforms
 
-The agent host worker and host-mode agents use separate dedicated users under [Agent host access](agent-hub.md#Agent%20host%20access). Provider privileges and platform-specific capture services follow [Enforcement](agent-sandbox.md#Enforcement), without settling the held [host isolation baseline](agent-open-questions.md#%60OQ-SBX-18%60).
+The agent host worker and host-mode agents use separate dedicated users under [Agent host access](agent-overlay.md#Agent%20host%20access). Provider privileges and platform-specific capture services follow [Enforcement](agent-sandbox.md#Enforcement), without settling the held [host isolation baseline](agent-open-questions.md#%60OQ-SBX-18%60).
 
 afakt permits all the modes in this table: [agent sandbox providers](agent-launch-contract.md#Provider%20operations) use host modes or container managers, or they use virtual machine monitors.
 

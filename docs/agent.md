@@ -4,7 +4,7 @@ title: Agents
 description: Durable agents, their lifecycle, owned resources, and operations across agent launches.
 tags: [afakt, agents, lifecycle]
 status: draft
-generated: { by: "codex:gpt-6-astra", at: "2026-10-27T00:00:00Z" }
+generated: { by: "codex:gpt-6", at: "2026-10-28T17:30:00Z" }
 ---
 
 # Agents
@@ -52,7 +52,7 @@ An agent launch request asks to use an agent to perform a task. An agent, human,
 | Budget | Bounds allowed usage across the agent's work. |
 | Labels and annotations | Store metadata for selection and reporting or descriptive context. Neither grants authority. |
 
-Ownership of a reference doesn't grant access to its target. Profile capabilities, agent sandbox rules, and service authorization still bound each agent launch. The API server identifies the agent launch from the agent proxy's peer certificate and reads capabilities and scopes from the agent launch spec it already holds. See [Agent launch authentication](agent-proxy.md#Agent%20launch%20authentication). The agent's durable identity doesn't extend that authority past a terminal state.
+Ownership of a reference doesn't grant access to its target. Profile capabilities, agent sandbox rules, and service authorization still bound each agent launch. The API server identifies the agent launch from the agent proxy's peer certificate and reads capabilities and scopes from the agent launch spec it already holds. See [Agent launch authentication](agent-workload-proxy.md#Agent%20launch%20authentication). The agent's durable identity doesn't extend that authority past a terminal state.
 
 [Agent states](agent-lifecycle.md#Agent%20states).
 

@@ -4,7 +4,7 @@ title: "Agent threat model for Modal Sandboxes"
 description: Remote execution, vendor custody, and provider integration threats for Modal Sandboxes.
 tags: [afakt, agents, security, threat-model]
 status: draft
-generated: { by: "codex:gpt-6-astra", at: "2026-10-27T00:00:00Z" }
+generated: { by: "codex:gpt-6", at: "2026-10-28T17:30:00Z" }
 ---
 
 # Agent threat model for Modal Sandboxes
@@ -15,7 +15,7 @@ generated: { by: "codex:gpt-6-astra", at: "2026-10-27T00:00:00Z" }
 
 The Modal Sandboxes provider follows its [provider design](agent-sandbox-modal.md).
 
-Vendor lifecycle authority, sandbox isolation, workspace and session storage, network paths, and retained state fall within this model, as do commands requested through `afakt agent exec`. The [common agent threat model](agent-threat-model.md) covers shared control plane authorization, credential exchange, agent hub sessions, registries, and audit storage because their controls don't depend on this vendor.
+Vendor lifecycle authority, sandbox isolation, workspace and session storage, network paths, and retained state fall within this model, as do commands requested through `afakt agent exec`. The [common agent threat model](agent-threat-model.md) covers shared control plane authorization, credential exchange, session access, registries, and audit storage because their controls don't depend on this vendor.
 
 STRIDE covers spoofing, tampering, repudiation, information disclosure, denial of service, and elevation of privilege. A virtual machine (VM) can supply a private kernel. Domain Name System (DNS) queries and Agent Client Protocol (ACP) sessions require the launch's agent mediator. Model Context Protocol (MCP) tools require afakt gateway authorization. An Application Programming Interface (API) exposes vendor management operations. Hypertext Transfer Protocol Secure (HTTPS) encrypts web traffic, while Hypertext Transfer Protocol (HTTP) names the underlying request protocol.
 
@@ -48,7 +48,7 @@ STRIDE covers spoofing, tampering, repudiation, information disclosure, denial o
 | `P-MOD-3` | Sandbox execution | Vendor sandbox. afakt-agent, afakt-sandbox, and harness. Compatibility unresolved |
 | `P-MOD-4` | Agent mediator | Required per launch. Remote placement unresolved |
 | `P-MOD-5` | Agent proxy | Required outside sandbox. Remote placement unresolved |
-| `P-MOD-6` | Agent hub and global egress gateway | afakt control plane. Shared models apply |
+| `P-MOD-6` | Overlay peers and global egress gateway | Workload peers and control plane gateway. Shared models apply |
 | `P-MOD-7` | Successor launch | New launch authority |
 | `P-MOD-8` | Workspace command | afakt-sandbox placement unresolved |
 | `DS-MOD-1` | Workspace and scratch | Launch data. Remote backing and separation unresolved |
@@ -78,8 +78,8 @@ flowchart LR
         P-MOD-4["P-MOD-4: Agent mediator"]
         P-MOD-5["P-MOD-5: Agent proxy"]
     end
-    subgraph services["TB-MOD-3 / afakt services"]
-        P-MOD-6["P-MOD-6: Hub and global egress gateway"]
+    subgraph services["TB-MOD-3 / overlay peers and afakt services"]
+        P-MOD-6["P-MOD-6: Overlay peers and global egress gateway"]
     end
     subgraph files["TB-MOD-4 / launch-controlled storage"]
         DS-MOD-1["DS-MOD-1: Workspace and scratch"]
@@ -134,7 +134,7 @@ flowchart LR
 - **`F-MOD-3`.** untrusted runtime input, system calls, and execution output presented to vendor services. Crosses `TB-MOD-2`.
 - **`F-MOD-4`.** Required launch-bound network, name queries, control, ACP, MCP, and preview traffic. Crosses `TB-MOD-1`, `TB-MOD-3`.
 - **`F-MOD-5`.** Permitted requests passed from the no-network mediator to its agent proxy. Crosses `TB-MOD-3`.
-- **`F-MOD-6`.** Authenticated hub streams and inspected traffic to the global egress gateway. Common service controls apply. Crosses `TB-MOD-3`.
+- **`F-MOD-6`.** Direct authenticated overlay connections and inspected traffic to the global egress gateway. Session routing depends on [`OQ-SES-17`](agent-open-questions.md#%60OQ-SES-17%60). Published-port routing depends on [`OQ-PORT-14`](agent-open-questions.md#%60OQ-PORT-14%60). Common service controls apply. Crosses `TB-MOD-3`.
 - **`F-MOD-7`.** Vendor-permitted external traffic, including potential direct paths outside afakt mediation. Crosses `TB-MOD-1`, `TB-MOD-3`.
 - **`F-MOD-8`.** Workspace and scratch reads and writes. Crosses `TB-MOD-4`.
 - **`F-MOD-9`.** Remote workspace transfer, capture, materialization, and cleanup of hostile content. Crosses `TB-MOD-1`, `TB-MOD-4`.

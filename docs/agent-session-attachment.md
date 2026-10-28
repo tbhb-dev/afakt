@@ -4,28 +4,28 @@ title: Agent session attachment
 description: Agent session attachment, history replay, and signed messages between agents.
 tags: [afakt, agents, sessions, acp, messaging]
 status: draft
-generated: { by: "codex:gpt-6-astra", at: "2026-10-27T00:00:00Z" }
+generated: { by: "codex:gpt-6", at: "2026-10-28T17:30:00Z" }
 ---
 
 # Agent session attachment
 
 [Public key infrastructure](pki.md).
 
-Clients attach to [agent sessions](agent-session.md) through the [Agent Client Protocol (ACP) endpoint](agent-acp.md#The%20protocol%20endpoint). Attachment follows the [writer and reader rules](agent-acp.md#Writer%20and%20readers). Agents use the same agent hub to send each other signed messages.
+Clients attach to [agent sessions](agent-session.md) through the [Agent Client Protocol (ACP) endpoint](agent-acp.md#The%20protocol%20endpoint). Attachment follows the [writer and reader rules](agent-acp.md#Writer%20and%20readers). Which component accepts connections and reaches the workload remains [open](agent-open-questions.md#%60OQ-SES-17%60).
 
 [Agent launch attachment](agent-acp.md#Agent%20launch%20attachment) admits readers. Interactive [requests from the agent](agent-acp.md#Requests%20from%20the%20agent) require the writer.
 
 ## History and replay
 
-- The agent hub keeps an append-only log of every message in the session, keyed by ACP message ID.
+- The [session message log](agent-acp.md#Session%20message%20log) is append-only and keyed by ACP message ID. Its owner and replay mechanism remain [open](agent-open-questions.md#%60OQ-SES-18%60).
 - A client that attaches with `replayFrom: {type: "start"}` receives the log as `session/update` notifications before the attach response.
-- The hub sends each client only the update kinds that its `initialize` capabilities accept.
+- Each client receives only the update kinds that its `initialize` capabilities accept.
 
 ## Agent messages
 
 - An agent with the `sessions.message` capability sends a message to another session through the session Application Programming Interface (API). The message enters the target session's prompt queue with the sender in `_meta`.
 - A profile limits which sessions its agents may message.
-- Each message includes a hop count. The hub drops a message whose hop count passes the deployment's limit.
+- Each message includes a hop count. afakt drops a message whose hop count passes the deployment's limit.
 - The receiving agent treats a message's content as untrusted input, whoever sent it.
 
 ## Message signatures

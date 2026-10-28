@@ -1,10 +1,10 @@
 ---
 type: Design
 title: Agent previews
-description: Preview publication, names, endpoints, viewer access, and lifetime through the agent hub.
+description: Preview publication, names, endpoints, viewer access, and lifetime through workload proxies.
 tags: [afakt, agents, previews, ports, network]
 status: draft
-generated: { by: "codex:gpt-6-astra", at: "2026-10-27T00:00:00Z" }
+generated: { by: "codex:gpt-6", at: "2026-10-28T17:30:00Z" }
 ---
 
 # Agent previews
@@ -17,13 +17,13 @@ An agent preview exposes a published Hypertext Transfer Protocol (HTTP) port thr
 
 Each published HTTP port gets a preview URL served by the [ingress gateway](components.md#Ingress%20gateway). A preview domain is the configured domain beneath which each publication gets a host name under the [preview naming scheme](agent-previews.md#Preview%20routing%20and%20names). Routing also distinguishes agent launches and listener records, so an old URL can't open another agent launch's server. Internal-only preview names resolve under `afakt.internal` for agents through the agent mediator's resolver. Applications see a site root that preserves their paths without a path prefix. WebSockets and server-sent events pass through without response buffering that prevents streaming.
 
-The preview server is a published-port client of the agent hub. After viewer authorization, it requests a publication through the hub, which returns the stream over the target launch's agent-proxy connection. The mediator checks that the publication is current and its launch ID matches before the guest relay connects to the bound loopback listener. The preview server routes only recorded publications, never an arbitrary browser-supplied destination. No preview transport requires an inbound host or guest listener. When the hub connection is unavailable, requests fail without opening a direct route. See [Previews](agent-previews.md#Preview%20routing%20and%20names).
+The preview server is a published-port client. After viewer authorization, it dials the target workload's proxy directly over the overlay. Both sides authenticate with SPIFFE mutual Transport Layer Security (TLS). At the target, the mediator checks ingress rules for that connection. The [published-port path](agent-open-questions.md#%60OQ-PORT-14%60), including caller context and binding to the guest listener, remains open. Routing admits only recorded publications, never an arbitrary browser-supplied destination.
 
 The ingress gateway serves previews on a second listener in the same gateway, separate from the ingress gateway's Application Programming Interface (API) and dashboard listener. afakt isolates preview origins and cookies from the API and dashboard origins and cookies: API and dashboard cookies are host-only and never scoped to a parent of preview hosts. Preview authentication uses cookies restricted to the exact preview host. Credentialed cross-origin access from preview origins fails because the API and dashboard reject it. Preview content can't read their cookies or use their authenticated browser access.
 
 ## Preview routing and names
 
-The preview server is a client of published ports. For a viewer's preview request, the external ingress gateway forwards the request to the preview server, which requests the authorized publication through the agent hub. Over the target launch's connection, the hub returns the stream. Before the guest relay connects to the bound loopback listener, the target mediator checks the publication and launch. The preview server never accepts a browser-supplied arbitrary destination. See the [preview flow](network-topology.md#Operator%20browser%20to%20a%20preview) for the host-access path and the same published-port boundary.
+The external ingress gateway forwards viewer requests to the preview server. It connects to workload proxies directly over the overlay. Authorization of the publication and current launch remains required. [How the proxy connects that request to the guest listener](agent-open-questions.md#%60OQ-PORT-14%60) is open. The preview server never accepts a browser-supplied arbitrary destination. See the [preview flow](network-topology.md#Operator%20browser%20to%20a%20preview) for host access.
 
 Default public preview names use `<namespace>-<agent_id>-<port_number or port_name>.<preview_domain>`. Vanity names use `<preview_name>.<preview_domain>`. Internal previews use the internal preview zone. [Vanity-name ownership](agent-open-questions.md#%60OQ-HUB-12%60) and [authorization across launch changes](agent-open-questions.md#%60OQ-HUB-13%60) remain undecided. Preview content remains separate from the API and dashboard origin. See [browser isolation](agent-open-questions.md#%60OQ-PORT-9%60) for the remaining boundary questions.
 
@@ -38,7 +38,7 @@ Internal preview Domain Name System (DNS) names use these targets.
 | `<preview_name>.<namespace>.previews.afakt.internal` | An internal preview through the preview server |
 | `previews.default.svc.afakt.internal` | The preview server |
 
-Internal preview names use the [shared namespace and resolution rules](agent-hub.md#Names).
+Internal preview names use the [shared namespace and resolution rules](agent-overlay.md#Names).
 
 ## Access and share links
 
@@ -52,7 +52,7 @@ Previews never pass afakt credentials to the app. Before forwarding, the preview
 
 Through host-level DNS, the operator's browser resolves an internal preview name and requests access under host-level authorization. Using host authority, the host connectivity role reaches the preview server. Names for published services and ports cross the same boundary. Any further authentication belongs to the accessed app. The local connection and caller-authentication mechanisms remain [undecided](agent-open-questions.md#%60OQ-HST-9%60).
 
-As a service client, the preview server opens an authorized published port through the agent hub. To return that stream, the hub uses the existing connection of the target launch's agent proxy, authenticated with the target launch's Secure Production Identity Framework for Everyone (SPIFFE) Verifiable Identity Document (SVID). Authenticated caller and publication context pass from the agent proxy to the agent mediator. Before the guest relay connects to the bound guest loopback listener, the mediator checks the current target launch and publication. No direct route connects the browser to a guest or its agent proxy.
+As a service client, the preview server dials the workload proxy over the overlay using SPIFFE mutual Transport Layer Security (TLS). The proxy requests an inbound connection decision from its mediator, accepting only the ingress gateway and peers named by its ingress rules. Publication and launch checks remain required. Their [binding to the guest listener](agent-open-questions.md#%60OQ-PORT-14%60) remains open. No direct route connects the browser to a guest or its proxy.
 
 [Published ports](agent-ports.md#Port%20discovery%20and%20records) and [preview access](agent-previews.md#Access%20and%20share%20links) define target authority. [Host access](agent-open-questions.md#%60OQ-HST-9%60), [preview request processing](agent-open-questions.md#%60OQ-PORT-13%60), [listener binding](agent-open-questions.md#%60OQ-PORT-6%60), and [active-route changes](agent-open-questions.md#%60OQ-PORT-10%60) remain undecided.
 

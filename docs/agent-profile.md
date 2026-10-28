@@ -4,7 +4,7 @@ title: Agent profile
 description: The versioned definition of an agent's behavior, which bounds what an agent launch spec may request and which a launch validates against.
 tags: [afakt, agents, agent-launch, profiles]
 status: draft
-generated: { by: "codex:gpt-6-astra", at: "2026-10-27T00:00:00Z" }
+generated: { by: "codex:gpt-6", at: "2026-10-28T17:30:00Z" }
 ---
 
 # Agent profile
@@ -158,7 +158,7 @@ Each server's deployment configuration fixes remote Hypertext Transfer Protocol 
 
 ### Capabilities
 
-A capability allows the agent one afakt API operation, which it calls through the afakt CLI or the [built-in afakt MCP server](agent-mcp-gateway.md#Built-in%20afakt%20MCP%20server). Reading a pull request or posting a review are afakt API operations too. A capability controls which external operations the agent may perform and where. On each request, the API server checks the agent launch's capabilities and scopes. The agent proxy authenticates with the launch's X.509 SPIFFE Verifiable Identity Document (SVID). From the peer certificate, the API server identifies the agent launch and reads those rights from the agent launch spec it already holds. After the agent launch enters a terminal state, the API server refuses requests from its identity. See [Agent launch authentication](agent-proxy.md#Agent%20launch%20authentication).
+A capability allows the agent one afakt API operation, which it calls through the afakt CLI or the [built-in afakt MCP server](agent-mcp-gateway.md#Built-in%20afakt%20MCP%20server). Reading a pull request or posting a review are afakt API operations too. A capability controls which external operations the agent may perform and where. On each request, the API server checks the agent launch's capabilities and scopes. The agent proxy authenticates with the launch's X.509 SPIFFE Verifiable Identity Document (SVID). From the peer certificate, the API server identifies the agent launch and reads those rights from the agent launch spec it already holds. After the agent launch enters a terminal state, the API server refuses requests from its identity. See [Agent launch authentication](agent-workload-proxy.md#Agent%20launch%20authentication).
 
 Each capability has the form `<resource>.<action>`, such as `pull-requests.read` or `pull-requests.review`. afakt's API server publishes the full set. A profile lists each capability with optional scopes, such as repositories and branches, that limit where it applies. Scopes accept [agent sandbox variables](agent-sandbox.md#Sandbox%20variables). With them, a profile can limit a capability to the repository in the agent workspace.
 
@@ -225,8 +225,6 @@ spec:
     pull-requests.comment: { repositories: ["${repository:.}"] }
     pull-requests.review: { repositories: ["${repository:.}"] }
   sandbox:
-    network:
-      allowedDomains: ["${repository-host:.}", api.example-provider.com]
     filesystem:
       denyRead: ["${home}/.aws", "${home}/.docker"]
   credentials:
@@ -321,7 +319,7 @@ Before it records an agent launch, the agent sandbox provider validates the spec
 | `hook-invalid` | A hook breaks a rule from [Hook fields](agent-hooks.md#Hook%20fields), such as a duplicate name in the combined list, an empty command, a working directory without a matching workspace source, or a timeout no shorter than the time limit. Other examples are a field that its event doesn't take, a tool name outside the profile's tools, or a decision that its event doesn't allow. The error gives the hook and the rule. |
 | `sandbox-variable-unknown` | A sandbox rule, capability scope, inject domain, environment value, or hook uses a variable that [Sandbox variables](agent-sandbox.md#Sandbox%20variables) doesn't define, or a target path without a matching workspace source. |
 | `sandbox-not-allowed` | A specification allow entry falls outside the profile's allow list, or the specification turns on an isolation relaxation that the profile leaves off. |
-| `credential-domain-not-allowed` | A credential brokering inject domain doesn't match the combined `allowedDomains` or selects passthrough rather than inspection for it. |
+| `credential-domain-not-allowed` | A credential brokering inject domain lacks firewall permission or selects passthrough rather than inspection for it. |
 | `harness-permission-unsupported` | The harness on this agent host can't enforce one of the profile's harness permissions. |
 | `sandbox-unsupported` | The provider can't enforce a setting of the sandbox configuration built from the profile and launch spec on this agent host. The error gives the setting. |
 | `credential-unavailable` | The agent host can't resolve one of the profile's or agent launch's credential references. The error gives the reference, never a value. |
@@ -340,7 +338,7 @@ A profile changes by gaining a new version. Publishing a profile version leaves 
 
 ## Example profiles
 
-| Profile | Workspace access | Agent harness permissions | Capabilities | Agent sandbox network | Output schema policy |
+| Profile | Workspace access | Agent harness permissions | Capabilities | Workload firewall | Output schema policy |
 | --- | --- | --- | --- | --- | --- |
 | `build` | `read-write` | `run-commands`, `edit-files`, `commit` | `pull-requests.read`, and `branches.push` limited to the new branch | The repository host, package registries, and the model provider | `per-agent-launch` |
 | `review` | `read-only` | `run-commands` | `pull-requests.read`, `pull-requests.comment`, and `pull-requests.review`, limited to the workspace repository | The repository host and the model provider | `fixed`, a review verdict |

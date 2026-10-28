@@ -4,7 +4,7 @@ title: "Agent sandbox provider for OpenAI Agents API"
 description: Remote isolation, mediation, storage, and lifecycle for OpenAI Agents API.
 tags: [afakt, agents, sandbox]
 status: draft
-generated: { by: "codex:gpt-6-astra", at: "2026-10-27T00:00:00Z" }
+generated: { by: "codex:gpt-6", at: "2026-10-28T17:30:00Z" }
 ---
 
 # Agent sandbox provider for OpenAI Agents API
@@ -31,9 +31,9 @@ OpenAI prepares packages and files before setup commands, and a nonzero setup ex
 
 ## Mediator connection and name resolution
 
-Each launch requires [agent mediation](agent-mediator.md#Launch%20boundary) for control, session, preview, and network traffic.
+Each launch requires [agent mediation](agent-workload-mediator.md#Launch%20boundary) for control, session, preview, and network traffic.
 
-Remote launches require the [agent proxy](agent-proxy.md#Launch%20boundary) and [global egress path](components.md#Agent%20egress%20gateway), with their placement and carrier subject to the provider mapping below.
+Remote launches require the [agent proxy](agent-workload-proxy.md#Launch%20boundary) and [global egress path](components.md#Agent%20egress%20gateway), with their placement and carrier subject to the provider mapping below.
 
 Remote placement, mandatory transport, Domain Name System (DNS) mediation, and prevention of direct connections remain under [`OQ-SBX-36`](agent-open-questions.md#%60OQ-SBX-36%60). Provider assertions for launch identity remain under [`OQ-SBX-52`](agent-open-questions.md#%60OQ-SBX-52%60).
 

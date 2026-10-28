@@ -31,13 +31,15 @@ okf_version: "0.2"
 * [Agent hooks](agent-hooks.md) - The hooks that run on hook events before, during, and after the agent's work, how profiles and specifications combine them, and which events and decisions each agent harness supports.
 * [Agent observability](agent-observability.md) - The OpenTelemetry trace and spans of an agent launch, the trace context the harness receives, and the metrics afakt publishes.
 * [Agent profile](agent-profile.md) - The blueprint for creating an agent, with configuration templates and bounds for finalizing each agent launch spec.
-* [Agent hub](agent-hub.md) - Per-launch connections, internal names, published services, and overlay access.
-* [Agent proxy](agent-proxy.md) - Per-launch overlay identity, authenticated connections, and hub streams.
+* [Agent overlay and names](agent-overlay.md) - Workload overlay nodes, direct connections, internal names, and ingress access.
+* [Agent workload](agent-workload.md) - Guest, mediator, proxy, firewall, and launch boundary.
+* [Agent workload guest](agent-workload-guest.md) - Guest routing, containment, and its private proxy link.
+* [Agent proxy](agent-workload-proxy.md) - Workload traffic, direct overlay connections, and mutual authentication.
 * [Agent session](agent-session.md) - An agent's durable conversation, retained transcripts, and session workflow.
 * [Agent ACP](agent-acp.md) - Agent Client Protocol connections, message policy, turns, and writer and reader roles.
 * [Agent session attachment](agent-session-attachment.md) - Session attachment, history replay, and signed agent messages.
 * [Agent sandbox](agent-sandbox.md) - The sandbox configuration, sandbox variables, credential brokering, and authentication of an agent launch.
-* [Agent mediator](agent-mediator.md) - Per-launch guest connections, network policy, and control requests.
+* [Agent mediator](agent-workload-mediator.md) - Per-launch guest connections, network policy, and control requests.
 * [Agent sandbox lifecycle](agent-sandbox-lifecycle.md) - Provisioning, readiness, suspension, restoration, and teardown across providers.
 * [Agent sandbox provider for macOS VM](agent-sandbox-macos-vm.md) - Isolation, mediation, storage, and lifecycle for macos-vm.
 * [Agent sandbox provider for Linux VM](agent-sandbox-linux-vm.md) - Isolation, mediation, storage, and lifecycle for linux-vm.

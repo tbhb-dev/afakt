@@ -4,7 +4,7 @@ title: Agent observability
 description: The OpenTelemetry trace of an agent launch, the spans inside it, the trace context the harness receives, and the metrics afakt publishes about agent launches.
 tags: [afakt, agents, agent-launch, observability, opentelemetry]
 status: draft
-generated: { by: "codex:gpt-6-astra", at: "2026-10-27T00:00:00Z" }
+generated: { by: "codex:gpt-6", at: "2026-10-28T17:30:00Z" }
 ---
 
 # Agent observability
@@ -150,7 +150,7 @@ Each span from `afakt.agent_launch` down includes the agent launch attributes. O
 The provider passes the trace context into the agent sandbox through the [trace context variables](agent-workspace.md#Trace%20context). The agent receives the agent harness span's context, and each hook receives its own span's context, so a hook's child processes can add spans under it.
 
 - Through the agent mediator and agent proxy, the agent harness sends telemetry to the agent host's endpoint at `${telemetry}`. The sandbox's network rules block every other telemetry destination.
-- The telemetry endpoint identifies the launch from the authenticated agent-proxy connection and the context stamped by its mediator. See [Per-launch services](agent-proxy.md#Launch%20boundary). It adds `afakt.agent_launch.id` and `afakt.agent_spec.generation` to each span and log record but never to a metric. Then it forwards the data to the deployment's collector.
+- The telemetry endpoint identifies the launch from the authenticated agent-proxy connection and the context stamped by its mediator. See [Per-launch services](agent-workload-proxy.md#Launch%20boundary). It adds `afakt.agent_launch.id` and `afakt.agent_spec.generation` to each span and log record but never to a metric. Then it forwards the data to the deployment's collector.
 - For each harness, the telemetry endpoint keeps only the attributes on its list of permitted names and drops the rest. It also drops any log record that [What telemetry never records](#What%20telemetry%20never%20records) excludes, even when the harness's own settings fail to leave it out.
 - A harness that accepts an inbound `TRACEPARENT` nests its spans under the agent harness span, while any other harness starts its own traces, which join the agent launch through the attributes that the telemetry endpoint adds.
 - When the harness doesn't export telemetry, the trace still contains every afakt span, including the hook dispatch spans, because the afakt CLI emits those.

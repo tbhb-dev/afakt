@@ -4,7 +4,7 @@ title: "Agent threat model for Docker Engine on Linux"
 description: Isolation, local transport, retained state, and platform threats for the docker-engine agent sandbox provider.
 tags: [afakt, agents, security, threat-model]
 status: draft
-generated: { by: "codex:gpt-6-astra", at: "2026-10-27T00:00:00Z" }
+generated: { by: "codex:gpt-6", at: "2026-10-28T17:30:00Z" }
 ---
 
 # Agent threat model for Docker Engine on Linux
@@ -42,7 +42,7 @@ Commands started by `afakt agent exec` use standalone afakt-sandbox. [Provider s
 | Boundary ID | Boundary | Two sides | Enforcement in the design |
 | --- | --- | --- | --- |
 | `TB-DE-1` | Agent harness and provider control | untrusted process tree / provider lifecycle and platform authority | [Enforcement](agent-sandbox.md#Enforcement) defines the isolation tier. [Host visibility and workspace commands](#Host%20visibility%20and%20workspace%20commands) identifies platform exposure and missing confinement. |
-| `TB-DE-2` | Local transport and agent mediator | Launch network and control endpoints / mediator identity and policy | [Agent mediator](agent-mediator.md#Launch%20boundary) Local endpoint binding remains [`OQ-SBX-13`](agent-open-questions.md#%60OQ-SBX-13%60). |
+| `TB-DE-2` | Local transport and agent mediator | Launch network and control endpoints / mediator identity and policy | [Agent mediator](agent-workload-mediator.md#Launch%20boundary) Local endpoint binding remains [`OQ-SBX-13`](agent-open-questions.md#%60OQ-SBX-13%60). |
 | `TB-DE-3` | Agent workspace and host processing | Launch-controlled files / worker capture, materialization, and cleanup | [Agent workspace capture](agent-workspace.md#Agent%20workspace%20capture) Host-side handling of repository metadata remains [`OQ-WSP-18`](agent-open-questions.md#%60OQ-WSP-18%60). |
 | `TB-DE-4` | Shared named tool cache | One launch / cache content consumed by another launch | [Sandbox variables](agent-sandbox.md#Sandbox%20variables) Access, provenance, and capacity controls remain [`OQ-WSP-19`](agent-open-questions.md#%60OQ-WSP-19%60). |
 | `TB-DE-5` | Captured state and successor launch | Current launch / retained capture and later launch | [Suspend and resume](agent-sandbox-lifecycle.md#Suspend%20and%20resume) State authorization and ownership remain [`OQ-AGT-31`](agent-open-questions.md#%60OQ-AGT-31%60). |
@@ -76,6 +76,7 @@ Arrows identify exchanges and their return paths. Unspecified carriers and place
 
 ```mermaid
 flowchart LR
+    P-DE-8["P-DE-8: Agent proxy"]
     subgraph z0["TB-DE-1 / launch confinement"]
         P-DE-1["P-DE-1: Agent harness and afakt-sandbox"]
     end
@@ -114,8 +115,8 @@ flowchart LR
     end
     P-DE-2 -->|"F-DE-1"| P-DE-1
     P-DE-1 -->|"F-DE-2"| P-DE-5
-    P-DE-5 -->|"F-DE-3"| P-DE-4
-    P-DE-1 -->|"F-DE-4"| P-DE-4
+    P-DE-5 -->|"F-DE-3"| P-DE-8
+    P-DE-1 -->|"F-DE-4"| P-DE-8
     P-DE-1 -->|"F-DE-5"| DS-DE-1
     P-DE-1 -->|"F-DE-6"| DS-DE-2
     P-DE-3 -->|"F-DE-7"| DS-DE-1
@@ -126,13 +127,13 @@ flowchart LR
     DS-DE-5 -->|"F-DE-12"| P-DE-6
     E-DE-1 -->|"F-DE-13"| P-DE-7
     P-DE-7 -->|"F-DE-14"| DS-DE-1
-    P-DE-7 -->|"F-DE-15"| P-DE-4
+    P-DE-7 -->|"F-DE-15"| P-DE-8
 ```
 
 - **`F-DE-1`.** Startup, stop, and observed exit of the process tree. Crosses `TB-DE-1`.
 - **`F-DE-2`.** Session and local control messages. Endpoint binding remains unresolved. Crosses `TB-DE-2`.
 - **`F-DE-3`.** Control messages and preview streams over the provider transport. Carrier authentication remains unresolved. Crosses `TB-DE-2`.
-- **`F-DE-4`.** Network packets and name queries. Network and control traffic needs a bound mediator path. Its provider-specific mechanism remains unspecified. Crosses `TB-DE-2`.
+- **`F-DE-4`.** Network packets and name queries through the workload proxy under mediator decisions. Network and control traffic needs a bound mediator path. Its provider-specific mechanism remains unspecified. Crosses `TB-DE-2`.
 - **`F-DE-5`.** Workspace reads and writes under launch confinement. Crosses `TB-DE-3`.
 - **`F-DE-6`.** Scratch reads and writes outside the workspace. Allocation and cleanup are unspecified. Crosses `TB-DE-3`.
 - **`F-DE-7`.** Host-side capture, metadata interpretation, and cleanup of hostile workspace content. Crosses `TB-DE-3`.
@@ -147,7 +148,7 @@ flowchart LR
 
 ## Agent proxy
 
-For each launch, the provider supplies one agent mediator and one agent proxy. Without network access of its own, the mediator passes permitted requests to the agent proxy. Using the launch identity outside guest confinement, that service opens the authenticated hub connection. Local framing, service users, and provider integration remain undecided under [Per-launch services](agent-proxy.md#Launch%20boundary).
+Each workload has one agent mediator and one agent proxy. The proxy transmits traffic in both directions and requests a mediator decision for every connection. The mediator never transmits traffic. Direct overlay peers authenticate with SPIFFE mutual Transport Layer Security (TLS), and both workload mediators check the connection. Service users and provider integration remain undecided under [Launch boundary](agent-workload-proxy.md#Launch%20boundary).
 
 ```mermaid
 flowchart LR
@@ -156,7 +157,7 @@ flowchart LR
     P-DE-4 -->|"F-DE-16"| P-DE-8
 ```
 
-- **`F-DE-16`.** Permitted requests, launch identity, and returning streams across the mediator/agent-proxy boundary. The local channel needs an authenticated peer and stream context.
+- **`F-DE-16`.** Connection decision requests, launch identity, and decisions across the mediator/agent-proxy boundary. The local channel needs an authenticated peer and workload context.
 
 ## STRIDE analysis
 
@@ -178,13 +179,13 @@ Each table covers the six categories for its listed flows and every participatin
 
 | Threat ID | Element | STRIDE category | Threat | Mitigation in the design | Status |
 | --- | --- | --- | --- | --- | --- |
-| `TM-DE-25` | `F-DE-2`, `F-DE-3`, `F-DE-4`, `P-DE-1`, `P-DE-5`, `P-DE-4` | spoofing | A process selects another launch's mediator endpoint and receives its authority. | [Agent mediator](agent-mediator.md#Launch%20boundary) Endpoint authentication remains unresolved. [Provider mediation](agent-sandbox-docker-engine.md#Mediator%20connection%20and%20name%20resolution). See [Per-launch services](agent-proxy.md#Launch%20boundary). | depends on an open question ([`OQ-SBX-13`](agent-open-questions.md#%60OQ-SBX-13%60)) |
-| `TM-DE-26` | `F-DE-2`, `F-DE-3`, `F-DE-4`, `P-DE-1`, `P-DE-5`, `P-DE-4` | tampering | A process changes proxy settings or uses an interface that bypasses the agent mediator. | [Agent mediator](agent-mediator.md#Launch%20boundary) Network and control traffic needs a bound mediator path. Its provider-specific mechanism remains unspecified. [Provider mediation](agent-sandbox-docker-engine.md#Mediator%20connection%20and%20name%20resolution). See [Per-launch services](agent-proxy.md#Launch%20boundary). | gap ([`OQ-SBX-54`](agent-open-questions.md#%60OQ-SBX-54%60)) |
-| `TM-DE-27` | `F-DE-2`, `F-DE-3`, `F-DE-4`, `P-DE-1`, `P-DE-5`, `P-DE-4` | repudiation | Unbound local traffic acquires another launch's attribution before shared logging. | [Control requests](agent-mediator.md#Control%20requests) Stamping identity requires a trustworthy local sender binding. [Provider mediation](agent-sandbox-docker-engine.md#Mediator%20connection%20and%20name%20resolution). See [Per-launch services](agent-proxy.md#Launch%20boundary). | depends on an open question ([`OQ-SBX-13`](agent-open-questions.md#%60OQ-SBX-13%60)) |
-| `TM-DE-28` | `F-DE-2`, `F-DE-3`, `F-DE-4`, `P-DE-1`, `P-DE-5`, `P-DE-4` | information disclosure | A control carrier or network view exposes another launch's session or loopback listener. | [Loopback listeners](agent-ports.md#Loopback%20listeners) The design requires separate network views. The provider binding remains unresolved. [Provider mediation](agent-sandbox-docker-engine.md#Mediator%20connection%20and%20name%20resolution). See [Per-launch services](agent-proxy.md#Launch%20boundary). | gap ([`OQ-SBX-54`](agent-open-questions.md#%60OQ-SBX-54%60)) |
-| `TM-DE-29` | `F-DE-2`, `F-DE-3`, `F-DE-4`, `P-DE-1`, `P-DE-5`, `P-DE-4` | denial of service | A launch floods its local control carrier and prevents lifecycle or session progress. | Local carrier bounds and sharing remain unresolved under [mediator overload control](agent-open-questions.md#%60OQ-SBX-14%60). [Provider mediation](agent-sandbox-docker-engine.md#Mediator%20connection%20and%20name%20resolution). See [Per-launch services](agent-proxy.md#Launch%20boundary). | depends on an open question ([`OQ-SBX-14`](agent-open-questions.md#%60OQ-SBX-14%60)) |
-| `TM-DE-30` | `F-DE-2`, `F-DE-3`, `F-DE-4`, `P-DE-1`, `P-DE-5`, `P-DE-4` | elevation of privilege | A local process uses an inherited control handle for host operations outside its launch authority. | [Host process sandbox](agent-sandbox.md#Host%20process%20sandbox). Control handle ownership and launch binding remain unresolved. [Common mediator threats](agent-threat-model.md#Agent%20mediator%20request%20admission) cover protocol parser attacks. [Provider mediation](agent-sandbox-docker-engine.md#Mediator%20connection%20and%20name%20resolution). See [Per-launch services](agent-proxy.md#Launch%20boundary). | depends on an open question ([`OQ-SBX-13`](agent-open-questions.md#%60OQ-SBX-13%60)) |
-| `TM-DE-67` | `F-DE-2`, `F-DE-3`, `P-DE-1`, `P-DE-5`, `P-DE-4` | spoofing | A process impersonates the local control endpoint or reuses its previous launch identity. | [Host process sandbox](agent-sandbox.md#Host%20process%20sandbox). A local endpoint needs the same binding guarantees as a guest relay. Its carrier authentication remains unresolved. [Provider mediation](agent-sandbox-docker-engine.md#Mediator%20connection%20and%20name%20resolution). See [Per-launch services](agent-proxy.md#Launch%20boundary). | depends on an open question ([`OQ-SES-5`](agent-open-questions.md#%60OQ-SES-5%60)) |
+| `TM-DE-25` | `F-DE-2`, `F-DE-3`, `F-DE-4`, `P-DE-1`, `P-DE-5`, `P-DE-4` | spoofing | A process selects another launch's mediator endpoint and receives its authority. | [Agent mediator](agent-workload-mediator.md#Launch%20boundary) Endpoint authentication remains unresolved. [Provider mediation](agent-sandbox-docker-engine.md#Mediator%20connection%20and%20name%20resolution). See [Per-launch services](agent-workload-proxy.md#Launch%20boundary). | depends on an open question ([`OQ-SBX-13`](agent-open-questions.md#%60OQ-SBX-13%60)) |
+| `TM-DE-26` | `F-DE-2`, `F-DE-3`, `F-DE-4`, `P-DE-1`, `P-DE-5`, `P-DE-4` | tampering | A process changes proxy settings or uses an interface that bypasses the agent mediator. | [Agent mediator](agent-workload-mediator.md#Launch%20boundary) Network and control traffic needs a bound mediator path. Its provider-specific mechanism remains unspecified. [Provider mediation](agent-sandbox-docker-engine.md#Mediator%20connection%20and%20name%20resolution). See [Per-launch services](agent-workload-proxy.md#Launch%20boundary). | gap ([`OQ-SBX-54`](agent-open-questions.md#%60OQ-SBX-54%60)) |
+| `TM-DE-27` | `F-DE-2`, `F-DE-3`, `F-DE-4`, `P-DE-1`, `P-DE-5`, `P-DE-4` | repudiation | Unbound local traffic acquires another launch's attribution before shared logging. | [Control requests](agent-workload-mediator.md#Control%20requests) Stamping identity requires a trustworthy local sender binding. [Provider mediation](agent-sandbox-docker-engine.md#Mediator%20connection%20and%20name%20resolution). See [Per-launch services](agent-workload-proxy.md#Launch%20boundary). | depends on an open question ([`OQ-SBX-13`](agent-open-questions.md#%60OQ-SBX-13%60)) |
+| `TM-DE-28` | `F-DE-2`, `F-DE-3`, `F-DE-4`, `P-DE-1`, `P-DE-5`, `P-DE-4` | information disclosure | A control carrier or network view exposes another launch's session or loopback listener. | [Loopback listeners](agent-ports.md#Loopback%20listeners) The design requires separate network views. The provider binding remains unresolved. [Provider mediation](agent-sandbox-docker-engine.md#Mediator%20connection%20and%20name%20resolution). See [Per-launch services](agent-workload-proxy.md#Launch%20boundary). | gap ([`OQ-SBX-54`](agent-open-questions.md#%60OQ-SBX-54%60)) |
+| `TM-DE-29` | `F-DE-2`, `F-DE-3`, `F-DE-4`, `P-DE-1`, `P-DE-5`, `P-DE-4` | denial of service | A launch floods its local control carrier and prevents lifecycle or session progress. | Local carrier bounds and sharing remain unresolved under [mediator overload control](agent-open-questions.md#%60OQ-SBX-14%60). [Provider mediation](agent-sandbox-docker-engine.md#Mediator%20connection%20and%20name%20resolution). See [Per-launch services](agent-workload-proxy.md#Launch%20boundary). | depends on an open question ([`OQ-SBX-14`](agent-open-questions.md#%60OQ-SBX-14%60)) |
+| `TM-DE-30` | `F-DE-2`, `F-DE-3`, `F-DE-4`, `P-DE-1`, `P-DE-5`, `P-DE-4` | elevation of privilege | A local process uses an inherited control handle for host operations outside its launch authority. | [Host process sandbox](agent-sandbox.md#Host%20process%20sandbox). Control handle ownership and launch binding remain unresolved. [Common mediator threats](agent-threat-model.md#Agent%20mediator%20request%20admission) cover protocol parser attacks. [Provider mediation](agent-sandbox-docker-engine.md#Mediator%20connection%20and%20name%20resolution). See [Per-launch services](agent-workload-proxy.md#Launch%20boundary). | depends on an open question ([`OQ-SBX-13`](agent-open-questions.md#%60OQ-SBX-13%60)) |
+| `TM-DE-67` | `F-DE-2`, `F-DE-3`, `P-DE-1`, `P-DE-5`, `P-DE-4` | spoofing | A process impersonates the local control endpoint or reuses its previous launch identity. | [Host process sandbox](agent-sandbox.md#Host%20process%20sandbox). A local endpoint needs the same binding guarantees as a guest relay. Its carrier authentication remains unresolved. [Provider mediation](agent-sandbox-docker-engine.md#Mediator%20connection%20and%20name%20resolution). See [Per-launch services](agent-workload-proxy.md#Launch%20boundary). | depends on an open question ([`OQ-SES-5`](agent-open-questions.md#%60OQ-SES-5%60)) |
 
 ### Workspace and scratch storage
 
@@ -227,23 +228,23 @@ This provider has no agent snapshot. Checkpoint capture, workspace binding, and 
 
 | Threat ID | Element | STRIDE category | Threat | Mitigation in the design | Status |
 | --- | --- | --- | --- | --- | --- |
-| `TM-DE-40` | `F-DE-13`, `F-DE-14`, `F-DE-15`, `E-DE-1`, `P-DE-7`, `DS-DE-1`, `P-DE-4` | spoofing | A workspace command uses the authority of a different agent launch. | [Host process sandbox](agent-sandbox.md#Host%20process%20sandbox) Standalone command confinement doesn't specify launch identity binding. [Provider startup](agent-sandbox-docker-engine.md#Process%20placement%20and%20startup). See [Per-launch services](agent-proxy.md#Launch%20boundary). | gap ([`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60)) |
-| `TM-DE-41` | `F-DE-13`, `F-DE-14`, `F-DE-15`, `E-DE-1`, `P-DE-7`, `DS-DE-1`, `P-DE-4` | tampering | A command races capture or changes files outside the selected workspace through a stale path. | [Agent workspace capture](agent-workspace.md#Agent%20workspace%20capture) Command placement and capture ordering remain unresolved. [Provider startup](agent-sandbox-docker-engine.md#Process%20placement%20and%20startup). See [Per-launch services](agent-proxy.md#Launch%20boundary). | gap ([`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60)) |
-| `TM-DE-42` | `F-DE-13`, `F-DE-14`, `F-DE-15`, `E-DE-1`, `P-DE-7`, `DS-DE-1`, `P-DE-4` | repudiation | A command runs without a record binding its caller, launch, and confinement settings. | [What telemetry never records](agent-observability.md#What%20telemetry%20never%20records) Command attribution and lifecycle records remain unspecified. [Provider observations](agent-sandbox-docker-engine.md#Host%20observations). See [Per-launch services](agent-proxy.md#Launch%20boundary). | gap ([`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60)) |
-| `TM-DE-43` | `F-DE-13`, `F-DE-14`, `F-DE-15`, `E-DE-1`, `P-DE-7`, `DS-DE-1`, `P-DE-4` | information disclosure | A command inherits another launch's environment, session data, or readable workspace paths. | [Host process sandbox](agent-sandbox.md#Host%20process%20sandbox) Execution identity, inherited state, and path ownership remain unresolved. [Provider startup](agent-sandbox-docker-engine.md#Process%20placement%20and%20startup). See [Per-launch services](agent-proxy.md#Launch%20boundary). | gap ([`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60)) |
-| `TM-DE-44` | `F-DE-13`, `F-DE-14`, `F-DE-15`, `E-DE-1`, `P-DE-7`, `DS-DE-1`, `P-DE-4` | denial of service | A command continues running after cancellation or blocks workspace capture and teardown. | [Cancellation and limits](agent-sandbox-lifecycle.md#Cancellation%20and%20limits) Independent command lifetime and cancellation remain unspecified. [Provider teardown](agent-sandbox-docker-engine.md#Cancellation%20and%20teardown). See [Per-launch services](agent-proxy.md#Launch%20boundary). | gap ([`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60)) |
-| `TM-DE-45` | `F-DE-13`, `F-DE-14`, `F-DE-15`, `E-DE-1`, `P-DE-7`, `DS-DE-1`, `P-DE-4` | elevation of privilege | A command starts outside the selected provider confinement or obtains a relaxation without review. | [Host process sandbox](agent-sandbox.md#Host%20process%20sandbox) afakt-sandbox confines standalone commands. Authority for an unsandboxed invocation remains unresolved. [Provider startup](agent-sandbox-docker-engine.md#Process%20placement%20and%20startup). See [Per-launch services](agent-proxy.md#Launch%20boundary). | depends on an open question ([`OQ-AGT-26`](agent-open-questions.md#%60OQ-AGT-26%60)) |
+| `TM-DE-40` | `F-DE-13`, `F-DE-14`, `F-DE-15`, `E-DE-1`, `P-DE-7`, `DS-DE-1`, `P-DE-4` | spoofing | A workspace command uses the authority of a different agent launch. | [Host process sandbox](agent-sandbox.md#Host%20process%20sandbox) Standalone command confinement doesn't specify launch identity binding. [Provider startup](agent-sandbox-docker-engine.md#Process%20placement%20and%20startup). See [Per-launch services](agent-workload-proxy.md#Launch%20boundary). | gap ([`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60)) |
+| `TM-DE-41` | `F-DE-13`, `F-DE-14`, `F-DE-15`, `E-DE-1`, `P-DE-7`, `DS-DE-1`, `P-DE-4` | tampering | A command races capture or changes files outside the selected workspace through a stale path. | [Agent workspace capture](agent-workspace.md#Agent%20workspace%20capture) Command placement and capture ordering remain unresolved. [Provider startup](agent-sandbox-docker-engine.md#Process%20placement%20and%20startup). See [Per-launch services](agent-workload-proxy.md#Launch%20boundary). | gap ([`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60)) |
+| `TM-DE-42` | `F-DE-13`, `F-DE-14`, `F-DE-15`, `E-DE-1`, `P-DE-7`, `DS-DE-1`, `P-DE-4` | repudiation | A command runs without a record binding its caller, launch, and confinement settings. | [What telemetry never records](agent-observability.md#What%20telemetry%20never%20records) Command attribution and lifecycle records remain unspecified. [Provider observations](agent-sandbox-docker-engine.md#Host%20observations). See [Per-launch services](agent-workload-proxy.md#Launch%20boundary). | gap ([`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60)) |
+| `TM-DE-43` | `F-DE-13`, `F-DE-14`, `F-DE-15`, `E-DE-1`, `P-DE-7`, `DS-DE-1`, `P-DE-4` | information disclosure | A command inherits another launch's environment, session data, or readable workspace paths. | [Host process sandbox](agent-sandbox.md#Host%20process%20sandbox) Execution identity, inherited state, and path ownership remain unresolved. [Provider startup](agent-sandbox-docker-engine.md#Process%20placement%20and%20startup). See [Per-launch services](agent-workload-proxy.md#Launch%20boundary). | gap ([`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60)) |
+| `TM-DE-44` | `F-DE-13`, `F-DE-14`, `F-DE-15`, `E-DE-1`, `P-DE-7`, `DS-DE-1`, `P-DE-4` | denial of service | A command continues running after cancellation or blocks workspace capture and teardown. | [Cancellation and limits](agent-sandbox-lifecycle.md#Cancellation%20and%20limits) Independent command lifetime and cancellation remain unspecified. [Provider teardown](agent-sandbox-docker-engine.md#Cancellation%20and%20teardown). See [Per-launch services](agent-workload-proxy.md#Launch%20boundary). | gap ([`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60)) |
+| `TM-DE-45` | `F-DE-13`, `F-DE-14`, `F-DE-15`, `E-DE-1`, `P-DE-7`, `DS-DE-1`, `P-DE-4` | elevation of privilege | A command starts outside the selected provider confinement or obtains a relaxation without review. | [Host process sandbox](agent-sandbox.md#Host%20process%20sandbox) afakt-sandbox confines standalone commands. Authority for an unsandboxed invocation remains unresolved. [Provider startup](agent-sandbox-docker-engine.md#Process%20placement%20and%20startup). See [Per-launch services](agent-workload-proxy.md#Launch%20boundary). | depends on an open question ([`OQ-AGT-26`](agent-open-questions.md#%60OQ-AGT-26%60)) |
 
 ### Per-launch network boundary
 
 | Threat ID | Element | STRIDE category | Threat | Mitigation in the design | Status |
 | --- | --- | --- | --- | --- | --- |
-| `TM-DE-155` | `F-DE-16`, `P-DE-4`, `P-DE-8` | spoofing | A process substitutes another launch's local agent-proxy endpoint. | [Per-launch services](agent-proxy.md#Launch%20boundary) requires a local channel bound to the launch. Its peer authentication remains undecided. | depends on an open question ([`OQ-HUB-14`](agent-open-questions.md#%60OQ-HUB-14%60)) |
-| `TM-DE-156` | `F-DE-16`, `P-DE-4`, `P-DE-8` | tampering | A malformed hub frame changes the caller or target associated with a stream. | [Hub connection](agent-proxy.md#Hub%20connection) requires caller and target context on each stream. Framing validation remains undecided. | depends on an open question ([`OQ-HUB-14`](agent-open-questions.md#%60OQ-HUB-14%60)) |
-| `TM-DE-157` | `F-DE-16`, `P-DE-4`, `P-DE-8` | repudiation | Reconnect loses the association between an admitted stream and its authorization record. | [Remote control and sessions](agent-acp.md#ACP%20through%20the%20agent%20hub) keeps message history. Reconnect attribution needs the local sender binding. | depends on an open question ([`OQ-HUB-14`](agent-open-questions.md#%60OQ-HUB-14%60)) |
-| `TM-DE-158` | `F-DE-16`, `P-DE-4`, `P-DE-8` | information disclosure | Connection replacement sends a stream to a different launch. | [Hub connection](agent-proxy.md#Hub%20connection) uses a separate authenticated launch connection. Replacement must also preserve local stream ownership. | depends on an open question ([`OQ-HUB-14`](agent-open-questions.md#%60OQ-HUB-14%60)) |
-| `TM-DE-159` | `F-DE-16`, `P-DE-4`, `P-DE-8` | denial of service | One launch consumes hub buffers or blocks control streams with published-port traffic. | [Hub connection](agent-proxy.md#Hub%20connection) requires bounded admission. The local scheduling and buffer limits remain undecided. | depends on an open question ([`OQ-HUB-14`](agent-open-questions.md#%60OQ-HUB-14%60)) |
-| `TM-DE-160` | `F-DE-16`, `P-DE-4`, `P-DE-8` | elevation of privilege | After compromising the agent proxy, an attacker sends traffic without mediator approval. | [Per-launch services](agent-proxy.md#Launch%20boundary) separates policy from network authority. Their authenticated local binding remains undecided. | depends on an open question ([`OQ-HUB-14`](agent-open-questions.md#%60OQ-HUB-14%60)) |
+| `TM-DE-155` | `F-DE-16`, `P-DE-4`, `P-DE-8` | spoofing | A process substitutes another launch's local agent-proxy endpoint. | [Per-launch services](agent-workload-proxy.md#Launch%20boundary) requires a local channel bound to the launch. Its peer authentication remains undecided. | depends on an open question ([`OQ-SBX-13`](agent-open-questions.md#%60OQ-SBX-13%60)) |
+| `TM-DE-156` | `F-DE-16`, `P-DE-4`, `P-DE-8` | tampering | A malformed connection request changes its caller or target. | [Overlay connections](agent-workload-proxy.md#Overlay%20connections) require direct mutual authentication and mediator checks. Binding caller and publication context to the guest listener remains open. | depends on an open question ([`OQ-PORT-14`](agent-open-questions.md#%60OQ-PORT-14%60)) |
+| `TM-DE-157` | `F-DE-16`, `P-DE-4`, `P-DE-8` | repudiation | Reconnect loses the association between an admitted stream and its authorization record. | [Session message log](agent-acp.md#Session%20message%20log) requires retained history. Its owner, replay, and reconnect attribution remain open. | depends on an open question ([`OQ-SES-18`](agent-open-questions.md#%60OQ-SES-18%60)) |
+| `TM-DE-158` | `F-DE-16`, `P-DE-4`, `P-DE-8` | information disclosure | Connection replacement sends a stream to a different launch. | Direct [overlay connections](agent-workload-proxy.md#Overlay%20connections) authenticate both peers and require mediator decisions. How that publication and caller map to the intended listener remains unresolved. | depends on an open question ([`OQ-PORT-14`](agent-open-questions.md#%60OQ-PORT-14%60)) |
+| `TM-DE-159` | `F-DE-16`, `P-DE-4`, `P-DE-8` | denial of service | One launch consumes proxy buffers or blocks control streams with published-port traffic. | [Overlay connections](agent-workload-proxy.md#Overlay%20connections) requires bounded admission. The local scheduling and buffer limits remain undecided. | depends on an open question ([`OQ-SBX-14`](agent-open-questions.md#%60OQ-SBX-14%60)) |
+| `TM-DE-160` | `F-DE-16`, `P-DE-4`, `P-DE-8` | elevation of privilege | After compromising the agent proxy, an attacker sends traffic without mediator approval. | [Per-launch services](agent-workload-proxy.md#Launch%20boundary) separates policy from network authority. Their authenticated local binding remains undecided. | depends on an open question ([`OQ-SBX-13`](agent-open-questions.md#%60OQ-SBX-13%60)) |
 
 ## Attack trees
 
@@ -287,7 +288,7 @@ flowchart TD
     choice --> leaf3["TM-DE-30: Use a privileged control handle"]
 ```
 
-- Cheapest path and blocking controls. Use a network path whose mediator routing is unspecified. [`OQ-SBX-54`](agent-open-questions.md#%60OQ-SBX-54%60) covers missing provider routing. [`OQ-SBX-13`](agent-open-questions.md#%60OQ-SBX-13%60) covers sender binding. The [common egress tree](agent-threat-model.md#Send%20traffic%20past%20egress%20policy) covers permitted name queries, passthrough, and relay proxy use.
+- Cheapest path and blocking controls. Use a network path whose proxy routing is unspecified. [`OQ-SBX-54`](agent-open-questions.md#%60OQ-SBX-54%60) covers missing provider routing. [`OQ-SBX-13`](agent-open-questions.md#%60OQ-SBX-13%60) covers sender binding. The [common egress tree](agent-threat-model.md#Send%20traffic%20past%20egress%20policy) covers permitted name queries, passthrough, and relay proxy use.
 
 ### Persist hostile state across agent launches
 
