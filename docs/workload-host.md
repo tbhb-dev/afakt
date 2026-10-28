@@ -11,7 +11,7 @@ generated: { by: "codex:gpt-6", at: "2026-10-28T17:30:00Z" }
 
 [Public key infrastructure](pki.md).
 
-A workload host is a machine that runs workloads for afakt. Its workload host worker connects it to the control plane and runs the [agent launcher workflow](components.md#Agent%20launcher). The [agent dispatcher workflow](components.md#Agent%20dispatcher) selects a host task queue. It finalizes the agent launch spec and queues the launch there, binding every operation for that launch to the chosen host.
+A workload host is a machine that runs workloads for afakt. Its [workload host worker](workload-host-worker.md) connects it to the control plane and runs the [agent launcher workflow](components.md#Agent%20launcher). The [agent dispatcher workflow](components.md#Agent%20dispatcher) selects a host task queue. It finalizes the agent launch spec and queues the launch there, binding every operation for that launch to the chosen host.
 
 [Workload host caches and startup](agent-workspace-lifecycle.md#Workload%20host%20caches%20and%20startup).
 
@@ -24,7 +24,7 @@ A workload host is a machine that runs workloads for afakt. Its workload host wo
 | Workload host supervisor | The supervisor controls virtual machine monitors independently of the worker, guest, and Agent Client Protocol (ACP). It starts, suspends, resumes, stops, and snapshots VMs and verifies forced stops. See [Virtual machine lifecycle](workload-lifecycle.md#Virtual%20machine%20lifecycle). |
 | Workload guest | Each agent has a guest kernel, a read-only operating system disk, and an independent writable workspace disk. The guest contains the relay, agent harness, adapter when needed, hooks, and helpers. See [Guest layout and lifecycle control](workload-sandbox.md#Guest%20layout%20and%20lifecycle%20control) and [Image contents](agent-workspace-image.md#Image%20contents). |
 | Workload proxy | One per workload transmits guest traffic and opens permitted connections with the launch's identity. See [Per-launch services](workload-proxy.md#Launch%20boundary). |
-| Workload proxy mediator | Each workload's mediator supplies DNS resolution and connection decisions to its proxy. The proxy transmits all guest traffic. The workload proxy ends Transport Layer Security (TLS) for inspected destinations. Traffic to passthrough destinations remains mediated without decryption. See [Workload proxy mediator](workload-proxy-mediator.md#Launch%20boundary). |
+| Workload proxy mediator | The proxy opens a connection only after the workload's mediator returns an allow verdict for it. Mediator-owned DNS resolution is a proposal under [`OQ-SBX-21`](agent-open-questions.md#%60OQ-SBX-21%60). The proxy transmits all guest traffic. The workload proxy ends Transport Layer Security (TLS) for inspected destinations. Traffic to passthrough destinations remains mediated without decryption. See [Workload proxy mediator](workload-proxy-mediator.md#Launch%20boundary). |
 | Credential broker | A host-side component that injects credentials at the workload proxy into permitted requests outside the guest. Its placement relative to the workload proxy and workload proxy mediator remains [open](agent-open-questions.md#%60OQ-SBX-23%60). |
 | Guest relay's host side | The proxy transmits guest relay traffic under the mediator's ACP message checks. It stamps identity on control requests. The relay itself runs inside the guest. See [Control requests](workload-proxy-mediator.md#Control%20requests) and [ACP message policy](agent-acp.md#ACP%20message%20policy). |
 | Telemetry endpoint | The endpoint receives harness telemetry through the workload proxy under mediator decisions and adds agent launch identity. It filters content and forwards it to the deployment's collector. See [Trace context propagation](agent-observability.md#Trace%20context%20propagation). Whether it belongs to the worker or a separate component remains [open](agent-open-questions.md#Agent%20observability). |
@@ -43,24 +43,19 @@ Each workload's proxy accepts direct authenticated [overlay connections](workloa
 
 ## Runtime privileges and platforms
 
-The workload host worker and host-mode agents use separate dedicated users under [Workload host access](workload-overlay.md#Workload%20host%20access). Workload provider privileges and platform-specific capture services follow [Enforcement](workload-sandbox.md#Enforcement), without settling the held [host isolation baseline](agent-open-questions.md#%60OQ-SBX-18%60).
+Separate dedicated users run the workload host worker and host-mode agents under [Workload host access](workload-overlay.md#Workload%20host%20access). Workload provider privileges and platform-specific capture services follow [Enforcement](workload-sandbox.md#Enforcement), without settling the held [host isolation baseline](agent-open-questions.md#%60OQ-SBX-18%60).
 
-afakt permits all the modes in this table: [workload providers](agent-launch-contract.md#Workload%20provider%20operations) use host modes or container managers, or they use virtual machine monitors.
+The Tier 1 targets follow the [platform matrix](https://github.com/tbhb-dev/afakt-drafts/blob/744ed448da1a77085e3a83cfb81550466718e5c8/workloads/workload-platform-support.md). Each target specifies a workload provider kind on a host platform. Worker authority follows [Runtime authority and targets](workload-host-worker.md#Runtime%20authority%20and%20targets).
 
 | Mode | Provider kind | Platform |
 | --- | --- | --- |
-| `docker-desktop` | Container manager | The Docker virtual machine (VM) on macOS and Windows. Windows uses Windows Subsystem for Linux (WSL2) or Hyper-V. |
-| `docker-engine` | Container manager | Docker Engine on amd64 Linux bare metal and VMs, and arm64 Linux VMs. |
-| `macos-vm` | Virtual machine | The macOS microVM design using Virtualization.framework. |
-| `windows-vm` | Virtual machine | The Linux microVM inside WSL2 by default. A Windows-native utility VM for an agent needing a Windows guest. |
-| `linux-vm` | Virtual machine | A Kernel-based Virtual Machine (KVM) microVM driven by Cloud Hypervisor. |
-| `macos-host` | Host mode | macOS. |
-| `windows-host` | Host mode | Windows. |
-| `linux-host` | Host mode | Linux. |
-| [Claude Managed Agents](workload-provider-claude-managed-agents.md) | Remote provider | Managed harness and cloud execution. |
-| [OpenAI Agents API](workload-provider-openai-agents-api.md) | Remote provider | Managed harness and cloud execution. |
-| [Modal Sandboxes](workload-provider-modal.md) | Remote provider | Remote Linux sandbox execution. |
-| [Cloudflare Sandbox SDK](workload-provider-cloudflare.md) | Remote provider | Remote Linux sandbox execution. |
+| `docker-engine` | Container manager | `linux/amd64`, `linux/arm64`. |
+| `macos-vm` | VM provider | `darwin/arm64`. |
+| `windows-vm` | VM provider | `windows/amd64`. |
+| `linux-vm` | VM provider | `linux/amd64`, `linux/arm64`. |
+| `macos-host` | Host provider | `darwin/arm64`. |
+| `windows-host` | Host provider | `windows/amd64`. |
+| `linux-host` | Host provider | `linux/amd64`, `linux/arm64`. |
 
 Host modes share their host kernel. The selected provider's isolation boundary and [afakt-sandbox enforcement](workload-sandbox.md#Enforcement) determine their confinement, while managed harness integration remains [`OQ-SBX-63`](agent-open-questions.md#%60OQ-SBX-63%60).
 

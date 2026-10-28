@@ -1278,3 +1278,11 @@ How do workload template versions, edits, parameters, defaults, host constraints
 ### `OQ-WLD-6`
 
 What are the workload image formats, payload keys, artifact digests, admission checks, compatibility declarations, and retention rules for each workload provider kind? The first build needs a guest image and a binding between its kernel and disk. Does an app release image serve directly as the workload image on some targets? The reference schemas omit WorkloadImage, and S-142 doesn't qualify boot and restoration across Tier 1 cells. See [Workload image](workload-image.md) and [Workload image resource](workload-image-resource.md).
+
+### `OQ-RES-6`
+
+How do WorkloadHostWorker and the workload host divide identity, desired configuration, registration, and observed state? The reference schema for AgentHost combines metadata about the machine with fields for worker queues and capacity. What identifies a replacement worker instance, and which fields keep their meaning across re-enrollment? See [Workload host worker resource](workload-host-worker-resource.md).
+
+### `OQ-WLD-7`
+
+What protocol carries worker registration, desired state, observations, acknowledgements, and recovery after either endpoint restarts? All control connections originate at the workload host. Reclaim needs persistent execution identity and authority, including for a different workload account. For each Tier 1 cell, how do control endpoints authenticate callers, and how does recovery handle missing inventory or a failed supervisor? S-188 leaves those guarantees incomplete, and its macOS support findings conflict with custom Seatbelt assumptions. The host isolation baseline remains held under `OQ-SBX-18`. See [Workload host worker](workload-host-worker.md).

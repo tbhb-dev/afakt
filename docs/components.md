@@ -145,7 +145,7 @@ A workload guest is the isolation boundary, with a guest kernel, read-only opera
 
 ## Workload host worker
 
-The workload host worker is the daemon that runs the agent launcher workflow on a workload host and connects that host to the control plane. It registers capacity and polls its host task queue. Alongside reconciliation of agent launch records, the worker observes [workload lifecycle](workload-lifecycle.md) state under the [open ownership contract](agent-open-questions.md#%60OQ-SBX-71%60). It stays outside launch data paths, including traffic between launches on its host. Each host also supplies [host-level name resolution and connectivity](workload-overlay.md#Workload%20host%20access). See [Workload host](workload-host.md). [Workload host caches and startup](agent-workspace-lifecycle.md#Workload%20host%20caches%20and%20startup).
+The [workload host worker](workload-host-worker.md) runs as a dedicated non-root user on a [workload host](workload-host.md). It registers capacity and polls its host task queue. Alongside reconciliation of agent launch records, the worker observes [workload lifecycle](workload-lifecycle.md) state under the [open ownership contract](agent-open-questions.md#%60OQ-SBX-71%60). Control connections originate at the worker. The control plane never opens a connection to a host. Workload data paths exclude this daemon. See [Workload host worker resource](workload-host-worker-resource.md) and [Workload host caches and startup](agent-workspace-lifecycle.md#Workload%20host%20caches%20and%20startup).
 
 ## Workload proxy
 
