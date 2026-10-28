@@ -1,7 +1,7 @@
 ---
 type: Design
 title: Agent workspace image
-description: Prebuilt workspace directory trees in Open Container Initiative (OCI) images, their sandboxed builds, registry and object storage, and agent host caches for fast workspace start.
+description: Prebuilt workspace directory trees in Open Container Initiative (OCI) images, their sandboxed builds, registry and object storage, and workload host caches for fast workspace start.
 tags: [afakt, agents, agent-launch, workspace, images, storage]
 status: draft
 generated: { by: "codex:gpt-6-astra", at: "2026-10-27T00:00:00Z" }
@@ -11,11 +11,11 @@ generated: { by: "codex:gpt-6-astra", at: "2026-10-27T00:00:00Z" }
 
 [Public key infrastructure](pki.md).
 
-A workspace image contains a prepared directory tree with repository checkouts and installed dependencies plus build outputs. To start, an agent launch places that tree in its agent workspace. It can then reach its agent without repeating the clone and dependency installation or the build. A warm agent host reuses local content, while a cold host fetches and unpacks the missing layers before the agent starts.
+A workspace image contains a prepared directory tree with repository checkouts and installed dependencies plus build outputs. To start, an agent launch places that tree in its agent workspace. It can then reach its agent without repeating the clone and dependency installation or the build. A warm workload host reuses local content, while a cold host fetches and unpacks the missing layers before the agent starts.
 
 ## Image contents
 
-A workspace image is an Open Container Initiative (OCI) image with a manifest, a config blob, and layers. Those layers contain a directory tree and unpack beneath a workspace source's target path. Inside the [agent sandbox VM](agent-sandbox.md#Enforcement), the agent uses a writable workspace disk built from these layers. A separate read-only root disk supplies the guest operating system. Workspace image process settings don't determine how afakt starts the agent harness.
+A workspace image is an Open Container Initiative (OCI) image with a manifest, a config blob, and layers. Those layers contain a directory tree and unpack beneath a workspace source's target path. Inside the [workload guest](workload-sandbox.md#Enforcement), the agent uses a writable workspace disk built from these layers. A separate read-only root disk supplies the guest operating system. Workspace image process settings don't determine how afakt starts the agent harness.
 
 The config records the inputs and steps that built the tree:
 
@@ -28,9 +28,9 @@ The config records the inputs and steps that built the tree:
 | Built at | The build completion time as a Coordinated Universal Time (UTC) timestamp in Request for Comments (RFC) 3339 form. |
 | Compatibility | The operating system and architecture used for the build, with any toolchain constraints its outputs require. |
 
-A base image supplies an earlier workspace directory tree, which the builder unpacks before fetching the sources and running the steps. It doesn't supply the agent host's operating system or install tools outside the agent workspace, and its layers remain part of the derived image's layer chain. Later layers take precedence. This includes OCI whiteouts that remove earlier entries and opaque directory markers that hide earlier directory contents.
+A base image supplies an earlier workspace directory tree, which the builder unpacks before fetching the sources and running the steps. It doesn't supply the workload host's operating system or install tools outside the agent workspace, and its layers remain part of the derived image's layer chain. Later layers take precedence. This includes OCI whiteouts that remove earlier entries and opaque directory markers that hide earlier directory contents.
 
-The agent launch's placement requirements identify agent hosts compatible with the image's outputs, since reusing a tree doesn't make native dependencies portable across operating systems, architectures, or incompatible toolchains.
+The agent launch's placement requirements identify workload hosts compatible with the image's outputs, since reusing a tree doesn't make native dependencies portable across operating systems, architectures, or incompatible toolchains.
 
 ## Image sources and digest pinning
 
@@ -64,7 +64,7 @@ The registry accepts bearer tokens only. After authorizing the worker's request,
 
 On every request, the registry checks the signature against the control plane's published JavaScript Object Notation (JSON) Web Key Set (JWKS), the trusted issuer and registry audience, the validity interval, and the repository and action scopes. It rejects missing or invalid tokens, unknown signing keys, and requests outside those scopes. Knowing a digest alone never authorizes a read. Blob reads, ranged reads, cross-repository blob mounts, tag operations, and deletion all receive the applicable scope check. Push scopes don't grant deletion or registry administration.
 
-For worker-owned pulls, agent hosts use tokens issued to their worker for the required image repositories. Pull ownership remains [`OQ-IMG-8`](agent-open-questions.md#%60OQ-IMG-8%60). A build job pushes through its worker with a token scoped to its destination image repository. Reading a base needs a separate pull grant. Tokens and store credentials stay outside the agent sandbox, images, evidence, and telemetry. Workers renew registry tokens through the control plane when a transfer outlasts their validity. The registry pulls through and caches base images from configured upstream registries. Before fetching upstream content, it authenticates and authorizes a downstream request. It preserves upstream content digests and keeps upstream credentials outside build sandboxes. Its signing key configuration follows the control plane's JWKS rotation without accepting unknown keys.
+For worker-owned pulls, workload hosts use tokens issued to their worker for the required image repositories. Pull ownership remains [`OQ-IMG-8`](agent-open-questions.md#%60OQ-IMG-8%60). A build job pushes through its worker with a token scoped to its destination image repository. Reading a base needs a separate pull grant. Tokens and store credentials stay outside the agent sandbox, images, evidence, and telemetry. Workers renew registry tokens through the control plane when a transfer outlasts their validity. The registry pulls through and caches base images from configured upstream registries. Before fetching upstream content, it authenticates and authorizes a downstream request. It preserves upstream content digests and keeps upstream credentials outside build sandboxes. Its signing key configuration follows the control plane's JWKS rotation without accepting unknown keys.
 
 ## Object store
 
@@ -74,9 +74,9 @@ The storage contract includes object reads and writes, metadata lookup, paginate
 
 Lifecycle expiry applies to temporary objects and abandoned upload data. Registry manifests and reachable blobs remain under registry retention and collection. An object-store expiry rule can't remove content that an agent launch protects. Using an external store changes the endpoint and credentials while preserving image semantics and agent launch retention.
 
-## Agent host caches and startup
+## Workload host caches and startup
 
-[Agent host caches and startup](agent-workspace-lifecycle.md#Agent%20host%20caches%20and%20startup).
+[Workload host caches and startup](agent-workspace-lifecycle.md#Workload%20host%20caches%20and%20startup).
 
 ## Workspace disk deltas and portable revisions
 

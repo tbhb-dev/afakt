@@ -17,7 +17,7 @@ The ACP adapter is the agent harness's Agent Client Protocol (ACP) agent inside 
 
 ## ACP relay
 
-The ACP relay is the [guest relay](#Guest%20relay) inside the agent sandbox VM. It acts as the ACP client to the adapter over standard input and output. For agent launches, it answers permission requests from profile grants and cancels elicitation requests. Its session traffic passes through the [agent proxy](#Agent%20proxy) under the mediator's default-deny policy for each ACP message. See [Agent launches over ACP](agent-acp.md#Agent%20launches%20over%20ACP).
+The ACP relay is the [guest relay](#Guest%20relay) inside the workload guest. It acts as the ACP client to the adapter over standard input and output. For agent launches, it answers permission requests from profile grants and cancels elicitation requests. Its session traffic passes through the [workload proxy](#Workload%20proxy) under the mediator's default-deny policy for each ACP message. See [Agent launches over ACP](agent-acp.md#Agent%20launches%20over%20ACP).
 
 ## afakt MCP server
 
@@ -25,25 +25,25 @@ Through the built-in afakt Model Context Protocol (MCP) server, an agent can sta
 
 ## Agent egress gateway
 
-Traffic from agent launches to inspected destinations passes through the agent egress gateway, which decrypts it and applies HTTP-level policy. It runs on each agent host by default. An agent host worker setting can direct a host's mediators to a site gateway on another machine instead, and remote sandboxes use a global egress gateway with the control plane through their agent proxies.
+Traffic from agent launches to inspected destinations passes through the agent egress gateway, which decrypts it and applies HTTP-level policy. It runs on each agent host by default. An agent host worker setting can direct a host's mediators to a site gateway on another machine instead, and remote sandboxes use a global egress gateway with the control plane through their workload proxies.
 
-Inspected destinations need credentials or Hypertext Transfer Protocol (HTTP) policy. Transport Layer Security (TLS) connections end at the gateway with a per-agent certificate authority trusted by the guest. The [credential broker](#Credential%20broker) injects credentials into permitted requests and keeps their values outside the guest. Traffic to passthrough destinations remains subject to the agent mediator's connection policy and leaves the agent host without decryption.
+Inspected destinations need credentials or Hypertext Transfer Protocol (HTTP) policy. Transport Layer Security (TLS) connections end at the gateway with a per-agent certificate authority trusted by the guest. The [credential broker](#Credential%20broker) injects credentials into permitted requests and keeps their values outside the guest. Traffic to passthrough destinations remains subject to the workload proxy mediator's connection policy and leaves the agent host without decryption.
 
-A site gateway is an agent egress gateway running on its own, on any machine the deployment chooses. It needn't run on an agent host. An agent host worker setting names the site gateway for that host's mediators. Over mutual TLS, each agent proxy connects to it with its agent launch's identity. The standalone site gateway has its own workload identity. The credential broker receives credentials from the control plane for the agent launches it serves. Each [credential type](agent-sandbox.md#Credential%20types%20and%20custody) defines custody, including static secrets that the control plane can't exchange.
+A site gateway is an agent egress gateway running on its own, on any machine the deployment chooses. It needn't run on an agent host. An agent host worker setting names the site gateway for that host's mediators. Over mutual TLS, each workload proxy connects to it with its agent launch's identity. The standalone site gateway has its own workload identity. The credential broker receives credentials from the control plane for the agent launches it serves. Each [credential type](workload-sandbox.md#Credential%20types%20and%20custody) defines custody, including static secrets that the control plane can't exchange.
 
-Like an [agent host](agent-host.md#Trust%20boundary), a site gateway is a trust boundary for policy enforcement. Its configuration defines certificate authority custody. Brokered secrets and signing material stay outside the agent sandbox.
+Like an [agent host](workload-host.md#Trust%20boundary), a site gateway is a trust boundary for policy enforcement. Its configuration defines certificate authority custody. Brokered secrets and signing material stay outside the agent sandbox.
 
-The global egress gateway serves remote sandboxes. Each remote sandbox launch has its own mediator and agent proxy. Their integration remains [undecided](agent-open-questions.md#%60OQ-SBX-36%60).
+The global egress gateway serves remote sandboxes. Each remote sandbox launch has its own mediator and workload proxy. Their integration remains [undecided](agent-open-questions.md#%60OQ-SBX-36%60).
 
 Whether proxy TLS termination takes over the agent egress gateway's decryption role remains [open](agent-open-questions.md#%60OQ-SBX-72%60). The mediator never transmits traffic.
 
-## Agent host worker
+## Workload host worker
 
-The agent host worker is the daemon that runs the agent launcher workflow on an agent host and connects that host to the control plane. It registers capacity and polls its host task queue. The worker also reconciles agent launch records. Its settings can select a site egress gateway. It stays outside launch data paths, including traffic between launches on its host. Each host also supplies [host-level name resolution and connectivity](agent-overlay.md#Agent%20host%20access). See [Agent host](agent-host.md). [Agent host caches and startup](agent-workspace-lifecycle.md#Agent%20host%20caches%20and%20startup).
+The workload host worker is the daemon that runs the agent launcher workflow on a workload host and connects that host to the control plane. It registers capacity and polls its host task queue. The worker also reconciles agent launch records. Its settings can select a site egress gateway. It stays outside launch data paths, including traffic between launches on its host. Each host also supplies [host-level name resolution and connectivity](workload-overlay.md#Workload%20host%20access). See [Workload host](workload-host.md). [Workload host caches and startup](agent-workspace-lifecycle.md#Workload%20host%20caches%20and%20startup).
 
-## Agent mediator
+## Workload proxy mediator
 
-Each workload's agent mediator decides every inbound and outbound connection without transmitting traffic. It controls guest Domain Name System (DNS) resolution through the proxy with no host fallback and stamps launch identity on control requests. Its control plane connections pass through its proxy under a fixed rule set that neither the launch's policy nor the guest can change. See [Agent mediator](agent-workload-mediator.md) and [ACP message policy](agent-acp.md#ACP%20message%20policy).
+Each workload's workload proxy mediator decides every inbound and outbound connection without transmitting traffic. It controls guest Domain Name System (DNS) resolution through the proxy with no host fallback and stamps launch identity on control requests. Its control plane connections pass through its proxy under a fixed rule set that neither the launch's policy nor the guest can change. See [Workload proxy mediator](workload-proxy-mediator.md) and [ACP message policy](agent-acp.md#ACP%20message%20policy).
 
 ## Agentmail
 
@@ -51,7 +51,7 @@ Agentmail manages messages addressed to durable agents. These include incoming a
 
 ## API server
 
-The Application Programming Interface (API) server serves afakt's Representational State Transfer (REST) API to its coordination workflows and, through the [ingress gateway](#Ingress%20gateway), to the dashboard, command-line interface (CLI), and apps. Agent proxies connect over the overlay. At TLS termination, the API server identifies the launch from its peer certificate. From the immutable spec, it reads capabilities and scopes and refuses requests after the launch enters a terminal state. For remote control and sessions, it exposes [endpoints whose connection owner remains open](agent-acp.md#Remote%20control%20and%20sessions). It keeps the [agent host registry](agent-placement.md#Agent%20host%20registry), and its reservation API places launches on hosts.
+The Application Programming Interface (API) server serves afakt's Representational State Transfer (REST) API to its coordination workflows and, through the [ingress gateway](#Ingress%20gateway), to the dashboard, command-line interface (CLI), and apps. Workload proxies connect over the overlay. At TLS termination, the API server identifies the launch from its peer certificate. From the immutable spec, it reads capabilities and scopes and refuses requests after the launch enters a terminal state. For remote control and sessions, it exposes [endpoints whose connection owner remains open](agent-acp.md#Remote%20control%20and%20sessions). It keeps the [workload host registry](workload-placement.md#Workload%20host%20registry), and its reservation API places launches on hosts.
 
 ### Health endpoints
 
@@ -67,7 +67,7 @@ The artifact proxy serves stored artifacts associated with agents or managed ind
 
 ## Capacity controller
 
-The capacity controller runs in each agent host worker. It measures host central processing unit (CPU) use, memory use, and free workspace disk space at intervals and adjusts the capacity for agent launch slots within the host's configured lower and upper bounds. The worker reports capacity to the agent host registry in each lease renewal. See [Slot capacity](agent-placement.md#Slot%20capacity).
+The capacity controller runs in each workload host worker. It measures host central processing unit (CPU) use, memory use, and free workspace disk space at intervals and adjusts the capacity for agent launch slots within the host's configured lower and upper bounds. The worker reports capacity to the workload host registry in each lease renewal. See [Slot capacity](workload-placement.md#Slot%20capacity).
 
 ## Command-line interface (CLI)
 
@@ -75,7 +75,7 @@ The `afakt` command provides one command-line entrypoint for both running afakt'
 
 ## Credential broker
 
-The credential broker is a host-side component outside the guest. It injects credentials into permitted requests outside the guest. Reflected response content remains [`OQ-SBX-26`](agent-open-questions.md#%60OQ-SBX-26%60). Its placement relative to the agent egress gateway and agent mediator remains [open](agent-open-questions.md#%60OQ-SBX-23%60). See [Credential brokering](agent-sandbox.md#Credential%20brokering).
+The credential broker is a host-side component outside the guest. It injects credentials into permitted requests outside the guest. Reflected response content remains [`OQ-SBX-26`](agent-open-questions.md#%60OQ-SBX-26%60). Its placement relative to the agent egress gateway and workload proxy mediator remains [open](agent-open-questions.md#%60OQ-SBX-23%60). See [Credential brokering](workload-sandbox.md#Credential%20brokering).
 
 ## GitHub webhook receiver
 
@@ -83,19 +83,19 @@ The GitHub webhook receiver accepts webhook deliveries from GitHub.
 
 ## Guest relay
 
-The guest relay handles session traffic, control requests, and authorized listener streams under [Relay behavior](agent-acp.md#Relay%20behavior) and [Port discovery and records](agent-ports.md#Port%20discovery%20and%20records). Its carrier and local authentication follow the selected provider, with the shared choice under [`OQ-SES-5`](agent-open-questions.md#%60OQ-SES-5%60).
+The guest relay handles session traffic, control requests, and authorized listener streams under [Relay behavior](agent-acp.md#Relay%20behavior) and [Port discovery and records](workload-ports.md#Port%20discovery%20and%20records). Its carrier and local authentication follow the selected provider, with the shared choice under [`OQ-SES-5`](agent-open-questions.md#%60OQ-SES-5%60).
 
 ## Host-level network service
 
-The host-level network service is the connectivity role for agent ports, previews, services, and cluster services under host-level authorization. It's separate from launch traffic. Host-level name resolution doesn't grant access. Its process, local caller authentication, and connection mechanism remain [undecided](agent-overlay.md#Agent%20host%20access).
+The host-level network service is the connectivity role for workload ports, previews, services, and cluster services under host-level authorization. It's separate from launch traffic. Host-level name resolution doesn't grant access. Its process, local caller authentication, and connection mechanism remain [undecided](workload-overlay.md#Workload%20host%20access).
 
 ## Ingress gateway
 
-The external ingress gateway uses Traefik with afakt authentication middleware to route user-facing traffic to the API server and preview server, and also to workload proxies. Preview origins and listeners are separate from the API and dashboard. It can attach to user tailnets without routing packets into the cluster overlay. See [External ingress gateway](agent-overlay.md#External%20ingress%20gateway) for construction and integration, and [Access and share links](agent-previews.md#Access%20and%20share%20links) for viewer authorization.
+The external ingress gateway uses Traefik with afakt authentication middleware to route user-facing traffic to the API server and preview server, and also to workload proxies. Preview origins and listeners are separate from the API and dashboard. It can attach to user tailnets without routing packets into the cluster overlay. See [External ingress gateway](workload-overlay.md#External%20ingress%20gateway) for construction and integration, and [Access and share links](workload-previews.md#Access%20and%20share%20links) for viewer authorization.
 
 ## MCP gateway
 
-The MCP gateway serves afakt agents only, with one Streamable HTTP endpoint per agent harness through the guest relay and workload proxy under mediator decisions. On each call, it checks the agent launch identity stamped by the mediator, whose agent proxy authenticates with the launch's SVID, and enforces server and tool allowlists. It holds upstream credentials outside the agent sandbox for the launch. ACP requests govern tool approvals, and every call produces audit and telemetry records. Calls route to remote HTTP servers or stdio servers inside the sandbox VM or sandboxed on the control plane. The built-in afakt server supplies afakt API tools. See [Agent MCP gateway](agent-mcp-gateway.md).
+The MCP gateway serves afakt agents only, with one Streamable HTTP endpoint per agent harness through the guest relay and workload proxy under mediator decisions. On each call, it checks the agent launch identity stamped by the mediator, whose workload proxy authenticates with the launch's SVID, and enforces server and tool allowlists. It holds upstream credentials outside the agent sandbox for the launch. ACP requests govern tool approvals, and every call produces audit and telemetry records. Calls route to remote HTTP servers or stdio servers inside the workload guest or sandboxed on the control plane. The built-in afakt server supplies afakt API tools. See [Agent MCP gateway](agent-mcp-gateway.md).
 
 ## Object store
 
@@ -103,43 +103,41 @@ The object store supplies the S3 API compatible endpoint used by the registry an
 
 ## Overlay node
 
-An overlay node represents one agent proxy, agent host, or control plane service instance in the isolated cluster overlay. Service instances share a role tag but keep separate node identities. Guests aren't nodes. See [Overlay transport](agent-overlay.md#Overlay%20transport).
+An overlay node represents one workload proxy, workload host, or control plane service instance in the isolated cluster overlay. Service instances share a role tag but keep separate node identities. Guests aren't nodes. See [Overlay transport](workload-overlay.md#Overlay%20transport).
 
-## Agent proxy
+## Workload proxy
 
-Each workload's agent proxy transmits guest traffic in both directions and requests a mediator decision for each connection. It has its own overlay node and holds the launch's X.509 SPIFFE Verifiable Identity Document (SVID) and private key outside the guest. The ingress gateway and permitted peers dial it directly with SPIFFE mutual TLS. See [Agent proxy](agent-workload-proxy.md).
+Each workload's workload proxy transmits guest traffic in both directions and requests a mediator decision for each connection. It has its own overlay node and holds the launch's X.509 SPIFFE Verifiable Identity Document (SVID) and private key outside the guest. The ingress gateway and permitted peers dial it directly with SPIFFE mutual TLS. See [Workload proxy](workload-proxy.md).
 
 ## Port forwarder
 
-Port forwarding requires authorization of the current publication and agent launch before reaching a guest loopback listener. Its [path through the workload proxy](agent-open-questions.md#%60OQ-PORT-14%60) remains open. See [Port discovery and records](agent-ports.md#Port%20discovery%20and%20records).
+Port forwarding requires authorization of the current publication and agent launch before reaching a guest loopback listener. Its [path through the workload proxy](agent-open-questions.md#%60OQ-PORT-14%60) remains open. See [Port discovery and records](workload-ports.md#Port%20discovery%20and%20records).
 
 ## Preview server
 
-The preview server serves authorized preview requests as a client of published ports. It dials the workload proxy over the overlay with mutual authentication. The [published-port path](agent-open-questions.md#%60OQ-PORT-14%60), including the binding to the guest listener, remains open. See [Previews](agent-previews.md#Preview%20routing%20and%20names).
+The preview server serves authorized preview requests as a client of published ports. It dials the workload proxy over the overlay with mutual authentication. The [published-port path](agent-open-questions.md#%60OQ-PORT-14%60), including the binding to the guest listener, remains open. See [Previews](workload-previews.md#Preview%20routing%20and%20names).
 
 ## Registry
 
 The registry stores workspace image manifests, config blobs, and layers in the object store. An afakt-owned interface supplies scoped token authentication, upstream caching, and collection of unreferenced content. Registry software and process placement remain [`OQ-IMG-16`](agent-open-questions.md#%60OQ-IMG-16%60). See [Registry](agent-workspace-image.md#Registry) and [registry admission](agent-workspace-lifecycle.md#Registry%20admission).
 
-## Agent workload guest
+## Workload guest
 
-The [agent workload guest](agent-workload-guest.md) is the VM or non-VM context that runs the harness and workspace commands. Guest routing components don't decide policy. External traffic, including DNS, uses only the workload proxy.
+The [workload guest](workload-guest.md) is the VM that runs the workload on a VM provider. Guest routing components don't decide policy. External traffic, including DNS, uses only the workload proxy.
 
-## Agent sandbox virtual machine
-
-An agent sandbox VM is the per-agent isolation boundary, with a guest kernel, read-only operating system disk, and writable workspace disk. The agent host supervisor controls its virtual machine monitors (VMMs) independently of ACP and guest policy. See [Enforcement](agent-sandbox.md#Enforcement).
+A workload guest is the isolation boundary, with a guest kernel, read-only operating system disk, and writable workspace disk. The workload host supervisor controls its virtual machine monitors (VMMs) independently of ACP and guest policy. See [Enforcement](workload-sandbox.md#Enforcement).
 
 ## Snapshot registry
 
-The snapshot registry stores and serves agent snapshots of VM state for restoration and transfer. Agent snapshot scope and retention remain [open](agent-open-questions.md#Agents). See [Agent snapshots and the snapshot registry](agent.md#Agent%20snapshots%20and%20the%20snapshot%20registry). [Workspace disk deltas and portable revisions](agent-workspace-lifecycle.md#Workspace%20disk%20deltas%20and%20portable%20revisions).
+The snapshot registry stores and serves workload snapshots of VM state for restoration and transfer. Workload snapshot scope and retention remain [open](agent-open-questions.md#Agents). See [Workload snapshots and the snapshot registry](agent.md#Workload%20snapshots%20and%20the%20snapshot%20registry). [Workspace disk deltas and portable revisions](agent-workspace-lifecycle.md#Workspace%20disk%20deltas%20and%20portable%20revisions).
 
 ## Tailnet attachment
 
-A tailnet attachment gives the external ingress gateway, or optionally a host-level node, access to a user's tailnet. It never adds launch nodes or routes packets between the user tailnet and cluster overlay. afakt sign-in remains required. See [User tailnet attachments](agent-overlay.md#User%20tailnet%20attachments).
+A tailnet attachment gives the external ingress gateway, or optionally a host-level node, access to a user's tailnet. It never adds launch nodes or routes packets between the user tailnet and cluster overlay. afakt sign-in remains required. See [User tailnet attachments](workload-overlay.md#User%20tailnet%20attachments).
 
 ## Tunnel providers
 
-The afakt binary includes Cloudflare Tunnel and Tailscale Funnel. Their connectors run in the API server process and publish the ingress gateway's listener for previews through outbound connections, with optional separate publication of the API and dashboard. Provider credentials stay on the control plane. See [Public tunnel providers](agent-previews.md#Public%20tunnel%20providers).
+The afakt binary includes Cloudflare Tunnel and Tailscale Funnel. Their connectors run in the API server process and publish the ingress gateway's listener for previews through outbound connections, with optional separate publication of the API and dashboard. Provider credentials stay on the control plane. See [Public tunnel providers](workload-previews.md#Public%20tunnel%20providers).
 
 ## Web dashboard
 
@@ -159,11 +157,11 @@ afakt coordinates work using Temporal workflows.
 
 ### Agent launcher
 
-The agent launcher workflow takes an immutable agent launch spec and manages one agent launch. The agent host worker runs it on the selected host task queue. It acquires an agent sandbox through the agent sandbox provider named in the spec, starts the agent harness, waits, and tears down. For workflow-controlled Agent Client Protocol (ACP) launches, it's the only writer and sends the rendered instructions and prompt together. It returns the agent launch result to the agent dispatcher workflow. See [Agent launch](agent-launch.md) and [Provider operations](agent-launch-contract.md#Provider%20operations).
+The agent launcher workflow takes an immutable agent launch spec and manages one agent launch. The workload host worker runs it on the selected host task queue. It acquires an agent sandbox through the workload provider named in the spec, starts the agent harness, waits, and tears down. For workflow-controlled Agent Client Protocol (ACP) launches, it's the only writer and sends the rendered instructions and prompt together. It returns the agent launch result to the agent dispatcher workflow. See [Agent launch](agent-launch.md) and [Provider operations](agent-launch-contract.md#Workload%20provider%20operations).
 
 ### Agent dispatcher
 
-The agent dispatcher workflow starts by default as a child of the caller's workflow. It authorizes an [agent launch request](agent.md#Agent%20launch%20request) and picks a host task queue. After finalizing the immutable [agent launch spec](agent-launch-contract.md#Agent%20launch%20spec), it queues the agent launch. Temporal delivers workflow and activity tasks to workers. This app workflow makes the authorization, placement, and configuration choices. See [Agent placement](agent-placement.md) and [Agent launch model](agent-launch-model.md).
+The agent dispatcher workflow starts by default as a child of the caller's workflow. It authorizes an [agent launch request](agent.md#Agent%20launch%20request) and picks a host task queue. After finalizing the immutable [agent launch spec](agent-launch-contract.md#Agent%20launch%20spec), it queues the agent launch. Temporal delivers workflow and activity tasks to workers. This app workflow makes the authorization, placement, and configuration choices. See [Workload placement](workload-placement.md) and [Agent launch model](agent-launch-model.md).
 
 ### Agent session
 
@@ -171,7 +169,7 @@ The agent session workflow holds an interactive session's control state, includi
 
 ## Workspace image builder
 
-The workspace image builder resolves image definitions and coordinates builds triggered by schedules, repository branch pushes, or manual requests. Each build runs as a job on an agent host, with its commands inside the pinned agent profile's agent sandbox. The worker snapshots and pushes the completed tree, and publication moves the output tag only after success. See [Building workspace images](agent-workspace-image.md#Image%20builds). [Workspace image build lifecycle](agent-workspace-lifecycle.md#Image%20builds).
+The workspace image builder resolves image definitions and coordinates builds triggered by schedules, repository branch pushes, or manual requests. Each build runs as a job on a workload host, with its commands inside the pinned agent profile's agent sandbox. The worker snapshots and pushes the completed tree, and publication moves the output tag only after success. See [Building workspace images](agent-workspace-image.md#Image%20builds). [Workspace image build lifecycle](agent-workspace-lifecycle.md#Image%20builds).
 
 ## Workspace registry
 

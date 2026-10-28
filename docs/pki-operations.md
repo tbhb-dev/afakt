@@ -15,9 +15,9 @@ Public key infrastructure (PKI) operations keep authentication, authorization, a
 
 The workload identity issuer needs a first trust anchor independent of workload credentials that it hasn't issued. First-run root setup, authenticated bundle installation, bootstrap-token delivery, and issuer data-store access remain [undecided](agent-open-questions.md#%60OQ-SBX-32%60). A downloaded public key set or a reachable enrollment endpoint doesn't create that first trust.
 
-Host enrollment checks the admitted machine or key claims. The issuer then needs an authorized mapping from host-side identity requests to their workloads. The Workload Application Programming Interface (API) serves host-side processes and excludes the guest. Attestation policy, registration ownership, and renewal authorization remain [undecided](agent-open-questions.md#%60OQ-SBX-30%60). Consumer device enrollment has a separate [identity question](agent-open-questions.md#%60OQ-ATT-23%60).
+Workload host enrollment checks the admitted machine or key claims. The issuer then needs an authorized mapping from host-side identity requests to their workloads. The Workload Application Programming Interface (API) serves host-side processes and excludes the guest. Attestation policy, registration ownership, and renewal authorization remain [undecided](agent-open-questions.md#%60OQ-SBX-30%60). Consumer device enrollment has a separate [identity question](agent-open-questions.md#%60OQ-ATT-23%60).
 
-Outside the guest, the agent proxy receives its launch's X.509 Secure Production Identity Framework for Everyone (SPIFFE) Verifiable Identity Document (SVID). Over mutual Transport Layer Security (TLS), a receiving service authenticates the identity and applies operation and target authorization. Credential exchange also checks the allowed scope and audience. Exchange may use a JavaScript Object Notation (JSON) Web Token (JWT) SVID. See [Workload identity](agent-host.md#Workload%20identity), [Launch authentication](agent-workload-proxy.md#Agent%20launch%20authentication), and [Exchange admission](agent-open-questions.md#%60OQ-SBX-17%60).
+Outside the guest, the workload proxy receives its launch's X.509 Secure Production Identity Framework for Everyone (SPIFFE) Verifiable Identity Document (SVID). Over mutual Transport Layer Security (TLS), a receiving service authenticates the identity and applies operation and target authorization. Credential exchange also checks the allowed scope and audience. Exchange may use a JavaScript Object Notation (JSON) Web Token (JWT) SVID. See [Workload identity](workload-host.md#Workload%20identity), [Launch authentication](workload-proxy.md#Agent%20launch%20authentication), and [Exchange admission](agent-open-questions.md#%60OQ-SBX-17%60).
 
 ## Renewal and authority rotation
 
@@ -41,13 +41,13 @@ Credential expiry bounds authentication only when the consumer checks time, and 
 | Inspection trust update fails | Existing client contexts or connections can keep old trust. Readiness, restart, and retirement bounds remain [undecided](agent-open-questions.md#%60OQ-PKI-6%60). Required inspection doesn't become passthrough. |
 | Overlay coordination unavailable | Nodes have a static map of stable addresses. Credential expiry, policy propagation, and how long an outage may last remain [undecided](agent-open-questions.md#%60OQ-HST-10%60). |
 | Signing-key publication unavailable | Registry authentication rejects unknown keys. Acceptance of cached known keys and their age limit remain [undecided](agent-open-questions.md#%60OQ-PKI-3%60). |
-| Host enrollment expires during sleep | Fresh enrollment and recovery authority remain [undecided](agent-open-questions.md#%60OQ-HST-4%60), and copied software state alone doesn't prove the same machine returned. |
+| Workload host enrollment expires during sleep | Fresh enrollment and recovery authority remain [undecided](agent-open-questions.md#%60OQ-HST-4%60), and copied software state alone doesn't prove the same machine returned. |
 
 The starting certificate lifetimes don't imply a numeric outage allowance. The validity left at failure depends on issuance time, verifier clock rules, and any independent revocation or launch-state check.
 
 ## Emergency revocation and disaster recovery
 
-Emergency response distinguishes a stolen leaf key, a compromised host, a signing-key compromise, and loss of a root authority. Stopping issuance and rejecting new use affect distinct authority, as do withdrawing trust and retiring active connections. Revoking exchanged credentials affects distinct authority too. Their scope and propagation bounds remain [undecided](agent-open-questions.md#%60OQ-HST-6%60), and replacing a leaf certificate alone doesn't invalidate another unexpired certificate under a trusted issuer.
+Emergency response distinguishes a stolen leaf key, a compromised workload host, a signing-key compromise, and loss of a root authority. Stopping issuance and rejecting new use affect distinct authority, as do withdrawing trust and retiring active connections. Revoking exchanged credentials affects distinct authority too. Their scope and propagation bounds remain [undecided](agent-open-questions.md#%60OQ-HST-6%60), and replacing a leaf certificate alone doesn't invalidate another unexpired certificate under a trusted issuer.
 
 Root rollover needs an authenticated replacement anchor. It also needs a way to reject the retired anchor. If all cached identities expire, recovery can't require only those same identities. The independent recovery authority and restoration of issuer data-store access remain [undecided](agent-open-questions.md#%60OQ-SBX-32%60). Whether an emergency transition permits any overlap depends on [trust retirement](agent-open-questions.md#%60OQ-SBX-41%60).
 
@@ -111,7 +111,7 @@ Check the recovered key state, registration permissions, revocations, and audit 
 
 ## Threat model
 
-The PKI threat model extends the [agent threat model](agent-threat-model.md), with private issuance keys, enrollment authority, trusted public bundles, secret-store keys, and verification history as its assets. Attackers include a hostile guest, a compromised worker or host, a network attacker, and a compromised signing or recovery authority. STRIDE classifies spoofing, tampering, repudiation, information disclosure, denial of service, and elevation of privilege.
+The PKI threat model extends the [workload threat model](workload-threat-model.md), with private issuance keys, enrollment authority, trusted public bundles, secret-store keys, and verification history as its assets. Attackers include a hostile guest, a compromised worker or workload host, a network attacker, and a compromised signing or recovery authority. STRIDE classifies spoofing, tampering, repudiation, information disclosure, denial of service, and elevation of privilege.
 
 | Threat ID | Category | Threat | Mitigation and remaining gap |
 | --- | --- | --- | --- |

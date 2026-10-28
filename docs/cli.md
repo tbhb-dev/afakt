@@ -35,7 +35,7 @@ See [Agents](agent.md).
 | --- | --- |
 | `afakt agent` | Manage durable agents and their work history. |
 | `afakt agent annotate` | Update an agent's annotations. |
-| `afakt agent archive` | Take an agent snapshot of a stopped agent and move it to archive storage. |
+| `afakt agent archive` | Take a workload snapshot of a stopped agent and move it to archive storage. |
 | `afakt agent attach` | Attach interactively to an agent in the terminal. |
 | `afakt agent budget` | Set or update an agent's usage budget. |
 | `afakt agent clear` | Clear an agent's session. |
@@ -52,18 +52,18 @@ See [Agents](agent.md).
 | `afakt agent history` | Fetch or follow an agent's current and historical transcripts. |
 | `afakt agent import` | Create an agent from an Open Container Initiative (OCI) artifact. |
 | `afakt agent info` | View a summary or detailed information about an agent. |
-| `afakt agent kill` | Stop the agent sandbox through its provider under [Cancellation and limits](agent-sandbox-lifecycle.md#Cancellation%20and%20limits). |
+| `afakt agent kill` | Stop the agent sandbox through its provider under [Cancellation and limits](workload-lifecycle.md#Cancellation%20and%20limits). |
 | `afakt agent label` | Update an agent's labels. |
 | `afakt agent limits` | View details about an agent's resource and usage limits. |
 | `afakt agent list` | List agents. |
 | `afakt agent logs` | Read agent logs or follow new log entries. |
-| `afakt agent migrate` | Move an agent to another host. |
+| `afakt agent migrate` | Move an agent to another workload host. |
 | `afakt agent prune` | Permanently delete unused agents. |
 | `afakt agent quarantine` | Remove network access from an agent. |
 | `afakt agent queue-message` | Send a user message to an agent after its current turn. |
 | `afakt agent rename` | Rename an agent. |
 | `afakt agent restart` | Restart the workspace and agent harness through a new agent launch linked to its predecessor. |
-| `afakt agent restore` | Start an agent from an agent snapshot. |
+| `afakt agent restore` | Start an agent from a workload snapshot. |
 | `afakt agent result` | View an agent's final message. |
 | `afakt agent resume` | Start a suspended agent. |
 | `afakt agent run` | Start an agent, wait for its session to end, and output its final message. |
@@ -74,7 +74,7 @@ See [Agents](agent.md).
 | `afakt agent stats` | View an agent's statistics. |
 | `afakt agent status` | View status information about an agent. |
 | `afakt agent steer` | Interrupt an agent's current turn with a user message. |
-| `afakt agent suspend` | Take an agent snapshot and an agent checkpoint together at an idle turn boundary and stop the sandbox VM. |
+| `afakt agent suspend` | Take a workload snapshot and an agent checkpoint together at an idle turn boundary and stop the workload guest. |
 | `afakt agent top` | Start a real-time view of agent activity. |
 | `afakt agent unarchive` | Restore an archived agent. |
 | `afakt agent unquarantine` | Restore network connectivity to an agent. |
@@ -267,23 +267,23 @@ See [Memory, skills, and artifacts](agent.md#Memory,%20skills,%20and%20artifacts
 | `afakt agent skill list` | List an agent's skills. |
 | `afakt agent skill remove` | Remove a skill from an agent. |
 
-## Agent snapshot
+## Workload snapshot
 
-See [Agent snapshots and the snapshot registry](agent.md#Agent%20snapshots%20and%20the%20snapshot%20registry). Agent snapshots require an eligible virtual machine (VM) provider under [Suspend and resume](agent-sandbox-lifecycle.md#Suspend%20and%20resume). Host modes and container managers have none.
+See [Workload snapshots and the snapshot registry](agent.md#Workload%20snapshots%20and%20the%20snapshot%20registry). Workload snapshots require an eligible virtual machine (VM) provider under [Suspend and resume](workload-lifecycle.md#Suspend%20and%20resume). Host modes and container managers have none.
 
 | Command | Description |
 | --- | --- |
-| `afakt agent snapshot` | Manage agent snapshots in the snapshot registry. |
-| `afakt agent snapshot annotate` | Update an agent snapshot's annotations. |
-| `afakt agent snapshot create` | Capture the agent sandbox's VM state and upload the agent snapshot to the snapshot registry. |
-| `afakt agent snapshot delete` | Delete an agent snapshot. |
-| `afakt agent snapshot download` | Download an agent snapshot. |
-| `afakt agent snapshot info` | View a summary of an agent snapshot. |
-| `afakt agent snapshot label` | Update an agent snapshot's labels. |
-| `afakt agent snapshot list` | List agent snapshots. |
-| `afakt agent snapshot prune` | Delete old agent snapshots. |
-| `afakt agent snapshot tag` | Tag an agent snapshot. |
-| `afakt agent snapshot upload` | Upload an agent snapshot. |
+| `afakt workload snapshot` | Manage workload snapshots in the snapshot registry. |
+| `afakt workload snapshot annotate` | Update a workload snapshot's annotations. |
+| `afakt workload snapshot create` | Capture the agent sandbox's VM state and upload the workload snapshot to the snapshot registry. |
+| `afakt workload snapshot delete` | Delete a workload snapshot. |
+| `afakt workload snapshot download` | Download a workload snapshot. |
+| `afakt workload snapshot info` | View a summary of a workload snapshot. |
+| `afakt workload snapshot label` | Update a workload snapshot's labels. |
+| `afakt workload snapshot list` | List workload snapshots. |
+| `afakt workload snapshot prune` | Delete old workload snapshots. |
+| `afakt workload snapshot tag` | Tag a workload snapshot. |
+| `afakt workload snapshot upload` | Upload a workload snapshot. |
 
 ## Agent subscription
 
@@ -481,12 +481,12 @@ See [Policies, roles, and organizational scope](agent.md#Policies,%20roles,%20an
 
 The mapping between port publications, sandbox port commands, and share-link operations remains [`OQ-HUB-7`](agent-open-questions.md#%60OQ-HUB-7%60).
 
-See [Agent ports and previews](agent-ports.md).
+See [Workload ports and previews](workload-ports.md).
 
 | Command | Description |
 | --- | --- |
 | `afakt port` | Manage port publications and authenticated client tunnels. |
-| `afakt port expose <port>` | Ask the policy engine for permission to publish a loopback listener through the agent mediator and the provider’s control path. |
+| `afakt port expose <port>` | Ask the policy engine for permission to publish a loopback listener through the workload proxy mediator and the provider’s control path. |
 | `afakt port forward` | Open an authenticated tunnel to a forwarded port. |
 | `afakt port list` | List accessible forwarded ports. |
 | `afakt port unforward` | Close a client port tunnel. |
@@ -555,7 +555,7 @@ See [Policies, roles, and organizational scope](agent.md#Policies,%20roles,%20an
 
 ## Sandbox
 
-See [Agent sandbox](agent-sandbox.md).
+See [Workload sandbox](workload-sandbox.md).
 
 | Command | Description |
 | --- | --- |
@@ -610,9 +610,9 @@ See [Agent sandbox](agent-sandbox.md).
 | `afakt sandbox policy list` | List a sandbox's local and attached policies. |
 | `afakt sandbox policy save` | Save a sandbox-local policy as a global policy. |
 | `afakt sandbox port` | Manage forwarded sandbox ports. |
-| `afakt sandbox port close` | Close a sandbox port publication under [Published ports](agent-ports.md#Port%20discovery%20and%20records). |
-| `afakt sandbox port expose` | Publish a sandbox port under [Published ports](agent-ports.md#Port%20discovery%20and%20records). |
-| `afakt sandbox port list` | List sandbox port publications under [Published ports](agent-ports.md#Port%20discovery%20and%20records). |
+| `afakt sandbox port close` | Close a sandbox port publication under [Published ports](workload-ports.md#Port%20discovery%20and%20records). |
+| `afakt sandbox port expose` | Publish a sandbox port under [Published ports](workload-ports.md#Port%20discovery%20and%20records). |
+| `afakt sandbox port list` | List sandbox port publications under [Published ports](workload-ports.md#Port%20discovery%20and%20records). |
 | `afakt sandbox rename` | Rename a sandbox configuration. |
 | `afakt sandbox run` | Create a standalone sandbox configuration and execute a command in it. |
 | `afakt sandbox ssh-key` | Manage sandbox Secure Shell (SSH) key authorizations. |

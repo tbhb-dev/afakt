@@ -21,7 +21,7 @@ An agent retains its identity, configuration, and history across [agent launches
 | `running` | An agent launch is active. It may be working, idle, or waiting for input. |
 | `suspended` | The agent preserves state for resume after a suspend request. |
 | `stopped` | The agent launch ended. The agent and its retained resources remain. |
-| `archived` | An agent snapshot preserves a stopped agent in archive storage where the agent runs in a virtual machine (VM). |
+| `archived` | A workload snapshot preserves a stopped agent in archive storage where the agent runs in a virtual machine (VM). |
 | `deleted` | Permanent deletion removed the agent resource. |
 
 Quarantine is a network condition on a running agent. It removes network access without becoming a lifecycle state. Unquarantine restores connectivity within the agent's network rules.
@@ -46,7 +46,7 @@ stateDiagram-v2
     end note
 ```
 
-The agent state transitions require successful completion. A signal or request alone doesn't prove the harness stopped. Before afakt treats an agent launch as ended, the provider [observes that every process it started for the launch has exited](agent-sandbox-lifecycle.md#Agent%20launch%20states). Launch failures leave an agent without an active agent launch. Mapping intermediate provider states to agent status remains an open question.
+The agent state transitions require successful completion. A signal or request alone doesn't prove the harness stopped. Before afakt treats an agent launch as ended, the provider [observes that every process it started for the launch has exited](workload-lifecycle.md#Agent%20launch%20states). Launch failures leave an agent without an active agent launch. Mapping intermediate provider states to agent status remains an open question.
 
 ## Create, start, and run
 
@@ -56,7 +56,7 @@ The agent state transitions require successful completion. A signal or request a
 
 Workload identities use the provisional lifetimes and half-life renewal in [Certificate policies](pki.md#Certificate%20policies), subject to [`OQ-HOOK-18`](agent-open-questions.md#%60OQ-HOOK-18%60).
 
-[Agent launch lifecycle](agent-sandbox-lifecycle.md#Agent%20launch%20lifecycle). [Agent launch states](agent-sandbox-lifecycle.md#Agent%20launch%20states).
+[Agent launch lifecycle](workload-lifecycle.md#Agent%20launch%20lifecycle). [Agent launch states](workload-lifecycle.md#Agent%20launch%20states).
 
 ## Agent launches and supersession
 
@@ -68,18 +68,18 @@ A successor waits until its predecessor is terminal before running. The provider
 
 ## Launch sequence
 
-The agent launch belongs to a durable [agent](agent.md), which retains its conversation after the launch ends. After the agent launcher completes its [lifecycle](agent-sandbox-lifecycle.md#Agent%20launch%20lifecycle), the caller receives a successful launch's result through the agent dispatcher workflow. See the [complete launch sequence](agent-launch-sequence.md#Agent%20launch%20sequence) for the messages between components.
+The agent launch belongs to a durable [agent](agent.md), which retains its conversation after the launch ends. After the agent launcher completes its [lifecycle](workload-lifecycle.md#Agent%20launch%20lifecycle), the caller receives a successful launch's result through the agent dispatcher workflow. See the [complete launch sequence](agent-launch-sequence.md#Agent%20launch%20sequence) for the messages between components.
 
 ## Session lifecycle
 
 The agent session lifecycle controls an interactive conversation and its active transport. Closing a transport or ending an agent launch leaves the retained transcript with its agent. How these control states map to [agent states](agent-lifecycle.md#Agent%20states) and agent launch boundaries remains [open](agent-open-questions.md#Agents).
 
 1. **Creation.** When a client creates a session for an agent through the ingress gateway and API server with a profile, workspace sources, and an optional first prompt, the API server starts the agent session workflow with the new session ID.
-2. **Placement.** The agent dispatcher workflow places the session on an agent host, as for an agent launch.
-3. **Start.** The provider builds the agent workspace and starts the guest relay before the `before-agent` hooks. Their CLI control requests use the agent mediator. After the hooks, the adapter starts in the agent sandbox and the relay sends `initialize` and `session/new`. Startup ownership remains [`OQ-SES-15`](agent-open-questions.md#%60OQ-SES-15%60). Session registration uses the workload proxy under mediator decisions. Its [endpoint owner and connection path](agent-open-questions.md#%60OQ-SES-17%60) remain open.
+2. **Placement.** The agent dispatcher workflow places the session on a workload host, as for an agent launch.
+3. **Start.** The provider builds the agent workspace and starts the guest relay before the `before-agent` hooks. Their CLI control requests use the workload proxy mediator. After the hooks, the adapter starts in the agent sandbox and the relay sends `initialize` and `session/new`. Startup ownership remains [`OQ-SES-15`](agent-open-questions.md#%60OQ-SES-15%60). Session registration uses the workload proxy under mediator decisions. Its [endpoint owner and connection path](agent-open-questions.md#%60OQ-SES-17%60) remain open.
 4. **Turns.** The agent receives prompts under the [ACP turn rules](agent-acp.md#Turns).
-5. **Suspend.** After the idle timeout, the agent session workflow suspends the session. For a VM provider that supports paired capture, afakt takes an agent snapshot and an agent checkpoint together at an idle turn boundary, with the guest filesystem frozen. The supervisor captures VM state, and the agent harness captures its session state. After the `before-teardown` hooks, it stops the VM and frees the slot.
-6. **Resume.** A prompt or an attach request for a suspended session resumes it. For a VM provider that supports paired capture, the supervisor restores the agent snapshot under the same guest paths, and the harness restores session state from the agent checkpoint. afakt reacquires credentials outside the guest. The guest relay reconnects through the proxy under mediator decisions. A restarted adapter receives `session/resume`. Which process and transport state survives restoration remains [open](agent-open-questions.md#Agents). Restoration in host modes and container managers remains [open](agent-open-questions.md#%60OQ-AGT-28%60).
+5. **Suspend.** After the idle timeout, the agent session workflow suspends the session. For a VM provider that supports paired capture, afakt takes a workload snapshot and an agent checkpoint together at an idle turn boundary, with the guest filesystem frozen. The supervisor captures VM state, and the agent harness captures its session state. After the `before-teardown` hooks, it stops the VM and frees the slot.
+6. **Resume.** A prompt or an attach request for a suspended session resumes it. For a VM provider that supports paired capture, the supervisor restores the workload snapshot under the same guest paths, and the harness restores session state from the agent checkpoint. afakt reacquires credentials outside the guest. The guest relay reconnects through the proxy under mediator decisions. A restarted adapter receives `session/resume`. Which process and transport state survives restoration remains [open](agent-open-questions.md#Agents). Restoration in host modes and container managers remains [open](agent-open-questions.md#%60OQ-AGT-28%60).
 7. **Close.** A close request, the session's lifetime limit, or a failure ends the session. The provider runs `session-end` hooks, records workspace changes, then runs `before-teardown` hooks and publishes the transcript as evidence, following [Hook events](agent-hooks.md#Hook%20events).
 
 ## Session states
@@ -92,7 +92,7 @@ Agent session states control the conversation, separate from the durable agent l
 | `running` | The agent is working on a turn. |
 | `requires-action` | The agent waits on a permission or elicitation answer from the writer. |
 | `idle` | The agent has no turn in progress and waits for a prompt. |
-| `suspended` | For a VM, state persists in an agent snapshot and an agent checkpoint after the VM stops. |
+| `suspended` | For a VM, state persists in a workload snapshot and an agent checkpoint after the VM stops. |
 | `closed` | The session ended on a close request or at its lifetime limit. |
 | `failed` | The session ended on a failure. |
 
@@ -105,11 +105,11 @@ Agent session states control the conversation, separate from the durable agent l
 
 A virtual machine alone doesn't establish capture or restore support. Eligibility and captured state remain [`OQ-AGT-1`](agent-open-questions.md#%60OQ-AGT-1%60) and [`OQ-AGT-3`](agent-open-questions.md#%60OQ-AGT-3%60).
 
-For a VM provider that supports paired capture, `suspend` takes an agent snapshot and an agent checkpoint together at an idle turn boundary, then stops the VM through the agent host's supervisor and virtual machine monitors. Resume restores VM state from the agent snapshot and harness session state from the agent checkpoint under the same guest paths, reacquiring credentials outside the guest. The [suspend and resume](agent-sandbox-lifecycle.md#Suspend%20and%20resume) contract keeps the agent workspace consistent with the harness's session state. Exactly which process and transport state returns remains open. Restoration in host modes and container managers remains [open](agent-open-questions.md#%60OQ-AGT-28%60).
+For a VM provider that supports paired capture, `suspend` takes a workload snapshot and an agent checkpoint together at an idle turn boundary, then stops the VM through the workload host's supervisor and virtual machine monitors. Resume restores VM state from the workload snapshot and harness session state from the agent checkpoint under the same guest paths, reacquiring credentials outside the guest. The [suspend and resume](workload-lifecycle.md#Suspend%20and%20resume) contract keeps the agent workspace consistent with the harness's session state. Exactly which process and transport state returns remains open. Restoration in host modes and container managers remains [open](agent-open-questions.md#%60OQ-AGT-28%60).
 
 `restart` restarts the agent's workspace and harness. Before the replacement agent launch starts, the predecessor agent launch ends. Identity and history remain with the agent. How restart selects the workspace revision and session to continue remains open.
 
-[Suspend and resume](agent-sandbox-lifecycle.md#Suspend%20and%20resume).
+[Suspend and resume](workload-lifecycle.md#Suspend%20and%20resume).
 
 ## Checkpoint capture
 
@@ -117,11 +117,11 @@ For a VM provider that supports paired capture, `suspend` takes an agent snapsho
 
 ## Archive and restore
 
-The snapshot registry stores and serves agent snapshots. `archive` takes an agent snapshot of a stopped agent and moves it to archive storage. Returning the archived agent to stopped state on `unarchive` is the leading option. Exceptions for automatic start remain [open](agent-open-questions.md#Agents). `restore` starts an agent from an agent snapshot. Snapshot contents, credential exclusions, identity handling, and retention rules remain open beyond the [suspend and resume](agent-sandbox-lifecycle.md#Suspend%20and%20resume) requirements.
+The snapshot registry stores and serves workload snapshots. `archive` takes a workload snapshot of a stopped agent and moves it to archive storage. Returning the archived agent to stopped state on `unarchive` is the leading option. Exceptions for automatic start remain [open](agent-open-questions.md#Agents). `restore` starts an agent from a workload snapshot. Snapshot contents, credential exclusions, identity handling, and retention rules remain open beyond the [suspend and resume](workload-lifecycle.md#Suspend%20and%20resume) requirements.
 
-An [agent snapshot](agent.md#Agent%20snapshots%20and%20the%20snapshot%20registry) captures VM state. An [agent checkpoint](agent.md#Agent%20checkpoints) captures harness session state. Snapshot commands and checkpoint operations keep these captures distinct.
+An [workload snapshot](agent.md#Workload%20snapshots%20and%20the%20snapshot%20registry) captures VM state. An [agent checkpoint](agent.md#Agent%20checkpoints) captures harness session state. Snapshot commands and checkpoint operations keep these captures distinct.
 
-[Virtual machine lifecycle](agent-sandbox-lifecycle.md#Virtual%20machine%20lifecycle).
+[Virtual machine lifecycle](workload-lifecycle.md#Virtual%20machine%20lifecycle).
 
 ## Kill, signal, and quarantine
 

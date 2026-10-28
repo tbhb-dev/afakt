@@ -21,15 +21,15 @@ One component inside the guest's `afakt-agent` command runs and talks to the har
 
 ## Session connection
 
-For a locally controlled harness, the agent sandbox provider starts the guest relay inside the sandbox virtual machine (VM). Managed-loop placement remains [`OQ-SBX-63`](agent-open-questions.md#%60OQ-SBX-63%60). The [component inside `afakt-agent`](agent-acp.md#Running%20the%20harness) runs the harness through its ACP adapter. ACP traffic from the guest relay passes through the agent proxy. The mediator authorizes which session messages the proxy may forward. Clients attach through the ingress gateway using the [session attachment](agent-session-attachment.md) Application Programming Interface (API).
+For a locally controlled harness, the workload provider starts the guest relay inside the workload guest (VM). Managed-loop placement remains [`OQ-SBX-63`](agent-open-questions.md#%60OQ-SBX-63%60). The [component inside `afakt-agent`](agent-acp.md#Running%20the%20harness) runs the harness through its ACP adapter. ACP traffic from the guest relay passes through the workload proxy. The mediator authorizes which session messages the proxy may forward. Clients attach through the ingress gateway using the [session attachment](agent-session-attachment.md) Application Programming Interface (API).
 
 ## Parts
 
 - **Agent session workflow**: holds the [session control state](agent-session.md#Session%20workflow), separately from the message stream.
-- **Guest relay**: a process inside the agent sandbox VM under its own user. It acts as the ACP client to the adapter over standard input and output and sends session traffic through the proxy under mediator decisions.
-- **Agent mediator**: the agent mediator applies default-deny policy to ACP messages. It supplies message decisions to the agent proxy without transmitting network traffic.
+- **Guest relay**: a process inside the workload guest under its own user. It acts as the ACP client to the adapter over standard input and output and sends session traffic through the proxy under mediator decisions.
+- **Workload proxy mediator**: the workload proxy mediator applies default-deny policy to ACP messages. It supplies message decisions to the workload proxy without transmitting network traffic.
 - **ACP adapter**: the agent harness's ACP agent, which runs inside the sandbox.
-- **Agent proxy**: transmits permitted traffic and keeps the launch credentials outside the guest.
+- **Workload proxy**: transmits permitted traffic and keeps the launch credentials outside the guest.
 - **Ingress gateway**: the public entry point for attached clients, with [endpoint ownership](agent-open-questions.md#%60OQ-SES-17%60) open. Internal launch connections use the overlay.
 - **Client**: any program that attaches to the session through the ingress gateway's `/acp` endpoint.
 
@@ -39,7 +39,7 @@ Agent profiles select the [harness transport](agent-profile.md#Harness%20transpo
 
 ## Launch connection
 
-For a workflow-controlled ACP agent launch, the agent sandbox provider starts the [guest relay](agent-acp.md#Parts) inside the agent sandbox VM, and the adapter runs under the separate agent user. Startup ownership and ordering remain [`OQ-SES-15`](agent-open-questions.md#%60OQ-SES-15%60). The agent mediator checks each ACP message under default deny while the proxy transmits permitted traffic. The [client connection path](agent-open-questions.md#%60OQ-SES-17%60) remains open. After initializing the adapter, the relay opens an ACP session. Only the agent launcher workflow writes to it. It sends the rendered instructions and the prompt together as one prompt and waits for the turn to end. The turn's last agent message is the final answer. Then the relay closes the ACP session. Before running `after-agent` hooks, the provider verifies that the adapter, harness, and their helpers have exited. Control services remain available to hooks under [Running hooks](agent-hooks.md#Running%20hooks). Before the launch becomes terminal, every launch-owned process must exit under [Agent launch states](agent-sandbox-lifecycle.md#Agent%20launch%20states).
+For a workflow-controlled ACP agent launch, the workload provider starts the [guest relay](agent-acp.md#Parts) inside the workload guest, and the adapter runs under the separate agent user. Startup ownership and ordering remain [`OQ-SES-15`](agent-open-questions.md#%60OQ-SES-15%60). The proxy mediator checks each ACP message under default deny while the proxy transmits permitted traffic. The [client connection path](agent-open-questions.md#%60OQ-SES-17%60) remains open. After initializing the adapter, the relay opens an ACP session. Only the agent launcher workflow writes to it. It sends the rendered instructions and the prompt together as one prompt and waits for the turn to end. The turn's last agent message is the final answer. Then the relay closes the ACP session. Before running `after-agent` hooks, the provider verifies that the adapter, harness, and their helpers have exited. Control services remain available to hooks under [Running hooks](agent-hooks.md#Running%20hooks). Before the launch becomes terminal, every launch-owned process must exit under [Agent launch states](workload-lifecycle.md#Agent%20launch%20states).
 
 The guest relay answers `session/request_permission` from the profile's harness permissions. It allows what the profile grants and rejects the rest. It cancels every `elicitation/create`. No person answers either request in a workflow-controlled agent launch. People with read access may [attach](agent-acp.md#Agent%20launch%20attachment) to a running ACP agent launch as readers and never become writers. Headless attachment remains [`OQ-SES-16`](agent-open-questions.md#%60OQ-SES-16%60).
 
@@ -69,7 +69,7 @@ The enforcement owner remains [open](agent-open-questions.md#%60OQ-SES-18%60). T
 
 How concurrent clients map to one launch's ACP stream while preserving these roles and request correlation remains [open](agent-open-questions.md#%60OQ-SES-20%60).
 
-- Every client attached to the agent session receives every permitted `session/update` notification of the session, within the agent mediator's size and rate bounds for ACP updates.
+- Every client attached to the agent session receives every permitted `session/update` notification of the session, within the workload proxy mediator's size and rate bounds for ACP updates.
 - Only the writer sends prompts and cancels turns. Answering permission and elicitation requests and changing session modes and configuration options also require that role. afakt rejects these messages from a reader.
 - A client becomes the writer by taking the role. Taking it from another client requires the `sessions.write` capability and moves the role at once.
 - Without an attached writer, prompts from people with `sessions.write` still queue for delivery when the agent goes idle. Queue ownership remains [`OQ-SES-14`](agent-open-questions.md#%60OQ-SES-14%60).
@@ -93,7 +93,7 @@ The API server exposes ACP at `/api/v1/agents/{agent_id}/acp` and remote control
 
 The outcome of [requests without an active launch](agent-open-questions.md#%60OQ-SES-19%60) and [protocol compatibility negotiation](agent-open-questions.md#%60OQ-SES-21%60) remain undecided.
 
-For each ACP message, the agent mediator applies its policy. Both directions use default deny. A workflow-controlled ACP launch keeps the agent launcher workflow as its only writer. [Session-end wait and SVID lifetime](agent-open-questions.md#%60OQ-HOOK-18%60) remain on hold.
+For each ACP message, the workload proxy mediator applies its policy. Both directions use default deny. A workflow-controlled ACP launch keeps the agent launcher workflow as its only writer. [Session-end wait and SVID lifetime](agent-open-questions.md#%60OQ-HOOK-18%60) remain on hold.
 
 ## Session message log
 
@@ -104,15 +104,15 @@ Workload identities use the provisional lifetimes and half-life renewal in [Cert
 ## Relay behavior
 
 - The guest relay advertises no file system or terminal capabilities to the adapter. Without those capabilities, the agent uses its own tools inside the agent sandbox and never accesses a client's machine.
-- For an interactive session, the relay forwards messages between the adapter and the agent proxy without changing them, apart from sender details in `_meta`. The mediator applies its default-deny policy to each ACP message before the proxy transmits it toward the client or adapter. For a workflow-controlled agent launch, it handles permission and elicitation requests itself under [Agent launches over ACP](agent-acp.md#Agent%20launches%20over%20ACP).
+- For an interactive session, the relay forwards messages between the adapter and the workload proxy without changing them, apart from sender details in `_meta`. The mediator applies its default-deny policy to each ACP message before the proxy transmits it toward the client or adapter. For a workflow-controlled agent launch, it handles permission and elicitation requests itself under [Agent launches over ACP](agent-acp.md#Agent%20launches%20over%20ACP).
 - When the channel drops, the relay reconnects with backoff and buffers the adapter's messages until the channel returns. The mediator applies the same default-deny policy to replayed ACP messages. Connection recovery depends on the open [session state ownership](agent-open-questions.md#%60OQ-SES-18%60).
-- The agent mediator stamps the session's identity. The agent proxy authenticates with the launch's X.509 SPIFFE Verifiable Identity Document (SVID) over mutual Transport Layer Security (TLS). Neither the SVID nor its private key enters the guest.
+- The workload proxy mediator stamps the session's identity. The workload proxy authenticates with the launch's X.509 SPIFFE Verifiable Identity Document (SVID) over mutual Transport Layer Security (TLS). Neither the SVID nor its private key enters the guest.
 
 ## ACP message policy
 
-At the agent mediator, policy evaluation uses default deny for each JavaScript Object Notation remote procedure call (`JSON-RPC`) message in both directions. Messages toward the agent, including prompts and cancel, have the sending user as their principal. For workflow prompts, the authenticated workflow supplies the user it acts for. Requests from the agent, including file reads and writes, terminal creation, and permission requests, have the agent as their principal. The relay's lack of file system and terminal capabilities still applies. A policy permit doesn't advertise those capabilities.
+At the workload proxy mediator, policy evaluation uses default deny for each JavaScript Object Notation remote procedure call (`JSON-RPC`) message in both directions. Messages toward the agent, including prompts and cancel, have the sending user as their principal. For workflow prompts, the authenticated workflow supplies the user it acts for. Requests from the agent, including file reads and writes, terminal creation, and permission requests, have the agent as their principal. The relay's lack of file system and terminal capabilities still applies. A policy permit doesn't advertise those capabilities.
 
-Update notifications have size and rate bounds. A denied message gets a `JSON-RPC` error and an entry in the agent's decision log. ACP never bypasses the mediator's policy or network rules. During workflow-controlled agent launches, the relay submits permission and elicitation requests and the answers it produces locally to the agent mediator for the same policy checks. Handling a request locally never exempts it from the message check.
+Update notifications have size and rate bounds. A denied message gets a `JSON-RPC` error and an entry in the workload's decision log. ACP never bypasses the mediator's policy or network rules. During workflow-controlled agent launches, the relay submits permission and elicitation requests and the answers it produces locally to the workload proxy mediator for the same policy checks. Handling a request locally never exempts it from the message check.
 
 Attached writers and readers enter through the ingress gateway. [Client connection ownership](agent-open-questions.md#%60OQ-SES-17%60), [session state ownership](agent-open-questions.md#%60OQ-SES-18%60), and the relay-to-proxy carrier remain undecided. Lifecycle control through the supervisor and virtual machine monitors (VMMs) is independent of ACP cancellation. Mediator policy can't block it.
 

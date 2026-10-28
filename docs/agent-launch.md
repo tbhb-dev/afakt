@@ -11,22 +11,22 @@ generated: { by: "codex:gpt-6", at: "2026-10-28T17:30:00Z" }
 
 [Public key infrastructure](pki.md).
 
-An agent launch is one instantiation of an agent in an agent sandbox on an agent host. At most one runs per agent. Retry, resume, migration, and crash recovery create a new agent launch linked to its predecessor, while the durable [agent](agent.md) and its session transcript persist.
+An agent launch is one instantiation of an agent in an agent sandbox on a workload host. At most one runs per agent. Retry, resume, migration, and crash recovery create a new agent launch linked to its predecessor, while the durable [agent](agent.md) and its session transcript persist.
 
-The [agent dispatcher workflow](components.md#Agent%20dispatcher) starts by default as a child of the caller's workflow. It authorizes an agent launch request and picks a host task queue. After finalizing the immutable agent launch spec, it queues the agent launch. The [agent launcher workflow](components.md#Agent%20launcher) takes that spec and obtains an agent sandbox through the specified agent sandbox provider. After starting the agent harness, it waits and tears down. It returns the result through the dispatcher to the caller.
+The [agent dispatcher workflow](components.md#Agent%20dispatcher) starts by default as a child of the caller's workflow. It authorizes an agent launch request and picks a host task queue. After finalizing the immutable agent launch spec, it queues the agent launch. The [agent launcher workflow](components.md#Agent%20launcher) takes that spec and obtains an agent sandbox through the specified workload provider. After starting the agent harness, it waits and tears down. It returns the result through the dispatcher to the caller.
 
 An agent launch has these contracts and supporting resources:
 
 - [Agent launch model](agent-launch-model.md) defines the fields and identity of an agent launch with its provenance record and evidence.
 - [Agent launch contract](agent-launch-contract.md) defines the agent launch spec, the agent launch result, and the provider operations.
-- [Agent placement](agent-placement.md) defines the agent host registry and the reservation Application Programming Interface (API) that bind each agent launch to an agent host.
+- [Workload placement](workload-placement.md) defines the workload host registry and the reservation Application Programming Interface (API) that bind each agent launch to a workload host.
 - [Agent launch sequence](agent-launch-sequence.md) follows each message of one agent launch, from the start of the agent dispatcher to the result.
 - [Agent launch resource](agent-launch-resource.md) gives the resource form of an agent launch, with a full example.
 - [Agent workspace](agent-workspace.md) defines the workspace sources and the environment variables the agent sees.
-- [Agent workspace image](agent-workspace-image.md) defines prebuilt workspace trees, their image builds and storage, and layer reuse on agent hosts.
+- [Agent workspace image](agent-workspace-image.md) defines prebuilt workspace trees, their image builds and storage, and layer reuse on workload hosts.
 - [Agent hooks](agent-hooks.md) defines the hooks that run before, during, and after the agent's work.
 - [Agent observability](agent-observability.md) defines the trace, spans, and metrics of each agent launch.
-- [Agent profile](agent-profile.md) and [Agent sandbox](agent-sandbox.md) define what bounds and confines each agent launch.
+- [Agent profile](agent-profile.md) and [Workload sandbox](workload-sandbox.md) define what bounds and confines each agent launch.
 - [Agent MCP gateway](agent-mcp-gateway.md) defines one Model Context Protocol (MCP) endpoint, server and tool access, approvals, and upstream credentials.
 
 [States and transitions](agent-workspace-lifecycle.md#States%20and%20transitions).
@@ -35,13 +35,13 @@ An agent launch has these contracts and supporting resources:
 
 - **parent workflow.** It submits an agent launch request and starts the agent dispatcher workflow as a child by default. Its default parent-close behavior requests cancellation of the child, which then cleans up.
 - **Agent dispatcher workflow.** Any afakt worker can run it. It authorizes the agent launch request and picks a host task queue. It finalizes the agent launch spec before queueing the launch.
-- **Agent launcher workflow.** The agent host worker runs it for one agent launch. It acquires an agent sandbox through the agent sandbox provider named by the spec, starts the agent harness, waits, and tears down.
-- **Agent host.** A bare metal machine, virtual machine, container manager, or remote platform that hosts agent sandboxes. Its agent host worker connects it to the control plane and runs the agent launcher workflow.
-- **Agent sandbox provider.** The adapter that manages an agent sandbox's lifecycle on an agent host. Its contract verbs are provision, restore, and release. Status, cancel, and result observe or control the associated agent launch.
+- **Agent launcher workflow.** The workload host worker runs it for one agent launch. It acquires an agent sandbox through the workload provider named by the spec, starts the agent harness, waits, and tears down.
+- **Workload host.** A bare metal machine, virtual machine, container manager, or remote platform that hosts agent sandboxes. Its workload host worker connects it to the control plane and runs the agent launcher workflow.
+- **Workload provider.** The adapter that manages an agent sandbox's lifecycle on a workload host. Its contract verbs are provision, restore, and release. Status, cancel, and result observe or control the associated agent launch.
 - **Agent harness.** The agent program inside the agent sandbox. Claude Code and Codex are examples.
 - **Model provider.** The service that serves model requests. Agent harness and model provider vary independently, and the spec lists both.
 - **Agent egress gateway.** The component that decrypts inspected destinations for Hypertext Transfer Protocol (HTTP) policy. See [Agent egress gateway](components.md#Agent%20egress%20gateway).
-- **Agent mediator.** The host-side component for one agent launch that ends the guest link and resolves guest names. It enforces connection policy. It sends inspected destinations to the agent egress gateway and mediates passthrough destinations without decryption. See [Agent sandbox](agent-sandbox.md).
+- **Workload proxy mediator.** The host-side component for one agent launch that ends the guest link and resolves guest names. It enforces connection policy. It sends inspected destinations to the agent egress gateway and mediates passthrough destinations without decryption. See [Workload sandbox](workload-sandbox.md).
 
 ## Harness transport
 
@@ -54,7 +54,7 @@ For a workflow-controlled ACP launch, a turn completes on its own when it ends w
 | ACP stop reason | Agent launch path | Result reason |
 | --- | --- | --- |
 | `end_turn` | The success path, with output validation and `after-agent` hooks. | `agent-exit`, unless validation or a hook fails. |
-| `cancelled` | The cancellation path, ending `canceled` after the provider observes that every process it started for the launch has exited. | `cancellation`, or `supersession` when a successor agent launch caused it. |
+| `cancelled` | The cancellation path, ending `canceled` after the workload provider observes that every process it started for the launch has exited. | `cancellation`, or `supersession` when a successor agent launch caused it. |
 | `refusal` | The failure path, ending `failed`. | `agent-refusal` |
 | `max_tokens` | The failure path, ending `failed`. | `resource-limit` |
 | `max_turn_requests` | The failure path, ending `failed`. | `resource-limit` |
@@ -63,7 +63,7 @@ A provider stop caused by a time limit or resource limit keeps that cause and fo
 
 ## Launch flow
 
-Each step follows the [agent launch lifecycle](agent-sandbox-lifecycle.md#Agent%20launch%20lifecycle), including its failure paths.
+Each step follows the [agent launch lifecycle](workload-lifecycle.md#Agent%20launch%20lifecycle), including its failure paths.
 
 ```mermaid
 sequenceDiagram
@@ -71,9 +71,9 @@ sequenceDiagram
     participant Dispatcher as agent dispatcher workflow
     participant Launcher as agent launcher workflow
     participant API as API server
-    participant Provider as Agent sandbox provider
-    participant Network as Agent proxy
-    participant Mediator as Agent mediator
+    participant Provider as Workload provider
+    participant Network as Workload proxy
+    participant Mediator as Workload proxy mediator
     participant Ingress as Ingress gateway
     participant SessionPath as ACP connection owner (open: OQ-SES-17)
     participant Relay as Guest relay
@@ -82,7 +82,7 @@ sequenceDiagram
     Parent->>Dispatcher: Start with the agent launch request
     Dispatcher->>Dispatcher: Authorize request and assign agent launch ID
     Dispatcher->>API: Placement activity calls the reservation API
-    API-->>Dispatcher: Agent host and host task queue
+    API-->>Dispatcher: Workload host and host task queue
     Dispatcher->>Dispatcher: Finalize immutable agent launch spec
     Dispatcher->>Launcher: Queue spec on the agent executor task queue
     Launcher->>Provider: Status
@@ -100,7 +100,7 @@ sequenceDiagram
     Note over Network,API: API server terminates mutual TLS
     API->>API: Identify launch from peer certificate and read capabilities and scopes from its spec
     Provider->>Provider: Combine the configurations and write the harness settings
-    Provider->>Relay: Start guest relay inside sandbox VM on either transport
+    Provider->>Relay: Start guest relay inside workload guest on either transport
     Provider->>Provider: Run the before-agent hooks
     alt ACP transport
         Relay->>Harness: Start adapter as agent user and open the session
@@ -141,9 +141,9 @@ sequenceDiagram
     Dispatcher-->>Parent: Agent launch result
 ```
 
-[Agent launch states](agent-sandbox-lifecycle.md#Agent%20launch%20states).
+[Agent launch states](workload-lifecycle.md#Agent%20launch%20states).
 
-[Provider observations](agent-sandbox-lifecycle.md#Provider%20observations). [Cancellation and limits](agent-sandbox-lifecycle.md#Cancellation%20and%20limits).
+[Provider observations](workload-lifecycle.md#Workload%20provider%20observations). [Cancellation and limits](workload-lifecycle.md#Cancellation%20and%20limits).
 
 ## Reconciliation after restart or retry
 
@@ -151,14 +151,14 @@ The agent launcher's workflow ID comes from the agent launch ID. When an agent d
 
 Before provision, the agent launcher checks whether the agent launch exists. A first attempt follows these steps in order, and so do a retried activity and the same step after a worker restart:
 
-1. Call status for the agent launch ID on the agent host that has the placement.
+1. Call status for the agent launch ID on the workload host that has the placement.
 2. On `not-found`, provision.
 3. On any state, adopt the existing agent launch and continue from that state without provisioning again. `pending`, `launch-unknown`, and `running` mean wait. A terminal state means fetch the result.
-4. On `unavailable`, call status again after a delay. The agent launcher never reads `unavailable` as `not-found`, and it never provisions that agent launch on another agent host instead.
+4. On `unavailable`, call status again after a delay. The agent launcher never reads `unavailable` as `not-found`, and it never provisions that agent launch on another workload host instead.
 
-A retried provider activity reconciles the same agent launch ID. Retrying the agent itself creates a new agent launch linked to its predecessor. If provision repeats despite these steps, the [identity rules](agent-launch-model.md#Agent%20launch%20identity) still return the existing agent launch, and the provider doesn't start a second agent.
+A retried provider activity reconciles the same agent launch ID. Retrying the agent itself creates a new agent launch linked to its predecessor. If provision repeats despite these steps, the [identity rules](agent-launch-model.md#Agent%20launch%20identity) still return the existing agent launch, and the workload provider doesn't start a second agent.
 
-When the worker on an agent host restarts, the supervisor keeps its virtual machine monitors and agent mediators running. The agents keep running inside their VMs. Agent launch records persist on the agent host across the restart. After it starts again, the worker loads those records and observes each agent launch's agent again before it answers status. Each agent launcher on the host then goes on from its workflow history, and its next status call follows the preceding steps.
+When the worker on a workload host restarts, the supervisor keeps its virtual machine monitors and workload proxy mediators running. The agents keep running inside their VMs. Agent launch records persist on the workload host across the restart. After it starts again, the worker loads those records and observes each agent launch's agent again before it answers status. Each agent launcher on the host then goes on from its workflow history, and its next status call follows the preceding steps.
 
 The agent launch record gives the step each agent launch was in. The worker doesn't run an interrupted step again, and it acts by step:
 
@@ -166,10 +166,10 @@ The agent launch record gives the step each agent launch was in. The worker does
 - **While the agent runs.** The provider observes the agent again, and the agent launch goes on from its recorded state.
 - **After the agent completes.** An interrupted `stop-requested`, `session-end`, `after-agent`, or `before-teardown` hook counts as a failed run of that hook, under the [hook failure rules](agent-hooks.md#Hook%20failures). An interrupted output validation or result build starts again from its beginning, because neither step changes anything outside the agent launch record.
 
-## Placement on agent hosts
+## Placement on workload hosts
 
-Placement binds an agent launch to one agent host before launch, and all later operations for that agent launch go to that host. [Agent placement](agent-placement.md) defines the agent host registry, the reservation API, and the slot rules. The host worker's [capacity controller](agent-placement.md#Slot%20capacity) adjusts slot capacity within the host's configured bounds from observed central processing unit (CPU) use, memory use, and free workspace disk space, and reports it in each lease renewal. A capacity decrease preserves running agent launches and existing reservations and blocks new reservations until a slot is free.
+Placement binds an agent launch to one workload host before launch, and all later operations for that agent launch go to that host. [Workload placement](workload-placement.md) defines the workload host registry, the reservation API, and the slot rules. The host worker's [capacity controller](workload-placement.md#Slot%20capacity) adjusts slot capacity within the host's configured bounds from observed central processing unit (CPU) use, memory use, and free workspace disk space, and reports it in each lease renewal. A capacity decrease preserves running agent launches and existing reservations and blocks new reservations until a slot is free.
 
 - The agent launcher workflow runs on the placed host's task queue, and so do its activities: provision, restore, release, status, cancel, result, and the watch activity. Cleanup also runs as an activity there.
 - While an agent runs, the host worker heartbeats a watch activity. A missed heartbeat shows that the workflow orchestrator lost contact with the host's worker, not that the agent stopped. Once the worker answers again, the agent launcher workflow calls status on the same host task queue.
-- While the agent host doesn't answer, the agent dispatcher workflow waits on the agent launcher workflow and never starts a launcher for the same agent launch on another agent host.
+- While the workload host doesn't answer, the agent dispatcher workflow waits on the agent launcher workflow and never starts a launcher for the same agent launch on another workload host.

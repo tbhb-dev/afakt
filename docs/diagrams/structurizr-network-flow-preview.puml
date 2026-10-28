@@ -71,17 +71,6 @@ skinparam {
     HorizontalAlignment: center;
     Shadowing: 0;
   }
-  // Launch agent proxy boundary
-  .Group-TGF1bmNoIGFnZW50IHByb3h5IGJvdW5kYXJ5 {
-    BackgroundColor: #ffffff;
-    LineColor: #536b7e;
-    LineStyle: 2-2;
-    LineThickness: 2;
-    FontColor: #182c3e;
-    FontSize: 24;
-    HorizontalAlignment: center;
-    Shadowing: 0;
-  }
   // Launch guest boundary
   .Group-TGF1bmNoIGd1ZXN0IGJvdW5kYXJ5 {
     BackgroundColor: #ffffff;
@@ -104,8 +93,19 @@ skinparam {
     HorizontalAlignment: center;
     Shadowing: 0;
   }
-  // Operator access on the agent host
-  .Group-T3BlcmF0b3IgYWNjZXNzIG9uIHRoZSBhZ2VudCBob3N0 {
+  // Launch workload proxy boundary
+  .Group-TGF1bmNoIHdvcmtsb2FkIHByb3h5IGJvdW5kYXJ5 {
+    BackgroundColor: #ffffff;
+    LineColor: #536b7e;
+    LineStyle: 2-2;
+    LineThickness: 2;
+    FontColor: #182c3e;
+    FontSize: 24;
+    HorizontalAlignment: center;
+    Shadowing: 0;
+  }
+  // Operator access on the workload host
+  .Group-T3BlcmF0b3IgYWNjZXNzIG9uIHRoZSB3b3JrbG9hZCBob3N0 {
     BackgroundColor: #ffffff;
     LineColor: #536b7e;
     LineStyle: 2-2;
@@ -126,19 +126,19 @@ rectangle "afakt\n<size:16>[Software System]</size>" <<Boundary-YWZha3Q=>> {
     rectangle "==Host name resolver\n<size:16>[Container: Domain Name System]</size>\n\nResolves names under *.afakt.internal for host clients." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Hostnameresolver
   }
 
-  rectangle "Launch agent proxy boundary" <<Group-TGF1bmNoIGFnZW50IHByb3h5IGJvdW5kYXJ5>> as group12 {
-    rectangle "==Agent proxy\n<size:16>[Container: Network proxy]</size>\n\nCarries workload traffic in both directions; own overlay node and launch X.509-SVID; asks the mediator to decide each connection." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Agentproxy
-  }
-
-  rectangle "Launch guest boundary" <<Group-TGF1bmNoIGd1ZXN0IGJvdW5kYXJ5>> as group13 {
+  rectangle "Launch guest boundary" <<Group-TGF1bmNoIGd1ZXN0IGJvdW5kYXJ5>> as group12 {
     rectangle "==Guest context\n<size:16>[Container: Provider confinement]</size>\n\nUntrusted harness, relay and loopback listeners; no overlay membership or workload keys." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Guestcontext
   }
 
-  rectangle "Launch mediation boundary" <<Group-TGF1bmNoIG1lZGlhdGlvbiBib3VuZGFyeQ==>> as group14 {
-    rectangle "==Agent mediator\n<size:16>[Container: Local policy enforcement]</size>\n\nDecides every inbound and outbound connection and stamps identity; never carries traffic." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Agentmediator
+  rectangle "Launch mediation boundary" <<Group-TGF1bmNoIG1lZGlhdGlvbiBib3VuZGFyeQ==>> as group13 {
+    rectangle "==Workload proxy mediator\n<size:16>[Container: Local policy enforcement]</size>\n\nDecides every inbound and outbound connection and stamps identity; never carries traffic." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Workloadproxymediator
   }
 
-  rectangle "Operator access on the agent host" <<Group-T3BlcmF0b3IgYWNjZXNzIG9uIHRoZSBhZ2VudCBob3N0>> as group15 {
+  rectangle "Launch workload proxy boundary" <<Group-TGF1bmNoIHdvcmtsb2FkIHByb3h5IGJvdW5kYXJ5>> as group14 {
+    rectangle "==Workload proxy\n<size:16>[Container: Network proxy]</size>\n\nCarries workload traffic in both directions; own overlay node and launch X.509-SVID; asks the mediator to decide each connection." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Workloadproxy
+  }
+
+  rectangle "Operator access on the workload host" <<Group-T3BlcmF0b3IgYWNjZXNzIG9uIHRoZSB3b3JrbG9hZCBob3N0>> as group15 {
     rectangle "==Host access boundary\n<size:16>[Container: Access mechanism undecided]</size>\n\nHost-level authorization for services, previews and ports; local caller and connection mechanisms undecided." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Hostaccessboundary
     rectangle "==Host-level connectivity\n<size:16>[Container: Host access role]</size>\n\nHost authorization for agent and cluster services; connection mechanism undecided; optional user tailnet attachment." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Hostlevelconnectivity
   }
@@ -151,9 +151,9 @@ Operatorbrowser --> afakt.Hostnameresolver <<Relationship-UmVsYXRpb25zaGlw>> : "
 Operatorbrowser --> afakt.Hostaccessboundary <<Relationship-UmVsYXRpb25zaGlw>> : "2: Host access request; mechanism undecided\n<size:16>[Host access mechanism undecided]</size>"
 afakt.Hostaccessboundary --> afakt.Hostlevelconnectivity <<Relationship-UmVsYXRpb25zaGlw>> : "3: Request under host-level authorization\n<size:16>[Connection mechanism undecided]</size>"
 afakt.Hostlevelconnectivity --> afakt.Previewserver <<Relationship-UmVsYXRpb25zaGlw>> : "4: Host workload identity; served app may require its own sign-in\n<size:16>[Workload mutual TLS over overlay]</size>"
-afakt.Previewserver --> afakt.Agentproxy <<Relationship-UmVsYXRpb25zaGlw>> : "5: Direct overlay connection; mutual SPIFFE authentication\n<size:16>[SPIFFE mutual TLS over overlay]</size>"
-afakt.Agentproxy --> afakt.Agentmediator <<Relationship-UmVsYXRpb25zaGlw>> : "6: Request decision for caller and publication\n<size:16>[Local channel]</size>"
-afakt.Agentmediator --> afakt.Agentproxy <<Relationship-UmVsYXRpb25zaGlw>> : "7: Return decision; publication binding remains open\n<size:16>[Local channel]</size>"
-afakt.Agentproxy --> afakt.Guestcontext <<Relationship-UmVsYXRpb25zaGlw>> : "8: Permitted ingress; listener binding open (OQ-PORT-14)\n<size:16>[Private workload link]</size>"
+afakt.Previewserver --> afakt.Workloadproxy <<Relationship-UmVsYXRpb25zaGlw>> : "5: Direct overlay connection; mutual SPIFFE authentication\n<size:16>[SPIFFE mutual TLS over overlay]</size>"
+afakt.Workloadproxy --> afakt.Workloadproxymediator <<Relationship-UmVsYXRpb25zaGlw>> : "6: Request decision for caller and publication\n<size:16>[Local channel]</size>"
+afakt.Workloadproxymediator --> afakt.Workloadproxy <<Relationship-UmVsYXRpb25zaGlw>> : "7: Return decision; publication binding remains open\n<size:16>[Local channel]</size>"
+afakt.Workloadproxy --> afakt.Guestcontext <<Relationship-UmVsYXRpb25zaGlw>> : "8: Permitted ingress; listener binding open (OQ-PORT-14)\n<size:16>[Private workload link]</size>"
 
 @enduml
