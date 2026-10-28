@@ -4,14 +4,14 @@ title: Agent services
 description: Published service names, port mappings, access, and lifetime across agent launches.
 tags: [afakt, agents, services, ports, network]
 status: draft
-generated: { by: "codex:gpt-6-astra", at: "2026-10-27T00:00:00Z" }
+generated: { by: "codex:gpt-6", at: "2026-10-28T17:30:00Z" }
 ---
 
 # Agent services
 
 [Public key infrastructure](pki.md).
 
-An agent service publishes an endpoint through the [agent hub](agent-hub.md). Whether services and [previews](agent-previews.md) use one model and lifecycle or separate models remains [undecided](agent-open-questions.md#%60OQ-HUB-18%60).
+An agent service publishes an endpoint through its [workload proxy](agent-workload-proxy.md). The [published-port path](agent-open-questions.md#%60OQ-PORT-14%60) remains open. Whether services and [previews](agent-previews.md) use one model and lifecycle or separate models remains [undecided](agent-open-questions.md#%60OQ-HUB-18%60).
 
 ## Published ports and services
 
@@ -25,12 +25,12 @@ A service name can remain after a launch ends and move to its successor. Interna
 
 | Name | Target |
 | --- | --- |
-| `<service_name>.<namespace>.svc.afakt.internal` | A published service through the agent hub |
+| `<service_name>.<namespace>.svc.afakt.internal` | A published service |
 
-Service names use the [shared namespace and resolution rules](agent-hub.md#Names).
+Service names use the [shared namespace and resolution rules](agent-overlay.md#Names).
 
 ## Access
 
-[Connections between agents](agent-ports.md#Connections%20between%20agents) require source network permission and a destination publication grant. [Agent host access](agent-hub.md#Agent%20host%20access) uses host-level authorization. Neither name resolution nor overlay reachability grants access. See the [grant flow](network-topology.md#Launch%20to%20launch%20under%20a%20grant) for both launch boundaries.
+[Connections between agents](agent-ports.md#Connections%20between%20agents) require source network permission and a destination publication grant. [Agent host access](agent-overlay.md#Agent%20host%20access) uses host-level authorization. Neither name resolution nor overlay reachability grants access. See the [grant flow](network-topology.md#Launch%20to%20launch%20under%20a%20grant) for both launch boundaries.
 
 A service name can remain after a launch ends without reopening its closed publication. Binding it to a successor requires that launch's authorized publication under [Port discovery and records](agent-ports.md#Port%20discovery%20and%20records). The shared resource and transfer rules remain [`OQ-HUB-18`](agent-open-questions.md#%60OQ-HUB-18%60) and [`OQ-HUB-11`](agent-open-questions.md#%60OQ-HUB-11%60).

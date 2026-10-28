@@ -4,7 +4,7 @@ title: Agent open questions
 description: Undecided design questions for agents, agent launches, and control plane server supervision, linked to the sections they concern.
 tags: [afakt, agents, open-questions]
 status: draft
-generated: { by: "codex:gpt-6-astra", at: "2026-10-27T00:00:00Z" }
+generated: { by: "codex:gpt-6", at: "2026-10-28T17:30:00Z" }
 ---
 
 # Agent open questions
@@ -205,7 +205,7 @@ Which user runs each per-launch agent mediator and agent proxy, and what separat
 
 ### `OQ-HST-9`
 
-How does an agent host provide host-level name resolution and authorized connectivity to agent ports, previews, services, and cluster services while excluding unauthorized host-mode agent processes? Who installs the name routing, and how do host clients establish certificate trust? A host-level network service with one loopback reverse proxy and process or user identity checks is one option. See [Agent host access](agent-hub.md#Agent%20host%20access).
+How does an agent host provide host-level name resolution and authorized connectivity to agent ports, previews, services, and cluster services while excluding unauthorized host-mode agent processes? Who installs the name routing, and how do host clients establish certificate trust? A host-level network service with one loopback reverse proxy and process or user identity checks is one option. See [Agent host access](agent-overlay.md#Agent%20host%20access).
 
 ### `OQ-HST-10`
 
@@ -547,11 +547,11 @@ Where does the agent host's telemetry endpoint run? It could belong to the agent
 
 ### `OQ-OBS-7`
 
-Should a protected action wait or fail when afakt can't durably log its authorization decision, or may afakt proceed under an accepted loss policy? Durable log admission before the action is the leading option when afakt requires a complete decision history. It delays or rejects work during logging outages. How should afakt reserve capacity for control operations within bounded log storage? How should afakt reconcile credentials issued before an audit failure so retrying the request can't create authority absent from the audit records? See [Network policy](agent-mediator.md#Network%20policy).
+Should a protected action wait or fail when afakt can't durably log its authorization decision, or may afakt proceed under an accepted loss policy? Durable log admission before the action is the leading option when afakt requires a complete decision history. It delays or rejects work during logging outages. How should afakt reserve capacity for control operations within bounded log storage? How should afakt reconcile credentials issued before an audit failure so retrying the request can't create authority absent from the audit records? See [Network policy](agent-workload-mediator.md#Network%20policy).
 
 ### `OQ-OBS-8`
 
-Who may read the agent's decision log, and how long should afakt store it? How do retention holds and export cursors affect collection? A decision log policy independent of trace retention is the leading option, at the cost of separate access and retention controls. See [Network policy](agent-mediator.md#Network%20policy).
+Who may read the agent's decision log, and how long should afakt store it? How do retention holds and export cursors affect collection? A decision log policy independent of trace retention is the leading option, at the cost of separate access and retention controls. See [Network policy](agent-workload-mediator.md#Network%20policy).
 
 ### `OQ-OBS-9`
 
@@ -559,7 +559,7 @@ What bounds on issuance and rotation latency, propagation delay, memory use, and
 
 ### `OQ-OBS-10`
 
-What protects decision log and audit records from alteration, deletion, replay, or false attribution after a writer or storage service suffers compromise? Which authority may append, export, or remove those records, and how can a reader detect missing records? Where should audit checkpoints and their verification keys stay so compromise of the log writer can't conceal removal of the log's tail? See [Network policy](agent-mediator.md#Network%20policy).
+What protects decision log and audit records from alteration, deletion, replay, or false attribution after a writer or storage service suffers compromise? Which authority may append, export, or remove those records, and how can a reader detect missing records? Where should audit checkpoints and their verification keys stay so compromise of the log writer can't conceal removal of the log's tail? See [Network policy](agent-workload-mediator.md#Network%20policy).
 
 ### `OQ-OBS-11`
 
@@ -611,31 +611,19 @@ Which requirements for an agent sandbox provider should an agent profile state e
 
 May a new successor launch use the retired profile version pinned by its unchanged agent spec, or must the agent spec change first? See [Pinning a profile](agent-profile.md#Pinning%20a%20profile%20version) and [Profile changes](agent-profile.md#Profile%20changes).
 
-## Agent hub
+## Agent overlay and names
 
 ### `OQ-HUB-1`
 
-How many agent hub and coordination service instances may a deployment run, and how do they divide ownership and recover it after failure? See [Overlay transport](agent-hub.md#Overlay%20transport).
+How many coordination service instances may a deployment run, and how do they divide ownership and recover it after failure? See [Overlay transport](agent-overlay.md#Overlay%20transport).
 
 ### `OQ-HUB-2`
 
-What defines a namespace for agent, port, service, and preview names, and how does authorization govern name allocation and changes? See [Names](agent-hub.md#Names).
+What defines a namespace for agent, port, service, and preview names, and how does authorization govern name allocation and changes? See [Names](agent-overlay.md#Names).
 
 ### `OQ-HUB-3`
 
-What does name resolution return for an agent or published port with no active launch, and how do clients distinguish absence from an unavailable launch? See [Names](agent-hub.md#Names).
-
-### `OQ-HUB-4`
-
-Does a remote-control or Agent Client Protocol (ACP) request to an agent without an active launch fail or request a separately authorized start, and how does the caller observe the outcome? See [Remote control and sessions](agent-acp.md#ACP%20through%20the%20agent%20hub).
-
-### `OQ-HUB-5`
-
-How do concurrent client connections map to one launch ACP stream while preserving the session writer, reader, and request-correlation rules? See [Remote control and sessions](agent-acp.md#ACP%20through%20the%20agent%20hub).
-
-### `OQ-HUB-6`
-
-How do the public endpoints, agent hub, and guest negotiate protocol compatibility and reject unsupported transport features? See [Remote control and sessions](agent-acp.md#ACP%20through%20the%20agent%20hub).
+What does name resolution return for an agent or published port with no active launch, and how do clients distinguish absence from an unavailable launch? See [Names](agent-overlay.md#Names).
 
 ### `OQ-HUB-7`
 
@@ -644,10 +632,6 @@ Which resources and operations publish a port and grant caller access, and how d
 ### `OQ-HUB-8`
 
 How does a host-mode launch map a published port without colliding with other host listeners or granting another launch access to the mapping? See [Published ports and services](agent-services.md#Published%20ports%20and%20services).
-
-### `OQ-HUB-9`
-
-What datagram framing, addressing, size limits, and backpressure apply when a User Datagram Protocol (UDP) publication crosses the hub connection? See [Hub connection](agent-proxy.md#Hub%20connection).
 
 ### `OQ-HUB-10`
 
@@ -665,21 +649,17 @@ Who may reserve a vanity preview name? How does allocation prevent collisions wi
 
 Does viewer authorization belong to the published port or the vanity preview name? May a vanity preview move to another launch, and what happens to its authorization? See [Previews](agent-previews.md#Preview%20routing%20and%20names).
 
-### `OQ-HUB-14`
-
-Does the agent mediator or the agent proxy own hub stream framing, and what authenticated context and bounds cross their local channel? See [Hub connection](agent-proxy.md#Hub%20connection).
-
 ### `OQ-HUB-15`
 
-How do container manager hosts and host-mode launches supply one agent mediator and one agent proxy per launch while enforcing the mediator's lack of network access? See [Per-launch services](agent-proxy.md#Launch%20boundary).
+How do container manager hosts and host modes supply one agent mediator and one agent proxy per workload while restricting the mediator to connections through its proxy? See [Launch boundary](agent-workload-proxy.md#Launch%20boundary).
 
 ### `OQ-HUB-16`
 
-Is the agent proxy a separate program or an adapted proxy, and which component manages its lifecycle and configuration? See [Per-launch services](agent-proxy.md#Launch%20boundary).
+Is the agent proxy a separate program or an adapted proxy, and which component manages its lifecycle and configuration? See [Per-launch services](agent-workload-proxy.md#Launch%20boundary).
 
 ### `OQ-HUB-17`
 
-May user tailnet identity contribute to afakt authorization, and how's that signal bound to the authenticated afakt user without replacing sign-in? See [User tailnet attachments](agent-hub.md#User%20tailnet%20attachments).
+May user tailnet identity contribute to afakt authorization, and how's that signal bound to the authenticated afakt user without replacing sign-in? See [User tailnet attachments](agent-overlay.md#User%20tailnet%20attachments).
 
 ### `OQ-HUB-18`
 
@@ -689,7 +669,7 @@ Is an agent service a preview whose configuration persists between agent launche
 
 ### `OQ-PRQ-6`
 
-Which limits apply to ACP notification size and rate? Bounded defaults set by deployment policy are the leading option, but must permit legitimate large updates without allowing a guest to exhaust the agent hub. See [Limits](agent-acp.md#ACP%20message%20policy).
+Which limits apply to ACP notification size and rate? Bounded defaults set by deployment policy are the leading option, but must permit legitimate large updates without allowing a guest to exhaust session services. See [Limits](agent-acp.md#ACP%20message%20policy).
 
 ### `OQ-SES-2`
 
@@ -699,13 +679,9 @@ Should the hooks get `suspend` and `resume` events of their own, beyond `before-
 
 How long do the idle timeout and the lifetime limit last by default? See [Limits](agent-lifecycle.md#Session%20limits).
 
-### `OQ-SES-4`
-
-Which stream transport carries the agent proxy's authenticated hub connection over the overlay? Mutually authenticated Hypertext Transfer Protocol (HTTP)/3 is the leading carrier where User Datagram Protocol (UDP) traffic is reachable, with mutually authenticated HTTP/2 over TCP as the required fallback. HTTP/3 reduces interference between streams under packet loss, while HTTP/2 needs bounded scheduling and both require durable ownership and replay. Those requirements add recovery coordination. Fallback timing, deployed routing, and recovery still need qualification. See [ACP message policy](agent-acp.md#ACP%20message%20policy).
-
 ### `OQ-SES-5`
 
-Which carrier joins the guest relay to the agent mediator? For separating session traffic from the data network, vsock is the leading option, at the cost of integration specific to each backend. Protecting it requires enforced process access and authenticated control endpoints for helpers and restored channels as well. Device ownership alone is insufficient, and those boundaries still need qualification for each backend. See [ACP message policy](agent-acp.md#ACP%20message%20policy).
+Which carrier joins the guest relay to the agent proxy for session traffic under mediator message checks? Protecting it requires enforced process access and authenticated control endpoints for helpers and restored channels as well. Device ownership alone is insufficient, and those boundaries still need qualification for each backend. See [ACP message policy](agent-acp.md#ACP%20message%20policy).
 
 ### `OQ-SES-6`
 
@@ -713,11 +689,11 @@ How does guest control through the mediator preserve the sender claims used by [
 
 API-side derivation is the leading option, but needs an authenticated claim binding.
 
-Deriving the signed envelope at the API server is the leading option, but the binding of user, agent, session, and agent launch claims needs a shared rule. Binding the relay channel to the agent and agent launch before accepting messages narrows the sender rule. That binding also includes the session. Signing at the API server can then use authenticated user context and durable message IDs, at the cost of shared signing and replay state across API replicas. See [Control requests](agent-mediator.md#Control%20requests).
+Deriving the signed envelope at the API server is the leading option, but the binding of user, agent, session, and agent launch claims needs a shared rule. Binding the relay channel to the agent and agent launch before accepting messages narrows the sender rule. That binding also includes the session. Signing at the API server can then use authenticated user context and durable message IDs, at the cost of shared signing and replay state across API replicas. See [Control requests](agent-workload-mediator.md#Control%20requests).
 
 ### `OQ-SES-7`
 
-Should the [external ingress gateway](agent-hub.md#External%20ingress%20gateway) share the API server process or run as an independently supervised process with separate restart and configuration reload behavior?
+Should the [external ingress gateway](agent-overlay.md#External%20ingress%20gateway) share the API server process or run as an independently supervised process with separate restart and configuration reload behavior?
 
 ### `OQ-SES-8`
 
@@ -733,7 +709,7 @@ How does user authentication bind a client connection to its session and resourc
 
 ### `OQ-SES-11`
 
-Which remote-control and Agent Client Protocol (ACP) endpoints does the agent hub serve, and which does the API server proxy or check for access? What binds authenticated user and session claims to messages sent to the mediator over the agent proxy's hub connection? See [Cluster](network-topology.md#Cluster). Where does the client transport end, and how does it map onto the harness transport?
+How do the API server's per-agent ACP and remote-control routes relate to the shared `/acp` endpoint? Where does client transport end, and how does it map onto the harness transport? Endpoint ownership remains [`OQ-SES-17`](#%60OQ-SES-17%60). See [Remote control and sessions](agent-acp.md#Remote%20control%20and%20sessions).
 
 ### `OQ-SES-12`
 
@@ -741,11 +717,11 @@ What names should identify the component inside the guest's `afakt-agent` comman
 
 ### `OQ-SES-13`
 
-How does afakt authentication middleware integrate with Traefik at the [external ingress gateway](agent-hub.md#External%20ingress%20gateway)?
+How does afakt authentication middleware integrate with Traefik at the [external ingress gateway](agent-overlay.md#External%20ingress%20gateway)?
 
 ### `OQ-SES-14`
 
-Which component controls the durable prompt queue, and how do the agent session workflow's control state and the agent hub's delivery state agree across reconnects and restarts? See [Session workflow](agent-session.md#Session%20workflow) and [Turns](agent-acp.md#Turns).
+Which component controls the durable prompt queue, and how do the agent session workflow's control state and session delivery state agree across reconnects and restarts? See [Session workflow](agent-session.md#Session%20workflow) and [Turns](agent-acp.md#Turns).
 
 ### `OQ-SES-15`
 
@@ -755,11 +731,19 @@ In what order are harness settings installed and the guest relay started, and wh
 
 Which headless transport defaults and integration rules apply to workflow-controlled and interactive launches, including output delivery, approvals, cancellation, attachment, hooks, results, and evidence? See [Running the harness without interaction](agent-acp.md#Running%20the%20harness%20without%20interaction).
 
+### `OQ-SES-17`
+
+Which component accepts client Agent Client Protocol (ACP) and remote-control connections and reaches the agent's workload? How does it bind authenticated callers to the target launch? See [Remote control and sessions](agent-acp.md#Remote%20control%20and%20sessions).
+
+### `OQ-SES-18`
+
+Which component retains the session message log and enforces writer and reader roles, and how does replay work across reconnects and service failures? See [Writer and readers](agent-acp.md#Writer%20and%20readers) and [Session message log](agent-acp.md#Session%20message%20log).
+
 ## Agent session attachment
 
 ### `OQ-ATT-2`
 
-How do the ingress gateway and API server replicas route a client to the agent hub replica that holds a session's [mediated connection](agent-acp.md#The%20protocol%20endpoint)? How does routing preserve ownership when the launch reconnects to a different hub instance?
+How do ingress gateway and API server replicas route an attached client to the session when its workload changes or reconnects? Routing depends on [endpoint ownership](#%60OQ-SES-17%60) and [session state ownership](#%60OQ-SES-18%60). See [The protocol endpoint](agent-acp.md#The%20protocol%20endpoint).
 
 ### `OQ-ATT-3`
 
@@ -767,7 +751,7 @@ What's the default limit on the hop count for [agent messages](agent-session-att
 
 ### `OQ-ATT-5`
 
-How does a client of an agent session recover when its replay cursor predates retained history or its accepted update kinds change? Bounded pagination or a verified copy of session history could supply recovery, while an explicit gap could identify missing history. What cursor lifetime, filtering watermarks, and recovery behavior should the agent hub provide? See [History and replay](agent-session-attachment.md#History%20and%20replay). What does a connected client observe while the launch connection is unavailable?
+How does a client of an agent session recover when its replay cursor predates retained history or its accepted update kinds change? Bounded pagination or a verified copy of session history could supply recovery, while an explicit gap could identify missing history. What cursor lifetime, filtering watermarks, and recovery behavior should session replay provide? See [History and replay](agent-session-attachment.md#History%20and%20replay). What does a connected client observe while the launch connection is unavailable?
 
 ### `OQ-ATT-6`
 
@@ -811,7 +795,7 @@ Must a wearable client for agent sessions connect independently, or may it requi
 
 ### `OQ-ATT-16`
 
-What should an agent session client do with a permission answer entered while it's offline? Delayed delivery can reach the hub after the request ends or the writer changes. The client could fail visibly or queue the answer for revalidation before expiry or hand it to an online companion without transferring writer authority. See [Requests from the agent](agent-acp.md#Requests%20from%20the%20agent).
+What should an agent session client do with a permission answer entered while it's offline? Delayed delivery can arrive after the request ends or the writer changes. The client could fail visibly or queue the answer for revalidation before expiry or hand it to an online companion without transferring writer authority. See [Requests from the agent](agent-acp.md#Requests%20from%20the%20agent).
 
 ### `OQ-ATT-17`
 
@@ -819,7 +803,7 @@ How should clients for agent sessions present a permission request after another
 
 ### `OQ-ATT-18`
 
-What expiry and delivery bounds should apply to interactive permission requests and their outcomes in an agent session? An old request can present obsolete action context or keep work waiting indefinitely. afakt could use shared deployment bounds or limits specific to the action, with expiry checked when the hub accepts an answer. See [Requests from the agent](agent-acp.md#Requests%20from%20the%20agent).
+What expiry and delivery bounds should apply to interactive permission requests and their outcomes in an agent session? An old request can present obsolete action context or keep work waiting indefinitely. afakt could use shared deployment bounds or limits specific to the action, with expiry checked when afakt accepts an answer. See [Requests from the agent](agent-acp.md#Requests%20from%20the%20agent).
 
 ### `OQ-ATT-19`
 
@@ -831,7 +815,7 @@ How should an agent session client present an answer rejected because its permis
 
 ### `OQ-ATT-21`
 
-How should an agent session client reconcile a permission answer with a lost response? A missing response doesn't establish whether the hub accepted the decision. The client could query the canonical outcome or offer an explicit retry tied to the same request or retry automatically within a bound that prevents duplicate dispatch. See [Tool approvals](agent-mcp-gateway.md#Tool%20approvals).
+How should an agent session client reconcile a permission answer with a lost response? A missing response doesn't establish whether afakt accepted the decision. The client could query the canonical outcome or offer an explicit retry tied to the same request or retry automatically within a bound that prevents duplicate dispatch. See [Tool approvals](agent-mcp-gateway.md#Tool%20approvals).
 
 ### `OQ-ATT-22`
 
@@ -873,15 +857,15 @@ How should the user service keep running after logout and start at boot? User li
 
 ### `OQ-SBX-12`
 
-Should the agent mediator run as a confined process or in its own VM? A confined process is the leading option for density and throughput. Running the mediator in a VM adds kernel separation at the cost of more memory and lower throughput. afakt permits all [agent sandbox provider modes](agent-host.md#Runtime%20privileges%20and%20platforms), including the weaker `macos-host`, `windows-host`, and `linux-host` modes. Which traffic parsers and privileged callbacks must share the mediator's confinement boundary under the on-hold [host isolation baseline](agent-open-questions.md#%60OQ-SBX-18%60)? See [Agent mediator](agent-mediator.md#Launch%20boundary).
+Should the agent mediator run as a confined process or in its own VM? A confined process is the leading option for density and throughput. Running the mediator in a VM adds kernel separation at the cost of more memory and lower throughput. afakt permits all [agent sandbox provider modes](agent-host.md#Runtime%20privileges%20and%20platforms), including the weaker `macos-host`, `windows-host`, and `linux-host` modes. Which traffic parsers and privileged callbacks must share the mediator's confinement boundary under the on-hold [host isolation baseline](agent-open-questions.md#%60OQ-SBX-18%60)? See [Agent mediator](agent-workload-mediator.md#Launch%20boundary).
 
 ### `OQ-SBX-13`
 
-How should afakt protect the guest link to the agent mediator? The agent proxy authenticates workload connections over the overlay with the launch's identity. The agent mediator has no network of its own. The leg between the guest and the mediator is still undecided, because the guest never receives an SVID. A local channel whose peer the host kernel attests is its leading option. With it, the guest doesn't store an SVID or private key, because the kernel or hypervisor moves the bytes and vouches for the peer. Connecting needs either a handle from the launcher or a peer identity assigned by the kernel. On macOS, the mediator binds a socket pair to the peer's audit token and code signature. Linux uses a vsock or socket pair channel identified by peer credentials or context ID, and Windows uses a Hyper-V socket keyed by the VM ID that the kernel assigns. Each connection also binds to an agent launch ID, so a reused peer identifier can't inherit an earlier launch's authority. Relays that end on the host, such as hybrid vsock, don't qualify. This choice costs a separate mechanism for each host platform. Plain frames over any other channel remain an option only under an explicitly accepted trust model. Even with an authenticated link, a same-user process with elevated privilege can read or attach to the mediator. afakt permits the weaker `macos-host`, `windows-host`, and `linux-host` modes. Separating agent launches from the worker user remains [open](#%60OQ-SBX-18%60). See [Agent mediator](agent-mediator.md#Launch%20boundary).
+How does each platform bind local proxy and mediator decision channels to the correct workload and launch, rejecting stale identities after reuse? The guest-to-proxy link is private to the workload and doesn't require encryption. Its [conditions each platform must meet](#%60OQ-SBX-70%60) remain draft. Host-mode isolation depends on the held [`OQ-SBX-18`](#%60OQ-SBX-18%60). See [Agent workload guest](agent-workload-guest.md).
 
 ### `OQ-SBX-14`
 
-How should the agent mediator handle overload without starving control? Bounded admission is a candidate for preserving control responsiveness, at the cost of rejecting useful streams. Complete streaming service, durable decision logging, and hard resource bounds remain unresolved. Admission limits and separate control capacity don't establish those guarantees. See [Agent mediator](agent-mediator.md#Launch%20boundary).
+How should the agent mediator handle overload without starving control? Bounded admission is a candidate for preserving control responsiveness, at the cost of rejecting useful streams. Complete streaming service, durable decision logging, and hard resource bounds remain unresolved. Admission limits and separate control capacity don't establish those guarantees. See [Agent mediator](agent-workload-mediator.md#Launch%20boundary).
 
 ### `OQ-SBX-16`
 
@@ -889,7 +873,7 @@ How do the permitted `macos-host`, `windows-host`, and `linux-host` sandboxes ke
 
 ### `OQ-SBX-17`
 
-Which credential exchange calls use X.509-SVIDs and which use JavaScript Object Notation (JSON) Web Token (JWT) SVIDs? Connections from an agent host to the control plane, including agent proxy connections to the API server and agent hub, use mutual TLS with X.509-SVIDs. Calls that exchange an SVID for other credentials use the X.509-SVID over mutual TLS or a JWT-SVID whose audience is the exchange service. The guest never receives an SVID. See [Agent mediator](agent-mediator.md#Launch%20boundary).
+Which credential exchange calls use X.509-SVIDs and which use JavaScript Object Notation (JSON) Web Token (JWT) SVIDs? Connections from an agent host to the control plane, including agent proxy connections to the API server and permitted services, use mutual TLS with X.509-SVIDs. Calls that exchange an SVID for other credentials use the X.509-SVID over mutual TLS or a JWT-SVID whose audience is the exchange service. The guest never receives an SVID. See [Agent mediator](agent-workload-mediator.md#Launch%20boundary).
 
 ### `OQ-SBX-18`
 
@@ -897,19 +881,19 @@ Should each agent launch run under its own User Identifier (UID), separate from 
 
 ### `OQ-SBX-19`
 
-How does each launch's own agent mediator fit the process and user boundaries of its provider? Each launch has one mediator and one agent proxy, with separate network state. One process per agent launch is the leading option if [per-launch user identifiers](#%60OQ-SBX-18%60) work, because each mediator can run under its launch's UID. It costs more memory and startup time per agent launch. See [Agent mediator](agent-mediator.md#Launch%20boundary).
+How does each launch's own agent mediator fit the process and user boundaries of its provider? Each launch has one mediator and one agent proxy, with separate network state. One process per agent launch is the leading option if [per-launch user identifiers](#%60OQ-SBX-18%60) work, because each mediator can run under its launch's UID. It costs more memory and startup time per agent launch. See [Agent mediator](agent-workload-mediator.md#Launch%20boundary).
 
 ### `OQ-SBX-20`
 
-Does the agent egress gateway run inside the agent mediator process or as a separate process for each agent launch? Running inside the mediator is the leading option unless separate sandboxing pays off. A separate process offers privilege separation: the half that parses guest traffic couldn't access the network or store secrets. What disruption and recovery bounds must the agent egress gateway meet when its process restarts or drains? See [Agent egress gateway](components.md#Agent%20egress%20gateway).
+How does agent egress gateway placement relate to [proxy TLS termination](#%60OQ-SBX-72%60)? The mediator decides connections without transmitting traffic. What disruption and recovery bounds must the agent egress gateway meet when its process restarts or drains? See [Agent egress gateway](components.md#Agent%20egress%20gateway).
 
 ### `OQ-SBX-21`
 
-Where does the agent mediator get upstream Domain Name System (DNS) answers? Options include DNS over HTTPS or DNS over TLS to deployment-configured upstreams. Full recursion and forward zones for split-horizon names are other options. See [Agent DNS](agent-mediator.md#Agent%20DNS).
+Where does the agent mediator get upstream Domain Name System (DNS) answers? Options include DNS over HTTPS or DNS over TLS to deployment-configured upstreams. Full recursion and forward zones for split-horizon names are other options. See [Agent DNS](agent-workload-mediator.md#Agent%20DNS).
 
 ### `OQ-SBX-22`
 
-Should the guest receive synthetic addresses for every name while real addresses stay inside the agent mediator? Synthetic addresses are the leading option. See [Agent DNS](agent-mediator.md#Agent%20DNS).
+Should the guest receive synthetic addresses for every name while real addresses stay inside the agent mediator? Synthetic addresses are the leading option. See [Agent DNS](agent-workload-mediator.md#Agent%20DNS).
 
 ### `OQ-SBX-23`
 
@@ -917,11 +901,11 @@ Where does the host-side credential broker sit relative to the agent egress gate
 
 ### `OQ-SBX-24`
 
-How should egress classification by the agent mediator handle encrypted or absent server names and literal network addresses? How should it handle pinned certificates, non-HTTP TLS, or encrypted datagram transports? Denying an unclassifiable destination is the leading option, at the cost of excluding clients whose destinations the mediator can't verify. Which visibility rules permit passthrough without bypassing required inspection? Which datagram and address-family capabilities must an agent sandbox preserve while enforcing these visibility rules? See [Network policy](agent-mediator.md#Network%20policy).
+How should egress classification by the agent mediator handle encrypted or absent server names and literal network addresses? How should it handle pinned certificates, non-HTTP TLS, or encrypted datagram transports? Denying an unclassifiable destination is the leading option, at the cost of excluding clients whose destinations the mediator can't verify. Which visibility rules permit passthrough without bypassing required inspection? Which datagram and address-family capabilities must an agent sandbox preserve while enforcing these visibility rules? See [Network policy](agent-workload-mediator.md#Network%20policy).
 
 ### `OQ-SBX-25`
 
-How should afakt authenticate and atomically install deployment policy revisions without changing an immutable agent launch spec? What happens to admitted flows after policy expiry or revocation, or when policy fails to load? Closing affected flows and denying admission without a valid revision is the leading option, at the cost of interrupted work during policy outages. See [Network policy](agent-mediator.md#Network%20policy).
+How should afakt authenticate and atomically install deployment policy revisions without changing an immutable agent launch spec? Rule changes end existing connections the new rules deny. How does policy expiry or failure to load affect admission, and how does [persistent egress and User Datagram Protocol (UDP) revocation](#%60OQ-SBX-69%60) work? See [Network policy](agent-workload-mediator.md#Network%20policy).
 
 ### `OQ-SBX-26`
 
@@ -961,11 +945,11 @@ Should an upstream credential exchange map each agent launch to its own provider
 
 ### `OQ-SBX-35`
 
-Which name queries may leave the agent mediator for upstream name services, and what prevents a guest from sending data through query names to an attacker-controlled name service? How do query authorization, response validation, and query limits relate to connection policy? See [Agent DNS](agent-mediator.md#Agent%20DNS).
+Which name queries may leave the agent mediator for upstream name services, and what prevents a guest from sending data through query names to an attacker-controlled name service? How do query authorization, response validation, and query limits relate to connection policy? See [Agent DNS](agent-workload-mediator.md#Agent%20DNS).
 
 ### `OQ-SBX-36`
 
-How does a remote agent sandbox integrate its per-launch mediator and agent proxy with the global egress gateway while preventing direct connections that bypass policy? How do its control requests, sessions, previews, and MCP calls use the launch-bound local channel and authenticated hub connection? See [Agent mediator](agent-mediator.md#Launch%20boundary).
+How does a remote agent sandbox integrate its per-launch mediator and agent proxy with the global egress gateway while preventing direct connections that bypass policy? How do its control requests, sessions, previews, and MCP calls use the launch-bound local channel and authenticated direct overlay connections? See [Agent mediator](agent-workload-mediator.md#Launch%20boundary).
 
 ### `OQ-SBX-37`
 
@@ -973,15 +957,15 @@ What contains the authority of a compromised agent host or site gateway, and whi
 
 ### `OQ-SBX-38`
 
-How should the agent egress gateway get destination certificates and replace them when permitted destinations change? The choice affects connection startup and removal of obsolete signing authority. It could receive certificates for an explicit destination inventory or request them as authorized connections arrive. See [Network policy](agent-mediator.md#Network%20policy).
+How should the agent egress gateway get destination certificates and replace them when permitted destinations change? The choice affects connection startup and removal of obsolete signing authority. It could receive certificates for an explicit destination inventory or request them as authorized connections arrive. See [Network policy](agent-workload-mediator.md#Network%20policy).
 
 ### `OQ-SBX-39`
 
-May policy evaluations reuse a process or sandbox, and what state must afakt clear between evaluations? Reuse can reduce startup cost but keep data or authority from an earlier request. afakt could create a fresh evaluator for each request or reuse evaluators after a defined reset or keep one evaluator per agent launch. This choice depends on the on-hold [host isolation baseline](agent-open-questions.md#%60OQ-SBX-18%60). See [Network policy](agent-mediator.md#Network%20policy).
+May policy evaluations reuse a process or sandbox, and what state must afakt clear between evaluations? Reuse can reduce startup cost but keep data or authority from an earlier request. afakt could create a fresh evaluator for each request or reuse evaluators after a defined reset or keep one evaluator per agent launch. This choice depends on the on-hold [host isolation baseline](agent-open-questions.md#%60OQ-SBX-18%60). See [Network policy](agent-workload-mediator.md#Network%20policy).
 
 ### `OQ-SBX-40`
 
-When workload credentials expire or an agent launch ends, how quickly must afakt close already authorized connections and revoke exchanged credentials? Refusing new requests doesn't retire authority already admitted by a downstream service. afakt could cancel active use immediately or permit a bounded drain or require downstream checks before each further operation. This choice depends on the on-hold [session-end wait and SVID lifetime](agent-open-questions.md#%60OQ-HOOK-18%60). See [Agent launch authentication](agent-proxy.md#Agent%20launch%20authentication).
+When workload credentials expire or an agent launch ends, how quickly must afakt close already authorized connections and revoke exchanged credentials? Refusing new requests doesn't retire authority already admitted by a downstream service. afakt could cancel active use immediately or permit a bounded drain or require downstream checks before each further operation. This choice depends on the on-hold [session-end wait and SVID lifetime](agent-open-questions.md#%60OQ-HOOK-18%60). See [Agent launch authentication](agent-workload-proxy.md#Agent%20launch%20authentication).
 
 ### `OQ-SBX-41`
 
@@ -997,7 +981,7 @@ How should each control plane service grant access to the workload identities th
 
 ### `OQ-SBX-44`
 
-When's an agent mediator ready to accept guest traffic during concurrent agent launch startup? Early admission can expose traffic before identity and policy are available, while waiting for unrelated launches delays ready agents. Readiness could be independent for each mediator or depend on a shared service becoming ready for all launches it serves. See [Agent mediator](agent-mediator.md#Launch%20boundary).
+When's an agent mediator ready to decide guest connections during concurrent agent launch startup? Early admission can expose traffic before identity and policy are available, while waiting for unrelated launches delays ready agents. Readiness could be independent for each mediator or depend on a shared service becoming ready for all launches it serves. See [Agent mediator](agent-workload-mediator.md#Launch%20boundary).
 
 ### `OQ-SBX-45`
 
@@ -1029,7 +1013,7 @@ What issuance limits and retry semantics apply when one workload identity reques
 
 ### `OQ-SBX-52`
 
-Which provider assertions may permit enrollment on behalf of a remote agent launch? A provider account claim alone may not bind the requested identity to the intended launch. afakt could require an authenticated provisioning channel or a verified runtime assertion bound to the launch or a trusted external representative with proof of the key it uses. See [Agent mediator](agent-mediator.md#Launch%20boundary).
+Which provider assertions may permit enrollment on behalf of a remote agent launch? A provider account claim alone may not bind the requested identity to the intended launch. afakt could require an authenticated provisioning channel or a verified runtime assertion bound to the launch or a trusted external representative with proof of the key it uses. See [Agent mediator](agent-workload-mediator.md#Launch%20boundary).
 
 ### `OQ-SBX-53`
 
@@ -1037,7 +1021,7 @@ What confines host-side virtual device processing and virtual machine monitors a
 
 ### `OQ-SBX-54`
 
-How does each host mode and container provider force all harness and workspace-command traffic through its own agent mediator? That traffic includes name queries and loopback publication streams. How do both windows-vm guests connect to the mediator across their distinct device and host boundaries? Which interfaces, inherited descriptors, daemon paths, and host services could bypass that routing, and how does each provider enforce the required network view? See [Agent mediator](agent-mediator.md#Launch%20boundary) and [Loopback listeners](agent-ports.md#Loopback%20listeners).
+How does each host mode and container provider force all harness and workspace-command traffic through its own proxy under mediator decisions? That traffic includes name queries and loopback publication streams. How do both windows-vm guests connect to the proxy across their distinct device and host boundaries? Which interfaces, inherited descriptors, daemon paths, and host services could bypass that routing, and how does each provider enforce the required network view? See [Agent mediator](agent-workload-mediator.md#Launch%20boundary) and [Loopback listeners](agent-ports.md#Loopback%20listeners).
 
 ### `OQ-SBX-55`
 
@@ -1053,11 +1037,11 @@ For each host mode and container provider, which independent authority stops eve
 
 ### `OQ-SBX-58`
 
-Which host operating systems and architectures does the `podman` provider support? How does Podman run without root privileges, and which setup privileges and services does it need? Is a Podman virtual machine part of the macOS or Windows deployment, and if so, where do the container kernel, runtime management, and physical host boundaries lie? How do the container and host integration restrictions in [`OQ-SBX-56`](#%60OQ-SBX-56%60) apply to Podman, and does its VM require the containment considered in [`OQ-SBX-53`](#%60OQ-SBX-53%60)? Setup and service survival remain under [`OQ-SBX-10`](#%60OQ-SBX-10%60), mediator routing under [`OQ-SBX-54`](#%60OQ-SBX-54%60), and storage placement under [`OQ-WSP-20`](#%60OQ-WSP-20%60). See [Runtime privileges and platforms](agent-host.md#Runtime%20privileges%20and%20platforms).
+Which host operating systems and architectures does the `podman` provider support? How does Podman run without root privileges, and which setup privileges and services does it need? Is a Podman virtual machine part of the macOS or Windows deployment, and if so, where do the container kernel, runtime management, and physical host boundaries lie? How do the container and host integration restrictions in [`OQ-SBX-56`](#%60OQ-SBX-56%60) apply to Podman, and does its VM require the containment considered in [`OQ-SBX-53`](#%60OQ-SBX-53%60)? Setup and service survival remain under [`OQ-SBX-10`](#%60OQ-SBX-10%60), proxy routing under [`OQ-SBX-54`](#%60OQ-SBX-54%60), and storage placement under [`OQ-WSP-20`](#%60OQ-WSP-20%60). See [Runtime privileges and platforms](agent-host.md#Runtime%20privileges%20and%20platforms).
 
 ### `OQ-SBX-59`
 
-For each host mode, what authenticates registration of a launch with its traffic capture component and binds its tunnel or flows to the current mediator? The choice needs to preserve original destinations and reject stale registrations after identity reuse. Installation, updates, and removal also need an authority whose privileged components remain confined after hostile input. How do component failure, restart, and removal preserve isolation for existing flows as well as new connections? See [Agent mediator](agent-mediator.md#Launch%20boundary).
+For each host mode, what authenticates registration of a launch with its traffic capture component and binds its tunnel or flows to the current proxy? The choice needs to preserve original destinations and reject stale registrations after identity reuse. Installation, updates, and removal also need an authority whose privileged components remain confined after hostile input. How do component failure, restart, and removal preserve isolation for existing flows as well as new connections? See [Agent mediator](agent-workload-mediator.md#Launch%20boundary).
 
 ### `OQ-SBX-60`
 
@@ -1069,7 +1053,7 @@ Which policy engine evaluates connection, message, and launch-to-launch grant ru
 
 ### `OQ-SBX-62`
 
-How does each operating system enforce the no-network rule for an agent mediator in host mode while permitting its launch-bound local channels to the captured workload and agent proxy? Which interfaces, inherited descriptors, resolver paths, and indirect host services must the confinement deny, and how does enforcement behave when a capture or confinement component fails? See [Agent launch](network-topology.md#Agent%20launch).
+How does each operating system restrict a host-mode mediator's connections to its proxy while preserving the fixed control plane rules and its local decision channel? Which interfaces, inherited descriptors, resolver paths, and indirect host services must the confinement deny, and how does enforcement behave when a capture or confinement component fails? See [Agent launch](network-topology.md#Agent%20launch).
 
 ### `OQ-SBX-63`
 
@@ -1086,6 +1070,30 @@ Which remote runtime, execution-user privileges, kernel boundary, and host privi
 ### `OQ-SBX-66`
 
 For each remote provider, which observation proves that every process and detached operation started for an agent launch has stopped before afakt releases its slot or starts a successor? How do session cancellation, shared environment lifetime, asynchronous deletion, provider unavailability, and late requests that recreate execution affect that proof? Which authority prevents further work under retired vendor handles? See [OpenAI termination](agent-sandbox-openai-agents-api.md#Cancellation%20and%20teardown) and [Cloudflare termination](agent-sandbox-cloudflare.md#Cancellation%20and%20teardown).
+
+### `OQ-SBX-67`
+
+What resource shape represents a workload's firewall and its ingress and egress rules? Egress defaults to a cluster-managed deny-all policy, including in host modes. See [Firewall](agent-workload.md#Firewall).
+
+### `OQ-SBX-68`
+
+How does a rule specifying a domain apply to QUIC traffic through the agent proxy, including domains with HTTP-level rules or credential injection? See [Network policy](agent-workload-mediator.md#Network%20policy).
+
+### `OQ-SBX-69`
+
+How does a rule change revoke persistent egress connections that the guest starts and UDP flows? A rule change ends existing connections the new rules deny. See [Rule changes](agent-workload-mediator.md#Rule%20changes).
+
+### `OQ-SBX-70`
+
+Which conditions must the private guest-to-proxy link meet on every platform? The working draft covers original destinations that the guest can't falsify to bypass policy, TCP, UDP and QUIC decisions, flow revocation, confinement of routing components, metadata trust, and a common mediator contract. Its preferred mechanisms, license constraints, and control interfaces remain draft conditions. Host modes apply containment against the agent at its sandbox privileges and depend on the held [`OQ-SBX-18`](#%60OQ-SBX-18%60). See [Agent workload guest](agent-workload-guest.md).
+
+### `OQ-SBX-71`
+
+Which component manages the workload lifecycle, and what are its states? A workload can exist without a launch or workspace. It runs exactly one agent launch, and afakt destroys it afterwards. A follow-up or relaunch uses a new workload. See [Lifecycle](agent-workload.md#Lifecycle).
+
+### `OQ-SBX-72`
+
+Does TLS termination in the agent proxy take over the agent egress gateway's decryption role? How does that choice affect inspection and credential brokering at a standalone site gateway? See [Agent egress gateway](agent-workload-mediator.md#Agent%20egress%20gateway).
 
 ## Agent MCP gateway
 
@@ -1139,10 +1147,6 @@ Should a preview request wake a suspended agent or fail? A failed request avoids
 
 Should bulk transfers use a connection separate from interactive preview streams? Separate connections are a candidate for reducing bulk-transfer interference, at the cost of extra ownership and scheduling. Reserved control capacity and bounded data admission reduce queue contention but don't establish a control-latency guarantee or remove shared TCP loss stalls and processor contention. Connection policy and behavior under saturation remain open. See [HTTP previews](agent-previews.md#HTTP%20previews).
 
-### `OQ-PORT-8`
-
-Should a later direct path between agent hosts bypass the agent hub, and which transport would it use? See [Connections between agents](agent-ports.md#Connections%20between%20agents).
-
 ### `OQ-PORT-9`
 
 What browser origin and site boundary isolates an untrusted preview from sibling preview cookies while preserving app compatibility? Separate site boundaries or restrictions on supported applications could prevent scripts from writing shared parent-domain cookies, at the cost of extra domains or reduced compatibility. See [HTTP previews](agent-previews.md#HTTP%20previews).
@@ -1158,6 +1162,10 @@ How are public tunnel route changes authenticated and audited, and how are tunne
 ### `OQ-PORT-13`
 
 Which preview request checks and transformations belong to the external ingress gateway and which belong to the preview server? Where are viewer authorization, afakt credential removal, and host-header rewriting enforced for both public and host-node access? How does the preview service bind its published-port request to the permitted caller and target launch? See [Operator browser to a preview](network-topology.md#Operator%20browser%20to%20a%20preview).
+
+### `OQ-PORT-14`
+
+How do the preview server and other callers reach a published port through the workload's proxy? Connections require the direct overlay path with mutual authentication and mediator checks. The binding from a publication to a guest listener and the caller context remain open. See [HTTP previews](agent-previews.md#HTTP%20previews) and [TCP client tunnels](agent-ports.md#TCP%20client%20tunnels).
 
 ## Control plane server supervision, data upgrades, and rollback
 

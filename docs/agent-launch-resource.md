@@ -4,7 +4,7 @@ title: Agent launch resource
 description: The AgentLaunch resource, the resource form of one agent launch, with its specification in spec and the provider's record in status, and a full example.
 tags: [afakt, agents, agent-launch, resources]
 status: draft
-generated: { by: "codex:gpt-6-astra", at: "2026-10-27T00:00:00Z" }
+generated: { by: "codex:gpt-6", at: "2026-10-28T17:30:00Z" }
 ---
 
 # Agent launch resource
@@ -59,7 +59,7 @@ One resource represents one agent launch. Status addresses an earlier launch by 
 | Placement requirements | `placement`, a map of names to values |
 | Retention | `retention` |
 
-Credential references appear in `spec.credentials` and in the pinned profile. Their bounds remain [on hold](agent-open-questions.md#Agent%20sandbox). Neither the specification nor the provider's record contains secret values. The Application Programming Interface (API) server reads capabilities and scopes from the spec it already stores after identifying the agent launch from the agent proxy's peer certificate. See [Agent launch authentication](agent-proxy.md#Agent%20launch%20authentication).
+Credential references appear in `spec.credentials` and in the pinned profile. Their bounds remain [on hold](agent-open-questions.md#Agent%20sandbox). Neither the specification nor the provider's record contains secret values. The Application Programming Interface (API) server reads capabilities and scopes from the spec it already stores after identifying the agent launch from the agent proxy's peer certificate. See [Agent launch authentication](agent-workload-proxy.md#Agent%20launch%20authentication).
 
 ## Status keys
 
@@ -188,11 +188,6 @@ spec:
     pull-requests.read: { repositories: ["${repository:app}"] }
     branches.push: { repositories: ["${repository:app}"], branches: ["${branch:app}"] }
   sandbox:
-    network:
-      allowedDomains: ["${repository-host:app}", api.example-provider.com, proxy.golang.org]
-      deniedDomains: [uploads.example.com]
-      refuseOpaqueTunnels: true
-      ambiguousRequestTarget: refuse
     filesystem:
       denyRead: ["${home}/.config/gcloud"]
       allowWrite: ["${cache:go-build-arm64}"]
@@ -215,11 +210,6 @@ status:
     path: /var/lib/afakt/workspaces/019a1a2b-3c4d-7e5f-8a6b-7c8d9e0f1a2b/2
   configuration:
     sandbox:
-      network:
-        allowedDomains: [git.example.com, api.example-provider.com, proxy.golang.org, "afakt-api.internal:8443", "127.0.0.1:4318"]
-        deniedDomains: [uploads.example.com]
-        refuseOpaqueTunnels: true
-        ambiguousRequestTarget: refuse
       filesystem:
         denyRead: [/home/agent/.aws, /home/agent/.docker, /home/agent/.config/gcloud]
         allowWrite:
@@ -306,7 +296,7 @@ status:
           pull-requests.read: { repositories: [git.example.com/team/app] }
           branches.push: { repositories: [git.example.com/team/app], branches: [agent/issue-37] }
       observed:
-        applied: [network, filesystem, credentials]
+        applied: [filesystem, credentials]
     environment:
       requested:
         - { name: GOCACHE, value: /var/cache/afakt/go-build-arm64, source: specification }

@@ -4,7 +4,7 @@ title: Agent launch
 description: Agent launch workflows, harness outcomes, provider observations, cancellation, reconciliation, and placement.
 tags: [afakt, agents, agent-launch, workflows]
 status: draft
-generated: { by: "codex:gpt-6-astra", at: "2026-10-27T00:00:00Z" }
+generated: { by: "codex:gpt-6", at: "2026-10-28T17:30:00Z" }
 ---
 
 # Agent launch
@@ -75,7 +75,7 @@ sequenceDiagram
     participant Network as Agent proxy
     participant Mediator as Agent mediator
     participant Ingress as Ingress gateway
-    participant Hub as Agent hub
+    participant SessionPath as ACP connection owner (open: OQ-SES-17)
     participant Relay as Guest relay
     participant Harness as Harness and adapter
     Parent->>Parent: Submit the agent launch request
@@ -94,8 +94,9 @@ sequenceDiagram
     Note over Launcher,Provider: Provision return boundary remains open
     Launcher->>Provider: Watch activity
     Provider->>Provider: Build the agent workspace
-    Mediator->>Network: Permitted control request
-    Network->>API: Authenticate with launch X.509-SVID over overlay mutual TLS
+    Network->>Mediator: Request control decision and launch identity
+    Mediator-->>Network: Permit control request
+    Network->>API: Authenticate with launch X.509-SVID over overlay mutual Transport Layer Security (TLS)
     Note over Network,API: API server terminates mutual TLS
     API->>API: Identify launch from peer certificate and read capabilities and scopes from its spec
     Provider->>Provider: Combine the configurations and write the harness settings
@@ -103,13 +104,14 @@ sequenceDiagram
     Provider->>Provider: Run the before-agent hooks
     alt ACP transport
         Relay->>Harness: Start adapter as agent user and open the session
-        Mediator->>Network: Permitted session registration
-        Network->>Hub: Authenticated launch connection over overlay
-        Note over Network,Hub: Agent hub terminates workload mutual TLS
-        Launcher->>Hub: One prompt with the instructions and the prompt
-        Hub->>Network: Prompt on launch connection
+        Mediator-->>Network: Permit session registration
+        Network->>SessionPath: Authenticated ACP path (owner and routing open)
+        Note over Network,SessionPath: ACP endpoint and transport termination remain open
+        Launcher->>SessionPath: One prompt with the instructions and the prompt
+        SessionPath->>Network: Prompt on ACP path
         Network->>Mediator: Caller and message
-        Mediator->>Relay: Permit prompt for sending user
+        Mediator-->>Network: Permit prompt for sending user
+        Network->>Relay: Prompt
     else Headless transport
         Provider->>Harness: Start with the instructions and the prompt
     end
@@ -117,10 +119,11 @@ sequenceDiagram
     Harness->>Harness: Work, running the hooks for harness events
     alt ACP transport
         Harness-->>Relay: Last agent message and end_turn
-        Relay-->>Mediator: Turn ended
+        Relay-->>Network: Turn ended
+        Network->>Mediator: Request update decision
         Mediator-->>Network: Permit agent update
-        Network-->>Hub: Update on launch connection
-        Hub-->>Launcher: Turn ended
+        Network-->>SessionPath: Update on ACP path
+        SessionPath-->>Launcher: Turn ended
         Relay->>Harness: Close the ACP session
     else Headless transport
         Harness-->>Provider: Exit

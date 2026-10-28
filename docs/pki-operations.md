@@ -4,7 +4,7 @@ title: Public key infrastructure operations
 description: Identity issuance, renewal, recovery, administrative operations, and threats.
 tags: [afakt, pki, security]
 status: draft
-generated: { by: "codex:gpt-6-astra", at: "2026-10-27T00:00:00Z" }
+generated: { by: "codex:gpt-6", at: "2026-10-28T17:30:00Z" }
 ---
 
 # Public key infrastructure operations
@@ -17,7 +17,7 @@ The workload identity issuer needs a first trust anchor independent of workload 
 
 Host enrollment checks the admitted machine or key claims. The issuer then needs an authorized mapping from host-side identity requests to their workloads. The Workload Application Programming Interface (API) serves host-side processes and excludes the guest. Attestation policy, registration ownership, and renewal authorization remain [undecided](agent-open-questions.md#%60OQ-SBX-30%60). Consumer device enrollment has a separate [identity question](agent-open-questions.md#%60OQ-ATT-23%60).
 
-Outside the guest, the agent proxy receives its launch's X.509 Secure Production Identity Framework for Everyone (SPIFFE) Verifiable Identity Document (SVID). Over mutual Transport Layer Security (TLS), a receiving service authenticates the identity and applies operation and target authorization. Credential exchange also checks the allowed scope and audience. Exchange may use a JavaScript Object Notation (JSON) Web Token (JWT) SVID. See [Workload identity](agent-host.md#Workload%20identity), [Launch authentication](agent-proxy.md#Agent%20launch%20authentication), and [Exchange admission](agent-open-questions.md#%60OQ-SBX-17%60).
+Outside the guest, the agent proxy receives its launch's X.509 Secure Production Identity Framework for Everyone (SPIFFE) Verifiable Identity Document (SVID). Over mutual Transport Layer Security (TLS), a receiving service authenticates the identity and applies operation and target authorization. Credential exchange also checks the allowed scope and audience. Exchange may use a JavaScript Object Notation (JSON) Web Token (JWT) SVID. See [Workload identity](agent-host.md#Workload%20identity), [Launch authentication](agent-workload-proxy.md#Agent%20launch%20authentication), and [Exchange admission](agent-open-questions.md#%60OQ-SBX-17%60).
 
 ## Renewal and authority rotation
 

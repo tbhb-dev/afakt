@@ -4,7 +4,7 @@ title: Glossary
 description: Short definitions of afakt's terms, each linked to the section that describes it.
 tags: [afakt, glossary]
 status: draft
-generated: { by: "codex:gpt-6-astra", at: "2026-10-27T00:00:00Z" }
+generated: { by: "codex:gpt-6", at: "2026-10-28T17:30:00Z" }
 ---
 
 # Glossary
@@ -12,7 +12,7 @@ generated: { by: "codex:gpt-6-astra", at: "2026-10-27T00:00:00Z" }
 [Public key infrastructure](pki.md).
 
 - **ACP adapter**: the agent harness's Agent Client Protocol (ACP) agent inside the agent sandbox. See [Parts](agent-acp.md#Parts).
-- **ACP relay**: the guest relay inside the sandbox VM that acts as the ACP client to the adapter and connects through the agent mediator to the agent hub. See [ACP relay](components.md#ACP%20relay).
+- **ACP relay**: the guest relay inside the sandbox VM that acts as the ACP client to the adapter and uses the workload proxy under mediator decisions. Its [connection owner](agent-open-questions.md#%60OQ-SES-17%60) remains open. See [ACP relay](components.md#ACP%20relay).
 - **afakt MCP server**: the built-in Model Context Protocol (MCP) server whose tools call afakt operations with the agent launch’s own authority. Profiles allowlist its tools like any other server. See [Built-in afakt MCP server](agent-mcp-gateway.md#Built-in%20afakt%20MCP%20server).
 - **afakt-agent**: afakt's cross-harness runner. For locally controlled execution, it starts afakt-sandbox and runs the agent harness inside it. Managed-loop integration remains [`OQ-SBX-63`](agent-open-questions.md#%60OQ-SBX-63%60). In host modes, it runs directly on the host. See [Enforcement](agent-sandbox.md#Enforcement).
 - **afakt-sandbox**: afakt's cross-platform process sandbox. afakt-agent starts it to confine the agent harness, and it also runs on its own to confine a command that `afakt agent exec` runs in an agent's workspace. See [Enforcement](agent-sandbox.md#Enforcement).
@@ -26,16 +26,15 @@ generated: { by: "codex:gpt-6-astra", at: "2026-10-27T00:00:00Z" }
 - **Agent host registry**: the Application Programming Interface (API) server's record of the agent hosts that can run agent launches. Each entry gives a host's task queue, lower and upper slot capacity bounds, current slot capacity, most recent capacity change reason, and host metadata, and it lasts while the host's worker renews its lease. See [Agent host registry](agent-placement.md#Agent%20host%20registry).
 - **Agent host worker**: the daemon that runs the agent launcher workflow on an agent host and connects it to the control plane. See [Agent host worker](components.md#Agent%20host%20worker).
 - **Agent host**: a bare metal or virtual machine that hosts agent sandboxes, or a container manager or remote platform that hosts them. See [Agent host](agent-host.md).
-- **Agent hub**: the control plane service that joins per-launch connections for remote control, sessions, published ports, services, and previews. See [Agent hub](agent-hub.md).
 - **Agent launch request**: a request by an agent, human, or automation to use an existing agent or an ephemeral agent to perform a task. Task completion deletes the ephemeral agent. See [Agent launch request](agent.md#Agent%20launch%20request).
 - **Agent launch result**: the terminal state, payload, evidence references, and provenance record an agent launch ends with. See [Agent launch result](agent-launch-contract.md#Agent%20launch%20result).
 - **Agent launch slot**: one place for a reserved or claimed agent launch on an agent host. The reservation API counts both kinds against slot capacity. See [Slot reservations](agent-placement.md#Slot%20reservations).
 - **Agent launch spec**: the finalized, immutable configuration of an agent instantiation on an agent host. It records the agent spec generation used for finalization and never changes during the agent launch. See [Agent launch spec](agent-launch-contract.md#Agent%20launch%20spec).
 - **Agent launch**: one instantiation of an agent in an agent sandbox on an agent host, linked to its predecessor on retry, resume, migration, or crash recovery. See [Agent launch](agent-launch.md).
 - **Agent launcher**: the workflow that takes an agent launch spec and acquires an agent sandbox through the provider the spec names. It starts the agent harness and waits before tearing down. See [Agent launcher](components.md#Agent%20launcher).
-- **Agent mediator**: the per-launch policy enforcement component with no network of its own. It controls guest resolution and stamps launch identity. Permitted requests pass to its launch's agent proxy. See [Agent mediator](components.md#Agent%20mediator).
+- **Agent mediator**: the workload component that decides connections and messages without transmitting traffic. It controls DNS through the proxy, with no host fallback, and stamps launch identity. See [Agent mediator](components.md#Agent%20mediator).
 - **Agent profile**: a blueprint for creating an agent, with configuration templates for its agent harness, model, credential authorizations, MCP servers, agent harness plugins, agent skills, agent sandbox, and system instructions. See [Agent profile](agent-profile.md).
-- **Agent proxy**: the component that opens one launch's hub connection and permitted service and internet connections with that launch's identity. Every provider supplies one per launch. See [Agent proxy](components.md#Agent%20proxy).
+- **Agent proxy**: the workload component on the guest data path in both directions. It has its own overlay node and authenticates peers. Each connection requires a mediator decision. See [Agent proxy](components.md#Agent%20proxy).
 - **Agent sandbox provider**: the adapter that manages an agent sandbox's lifecycle on an agent host through provision, restore, and release. See [Agent sandbox provider](agent-launch-contract.md#Provider%20operations).
 - **Agent sandbox**: the isolated execution environment for the agent harness or its tools under the selected provider. See [Agent sandbox](agent-sandbox.md).
 - **Agent session workflow**: the entity workflow that holds a session's control state. This includes the lifecycle and writer as well as the attached clients. See [Agent session](components.md#Agent%20session).
@@ -46,7 +45,7 @@ generated: { by: "codex:gpt-6-astra", at: "2026-10-27T00:00:00Z" }
 - **Agent**: a durable entity representing the identity, configuration, and history of an artificial intelligence (AI) model. Its lifecycle has one or more agent launches, with at most one running at a time. See [Agent](agent.md).
 - **AgentLaunch resource**: the resource form of one agent launch, with its specification under `spec` and the provider's record under `status`. See [Agent launch resource](agent-launch-resource.md).
 - **Agentmail**: messaging addressed to durable agents. It includes incoming and outgoing mail with message verification. Delivery and signing semantics remain open. See [Agentmail](agent.md#Agentmail,%20groups,%20and%20subscriptions).
-- **API server**: the component serving afakt's Representational State Transfer (REST) API to app clients through the ingress gateway and to coordination workflows. It authenticates agent proxies over the overlay and uses the agent hub for remote control and sessions. See [API server](components.md#API%20server).
+- **API server**: the component serving afakt's Representational State Transfer (REST) API to app clients through the ingress gateway and to coordination workflows. It authenticates agent proxies over the overlay and exposes remote-control and session routes whose [connection owner](agent-open-questions.md#%60OQ-SES-17%60) remains open. See [API server](components.md#API%20server).
 - **Archive**: agent snapshot storage for a stopped agent running in a VM whose durable resource enters the archived state. See [Archive](agent-lifecycle.md#Archive%20and%20restore).
 - **Artifact proxy**: the service that serves stored artifact content. See [Artifact proxy](components.md#Artifact%20proxy).
 - **Artifact**: stored content used as input or output, with optional associations to agents. See [Artifact](agent.md#Memory,%20skills,%20and%20artifacts).
@@ -67,7 +66,7 @@ generated: { by: "codex:gpt-6-astra", at: "2026-10-27T00:00:00Z" }
 - **Host-level network service**: the agent host's connectivity role for agent ports, previews, services, and cluster services under host-level authorization. Its mechanism is undecided. See [Host-level network service](components.md#Host-level%20network%20service).
 - **Image build**: one agent launch-like job for a workspace image definition. It runs the steps in a profile sandbox and publishes the resulting directory tree as image layers. See [Build process](agent-workspace-image.md#Image%20builds).
 - **Index**: registered content organized for retrieval by agents. Its source and query contract remains open. See [Index](cli.md#Configuration%20and%20indexing).
-- **External ingress gateway**: the Traefik gateway with afakt authentication middleware that receives user-facing traffic. See [External ingress gateway](agent-hub.md#External%20ingress%20gateway).
+- **External ingress gateway**: the Traefik gateway with afakt authentication middleware that receives user-facing traffic. See [External ingress gateway](agent-overlay.md#External%20ingress%20gateway).
 - **Layer cache**: the worker's local store of verified image layer blobs keyed by digest, with a cache of unpacked layers for reuse in independent agent workspaces. See [Agent host caches and startup](agent-workspace-image.md#Agent%20host%20caches%20and%20startup).
 - **MCP gateway**: afakt’s single MCP endpoint for each agent launch or session harness, enforcing tool access, credential isolation, approvals, and audit. It doesn't serve outside MCP clients. See [Agent MCP gateway](agent-mcp-gateway.md).
 - **Memory**: knowledge retained for reuse across an agent's sessions. Operations support storage and query. See [Memory](agent.md#Memory,%20skills,%20and%20artifacts).
@@ -76,9 +75,9 @@ generated: { by: "codex:gpt-6-astra", at: "2026-10-27T00:00:00Z" }
 - **Placement**: the binding of an agent launch to one agent host and its host task queue before launch. See [Agent placement](agent-placement.md).
 - **Policy proposal**: a proposed policy change with explicit approval or rejection. See [Policy proposal](agent.md#Policies,%20roles,%20and%20organizational%20scope).
 - **Policy**: authorization rules associated with roles, credentials, or sandbox configurations. See [Policy](agent.md#Policies,%20roles,%20and%20organizational%20scope).
-- **Port forwarder**: the agent mediator and guest relay path that connects authorized publication streams to guest loopback listeners. See [Port forwarder](components.md#Port%20forwarder).
+- **Port forwarder**: the function that connects authorized publications to guest loopback listeners. Its [path through the workload proxy](agent-open-questions.md#%60OQ-PORT-14%60) remains open. See [Port forwarder](components.md#Port%20forwarder).
 - **Preheating**: pulling and unpacking a published image into chosen agent hosts' caches before agent launches need it. See [Placement and preheating](agent-workspace-image.md#Placement%20and%20preheating).
-- **Preview server**: a client of published ports that reaches a target launch through the agent hub for authorized preview viewers. See [Preview server](components.md#Preview%20server).
+- **Preview server**: a client of published ports that dials the target workload proxy directly over the overlay for authorized preview viewers. The [published-port path](agent-open-questions.md#%60OQ-PORT-14%60) remains open. See [Preview server](components.md#Preview%20server).
 - **Preview**: an HTTP view of one forwarded port through an authenticated control plane uniform resource locator (URL). See [HTTP previews](agent-previews.md#HTTP%20previews).
 - **Profile binding**: an agent's association with the profile used as a blueprint for its spec. See [Profile binding](agent.md#Owned%20resources).
 - **Profile catalog**: the central store of published agent profile versions. See [Profile sources](agent-profile.md#Profile%20sources).
@@ -113,6 +112,7 @@ generated: { by: "codex:gpt-6-astra", at: "2026-10-27T00:00:00Z" }
 - **VM sandbox provider**: the default provider for agent sandboxes, which runs each agent in its own sandbox VM under the agent host supervisor. See [Agent sandbox](agent-sandbox.md).
 - **Web dashboard**: the component that provides afakt's web UI. See [Web dashboard](components.md#Web%20dashboard).
 - **Workflow orchestrator**: the component, Temporal, that provides durable execution for afakt's workflows. See [Workflow orchestrator](components.md#Workflow%20orchestrator).
+- **Workload**: the guest context plus the agent mediator and agent proxy together with `afakt-agent`. The context is a VM or the host or container context in non-VM modes. A workload can exist without a launch or workspace. It runs exactly one launch before afakt destroys it. A follow-up or relaunch uses a new workload. SPIFFE uses workload for mediators and gateways as well as workers, a distinct meaning. See [Agent workload](agent-workload.md).
 - **Workload identity**: the SPIFFE ID that afakt assigns to a workload and proves with a SPIFFE Verifiable Identity Document (SVID). See [Workload identity](agent-host.md#Workload%20identity).
 - **Workspace image builder**: the component that coordinates image builds and publishes successful results. See [Workspace image builder](components.md#Workspace%20image%20builder).
 - **Workspace image definition**: the sources, optional base image, steps, agent profile, triggers, destination, and retention settings that describe how to produce a workspace image. See [Workspace image definitions](agent-workspace-image.md#Workspace%20image%20definitions).

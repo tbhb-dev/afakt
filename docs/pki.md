@@ -4,7 +4,7 @@ title: Public key infrastructure
 description: Authorities, trust boundaries, certificate policies, and key custody for afakt.
 tags: [afakt, pki, security]
 status: draft
-generated: { by: "codex:gpt-6-astra", at: "2026-10-27T00:00:00Z" }
+generated: { by: "codex:gpt-6", at: "2026-10-28T17:30:00Z" }
 ---
 
 # Public key infrastructure
@@ -15,7 +15,7 @@ afakt separates workload identity, public transport trust, inspection trust, and
 
 A workload identity issuer provides attestation, registration, certificate and token issuance, and authenticated trust distribution. The choice of issuer software and its administrative ownership remain [undecided](agent-open-questions.md#%60OQ-SBX-33%60), along with its [operational contract](agent-open-questions.md#%60OQ-PKI-1%60). Regardless of the issuer selected, the boundary between an authenticated workload and its permitted actions remains the same.
 
-Each control plane has one Secure Production Identity Framework for Everyone (SPIFFE) trust domain, without federation to other control planes. A workload has an identity of the form `spiffe://<trust-domain>/...`. Host-side processes get SPIFFE Verifiable Identity Documents (SVIDs) through a Workload Application Programming Interface (API) endpoint that the guest can't access. The agent proxy keeps its launch's identity and private key outside the guest. See [Workload identity](agent-host.md#Workload%20identity) and [Launch boundary](agent-proxy.md#Launch%20boundary).
+Each control plane has one Secure Production Identity Framework for Everyone (SPIFFE) trust domain, without federation to other control planes. A workload has an identity of the form `spiffe://<trust-domain>/...`. Host-side processes get SPIFFE Verifiable Identity Documents (SVIDs) through a Workload Application Programming Interface (API) endpoint that the guest can't access. The agent proxy keeps its launch's identity and private key outside the guest. See [Workload identity](agent-host.md#Workload%20identity) and [Launch boundary](agent-workload-proxy.md#Launch%20boundary).
 
 ## Authority hierarchy
 
@@ -65,7 +65,7 @@ The workload identity starting values are an X.509-SVID lifetime of one hour, a 
 | Algorithms and key sizes | The inventory explicitly marks the value for each class undecided pending selection of its [cryptographic profile](agent-open-questions.md#%60OQ-PKI-2%60). |
 | Lifetime limits | Upper lifetime limits for roots, issuing authorities, workload certificates, public and inspection certificates, and delegated credentials remain [undecided](agent-open-questions.md#%60OQ-PKI-2%60). Workload starting values remain under the preceding held decision. |
 | Clock skew and backdating | Allowed skew, backdating, and deadline interpretation remain [undecided](agent-open-questions.md#%60OQ-SBX-49%60). |
-| Identity names | The SPIFFE path scheme is [undecided](agent-open-questions.md#%60OQ-MOD-9%60). An internal service name from [hub naming](agent-hub.md#Names) doesn't itself specify a certificate SAN or confer authority. |
+| Identity names | The SPIFFE path scheme is [undecided](agent-open-questions.md#%60OQ-MOD-9%60). An internal service name from [overlay naming](agent-overlay.md#Names) doesn't itself specify a certificate SAN or confer authority. |
 | Certificate validation | Complete profile validation and its enforcement boundary remain [undecided](agent-open-questions.md#%60OQ-SBX-46%60). Service authorization remains separate from signature validation. |
 | Issuance admission | Launch mapping and renewal authorization remain [undecided](agent-open-questions.md#%60OQ-SBX-30%60). A guest can't choose another launch identity or access the Workload API. |
 | Exchange admission | A credential exchange uses an X.509-SVID over mutual Transport Layer Security (TLS) or an audience-bound JWT-SVID. [Exchange rules](agent-open-questions.md#%60OQ-SBX-17%60) determine the form. |

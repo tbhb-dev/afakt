@@ -4,7 +4,7 @@ title: Transport certificates and keys
 description: Overlay credentials, public and inspection certificates, and storage transport trust.
 tags: [afakt, pki, security]
 status: draft
-generated: { by: "codex:gpt-6-astra", at: "2026-10-27T00:00:00Z" }
+generated: { by: "codex:gpt-6", at: "2026-10-28T17:30:00Z" }
 ---
 
 # Transport certificates and keys
@@ -13,7 +13,7 @@ Transport Layer Security (TLS) authenticates service connections separately from
 
 ## Overlay credentials
 
-The cluster overlay uses isolated coordination, separate launch and service nodes, and relays. In the control plane, the coordination interface uses a presented SVID to register nodes and issue single-use tagged pre-authentication keys. It also sets tags and access rules and deletes nodes. See [Coordination interface](agent-hub.md#Coordination%20interface). Designated Encrypted Relay for Packets (DERP) provides the relay role. Overlay high availability (HA), expiry behavior, and propagation remain [undecided](agent-open-questions.md#%60OQ-HST-10%60).
+The cluster overlay uses isolated coordination, separate launch and service nodes, and relays. In the control plane, the coordination interface uses a presented SVID to register nodes and issue single-use tagged pre-authentication keys. It also sets tags and access rules and deletes nodes. See [Coordination interface](agent-overlay.md#Coordination%20interface). Designated Encrypted Relay for Packets (DERP) provides the relay role. Overlay high availability (HA), expiry behavior, and propagation remain [undecided](agent-open-questions.md#%60OQ-HST-10%60).
 
 | Material and purpose | Private custody | Issuer, verifier, and trust anchor | Other undecided fields |
 | --- | --- | --- | --- |
@@ -28,11 +28,11 @@ The cluster overlay uses isolated coordination, separate launch and service node
 
 Storage, algorithm, key size, lifetime, and rotation remain [undecided](agent-open-questions.md#%60OQ-PKI-4%60) for every entry in this table, along with the fields in the last column. Revocation uses node removal or key retirement for all entries except `KT-05`, with [undecided propagation](agent-open-questions.md#%60OQ-HST-10%60). Each `KT-05` key permits one use.
 
-The node-key class includes the transport and machine key material required by the selected overlay protocol. Its exact inventory and independent rotation remain [undecided](agent-open-questions.md#%60OQ-PKI-4%60). During coordination outages, the static map of stable nodes supplies addresses. It doesn't renew credentials or bypass service authentication. User-tailnet membership never grants afakt user authority or joins a launch to a user tailnet. See [Overlay transport](agent-hub.md#Overlay%20transport).
+The node-key class includes the transport and machine key material required by the selected overlay protocol. Its exact inventory and independent rotation remain [undecided](agent-open-questions.md#%60OQ-PKI-4%60). During coordination outages, the static map of stable nodes supplies addresses. It doesn't renew credentials or bypass service authentication. User-tailnet membership never grants afakt user authority or joins a launch to a user tailnet. See [Overlay transport](agent-overlay.md#Overlay%20transport).
 
 ## External ingress gateway
 
-The external ingress gateway uses Traefik with afakt authentication middleware under [External ingress gateway](agent-hub.md#External%20ingress%20gateway). Its middleware integration remains undecided in [`OQ-SES-13`](agent-open-questions.md#%60OQ-SES-13%60).
+The external ingress gateway uses Traefik with afakt authentication middleware under [External ingress gateway](agent-overlay.md#External%20ingress%20gateway). Its middleware integration remains undecided in [`OQ-SES-13`](agent-open-questions.md#%60OQ-SES-13%60).
 
 Traefik provides public TLS and Automated Certificate Management Environment (ACME) integration for the external ingress gateway. Its public certificates serve the app and preview names. Public certificate trust remains distinct from internal workload trust. ACME wildcard issuance requires Domain Name System (DNS) validation. A wildcard covers one label beneath its domain. It doesn't cover the domain apex or deeper descendants. The [preview naming scheme](agent-previews.md#Preview%20routing%20and%20names) uses one label beneath the preview domain.
 
@@ -52,7 +52,7 @@ Traefik's local ACME store retains account and certificate private material. A s
 
 ## Inspection certificates
 
-The agent egress gateway is the TLS endpoint for inspected connections after the agent mediator admits the destination. Guest clients trust the per-agent certificate authority (CA). Signing material remains outside the sandbox, with custody defined by the host or selected site gateway configuration. Per-Server Name Indication (SNI) certificates authenticate inspected destinations. Their creation from a destination inventory or on demand remains [undecided](agent-open-questions.md#%60OQ-SBX-38%60). See [Network policy](agent-mediator.md#Network%20policy).
+The agent egress gateway is the TLS endpoint for inspected connections after the agent mediator admits the destination. Guest clients trust the per-agent certificate authority (CA). Signing material remains outside the sandbox, with custody defined by the host or selected site gateway configuration. Per-Server Name Indication (SNI) certificates authenticate inspected destinations. Their creation from a destination inventory or on demand remains [undecided](agent-open-questions.md#%60OQ-SBX-38%60). See [Network policy](agent-workload-mediator.md#Network%20policy).
 
 | Material and purpose | Private custody | Issuer, verifier, and trust anchor | Other undecided fields |
 | --- | --- | --- | --- |

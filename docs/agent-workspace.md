@@ -4,7 +4,7 @@ title: Agent workspace
 description: The workspace sources an agent sandbox provider builds an agent workspace from, and the environment variables that the agent and its hooks see.
 tags: [afakt, agents, agent-launch, workspace]
 status: draft
-generated: { by: "codex:gpt-6-astra", at: "2026-10-27T00:00:00Z" }
+generated: { by: "codex:gpt-6", at: "2026-10-28T17:30:00Z" }
 ---
 
 # Agent workspace
@@ -68,7 +68,7 @@ At launch the provider resolves the [agent sandbox variables](agent-sandbox.md#S
 
 `HOME` gets the value of `${home}`. Hooks see a few more variables, which [Hook environment](agent-hooks.md#Hook%20environment) lists.
 
-The CLI sends control requests through the guest relay. The agent mediator stamps the agent's identity. The agent proxy authenticates with the launch's X.509 SPIFFE Verifiable Identity Document (SVID) over mutual Transport Layer Security (TLS) on the overlay. TLS ends at the API server. See [Per-launch services](agent-proxy.md#Launch%20boundary). Neither an SVID nor its private key enters the guest. Only the provider sets an `AFAKT_` variable, and no profile, specification, or hook entry can add or replace one.
+The CLI sends control requests through the guest relay. The agent mediator stamps the agent's identity. The agent proxy authenticates with the launch's X.509 SPIFFE Verifiable Identity Document (SVID) over mutual Transport Layer Security (TLS) on the overlay. TLS ends at the API server. See [Per-launch services](agent-workload-proxy.md#Launch%20boundary). Neither an SVID nor its private key enters the guest. Only the provider sets an `AFAKT_` variable, and no profile, specification, or hook entry can add or replace one.
 
 ## Agent environment
 
@@ -108,7 +108,7 @@ The provider sets these names itself or keeps them as the agent host provides th
 | `HOME` | The provider sets it to `${home}`. |
 | `PATH` | It decides which programs the agent, the hooks, and the afakt CLI run. |
 | Any name that starts with `LD_` or `DYLD_`, and `NODE_OPTIONS` | They load code into each process that starts. |
-| `HTTP_PROXY`, `HTTPS_PROXY`, `ALL_PROXY`, and `NO_PROXY` | The provider reserves these routing settings. Network enforcement still routes every guest flow through the agent mediator even if a tool ignores them. |
+| `HTTP_PROXY`, `HTTPS_PROXY`, `ALL_PROXY`, and `NO_PROXY` | The provider reserves these routing settings. Network enforcement still routes every guest flow through the agent proxy under mediator decisions even if a tool ignores them. |
 | `SSL_CERT_FILE`, `SSL_CERT_DIR`, `NODE_EXTRA_CA_CERTS`, `REQUESTS_CA_BUNDLE`, `CURL_CA_BUNDLE`, and `GIT_SSL_CAINFO` | They decide which certificate authorities the agent sandbox trusts, including the [inspection authority](pki-transport.md#Inspection%20certificates). |
 | Any name that starts with `CLAUDE_`, `ANTHROPIC_`, `CODEX_`, `OPENAI_`, `GEMINI_`, or `GOOGLE_` | The harnesses read them as settings, and the provider writes the agent harness settings itself. An `apiKey.name` may still use one of these names. |
 | `XDG_CONFIG_HOME`, `GIT_CONFIG_GLOBAL`, and `GIT_CONFIG_SYSTEM` | They move the configuration that the harness and its tools read. |

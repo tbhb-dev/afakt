@@ -4,7 +4,7 @@ title: "Agent sandbox provider for Cloudflare Sandbox SDK"
 description: Remote isolation, mediation, storage, and lifecycle for Cloudflare Sandbox SDK.
 tags: [afakt, agents, sandbox]
 status: draft
-generated: { by: "codex:gpt-6-astra", at: "2026-10-27T00:00:00Z" }
+generated: { by: "codex:gpt-6", at: "2026-10-28T17:30:00Z" }
 ---
 
 # Agent sandbox provider for Cloudflare Sandbox SDK
@@ -31,17 +31,17 @@ Cloudflare Sandbox SDK creates a container lazily on its first operation. Reusin
 
 ## Mediator connection and name resolution
 
-Each launch requires [agent mediation](agent-mediator.md#Launch%20boundary) for control, session, preview, and network traffic.
+Each launch requires [agent mediation](agent-workload-mediator.md#Launch%20boundary) for control, session, preview, and network traffic.
 
-Remote launches require the [agent proxy](agent-proxy.md#Launch%20boundary) and [global egress path](components.md#Agent%20egress%20gateway), with their placement and carrier subject to the provider mapping below.
+Remote launches require the [agent proxy](agent-workload-proxy.md#Launch%20boundary) and [global egress path](components.md#Agent%20egress%20gateway), with their placement and carrier subject to the provider mapping below.
 
 Remote placement, mandatory transport, Domain Name System (DNS) mediation, and prevention of direct connections remain under [`OQ-SBX-36`](agent-open-questions.md#%60OQ-SBX-36%60). Provider assertions for launch identity remain under [`OQ-SBX-52`](agent-open-questions.md#%60OQ-SBX-52%60).
 
-Cloudflare Sandbox SDK allows internet access by default. With internet access off, only explicitly permitted hosts or outbound handlers allow web traffic, while DNS uses Cloudflare resolvers. Outbound handlers process Hypertext Transfer Protocol (HTTP) and Hypertext Transfer Protocol Secure (HTTPS) on ports 80 and 443, not other protocols. HTTPS interception defaults to off. Host rules and handlers apply only to HTTP without it. HTTPS can reach any host with internet access on and fails with internet access off. These settings don't select afakt's mandatory DNS and mediator path under [`OQ-SBX-36`](agent-open-questions.md#%60OQ-SBX-36%60). [Handle outbound traffic](https://developers.cloudflare.com/sandbox/sdk/guides/outbound-traffic/).
+Cloudflare Sandbox SDK allows internet access by default. With internet access off, only explicitly permitted hosts or outbound handlers allow web traffic, while DNS uses Cloudflare resolvers. Outbound handlers process Hypertext Transfer Protocol (HTTP) and Hypertext Transfer Protocol Secure (HTTPS) on ports 80 and 443, not other protocols. HTTPS interception defaults to off. Host rules and handlers apply only to HTTP without it. HTTPS can reach any host with internet access on and fails with internet access off. These settings don't select afakt's mandatory DNS and proxy path under mediator decisions under [`OQ-SBX-36`](agent-open-questions.md#%60OQ-SBX-36%60). [Handle outbound traffic](https://developers.cloudflare.com/sandbox/sdk/guides/outbound-traffic/).
 
 Cloudflare Sandbox SDK outbound handlers run in the Workers runtime outside the sandbox, on the same machine, with access to Worker bindings. Handlers can inject credentials kept in the Worker and scope them by container identity. Their rules can change while a sandbox runs. HTTPS interception uses an ephemeral certificate authority (CA) that the runtime tries to add to common trust stores. Using these handlers for afakt mediation, networking, or credential brokering remains undecided. Their identity binding, no-network mediator confinement, immutable launch configuration, and global egress path remain under [`OQ-SBX-36`](agent-open-questions.md#%60OQ-SBX-36%60), [`OQ-SBX-23`](agent-open-questions.md#%60OQ-SBX-23%60), [`OQ-SBX-52`](agent-open-questions.md#%60OQ-SBX-52%60). Repository profile self-grants and credential domain bounds remain on hold under [`OQ-SBX-2`](agent-open-questions.md#%60OQ-SBX-2%60). [Handle outbound traffic](https://developers.cloudflare.com/sandbox/sdk/guides/outbound-traffic/).
 
-Cloudflare Sandbox SDK preview uniform resource locators (URLs) grant access to anyone holding them. Quick tunnels use the random host name itself as access control. The SDK requires app authentication for sensitive services, without establishing afakt's per-stream publication checks or authenticated agent hub path through these vendor routes. Their integration remains under [`OQ-SBX-36`](agent-open-questions.md#%60OQ-SBX-36%60). See [Port discovery and records](agent-ports.md#Port%20discovery%20and%20records). [Security model](https://developers.cloudflare.com/sandbox/sdk/concepts/security/).
+Cloudflare Sandbox SDK preview uniform resource locators (URLs) grant access to anyone holding them. Quick tunnels use the random host name itself as access control. The SDK requires app authentication for sensitive services, without establishing afakt's per-stream publication checks or authenticated workload proxy path through these vendor routes. Their integration remains under [`OQ-SBX-36`](agent-open-questions.md#%60OQ-SBX-36%60). See [Port discovery and records](agent-ports.md#Port%20discovery%20and%20records). [Security model](https://developers.cloudflare.com/sandbox/sdk/concepts/security/).
 
 ## Workspace, scratch, and caches
 

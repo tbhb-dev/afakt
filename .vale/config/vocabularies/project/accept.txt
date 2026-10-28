@@ -99,6 +99,7 @@ prebuild
 prek
 proxying
 qcow2
+QUIC
 reachability
 reflink
 reflinks

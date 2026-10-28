@@ -4,7 +4,7 @@ title: Agent hooks
 description: The hooks that run on hook events before, during, and after the agent's work, how profiles and specifications combine them, and which events and decisions each harness supports.
 tags: [afakt, agents, agent-launch, hooks]
 status: draft
-generated: { by: "codex:gpt-6-astra", at: "2026-10-27T00:00:00Z" }
+generated: { by: "codex:gpt-6", at: "2026-10-28T17:30:00Z" }
 ---
 
 # Agent hooks
@@ -108,7 +108,7 @@ On standard input, each command reads one JSON object with these fields.
 
 ## Running hooks
 
-- Each hook runs inside the agent launch's agent sandbox under the [sandbox configuration built from the profile and launch spec](agent-sandbox.md#Combining%20configurations), with the agent's workspace access and mediated agent launch authority. Its network traffic passes through the agent mediator like the agent's. The guest never receives authentication material from the agent proxy, including the launch's SPIFFE Verifiable Identity Document (SVID) or private key. A hook never has wider access than the agent. Under `read-only` workspace access, a hook can't change the agent workspace either.
+- Each hook runs inside the agent launch's agent sandbox under the [sandbox configuration built from the profile and launch spec](agent-sandbox.md#Combining%20configurations), with the agent's workspace access and mediated agent launch authority. Its network traffic passes through the agent proxy under mediator decisions like the agent's. The guest never receives authentication material from the agent proxy, including the launch's SPIFFE Verifiable Identity Document (SVID) or private key. A hook never has wider access than the agent. Under `read-only` workspace access, a hook can't change the agent workspace either.
 - Agent harness permissions and tools apply to the agent, and they don't limit hooks.
 - The time limit and resource limits cover the hooks and the agent together, apart from the `stop-requested`, `session-end`, and `before-teardown` hooks. For hooks within the time limit, a hook's timeout ends early when that limit would end first.
 - The `session-end` hooks share a session-end budget of their own, 10 seconds in total. It starts when the provider observes a headless harness exit or ACP session closure, after any stop grace period the agent launch used, and the time limit doesn't count it. A `session-end` hook's timeout ends early when the budget would end first. Once the budget runs out, the provider skips the `session-end` hooks still to come.

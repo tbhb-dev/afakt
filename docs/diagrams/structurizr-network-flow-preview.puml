@@ -119,8 +119,7 @@ skinparam {
 
 rectangle "afakt\n<size:16>[Software System]</size>" <<Boundary-YWZha3Q=>> {
   rectangle "Control plane services" <<Group-Q29udHJvbCBwbGFuZSBzZXJ2aWNlcw==>> as group10 {
-    rectangle "==Agent hub\n<size:16>[Container: Application service]</size>\n\nJoins per-launch connections carrying sessions, remote control, ports and previews." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Agenthub
-    rectangle "==Preview server\n<size:16>[Container: Application service]</size>\n\nServes previews as a client of authorized published ports through the agent hub." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Previewserver
+    rectangle "==Preview server\n<size:16>[Container: Application service]</size>\n\nDials workload proxies over the overlay; published-port listener binding remains open." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Previewserver
   }
 
   rectangle "Host management boundary" <<Group-SG9zdCBtYW5hZ2VtZW50IGJvdW5kYXJ5>> as group11 {
@@ -128,15 +127,15 @@ rectangle "afakt\n<size:16>[Software System]</size>" <<Boundary-YWZha3Q=>> {
   }
 
   rectangle "Launch agent proxy boundary" <<Group-TGF1bmNoIGFnZW50IHByb3h5IGJvdW5kYXJ5>> as group12 {
-    rectangle "==Agent proxy\n<size:16>[Container: Tailscale tsnet]</size>\n\nOwn overlay node, hub connection and launch X.509-SVID; only launch component opening connections off the host." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Agentproxy
+    rectangle "==Agent proxy\n<size:16>[Container: Network proxy]</size>\n\nCarries workload traffic in both directions; own overlay node and launch X.509-SVID; asks the mediator to decide each connection." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Agentproxy
   }
 
   rectangle "Launch guest boundary" <<Group-TGF1bmNoIGd1ZXN0IGJvdW5kYXJ5>> as group13 {
-    rectangle "==Guest workload\n<size:16>[Container: Provider confinement]</size>\n\nUntrusted harness, relay and loopback listeners; no overlay membership or workload keys." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Guestworkload
+    rectangle "==Guest context\n<size:16>[Container: Provider confinement]</size>\n\nUntrusted harness, relay and loopback listeners; no overlay membership or workload keys." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Guestcontext
   }
 
   rectangle "Launch mediation boundary" <<Group-TGF1bmNoIG1lZGlhdGlvbiBib3VuZGFyeQ==>> as group14 {
-    rectangle "==Agent mediator\n<size:16>[Container: Local policy enforcement]</size>\n\nEnforces this launch's policy and stamps identity; has no network access of its own." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Agentmediator
+    rectangle "==Agent mediator\n<size:16>[Container: Local policy enforcement]</size>\n\nDecides every inbound and outbound connection and stamps identity; never carries traffic." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Agentmediator
   }
 
   rectangle "Operator access on the agent host" <<Group-T3BlcmF0b3IgYWNjZXNzIG9uIHRoZSBhZ2VudCBob3N0>> as group15 {
@@ -152,9 +151,9 @@ Operatorbrowser --> afakt.Hostnameresolver <<Relationship-UmVsYXRpb25zaGlw>> : "
 Operatorbrowser --> afakt.Hostaccessboundary <<Relationship-UmVsYXRpb25zaGlw>> : "2: Host access request; mechanism undecided\n<size:16>[Host access mechanism undecided]</size>"
 afakt.Hostaccessboundary --> afakt.Hostlevelconnectivity <<Relationship-UmVsYXRpb25zaGlw>> : "3: Request under host-level authorization\n<size:16>[Connection mechanism undecided]</size>"
 afakt.Hostlevelconnectivity --> afakt.Previewserver <<Relationship-UmVsYXRpb25zaGlw>> : "4: Host workload identity; served app may require its own sign-in\n<size:16>[Workload mutual TLS over overlay]</size>"
-afakt.Previewserver --> afakt.Agenthub <<Relationship-UmVsYXRpb25zaGlw>> : "5: Preview service identity; authorized published port\n<size:16>[Authenticated service connection]</size>"
-afakt.Agenthub --> afakt.Agentproxy <<Relationship-UmVsYXRpb25zaGlw>> : "6: Target launch X.509-SVID on existing outbound connection\n<size:16>[Workload mutual TLS over overlay]</size>"
-afakt.Agentproxy --> afakt.Agentmediator <<Relationship-UmVsYXRpb25zaGlw>> : "7: Authenticated caller and current publication\n<size:16>[Local channel]</size>"
-afakt.Agentmediator --> afakt.Guestworkload <<Relationship-UmVsYXRpb25zaGlw>> : "8: Permitted stream to bound guest listener\n<size:16>[Local provider carrier]</size>"
+afakt.Previewserver --> afakt.Agentproxy <<Relationship-UmVsYXRpb25zaGlw>> : "5: Direct overlay connection; mutual SPIFFE authentication\n<size:16>[SPIFFE mutual TLS over overlay]</size>"
+afakt.Agentproxy --> afakt.Agentmediator <<Relationship-UmVsYXRpb25zaGlw>> : "6: Request decision for caller and publication\n<size:16>[Local channel]</size>"
+afakt.Agentmediator --> afakt.Agentproxy <<Relationship-UmVsYXRpb25zaGlw>> : "7: Return decision; publication binding remains open\n<size:16>[Local channel]</size>"
+afakt.Agentproxy --> afakt.Guestcontext <<Relationship-UmVsYXRpb25zaGlw>> : "8: Permitted ingress; listener binding open (OQ-PORT-14)\n<size:16>[Private workload link]</size>"
 
 @enduml

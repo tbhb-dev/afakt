@@ -4,7 +4,7 @@ title: Agent sandbox
 description: The sandbox configuration, sandbox variables, credential brokering, and authentication of an agent launch.
 tags: [afakt, agents, agent-launch, sandbox, credentials]
 status: draft
-generated: { by: "codex:gpt-6-astra", at: "2026-10-27T00:00:00Z" }
+generated: { by: "codex:gpt-6", at: "2026-10-28T17:30:00Z" }
 ---
 
 # Agent sandbox
@@ -39,7 +39,7 @@ Each agent sandbox VM has its own guest kernel and disks. Linux uses a Kernel-ba
 
 ### Runtime privileges
 
-The agent host worker uses a dedicated user. It never runs as root. Host-mode agents use a dedicated user separate from the worker, under [Agent host access](agent-hub.md#Agent%20host%20access). Runtime privileges follow the selected [provider boundary](agent-sandbox-linux-host.md#Platforms%20and%20privileges). Privileged setup and platform capture services remain provider-specific. Container manager deployments use rootless Docker or Podman. afakt uses a systemd user unit on Linux and a launchd agent on macOS. Setup privileges and service survival after logout remain [open](agent-open-questions.md#Agent%20sandbox). Running each agent launch under its own User Identifier (UID), separate from the worker user, remains [open](agent-open-questions.md#%60OQ-SBX-18%60).
+The agent host worker uses a dedicated user. It never runs as root. Host-mode agents use a dedicated user separate from the worker, under [Agent host access](agent-overlay.md#Agent%20host%20access). Runtime privileges follow the selected [provider boundary](agent-sandbox-linux-host.md#Platforms%20and%20privileges). Privileged setup and platform capture services remain provider-specific. Container manager deployments use rootless Docker or Podman. afakt uses a systemd user unit on Linux and a launchd agent on macOS. Setup privileges and service survival after logout remain [open](agent-open-questions.md#Agent%20sandbox). Running each agent launch under its own User Identifier (UID), separate from the worker user, remains [open](agent-open-questions.md#%60OQ-SBX-18%60).
 
 ### Host process sandbox
 
@@ -51,15 +51,15 @@ In a Linux guest, afakt's init runs as process ID (`PID`) 1, then the guest rela
 
 The guest relay handles the ACP session channel, the command-line interface (CLI) and MCP control channel from inside the agent, port discovery, and preview connections to guest loopback listeners. It advertises no ACP file system or terminal capabilities. [Agent session](agent-acp.md#Relay%20behavior) defines permission answers, buffering, and reconnect behavior.
 
-[Startup and readiness](agent-sandbox-lifecycle.md#Startup%20and%20readiness) use the independent lifecycle path. Guest traffic follows the [agent mediator](agent-mediator.md) policy.
+[Startup and readiness](agent-sandbox-lifecycle.md#Startup%20and%20readiness) use the independent lifecycle path. Guest traffic follows the [agent mediator](agent-workload-mediator.md) policy.
 
 ## Sandbox configuration
 
-An agent sandbox configuration offers the settings of the [Anthropic sandbox runtime](https://github.com/anthropics/sandbox-runtime) under the same names and with the same meaning.
+An agent sandbox configuration uses the filesystem, credential masking, and process restrictions of the [Anthropic sandbox runtime](https://github.com/anthropics/sandbox-runtime). Ingress and egress restrictions belong to the [workload firewall](agent-workload.md#Firewall). Its [resource format](agent-open-questions.md#%60OQ-SBX-67%60) remains open, including in host modes where capture sends traffic through the same enforcement point at the workload proxy.
 
 | Group                 | Settings                                                                                                                                                                                                                                                                                |
 | --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `network`             | `allowedDomains`, `deniedDomains`, `deniedDomainReasons`, `allowUnixSockets`, `allowLocalBinding`, `deniedResolvedAddresses`, `allowPlaintextHeaderSet`, `stripResponseHeaders`, `refuseOpaqueTunnels`, `requireHostMatch`, `ambiguousRequestTarget` |
+| Local sockets and binding | `allowUnixSockets` and `allowLocalBinding` |
 | `filesystem`          | `denyRead`, `allowRead`, `allowWrite`, and `denyWrite`, including literal entries                                                                                                                                                                                                       |
 | `ignoreViolations`    | Command patterns mapped to the paths whose violations the sandbox doesn't report                                                                                                                                                                                                        |
 | `credentials`         | `envVars` and `files` entries that the sandbox withholds from the agent or masks                                                                                                                                                                                                        |
@@ -68,7 +68,7 @@ An agent sandbox configuration offers the settings of the [Anthropic sandbox run
 
 The precedence rules match the sandbox runtime:
 
-- Network access starts denied. `deniedDomains` wins over `allowedDomains`.
+- Firewall egress defaults to a cluster-managed deny-all policy.
 - Reads start allowed. `allowRead` wins over `denyRead`, but a more specific `denyRead` entry still applies.
 - Writes start denied. `denyWrite` wins over `allowWrite`.
 
@@ -90,8 +90,8 @@ An agent sandbox rule may contain sandbox variables in the form `${name}`. The p
 | `${scratch}` | The absolute path of the agent launch's scratch directory, outside the agent workspace. Cleanup removes it with the workspace. |
 | `${home}` | The absolute path of the agent's home directory inside the sandbox. |
 | `${cache:<name>}` | The path inside the guest for the agent host cache with that name, such as `go-build`. Every agent launch on the agent host that uses this variable with that name shares the cache. |
-| `${afakt-api}` | The host name and port of the afakt Application Programming Interface (API) that the agent reaches through the guest relay and agent mediator. |
-| `${telemetry}` | The host name and port of the agent host's telemetry endpoint, which receives the agent harness's OpenTelemetry data through the agent mediator. See [Agent observability](agent-observability.md#Trace%20context%20propagation). |
+| `${afakt-api}` | The host name and port of the afakt Application Programming Interface (API) that the agent reaches through the guest relay and workload proxy under mediator decisions. |
+| `${telemetry}` | The host name and port of the agent host's telemetry endpoint, which receives the agent harness's OpenTelemetry data through the workload proxy under mediator decisions. See [Agent observability](agent-observability.md#Trace%20context%20propagation). |
 | `${agent-launch-id}` and `${generation}` | The canonical agent launch ID and the agent spec generation recorded at finalization, as a decimal integer. See [Agent launch ID format](agent-launch-model.md#Agent%20launch%20ID%20format). |
 | `${profile-name}` and `${profile-version}` | The pinned profile's name and version. |
 
@@ -103,12 +103,10 @@ Each profile's agent sandbox configuration is the base and the ceiling. A specif
 
 | Setting kind | Combined value |
 | --- | --- |
-| Deny lists: `deniedDomains`, `deniedResolvedAddresses`, `stripResponseHeaders`, `denyRead`, `denyWrite`, and `credentials` entries | Both lists joined. |
-| Allow lists: `allowedDomains`, `allowUnixSockets`, `allowRead`, and `allowWrite` | Without a specification list, the profile's list. Otherwise the specification's list, where each entry must fall within an entry of the profile's list. |
-| Isolation relaxations and `allowLocalBinding`, `allowPlaintextHeaderSet` | True when the profile sets it true and the specification doesn't set it false. |
-| `refuseOpaqueTunnels` and `requireHostMatch` | True when either configuration sets it true. |
-| `ambiguousRequestTarget` | Whichever value is stricter, where `refuse` is stricter than `normalize`, which is stricter than `asSpelled`. |
-| `ignoreViolations`, `deniedDomainReasons`, `git.safeDirectories` | Only the profile's value. A specification that sets one is invalid. |
+| Deny lists: `denyRead`, `denyWrite`, and `credentials` entries | Both lists joined. |
+| Allow lists: `allowUnixSockets`, `allowRead`, and `allowWrite` | Without a specification list, the profile's list. Otherwise the specification's list, where each entry must fall within an entry of the profile's list. |
+| Isolation relaxations and `allowLocalBinding` | True when the profile sets it true and the specification doesn't set it false. |
+| `ignoreViolations`, `git.safeDirectories` | Only the profile's value. A specification that sets one is invalid. |
 
 An entry falls within another entry when each path or domain it matches also matches the other entry. An entry that the provider can't confirm as within another counts as outside it.
 
@@ -116,7 +114,7 @@ After it combines the two configurations, the provider adds the rules that the a
 
 - With `read-write` workspace access, `allowWrite` gains `${workspace}`. With `read-only` access, `denyWrite` gains `${workspace}`.
 - `allowWrite` gains `${scratch}`.
-- `allowedDomains` gains `${afakt-api}` and `${telemetry}`, and the agent egress gateway's per-agent certificate authority joins the sandbox's trusted certificates.
+- The agent egress gateway's per-agent certificate authority joins the sandbox's trusted certificates. Mediator connections to control plane services use the workload proxy under its fixed [control plane rules](agent-workload-mediator.md#Control%20plane%20connections).
 
 After variable replacement, the provider publishes the sandbox configuration built from the profile and launch spec as evidence with its digest. Both the configuration digest and the provenance record include that digest.
 
@@ -146,7 +144,7 @@ credentials:
 | --- | --- |
 | `service` | The credential reference, a stable name in the profile or agent launch that resolves through afakt's credential store. |
 | `apiKey.name` | The environment variable that the agent sees. It holds the placeholder `afakt-brokered`, never the secret. |
-| `apiKey.inject[].domain` | A domain whose requests receive the credential, with the same wildcards as `allowedDomains`. |
+| `apiKey.inject[].domain` | A domain whose requests receive the credential, using domain patterns. |
 | `apiKey.inject[].header` | The request header that the broker writes. |
 | `apiKey.inject[].format` | The header value, with `%s` standing for the secret. |
 | `oauth` | In place of `apiKey`, a login credential held in afakt's credential store, the only refresh owner. The broker refreshes through that store and never passes the token to the agent. Entry fields and user mapping remain [open](agent-open-questions.md#Agent%20sandbox). |
@@ -155,7 +153,7 @@ The broker follows these rules:
 
 - It writes the header only on requests to the listed domains, and it replaces any value the agent sent in that header.
 - It writes headers only, never request bodies.
-- Each inject domain must also match the combined `allowedDomains`. Only a request that the broker sends on over Transport Layer Security (TLS) receives a credential, never a request without TLS. Credential injection requires the inspected path under [Network policy](agent-mediator.md#Network%20policy).
+- The workload firewall must also permit each inject domain. Only a request that the broker sends on over Transport Layer Security (TLS) receives a credential, never a request without TLS. Credential injection requires the inspected path under [Network policy](agent-workload-mediator.md#Network%20policy).
 - It resolves each credential reference through afakt's credential store at launch. Refresh ownership stays in that store. The broker sends service credentials only inside requests to the listed domains. Placement offers an agent launch only to agent hosts that can resolve every one of its credential references.
 - It stops writing credentials when the agent launch enters a terminal state.
 
@@ -167,4 +165,4 @@ Credential brokering uses references on both the profile and the agent launch. T
 
 Each credential type defines custody and exchange. Exchangeable credentials stay in the control plane, and the host-side credential broker receives short-lived credentials issued in exchange. Examples include an Open Authorization (OAuth) refresh token such as a Codex login, a GitHub App key, and cloud role credentials. For one agent launch, a static secret that the control plane can't exchange stays in the credential broker's memory outside the guest. The broker doesn't deliver the secret directly to the guest. Preventing a remote service from reflecting credentials in response content remains [`OQ-SBX-26`](agent-open-questions.md#%60OQ-SBX-26%60). See [Credential types](agent.md#Secrets,%20credentials,%20and%20trust%20material).
 
-[Agent launch authentication](agent-proxy.md#Agent%20launch%20authentication).
+[Agent launch authentication](agent-workload-proxy.md#Agent%20launch%20authentication).

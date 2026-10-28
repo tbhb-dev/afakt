@@ -4,7 +4,7 @@ title: "Agent sandbox provider for Podman"
 description: Isolation, mediation, storage, and lifecycle for the Podman agent sandbox provider.
 tags: [afakt, agents, sandbox]
 status: draft
-generated: { by: "codex:gpt-6-astra", at: "2026-10-27T00:00:00Z" }
+generated: { by: "codex:gpt-6", at: "2026-10-28T17:30:00Z" }
 ---
 
 # Agent sandbox provider for Podman
@@ -29,13 +29,13 @@ Local helper authentication and binding to the intended launch remain under [`OQ
 
 ## Mediator connection and name resolution
 
-Each agent launch's agent mediator and agent proxy follow [Per-launch services](agent-proxy.md#Launch%20boundary) and the authenticated [hub connection](agent-proxy.md#Hub%20connection).
+Each workload's agent mediator and agent proxy follow [Launch boundary](agent-workload-proxy.md#Launch%20boundary) and the authenticated [overlay connections](agent-workload-proxy.md#Overlay%20connections).
 
-The container needs an enforced path to its agent mediator for Domain Name System (DNS) resolution, external traffic, control messages, and preview streams. The Podman network backend and mediator carrier remain undecided under [`OQ-SBX-54`](agent-open-questions.md#%60OQ-SBX-54%60). A container without networking requires a carrier. An internal network doesn't prove isolation from its gateway or other attached services, and rootless networking alone doesn't establish launch policy enforcement.
+All external traffic uses the workload proxy. This includes Domain Name System (DNS) queries, which the proxy forwards to the mediator without a host resolver fallback. Each inbound and outbound connection requires a mediator decision. Encryption isn't required on the private link to the proxy. The [conditions each platform must meet](agent-open-questions.md#%60OQ-SBX-70%60) remain a working draft. Provider enforcement, including alternate interfaces, inherited descriptors, and indirect host services, remains under [`OQ-SBX-54`](agent-open-questions.md#%60OQ-SBX-54%60).
 
 [Workload identity](agent-host.md#Workload%20identity) keeps agent-proxy credentials outside this provider’s confinement. Kernel-attested local transport remains the leading option in [`OQ-SBX-13`](agent-open-questions.md#%60OQ-SBX-13%60). Current-launch binding and sender attribution remain unresolved under [`OQ-SES-6`](agent-open-questions.md#%60OQ-SES-6%60). Control capacity remains under [`OQ-SBX-14`](agent-open-questions.md#%60OQ-SBX-14%60), while mediator placement and confinement remain under [`OQ-SBX-12`](agent-open-questions.md#%60OQ-SBX-12%60), [`OQ-SBX-19`](agent-open-questions.md#%60OQ-SBX-19%60), [`OQ-SBX-20`](agent-open-questions.md#%60OQ-SBX-20%60), [`OQ-SBX-23`](agent-open-questions.md#%60OQ-SBX-23%60).
 
-[Egress gateway routing](agent-mediator.md#Egress%20gateway%20routing) governs host or configured site forwarding after mediator admission. Upstream resolution and workspace command routing remain under [`OQ-SBX-21`](agent-open-questions.md#%60OQ-SBX-21%60), [`OQ-SBX-22`](agent-open-questions.md#%60OQ-SBX-22%60), [`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60).
+[Egress gateway routing](agent-workload-mediator.md#Agent%20egress%20gateway) governs host or configured site forwarding after mediator admission. Upstream resolution and workspace command routing remain under [`OQ-SBX-21`](agent-open-questions.md#%60OQ-SBX-21%60), [`OQ-SBX-22`](agent-open-questions.md#%60OQ-SBX-22%60), [`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60).
 
 ## Workspace, scratch, and caches
 

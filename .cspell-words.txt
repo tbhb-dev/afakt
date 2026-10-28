@@ -122,6 +122,7 @@ proxying
 puml
 pyyaml
 qcow2
+QUIC
 ranksep
 reachability
 readyz

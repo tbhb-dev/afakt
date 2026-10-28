@@ -29,15 +29,6 @@ hide stereotype
     FontSize: 24;
     MaximumWidth: 200;
   }
-  // Relationship,Undecided
-  .Relationship-UmVsYXRpb25zaGlwLFVuZGVjaWRlZA== {
-    LineThickness: 2;
-    LineStyle: 10-10;
-    LineColor: #8a5a00;
-    FontColor: #8a5a00;
-    FontSize: 24;
-    MaximumWidth: 200;
-  }
   // afakt
   .Boundary-YWZha3Q= {
     BackgroundColor: #ffffff;
@@ -127,8 +118,5 @@ rectangle "==Topology" <<Element-RWxlbWVudCxUb3BvbG9neQ==>>
 
 rectangle "." <<.Element-Transparent>> as 1
 1 --> 1 <<Relationship-UmVsYXRpb25zaGlw>> : "Relationship"
-
-rectangle "." <<.Element-Transparent>> as 2
-2 --> 2 <<Relationship-UmVsYXRpb25zaGlwLFVuZGVjaWRlZA==>> : "Undecided"
 
 @enduml
