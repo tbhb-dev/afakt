@@ -90,6 +90,10 @@ rectangle "Cluster overlay boundary\n<size:16>[Deployment Node: Private overlay]
       rectangle "==MCP gateway\n<size:16>[Container: Application service]</size>\n\nChecks launch tool grants and keeps upstream credentials outside guests." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as Topologycluster.Clusteroverlayboundary.Controlplaneboundary.MCPservicenode.MCPgateway_1
     }
 
+    rectangle "Static origin node\n<size:16>[Deployment Node: tsnet node]</size>" <<DeploymentNode-RWxlbWVudCxEZXBsb3ltZW50IE5vZGU=>> as Topologycluster.Clusteroverlayboundary.Controlplaneboundary.Staticoriginnode {
+      rectangle "==Static origin\n<size:16>[Container: Caddy]</size>\n\nServes static site and single-page app deploys from local copies of their files; keeps no cache." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as Topologycluster.Clusteroverlayboundary.Controlplaneboundary.Staticoriginnode.Staticorigin_1
+    }
+
     rectangle "Coordination node\n<size:16>[Deployment Node: Coordination service]</size>" <<DeploymentNode-RWxlbWVudCxEZXBsb3ltZW50IE5vZGU=>> as Topologycluster.Clusteroverlayboundary.Controlplaneboundary.Coordinationnode {
       rectangle "==Overlay coordination\n<size:16>[Container: Headscale]</size>\n\nAn afakt interface fronts isolated Headscale coordination; cluster nodes retain a static map of stable nodes." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as Topologycluster.Clusteroverlayboundary.Controlplaneboundary.Coordinationnode.Overlaycoordination_1
     }
@@ -131,6 +135,7 @@ Topologycluster.Externalingressboundary.Externalingressgateway_1 --> Topologyclu
 Topologycluster.Clusteroverlayboundary.Controlplaneboundary.APIservicenode.APIserverandwebdashboard_1 --> Topologycluster.Clusteroverlayboundary.Privateoverlayreachability <<Relationship-UmVsYXRpb25zaGlw>> : "Service identity\n<size:16>[Overlay membership]</size>"
 Topologycluster.Clusteroverlayboundary.Controlplaneboundary.Previewservicenode.Previewserver_1 --> Topologycluster.Clusteroverlayboundary.Privateoverlayreachability <<Relationship-UmVsYXRpb25zaGlw>> : "Service identity\n<size:16>[Overlay membership]</size>"
 Topologycluster.Clusteroverlayboundary.Controlplaneboundary.MCPservicenode.MCPgateway_1 --> Topologycluster.Clusteroverlayboundary.Privateoverlayreachability <<Relationship-UmVsYXRpb25zaGlw>> : "Service identity\n<size:16>[Overlay membership]</size>"
+Topologycluster.Clusteroverlayboundary.Controlplaneboundary.Staticoriginnode.Staticorigin_1 --> Topologycluster.Clusteroverlayboundary.Privateoverlayreachability <<Relationship-UmVsYXRpb25zaGlw>> : "Service identity\n<size:16>[Overlay membership]</size>"
 Topologycluster.Clusteroverlayboundary.Controlplaneboundary.Agenthubnode.Agenthub_1 --> Topologycluster.Clusteroverlayboundary.Privateoverlayreachability <<Relationship-UmVsYXRpb25zaGlw>> : "Service identity\n<size:16>[Overlay membership]</size>"
 Topologycluster.Clusteroverlayboundary.Controlplaneboundary.Coordinationnode.Overlaycoordination_1 --> Topologycluster.Clusteroverlayboundary.Privateoverlayreachability <<Relationship-UmVsYXRpb25zaGlw>> : "Node coordination\n<size:16>[afakt interface]</size>"
 Topologycluster.Clusteroverlayboundary.Controlplaneboundary.Relaynode.Overlayrelay_1 --> Topologycluster.Clusteroverlayboundary.Privateoverlayreachability <<Relationship-UmVsYXRpb25zaGlw>> : "Encrypted transport\n<size:16>[Relay path]</size>"

@@ -29,6 +29,7 @@ workspace "afakt" "Architecture of the afakt modular monolith." {
                 controlApi = container "API server and web dashboard" "Authorizes operations and serves the dashboard from its own origin." "Application service" "Topology"
                 previewServer = container "Preview server" "Serves previews as a client of authorized published ports through the agent hub." "Application service" "Topology"
                 mcpGateway = container "MCP gateway" "Checks launch tool grants and keeps upstream credentials outside guests." "Application service" "Topology"
+                staticOrigin = container "Static origin" "Serves static site and single-page app deploys from local copies of their files; keeps no cache." "Caddy" "Topology"
                 coordination = container "Overlay coordination" "An afakt interface fronts isolated Headscale coordination; cluster nodes retain a static map of stable nodes." "Headscale" "Topology"
                 overlayRelay = container "Overlay relay" "Carries encrypted overlay traffic when a relay path is needed." "Overlay transport" "Topology"
             }
@@ -115,6 +116,7 @@ workspace "afakt" "Architecture of the afakt modular monolith." {
         browser -> edge "Sends public application requests as signed-in user" "Transport Layer Security" "TopologyConnection,OverviewHidden"
         edge -> controlApi "Forwards authenticated dashboard and API requests" "Application protocol over overlay" "TopologyConnection,OverviewHidden"
         edge -> previewServer "Forwards preview requests with user context" "Application protocol over overlay" "TopologyConnection,OverviewHidden"
+        edge -> staticOrigin "Forwards static site requests by hostname" "Application protocol over overlay" "TopologyConnection,OverviewHidden"
         controlApi -> hub "Uses agent streams; endpoint ownership undecided" "Authenticated service connection" "TopologyConnection,ReturnDetail"
         mcpGateway -> controlApi "Calls permitted operations with launch context" "Authenticated service connection" "TopologyConnection"
         guest -> mediator "Sends traffic bound to this launch" "Local provider carrier" "TopologyConnection,OverviewHidden"
@@ -183,6 +185,9 @@ workspace "afakt" "Architecture of the afakt modular monolith." {
                     cluster_mcpServiceNodeNode = deploymentNode "MCP service node" "Independent service identity." "tsnet node" {
                         cluster_mcpGateway = containerInstance mcpGateway
                     }
+                    cluster_staticOriginNodeNode = deploymentNode "Static origin node" "Independent service identity." "tsnet node" {
+                        cluster_staticOrigin = containerInstance staticOrigin
+                    }
                     cluster_coordinationNodeNode = deploymentNode "Coordination node" "Isolated Headscale behind an afakt interface; instance count undecided." "Coordination service" {
                         cluster_coordination = containerInstance coordination
                     }
@@ -211,6 +216,7 @@ workspace "afakt" "Architecture of the afakt modular monolith." {
             cluster_controlApi -> clusterOverlay "Service identity" "Overlay membership"
             cluster_previewServer -> clusterOverlay "Service identity" "Overlay membership"
             cluster_mcpGateway -> clusterOverlay "Service identity" "Overlay membership"
+            cluster_staticOrigin -> clusterOverlay "Service identity" "Overlay membership"
             cluster_hub -> clusterOverlay "Service identity" "Overlay membership"
             cluster_coordination -> clusterOverlay "Node coordination" "afakt interface"
             cluster_overlayRelay -> clusterOverlay "Encrypted transport" "Relay path"
@@ -352,6 +358,11 @@ workspace "afakt" "Architecture of the afakt modular monolith." {
             phone -> userTailnet "Device identity in user-owned network"
             userTailnet -> edge "Private application request; afakt sign-in"
             edge -> controlApi "Authenticated user context to web dashboard; no packet routing"
+            autoLayout lr
+        }
+        dynamic afakt "network-flow-static" "A browser requests a static site through the external ingress gateway." {
+            browser -> edge "Public request for a static site hostname"
+            edge -> staticOrigin "Hostname mapped to the active deploy; gateway compresses and caches"
             autoLayout lr
         }
         dynamic afakt "network-flow-grant" "Logical grant flow; direct overlay versus agent hub transport is undecided." {

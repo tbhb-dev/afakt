@@ -33,6 +33,7 @@ APFS
 backoff
 backpressure
 bubblewrap
+Caddy
 callout
 checkpointed
 Claude Managed Agents
