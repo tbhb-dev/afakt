@@ -255,7 +255,7 @@ A metric attribute takes values from a set that a deployment's configuration bou
 - Environment names and values
 - Error messages and any free text
 
-afakt records an attribute value outside its enumerated set as `other`. Labels count as bounded because each deployment defines its task classes and variants. Launch IAM role names require an enumerated set. Other names become `other`. The names of catalog profiles and their hooks count as bounded too, unlike those of repository profiles. A metric records the name of a repository profile, and each hook name in it, as `other`.
+afakt records an attribute value outside its enumerated set as `other`. Labels count as bounded because each deployment defines its task classes and variants. Launch IAM role names count as bounded for the same reason. The names of catalog profiles and their hooks count as bounded too, but a metric records the name of a repository profile, and each hook name in it, as `other`.
 
 ## What telemetry never records
 

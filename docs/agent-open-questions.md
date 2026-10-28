@@ -335,7 +335,7 @@ How should afakt expose a workload provider's native disk recovery operation tha
 
 ### `OQ-CON-15`
 
-How does an agent launch's own Identity and Access Management (IAM) role compose with the workload's role? Permission intersection remains undecided. Binding and pinning time also need a decision, along with the permission to use the role and compatibility of identity claims. See [Agent launch spec](agent-launch-contract.md#Agent%20launch%20spec) and [Workload](workload.md).
+How does an agent launch's own Identity and Access Management (IAM) role compose with the workload's role? Permission intersection remains undecided. Binding and pinning time also need a decision, along with the permission to use the role and whether a workload claim selects only workloads whose role covers the launch's role. See [Agent launch spec](agent-launch-contract.md#Agent%20launch%20spec) and [Workload](workload.md).
 
 ## Workload placement
 
