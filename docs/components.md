@@ -73,7 +73,7 @@ The guest relay handles session traffic, control requests, and authorized listen
 
 ## Host-level network service
 
-The host-level network service is the connectivity role for workload ports, previews, services, and cluster services under host-level authorization. It's separate from launch traffic. Host-level name resolution doesn't grant access. Its process, local caller authentication, and connection mechanism remain [undecided](workload-overlay.md#Workload%20host%20access).
+The host-level network service provides connectivity for workload ports, previews, services, and cluster services under host-level authorization. It's separate from launch traffic. Host-level name resolution doesn't grant access. Its process, local caller authentication, and connection mechanism remain [undecided](workload-overlay.md#Workload%20host%20access).
 
 ## Ingress gateway
 
@@ -89,7 +89,7 @@ The object store supplies the S3 API compatible endpoint used by the registry an
 
 ## Overlay node
 
-An overlay node represents one workload proxy, workload host, or control plane service instance in the isolated cluster overlay. Service instances share a role tag but keep separate node identities. Guests aren't nodes. See [Overlay transport](workload-overlay.md#Overlay%20transport).
+An overlay node represents one workload proxy, workload host, or control plane service instance in the isolated cluster overlay. Service instances share a service tag but keep separate node identities. Guests aren't nodes. See [Overlay transport](workload-overlay.md#Overlay%20transport).
 
 ## Workload proxy
 
@@ -129,13 +129,13 @@ The afakt binary includes Cloudflare Tunnel and Tailscale Funnel. Their connecto
 
 The web dashboard provides afakt's web UI.
 
-The dashboard shares an origin and HTTP listener with the API at the ingress gateway, including when every runtime role runs together. Its routes belong under `/dashboard/`. Readiness requires every selected service to run and fails during startup and shutdown.
+The dashboard shares an origin and HTTP listener with the API at the ingress gateway, including when every runtime service runs together. Its routes belong under `/dashboard/`. Readiness requires every selected service to run and fails during startup and shutdown.
 
 ## Workflow orchestrator
 
 The workflow orchestrator ([Temporal](https://temporal.io)) provides durable execution for afakt's workflows. A worker connects to an external Temporal service or runs an embedded Temporal server inside its own process. See [Workflows](architecture.md#Workflows).
 
-The Temporal Web UI shares the HTTP listener with the other runtime roles and gives developers and testers access to the embedded server's namespaces, workflows, and histories. Embedded Temporal operates independently of afakt's operational store.
+The Temporal Web UI shares the HTTP listener with the other runtime services and gives developers and testers access to the embedded server's namespaces, workflows, and histories. Embedded Temporal operates independently of afakt's operational store.
 
 ## Workflows
 

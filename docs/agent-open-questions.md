@@ -299,7 +299,7 @@ If afakt acknowledged cancel before the agent launch ended, should a repeated ca
 
 ### `OQ-CON-6`
 
-What format do label values take? Task class, variant, and role have none here, and each deployment defines their values. The profile name rule or a list in the deployment's configuration that the workload provider checks would each work. See [Agent launch spec](agent-launch-contract.md#Agent%20launch%20spec).
+What format do label values take? Task class and variant have none here, and each deployment defines their values. The profile name rule or a list in the deployment's configuration that the workload provider checks would each work. See [Agent launch spec](agent-launch-contract.md#Agent%20launch%20spec).
 
 ### `OQ-CON-7`
 
@@ -332,6 +332,10 @@ Which JSON Schema dialect and keywords may an agent launch's output schema use? 
 ### `OQ-CON-14`
 
 How should afakt expose a workload provider's native disk recovery operation that preserves files but restarts processes? Should recovered content become a workspace source for provision or use a separate operation, and which native operation metadata should clients receive? See [Restore](agent-launch-contract.md#Restore).
+
+### `OQ-CON-15`
+
+How does an agent launch's own Identity and Access Management (IAM) role compose with the workload's role? Permission intersection remains undecided. Binding and pinning time also need a decision, along with the permission to use the role and compatibility of identity claims. See [Agent launch spec](agent-launch-contract.md#Agent%20launch%20spec) and [Workload](workload.md).
 
 ## Workload placement
 
@@ -601,7 +605,7 @@ What's an entry's capacity, and how does afakt measure it? Selection prefers the
 
 ### `OQ-PRF-17`
 
-What role does `default: true` play? An agent launch request that names none of the four fields matches every entry. The default entry could decide that request, or priority and capacity could decide it as they decide any other. See [Profile fields](agent-profile.md#Profile%20fields).
+How does `default: true` affect model selection? An agent launch request that names none of the four fields matches every entry. The default entry could decide that request, or priority and capacity could decide it as they decide any other. See [Profile fields](agent-profile.md#Profile%20fields).
 
 ### `OQ-PRF-18`
 
@@ -737,7 +741,7 @@ Which component accepts client Agent Client Protocol (ACP) and remote-control co
 
 ### `OQ-SES-18`
 
-Which component retains the session message log and enforces writer and reader roles, and how does replay work across reconnects and service failures? See [Writer and readers](agent-acp.md#Writer%20and%20readers) and [Session message log](agent-acp.md#Session%20message%20log).
+Which component retains the session message log and enforces writer and reader access, and how does replay work across reconnects and service failures? See [Writer and readers](agent-acp.md#Writer%20and%20readers) and [Session message log](agent-acp.md#Session%20message%20log).
 
 ### `OQ-SES-19`
 
@@ -1137,7 +1141,7 @@ What per-profile limits apply to how many ports and previews an agent launch may
 
 ### `OQ-PORT-4`
 
-How does afakt certify preview host names beneath a wildcard domain behind a public tunnel? Wildcard coverage is the leading candidate where the workload provider supports the required host names and certificates, while certificates for each host add issuance and renewal work. Funnel's assigned names require a different arrangement with enrollment and quota costs, potentially using separate node identities. Public issuance, renewal, and the embedded Funnel path remain unqualified. See [Public tunnel providers](workload-previews.md#Public%20tunnel%20providers).
+How does afakt certify preview host names beneath a wildcard domain behind a public tunnel? Wildcard coverage is the leading candidate where the tunnel provider supports the required host names and certificates, while certificates for each host add issuance and renewal work. Funnel's assigned names require a different arrangement with enrollment and quota costs, potentially using separate node identities. Public issuance, renewal, and the embedded Funnel path remain unqualified. See [Public tunnel providers](workload-previews.md#Public%20tunnel%20providers).
 
 ### `OQ-PORT-5`
 

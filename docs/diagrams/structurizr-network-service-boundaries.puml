@@ -1,5 +1,5 @@
 @startuml
-title <size:24>Container View: afakt</size>\n<size:24>Service roles supporting the deployment topology; connections are control or transport dependencies.</size>
+title <size:24>Container View: afakt</size>\n<size:24>Services supporting the deployment topology; connections are control or transport dependencies.</size>
 
 set separator none
 top to bottom direction

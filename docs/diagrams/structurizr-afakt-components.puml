@@ -1,5 +1,5 @@
 @startuml
-title <size:24>Component View: afakt - afakt process</size>\n<size:24>The roles inside the combined afakt process.</size>
+title <size:24>Component View: afakt - afakt process</size>\n<size:24>The components inside the combined afakt process.</size>
 
 set separator none
 left to right direction
@@ -77,7 +77,7 @@ rectangle "afakt\n<size:16>[Software System]</size>" <<Boundary-YWZha3Q=>> {
     rectangle "==Coordination workflows\n<size:16>[Component: Temporal]</size>\n\nCoordinate work on workers inside the binary and start other workflows." <<Element-RWxlbWVudA==>> as afakt.afaktprocess.Coordinationworkflows
     rectangle "==Agent runner\n<size:16>[Component: Temporal]</size>\n\nRuns AI coding agents as a workflow." <<Element-RWxlbWVudA==>> as afakt.afaktprocess.Agentrunner
     rectangle "==Temporal Web UI\n<size:16>[Component: Temporal]</size>\n\nShows the embedded server's namespaces, workflows, and histories." <<Element-RWxlbWVudA==>> as afakt.afaktprocess.TemporalWebUI
-    rectangle "==Command-line interface\n<size:16>[Component: Go]</size>\n\nRuns server roles and communicates with the API." <<Element-RWxlbWVudA==>> as afakt.afaktprocess.Commandlineinterface
+    rectangle "==Command-line interface\n<size:16>[Component: Go]</size>\n\nRuns server services and communicates with the API." <<Element-RWxlbWVudA==>> as afakt.afaktprocess.Commandlineinterface
     rectangle "==API server\n<size:16>[Component: Go]</size>\n\nServes the REST API and starts workflows." <<Element-RWxlbWVudA==>> as afakt.afaktprocess.APIserver
   }
 

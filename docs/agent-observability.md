@@ -76,7 +76,8 @@ Each span from `afakt.agent_launch` down includes the agent launch attributes. O
 | `afakt.profile.name` | string | All agent launch spans | The profile name. |
 | `afakt.profile.version` | string | All agent launch spans | The profile version, in the form of `AFAKT_PROFILE_VERSION`. |
 | `afakt.agent_host` | string | All spans from placement on | The workload host's name. |
-| `afakt.label.task_class`, `afakt.label.variant`, and `afakt.label.role` | string | `afakt.agent_launch` and `afakt.agent_launch.lifecycle` | The agent launch's labels, when set. |
+| `afakt.label.task_class` and `afakt.label.variant` | string | `afakt.agent_launch` and `afakt.agent_launch.lifecycle` | The agent launch's labels, when set. |
+| `afakt.agent_launch.role.name` | string | `afakt.agent_launch` and `afakt.agent_launch.lifecycle` | The name of the launch's own Identity and Access Management (IAM) role. |
 | `afakt.specification.digest` | string | `afakt.agent_launch.lifecycle` | The specification digest. |
 | `afakt.agent_launch.state` | string | `afakt.agent_launch` and `afakt.agent_launch.lifecycle` | The terminal state, set when the span ends. |
 | `afakt.agent_launch.reason` | string | `afakt.agent_launch` and `afakt.agent_launch.lifecycle` | The reason from the result, set when the span ends. |
@@ -190,7 +191,7 @@ afakt publishes these metrics from the workload host worker and, for gateway, pr
 | `afakt.agent_launch.usage.output_tokens` | Counter | `{token}` | Observed output tokens per agent launch, when reported. | Usage metric attributes |
 | `afakt.cleanups` | Counter | `{cleanup}` | Each cleanup of one agent launch. | `afakt.cleanup.outcome`, `complete` or `incomplete`, and `afakt.agent_host` |
 
-- **Agent launch metric attributes.** `afakt.profile.source`, `afakt.profile.name`, `afakt.harness.name`, `afakt.harness.transport`, `gen_ai.provider.name`, `gen_ai.request.model`, `afakt.effort`, `afakt.agent_launch.state`, `afakt.agent_launch.reason`, `afakt.label.task_class`, `afakt.label.variant`, and `afakt.label.role`.
+- **Agent launch metric attributes.** `afakt.profile.source`, `afakt.profile.name`, `afakt.harness.name`, `afakt.harness.transport`, `gen_ai.provider.name`, `gen_ai.request.model`, `afakt.effort`, `afakt.agent_launch.state`, `afakt.agent_launch.reason`, `afakt.label.task_class`, `afakt.label.variant`, and `afakt.agent_launch.role.name`.
 - **Hook metric attributes.** `afakt.hook.event`, `afakt.hook.source`, `afakt.hook.outcome`, and `afakt.profile.name`. `afakt.hook.name` appears only for a hook from the profile.
 - **Image build metric attributes.** `afakt.profile.source`, `afakt.profile.name`, `afakt.workspace.image.build.trigger`, and `afakt.workspace.image.build.result`. These use the same bounded catalog profile names and `other` rule as agent launch metrics.
 - **Usage metric attributes.** `gen_ai.operation.name` as `invoke_agent`, `gen_ai.provider.name`, `gen_ai.request.model`, `afakt.profile.name`, and `afakt.harness.name`.
@@ -254,7 +255,7 @@ A metric attribute takes values from a set that a deployment's configuration bou
 - Environment names and values
 - Error messages and any free text
 
-afakt records an attribute value outside its enumerated set as `other`. Labels count as bounded because each deployment defines its task classes, variants, and roles, and the names of catalog profiles and their hooks count as bounded too, unlike those of repository profiles. A metric records the name of a repository profile, and each hook name in it, as `other`.
+afakt records an attribute value outside its enumerated set as `other`. Labels count as bounded because each deployment defines its task classes and variants. Launch IAM role names require an enumerated set. Other names become `other`. The names of catalog profiles and their hooks count as bounded too, unlike those of repository profiles. A metric records the name of a repository profile, and each hook name in it, as `other`.
 
 ## What telemetry never records
 

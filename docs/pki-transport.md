@@ -13,14 +13,14 @@ Transport Layer Security (TLS) authenticates service connections separately from
 
 ## Overlay credentials
 
-The cluster overlay uses isolated coordination, separate launch and service nodes, and relays. In the control plane, the coordination interface uses a presented SVID to register nodes and issue single-use tagged pre-authentication keys. It also sets tags and access rules and deletes nodes. See [Coordination interface](workload-overlay.md#Coordination%20interface). Designated Encrypted Relay for Packets (DERP) provides the relay role. Overlay high availability (HA), expiry behavior, and propagation remain [undecided](agent-open-questions.md#%60OQ-HST-10%60).
+The cluster overlay uses isolated coordination, separate launch and service nodes, and relays. In the control plane, the coordination interface uses a presented SVID to register nodes and issue single-use tagged pre-authentication keys. It also sets tags and access rules and deletes nodes. See [Coordination interface](workload-overlay.md#Coordination%20interface). Designated Encrypted Relay for Packets (DERP) provides the relay service. Overlay high availability (HA), expiry behavior, and propagation remain [undecided](agent-open-questions.md#%60OQ-HST-10%60).
 
 | Material and purpose | Private custody | Issuer, verifier, and trust anchor | Other undecided fields |
 | --- | --- | --- | --- |
 | `KT-01` Coordinator private keys. Authenticate overlay coordination. | Coordinator. | Coordinator generates keys that nodes verify. | Key kinds and initial coordinator anchor. |
 | `KT-02` Launch node keys. Authenticate one launch overlay node. | Workload proxy outside the guest. | Keys originate at the node. Coordinator and overlay peers verify under node registration. | Node registration. |
 | `KT-03` Host node keys. Authenticate host-level overlay membership. | Host-level node outside agent confinement. | Node generates. Coordinator and peers verify under host registration. | Host registration. |
-| `KT-04` Control plane node keys. Authenticate each service instance in its role. | Each service node. | Node generates. Service registration governs verification by the coordinator and peers. | Service registration. |
+| `KT-04` Control plane node keys. Authenticate each service instance. | Each service node. | Node generates. Service registration governs verification by the coordinator and peers. | Service registration. |
 | `KT-05` Single-use pre-authentication keys. Enroll a node with authorized tags. | Coordination interface and enrolling node. | Coordination interface issues against an SVID. Coordinator verifies. | Bootstrap anchor, expiry, and invalidation. |
 | `KT-06` DERP relay private key. Identify the relay protocol endpoint. | Relay. | Undecided. | Relay key generation, peer verification, and anchor. |
 | `KT-07` DERP TLS certificate and key. Authenticate the relay transport endpoint. | Relay TLS terminator. | Undecided. | Certificate issuer, verifier profile, and transport anchor. |

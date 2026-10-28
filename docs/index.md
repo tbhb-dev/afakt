@@ -18,7 +18,7 @@ okf_version: "0.2"
 
 * [Agents](agent.md) - Durable agent identity, configuration, owned resources, and operations across agent launches.
 * [Agent lifecycle](agent-lifecycle.md) - Agent, launch, and session states from creation through suspension, capture, restoration, and deletion.
-* [Workload host](workload-host.md) - A machine's role in the agent fleet, its agent launch services, trust boundary, and recovery behavior.
+* [Workload host](workload-host.md) - A machine's responsibilities in the agent fleet, its agent launch services, trust boundary, and recovery behavior.
 * [Agent launch](agent-launch.md) - One instantiation of an agent in an agent sandbox on a workload host, with lifecycle, retries, placement, and cleanup.
 * [Agent launch model](agent-launch-model.md) - The fields and identity of each agent launch, who sets them, which never change, and the provenance record and evidence.
 * [Agent launch contract](agent-launch-contract.md) - The agent launch spec, the agent launch result, and the provision, restore, release, status, cancel, and result operations of a workload provider.
@@ -36,7 +36,7 @@ okf_version: "0.2"
 * [Workload guest](workload-guest.md) - Guest routing, containment, and its private proxy link.
 * [Workload proxy](workload-proxy.md) - Workload traffic, direct overlay connections, and mutual authentication.
 * [Agent session](agent-session.md) - An agent's durable conversation, retained transcripts, and session workflow.
-* [Agent ACP](agent-acp.md) - Agent Client Protocol connections, message policy, turns, and writer and reader roles.
+* [Agent ACP](agent-acp.md) - Agent Client Protocol connections, message policy, turns, and writer and reader access.
 * [Agent session attachment](agent-session-attachment.md) - Session attachment, history replay, and signed agent messages.
 * [Workload sandbox](workload-sandbox.md) - The sandbox configuration, sandbox variables, credential brokering, and authentication of an agent launch.
 * [Workload proxy mediator](workload-proxy-mediator.md) - Per-launch guest connections, network policy, and control requests.

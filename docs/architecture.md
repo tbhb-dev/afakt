@@ -9,7 +9,7 @@ generated: { by: "claude-code:claude-opus-5-5", at: "2026-10-25T11:44:54Z" }
 
 # Architecture
 
-afakt is a modular monolith. One binary contains every component in [Components](components.md), and `afakt server --target=api|webhook|dashboard|worker|all` selects which runtime roles a process takes on.
+afakt is a modular monolith. One binary contains every component in [Components](components.md), and `afakt server --target=api|webhook|dashboard|worker|all` selects which runtime services a process runs.
 
 The `all` target combines the API, webhook receiver, dashboard, and worker in one process. The API, webhook receiver, dashboard, and embedded Temporal Web UI share the process's HTTP listener. With embedded Temporal, the combined process runs without external services or an operational store.
 

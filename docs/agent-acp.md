@@ -1,7 +1,7 @@
 ---
 type: Design
 title: Agent ACP
-description: Agent Client Protocol connections, message policy, turns, session logs, and writer and reader roles.
+description: Agent Client Protocol connections, message policy, turns, session logs, and writer and reader access.
 tags: [afakt, agents, acp, sessions]
 status: draft
 generated: { by: "codex:gpt-6", at: "2026-10-28T17:30:00Z" }
@@ -57,7 +57,7 @@ Clients connect at `/acp`. Through that endpoint, the ingress gateway accepts wr
 | `session/cancel`                | Cancels the current turn as the writer.                                                       |
 | `session/close`                 | Closes the session.                                                                           |
 | `_afakt/session/take_writer`    | Makes the caller the session's writer.                                                        |
-| `_afakt/session/release_writer` | Gives up the writer role.                                                                     |
+| `_afakt/session/release_writer` | Stops being the writer.                                                                     |
 
 For clients that don't speak ACP, the API server also offers the same session operations as Representational State Transfer (REST) resources through the ingress gateway.
 
@@ -65,19 +65,19 @@ The API server exposes per-agent remote-control and ACP routes through the ingre
 
 ## Writer and readers
 
-The enforcement owner remains [open](agent-open-questions.md#%60OQ-SES-18%60). The role requirements apply independently of that owner.
+The enforcement owner remains [open](agent-open-questions.md#%60OQ-SES-18%60). The access requirements apply independently of that owner.
 
-How concurrent clients map to one launch's ACP stream while preserving these roles and request correlation remains [open](agent-open-questions.md#%60OQ-SES-20%60).
+How concurrent clients map to one launch's ACP stream while preserving writer and reader access and request correlation remains [open](agent-open-questions.md#%60OQ-SES-20%60).
 
 - Every client attached to the agent session receives every permitted `session/update` notification of the session, within the workload proxy mediator's size and rate bounds for ACP updates.
-- Only the writer sends prompts and cancels turns. Answering permission and elicitation requests and changing session modes and configuration options also require that role. afakt rejects these messages from a reader.
-- A client becomes the writer by taking the role. Taking it from another client requires the `sessions.write` capability and moves the role at once.
+- Only the writer sends prompts and cancels turns. Answering permission and elicitation requests and changing session modes and configuration options also require the client to be the writer. afakt rejects these messages from a reader.
+- A client becomes the writer by taking writer control. Taking it from another client requires the `sessions.write` capability and transfers control at once.
 - Without an attached writer, prompts from people with `sessions.write` still queue for delivery when the agent goes idle. Queue ownership remains [`OQ-SES-14`](agent-open-questions.md#%60OQ-SES-14%60).
 - Each prompt specifies its author in `_meta`, and commits and pull requests from the session credit that author.
 
 ## Agent launch attachment
 
-People with read access may attach to a running workflow-controlled [ACP agent launch](agent-acp.md#Agent%20launches%20over%20ACP) as readers through the same endpoint. Its only writer is the agent launcher workflow. afakt rejects attempts by an attached client to take the writer role, submit prompts, cancel turns, close the session, answer agent requests, or change modes or configuration options. Headless attachment remains [`OQ-SES-16`](agent-open-questions.md#%60OQ-SES-16%60).
+People with read access may attach to a running workflow-controlled [ACP agent launch](agent-acp.md#Agent%20launches%20over%20ACP) as readers through the same endpoint. Its only writer is the agent launcher workflow. afakt rejects attempts by an attached client to become the writer, submit prompts, cancel turns, close the session, answer agent requests, or change modes or configuration options. Headless attachment remains [`OQ-SES-16`](agent-open-questions.md#%60OQ-SES-16%60).
 
 For workflow-controlled agent launches, the relay answers `session/request_permission` from the profile's agent harness permissions and cancels each `elicitation/create`. No person answers either request. The writer transfer, prompt queue, and request forwarding rules for interactive sessions don't apply to workflow-controlled agent launches.
 
@@ -97,7 +97,7 @@ For each ACP message, the workload proxy mediator applies its policy. Both direc
 
 ## Session message log
 
-Session history requires a retained message log and replay for attached clients. Which component retains that log and enforces [writer and reader roles](#Writer%20and%20readers), and how replay works, remains [open](agent-open-questions.md#%60OQ-SES-18%60). [Replay cursor recovery](agent-open-questions.md#%60OQ-ATT-5%60) remains open independently of the owner. See [History and replay](agent-session-attachment.md#History%20and%20replay).
+Session history requires a retained message log and replay for attached clients. Which component retains that log and enforces [writer and reader access](#Writer%20and%20readers), and how replay works, remains [open](agent-open-questions.md#%60OQ-SES-18%60). [Replay cursor recovery](agent-open-questions.md#%60OQ-ATT-5%60) remains open independently of the owner. See [History and replay](agent-session-attachment.md#History%20and%20replay).
 
 Workload identities use the provisional lifetimes and half-life renewal in [Certificate policies](pki.md#Certificate%20policies), subject to [`OQ-HOOK-18`](agent-open-questions.md#%60OQ-HOOK-18%60).
 

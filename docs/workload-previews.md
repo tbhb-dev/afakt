@@ -50,7 +50,7 @@ Previews never pass afakt credentials to the app. Before forwarding, the preview
 
 ## Host browser access
 
-Through the workload host's DNS, the operator's browser resolves an internal preview name and requests access under host-level authorization. Using host authority, the host connectivity role reaches the preview server. Names for published services and ports cross the same boundary. Any further authentication belongs to the accessed app. The local connection and caller-authentication mechanisms remain [undecided](agent-open-questions.md#%60OQ-HST-9%60).
+Through the workload host's DNS, the operator's browser resolves an internal preview name and requests access under host-level authorization. Using host authority, the host-level network service reaches the preview server. Names for published services and ports cross the same boundary. Any further authentication belongs to the accessed app. The local connection and caller-authentication mechanisms remain [undecided](agent-open-questions.md#%60OQ-HST-9%60).
 
 As a service client, the preview server dials the workload proxy over the overlay using SPIFFE mutual Transport Layer Security (TLS). The proxy requests an inbound connection decision from its mediator, accepting only the ingress gateway and the peers its ingress rules name, and only for the ports those rules publish. Publication and launch checks remain required. Their [binding to the guest listener](agent-open-questions.md#%60OQ-PORT-14%60) remains open. No direct route connects the browser to a guest or its proxy.
 
@@ -60,7 +60,7 @@ See the [host browser preview flow](network-topology.md#Operator%20browser%20to%
 
 ## Sessions and clients
 
-The web client and chat bridges show an agent session's forwarded ports and preview links as they appear, change, or close. Preview links open beside the session in a browser tab. Users with session read access can use the ports. The writer role isn't required. A chat message contains a link, never an afakt credential or a share-link secret unless a user explicitly creates that share link for sharing.
+The web client and chat bridges show an agent session's forwarded ports and preview links as they appear, change, or close. Preview links open beside the session in a browser tab. Users with session read access can use the ports without being the writer. A chat message contains a link, never an afakt credential or a share-link secret unless a user explicitly creates that share link for sharing.
 
 Previews use afakt sign-in and the session's access checks, with expiring, revocable share links for one port. Raw Transmission Control Protocol (TCP) access requires an [authenticated afakt client tunnel](workload-ports.md#TCP%20client%20tunnels).
 
@@ -84,7 +84,7 @@ Each port's agent launch-specific host name appears beneath that configured prev
 
 afakt runs embedded Tailscale nodes through `tsnet` in the API server process, with Funnel listeners feeding the ingress gateway's listener for previews. For enrollment, the operator supplies credentials and enables DNS and Hypertext Transfer Protocol Secure (HTTPS) for the tailnet. The operator grants Funnel permission to those nodes in the tailnet policy. Funnel uses the tailnet's domain for its public names. See [Tailscale Funnel](https://tailscale.com/docs/features/tailscale-funnel) and [the embedded server API](https://tailscale.com/docs/reference/tsnet-server-api).
 
-Each preview needs its own site root and a route bound to its publication record. Closing the record withdraws its public route. Whether Funnel supplies these names through one embedded node per preview remains [`OQ-PORT-4`](agent-open-questions.md#%60OQ-PORT-4%60). Publishing the API and dashboard listener preserves its separate origin. The provider reports a publication failure when enrollment, naming, or Funnel policy prevents it from serving a required preview host.
+Each preview needs its own site root and a route bound to its publication record. Closing the record withdraws its public route. Whether Funnel supplies these names through one embedded node per preview remains [`OQ-PORT-4`](agent-open-questions.md#%60OQ-PORT-4%60). Publishing the API and dashboard listener preserves its separate origin. The tunnel provider reports a publication failure when enrollment, naming, or Funnel policy prevents it from serving a required preview host.
 
 ## Telemetry
 

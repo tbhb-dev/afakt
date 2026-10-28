@@ -58,7 +58,7 @@ rectangle "==AI coding agents\n<size:16>[Software System]</size>\n\nPerform codi
 rectangle "==External Temporal\n<size:16>[Software System]</size>\n\nProvides durable execution when workers use an external server." <<Element-RWxlbWVudA==>> as ExternalTemporal
 
 rectangle "afakt\n<size:16>[Software System]</size>" <<Boundary-YWZha3Q=>> {
-  rectangle "==afakt process\n<size:16>[Container: Go]</size>\n\nRuns the selected runtime roles together or separately from the same binary." <<Element-RWxlbWVudA==>> as afakt.afaktprocess
+  rectangle "==afakt process\n<size:16>[Container: Go]</size>\n\nRuns the selected runtime services together or separately from the same binary." <<Element-RWxlbWVudA==>> as afakt.afaktprocess
 }
 
 Developerortester --> afakt.afaktprocess <<Relationship-UmVsYXRpb25zaGlw>> : "Runs commands\n<size:16>[CLI]</size>"
