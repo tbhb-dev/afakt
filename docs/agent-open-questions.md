@@ -1101,7 +1101,7 @@ Which conditions must the private guest-to-proxy link meet on every platform? Th
 
 ### `OQ-SBX-71`
 
-Which component manages the workload lifecycle, and what are its states? A workload can exist without a launch or workspace. It runs exactly one agent launch, and afakt destroys it afterwards. A follow-up or relaunch uses a new workload. See [Lifecycle](workload.md#Lifecycle).
+Does the workload host worker or the control plane manage the workload lifecycle, or does a workflow own it? Are `provisioning`, `ready`, `bound`, `draining`, and `terminated` the right states, and which observations permit each transition? How do failure conditions, app and worker readiness, and reclaim completion fit? An agent workload runs one agent launch before afakt destroys it. See [States and transition authority](workload-lifecycle.md#States%20and%20transition%20authority).
 
 ## Agent MCP gateway
 
@@ -1244,3 +1244,25 @@ What administrative commands, permissions, audit guarantees, metrics, alert thre
 ### `OQ-PKI-11`
 
 How are inbound and outbound webhook signing secrets provisioned, stored, rotated, and revoked? Which keyed hash algorithm, secret size, signed fields, delivery identity, replay window, and overlap rule apply to each workload provider and destination? See [Webhook authentication](pki-signing.md#Webhook%20authentication).
+
+## Workload resources
+
+### `OQ-RES-4`
+
+What wire keys, required fields, revision identifiers, and concurrency rules represent Workload and its lifecycle conditions? The reference schema uses `guest_image` and `agent_host`. It lists sequential launches but lacks `type` and a workload template version. Creation-time terminology and the single-launch rule require a different representation. See [Workload resource](workload-resource.md).
+
+### `OQ-WLD-1`
+
+How do workload creation, claims, and warm preparation relate? What selects the pool key, and when are namespace, type, role, and identities assigned? The proposal to key pools by workload template and the warm-guest model need one contract. See [Workload resource](workload-resource.md#Specification%20keys).
+
+### `OQ-WLD-2`
+
+What are the lifetimes of apps and workers that run user code, restart caps, backoff, replacement rules, and drain observations? The one-agent-launch rule doesn't define them. How does a version of a worker deployment retire without admitting new tasks? See [Workload lifecycle](workload-lifecycle.md).
+
+### `OQ-WLD-3`
+
+Which capture can restore a follow-up onto a new workload? How do agent snapshots, workload snapshots, paired checkpoints, retention, and compatibility with a workload host interact? Portable agent capture and VM restoration imply different compatibility checks for a follow-up, which the capture contents alone don't settle. See [Suspend and resume](workload-lifecycle.md#Suspend%20and%20resume).
+
+### `OQ-WLD-4`
+
+Does a workload own capacity independently of an agent launch, and how are app and user code worker allocations reserved and reclaimed? How does the capacity and budget proposal extend the launch slot contract without counting one allocation twice? See [Failure and reclaim](workload-lifecycle.md#Failure%20and%20reclaim).

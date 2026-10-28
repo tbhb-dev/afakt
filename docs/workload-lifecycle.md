@@ -1,19 +1,41 @@
 ---
 type: Design
 title: Workload lifecycle
-description: Provisioning, readiness, suspension, restoration, and teardown of agent sandboxes across providers.
-tags: [afakt, agents, sandbox, lifecycle]
+description: Workload states, transition proposals, observations, failure paths, and single-launch destruction.
+tags: [afakt, workload, resources]
 status: draft
-generated: { by: "codex:gpt-6", at: "2026-10-28T17:30:00Z" }
+generated: { by: "codex:gpt-6", at: "2026-10-28T22:38:36Z" }
 ---
 
 # Workload lifecycle
 
-[Public key infrastructure](pki.md).
+For an agent [workload](workload-resource.md), afakt destroys the execution context after its single launch. Workload state describes that context independently of the launch result. Apps and workers that run user code don't bind an agent. Their replacement and drain rules remain [`OQ-WLD-2`](agent-open-questions.md#%60OQ-WLD-2%60).
 
-For one agent launch, the workload provider manages provisioning, restoration, and release. Launch states record provider observations separately from [agent states](agent-lifecycle.md#Agent%20states) and [session states](agent-lifecycle.md#Session%20states). A virtual machine (VM) has lifecycle control independent of the Agent Client Protocol (ACP) and the guest.
+The contract applies to every Tier 1 cell: `linux-host`, `linux-vm`, and `docker-engine` on `linux/amd64` and `linux/arm64`, `macos-host` and `macos-vm` on `darwin/arm64`, and `windows-host` and `windows-vm` on `windows/amd64`. Provider capabilities determine the available operations, without changing creation-time immutability. See the [platform support matrix](https://github.com/tbhb-dev/afakt-drafts/blob/2c4a19dc30ae73d3597fbc6c7be1d8a93e391023/workloads/workload-platform-support.md).
 
-[Deletion and teardown](agent-workspace-lifecycle.md#Deletion%20and%20teardown).
+## States and transition authority
+
+The proposed states are `provisioning`, `ready`, `bound`, `draining`, and `terminated`. Ownership remains undecided between the workload host worker and control plane, with a workflow as another candidate. [`OQ-SBX-71`](agent-open-questions.md#%60OQ-SBX-71%60) covers ownership and transitions. Requested transitions and workload provider observations have distinct drivers in this proposal.
+
+| From | To | Proposed driver and evidence |
+| --- | --- | --- |
+| Creation | `provisioning` | Control plane admits creation. The workload host worker starts the selected workload provider. |
+| `provisioning` | `ready` | Worker reports the selected workload provider's readiness. |
+| `ready` | `bound` | Control plane accepts the one-shot agent binding. The worker observes it. This transition applies to agent workloads. |
+| `provisioning`, `ready`, or `bound` | `draining` | Lifecycle owner requests teardown after a failure, cancellation, or completed launch. The worker performs teardown. |
+| `draining` | `terminated` | Workload provider observations establish that execution stopped and reclaim completed. |
+
+Failure conditions record the cause while teardown proceeds. Whether failure has its own state, how app and worker readiness differs from agent binding, and which observations complete reclaim remain [`OQ-SBX-71`](agent-open-questions.md#%60OQ-SBX-71%60). No transition returns a used agent workload to `ready`.
+
+![Proposed workload states, with observed readiness and reclaim and an undecided lifecycle owner](workload-lifecycle.d2.svg)
+
+## Failure and reclaim
+
+Losing contact proves nothing about termination. On reconnect, the workload host worker reconciles surviving execution before reporting state, preserving the last observation and its freshness until it can observe again. Neither a timeout nor a lease expiry proves that execution ended, even after an acknowledged stop request. Whole-machine restart and a workload host that never returns remain [`OQ-HST-1`](agent-open-questions.md#%60OQ-HST-1%60) and [`OQ-SBX-71`](agent-open-questions.md#%60OQ-SBX-71%60).
+
+Retries can't adopt a workload that already ran a different launch because each new agent launch needs a new workload. Releasing capacity requires observed release. The ownership of workload capacity versus launch slots remains [`OQ-WLD-4`](agent-open-questions.md#%60OQ-WLD-4%60). For host modes, termination authority remains [`OQ-SBX-57`](agent-open-questions.md#%60OQ-SBX-57%60), without settling the held baseline for host isolation [`OQ-SBX-18`](agent-open-questions.md#%60OQ-SBX-18%60).
+
+The proposal follows [workload design question 8](https://github.com/tbhb-dev/afakt-drafts/blob/2c4a19dc30ae73d3597fbc6c7be1d8a93e391023/workloads/workload-design.md#Open%20questions). [S-073](https://github.com/tbhb-dev/afakt-spikes/blob/23716546c0a7ff73d2f630a53cdd1c8bf55fb785/s-073-what-is-the-execution-backend-contract-that-covers-vm/REPORT.md) tests backend capabilities in a synthetic fixture. Workload lifecycle ownership remains open.
 
 ## Agent launch lifecycle
 
@@ -108,7 +130,7 @@ Terminal transitions require [provider observations](workload-lifecycle.md#Workl
 
 ## Startup and readiness
 
-For the hypervisor workload provider, native start reaches the agent sandbox-ready stage. Agent harness startup follows separately. Suspend, resume, stop, `kill`, and workload snapshot operations go through the workload host's supervisor and hypervisor. They never go through ACP or the guest. No guest or session policy can block lifecycle control. Filesystem freezing keeps VM state consistent with the workspace disk delta when afakt takes a workload snapshot and an agent checkpoint together at an idle turn boundary. The agent harness takes its agent checkpoint of session state. Capture doesn't grant the guest authority over host lifecycle operations. Host modes and container managers have no workload snapshot.
+The workload provider observes the execution context and the workload proxy boundary before reporting readiness. Starting a virtual machine (VM) doesn't prove that the agent harness is ready. The readiness observations for each workload type remain [`OQ-SBX-71`](agent-open-questions.md#%60OQ-SBX-71%60). VM lifecycle control stays outside the guest and the Agent Client Protocol (ACP).
 
 ## Workload provider observations
 
@@ -133,15 +155,13 @@ These rules apply to all providers:
 
 ## Suspend and resume
 
-A virtual machine alone doesn't establish capture or restore support. Eligibility and captured state remain [`OQ-AGT-1`](agent-open-questions.md#%60OQ-AGT-1%60) and [`OQ-AGT-3`](agent-open-questions.md#%60OQ-AGT-3%60).
+Capture contents distinguish workload snapshots (VM memory plus disk) from portable agent snapshots (workspace and harness layers). Workspace snapshots contain disk only. Harness snapshots contain harness configuration and state. Native agent checkpoints remain separate. Capture eligibility and pairing remain [`OQ-AGT-1`](agent-open-questions.md#%60OQ-AGT-1%60) and [`OQ-AGT-3`](agent-open-questions.md#%60OQ-AGT-3%60). Whether a follow-up restores an agent snapshot instead of a workload snapshot remains [`OQ-WLD-3`](agent-open-questions.md#%60OQ-WLD-3%60). It always uses a new workload and a new agent launch.
 
-For a VM provider that supports paired capture, afakt takes a workload snapshot and an agent checkpoint together at the same idle turn boundary. The workload snapshot captures VM state, while the agent harness takes its own checkpoint of session state. The guest filesystem is frozen for capture so the workspace disk delta and session state agree. Credentials and broker state stay outside the guest and both captures.
-
-In the object store, the workload provider retains the workload snapshot and agent checkpoint data. Resume creates a new agent launch linked to its predecessor. It restores VM state from the snapshot and harness session state from the checkpoint. It preserves guest paths and reacquires credentials outside the guest. It must recheck port publications and channels. Which process state, compatibility constraints, and placement rules allow restoration on another workload host remain [open](agent-open-questions.md#Agents). Host modes and container managers have no workload snapshot. Their rewind and resume behavior remains [open](agent-open-questions.md#%60OQ-AGT-28%60).
+Host providers and container manager providers have no workload VM memory to capture. Their restoration contract remains [`OQ-AGT-28`](agent-open-questions.md#%60OQ-AGT-28%60). Warm preparation and the boundary at which a workload exists remain [`OQ-WLD-1`](agent-open-questions.md#%60OQ-WLD-1%60).
 
 ## Virtual machine lifecycle
 
-The workload host supervisor and virtual machine monitors control the VM lifecycle independently of ACP and the guest. This path supplies start, suspend, resume, stop, `kill`, and workload snapshot control. A workload snapshot captures VM state and exists only where the agent runs in a VM. Where harness session state must agree with VM state, afakt takes a workload snapshot and an agent checkpoint together at an idle turn boundary. Session state checkpoints are the agent harness's responsibility. Restoration in host modes and container managers remains [open](agent-open-questions.md#%60OQ-AGT-28%60). The supervisor verifies a forced VM stop even if the guest or the mediator's ACP policy checks don't respond. Graceful process signals and bounded hooks don't give the guest authority to block that fallback.
+On the workload host, the supervisor controls VM start, suspend, resume, stop, forced stop, and capture independently of ACP and the guest. It verifies a forced stop even when the guest doesn't respond. Graceful process signals and bounded hooks give the guest no authority to block that fallback. Capture and restoration require explicit workload provider capabilities. A VM alone doesn't establish them.
 
 ## Workload provider lifecycle contracts
 

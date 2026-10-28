@@ -1,0 +1,14 @@
+direction: right
+title: "Workload lifecycle proposal — owner undecided (OQ-SBX-71)" {shape: text}
+provisioning: Provisioning
+ready: Ready
+bound: Bound to one agent launch
+draining: Draining
+terminated: Terminated
+provisioning -> ready: Worker observes readiness
+ready -> bound: Control plane accepts agent binding
+bound -> draining: Launch ends or stop requested
+provisioning -> draining: Failure or cancellation
+ready -> draining: Stop requested
+draining -> terminated: Provider observes stop and reclaim
+note: "App and worker transitions remain open. Lost contact never proves termination." {shape: text}
