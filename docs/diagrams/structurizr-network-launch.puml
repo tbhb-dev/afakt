@@ -71,7 +71,7 @@ rectangle "Workload host trust boundary\n<size:16>[Deployment Node: Workload hos
 
 rectangle "Control plane trust boundary\n<size:16>[Deployment Node: Cluster overlay]</size>" <<DeploymentNode-RWxlbWVudCxEZXBsb3ltZW50IE5vZGU=>> as Topologylaunch.Controlplanetrustboundary {
   rectangle "API service node\n<size:16>[Deployment Node: tsnet node]</size>" <<DeploymentNode-RWxlbWVudCxEZXBsb3ltZW50IE5vZGU=>> as Topologylaunch.Controlplanetrustboundary.APIservicenode {
-    rectangle "==API server and web dashboard\n<size:16>[Container: Application service]</size>\n\nAuthorizes operations and serves the dashboard from its own origin." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as Topologylaunch.Controlplanetrustboundary.APIservicenode.APIserverandwebdashboard_1
+    rectangle "==API server and web dashboard\n<size:16>[Container: Application service]</size>\n\nAuthorizes workload creation using workload templates and workload images; serves the dashboard from its own origin." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as Topologylaunch.Controlplanetrustboundary.APIservicenode.APIserverandwebdashboard_1
   }
 
 }

@@ -133,3 +133,6 @@ generated: { by: "codex:gpt-6", at: "2026-10-28T17:30:00Z" }
 - **Remote sandbox provider**: a workload provider that runs the workload in a remote sandbox service. See [Sandbox modes](workload-sandbox.md#Sandbox%20modes).
 - **Hosted agent provider**: a workload provider that runs an agent in a hosted agent service. See [Sandbox modes](workload-sandbox.md#Sandbox%20modes).
 - **Workload lifecycle**: the execution context's observed states and reclaim path, separate from agent launch results. Its owner remains open. See [Workload lifecycle](workload-lifecycle.md).
+- **Workload image**: the execution image selected at workload creation. Its form depends on the workload provider kind. See [Workload image](workload-image.md).
+- **Workload template**: the resource holding workload creation settings. A workload records the template version it uses. See [Workload template](workload-template.md).
+- **Workload type**: the agent, app, or worker classification in the workload's `type` field, distinct from its IAM role. See [Workload resource](workload-resource.md).

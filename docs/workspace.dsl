@@ -25,7 +25,7 @@ workspace "afakt" "Architecture of the afakt modular monolith." {
             }
 
             group "Control plane services" {
-                controlApi = container "API server and web dashboard" "Authorizes operations and serves the dashboard from its own origin." "Application service" "Topology"
+                controlApi = container "API server and web dashboard" "Authorizes workload creation using workload templates and workload images; serves the dashboard from its own origin." "Application service" "Topology"
                 previewServer = container "Preview server" "Dials workload proxies over the overlay; published-port listener binding remains open." "Application service" "Topology"
                 mcpGateway = container "MCP gateway" "Checks launch tool grants and keeps upstream credentials outside guests." "Application service" "Topology"
                 staticOrigin = container "Static origin" "Serves static site and single-page app deploys from local copies of their files; keeps no cache." "Caddy" "Topology"

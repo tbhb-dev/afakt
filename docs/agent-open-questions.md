@@ -1266,3 +1266,15 @@ Which capture can restore a follow-up onto a new workload? How do agent snapshot
 ### `OQ-WLD-4`
 
 Does a workload own capacity independently of an agent launch, and how are app and user code worker allocations reserved and reclaimed? How does the capacity and budget proposal extend the launch slot contract without counting one allocation twice? See [Failure and reclaim](workload-lifecycle.md#Failure%20and%20reclaim).
+
+### `OQ-RES-5`
+
+What wire keys, required fields, and version metadata represent WorkloadTemplate? The reference schema uses `guest_image` and `agent_host`. Its fields omit `type` and version metadata. Status is empty despite the preparation proposal. How do the canonical creation fields and preparation observations map to the resource? See [Workload template resource](workload-template-resource.md).
+
+### `OQ-WLD-5`
+
+How do workload template versions, edits, parameters, defaults, host constraints, and catalog visibility work? Which reference pins the version, and what keeps earlier versions available for existing workloads? How do preparation levels, refresh, and invalidation relate to versions without deciding the pool and claim boundary in `OQ-WLD-1`? See [Creation and versioning](workload-template.md#Creation%20and%20versioning).
+
+### `OQ-WLD-6`
+
+What are the workload image formats, payload keys, artifact digests, admission checks, compatibility declarations, and retention rules for each workload provider kind? The first build needs a guest image and a binding between its kernel and disk. Does an app release image serve directly as the workload image on some targets? The reference schemas omit WorkloadImage, and S-142 doesn't qualify boot and restoration across Tier 1 cells. See [Workload image](workload-image.md) and [Workload image resource](workload-image-resource.md).

@@ -97,7 +97,7 @@ skinparam {
 
 rectangle "afakt\n<size:16>[Software System]</size>" <<Boundary-YWZha3Q=>> {
   rectangle "Control plane services" <<Group-Q29udHJvbCBwbGFuZSBzZXJ2aWNlcw==>> as group6 {
-    rectangle "==API server and web dashboard\n<size:16>[Container: Application service]</size>\n\nAuthorizes operations and serves the dashboard from its own origin." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.APIserverandwebdashboard
+    rectangle "==API server and web dashboard\n<size:16>[Container: Application service]</size>\n\nAuthorizes workload creation using workload templates and workload images; serves the dashboard from its own origin." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.APIserverandwebdashboard
   }
 
   rectangle "Launch guest boundary" <<Group-TGF1bmNoIGd1ZXN0IGJvdW5kYXJ5>> as group7 {
