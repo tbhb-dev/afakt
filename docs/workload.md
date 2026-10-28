@@ -15,7 +15,7 @@ A workload consists of its execution context, the workload proxy mediator, the w
 
 A workload records its type, role, workload image, execution mode, shape, workload host, namespace, and workload template version at creation. The `type` field classifies it as agent, app, or worker. A role groups Identity and Access Management (IAM) policies under a name. The workload gets its role at creation and pins it as an immutable parameter, like an IAM instance profile on an EC2 instance.
 
-A workload template stores the creation-time fields. Workload template commands live under `afakt workload template`. An agent profile supplies the configuration for an agent launch.
+The [Workload resource](workload-resource.md) records these immutable fields. A workload template stores the creation-time fields. Workload template commands live under `afakt workload template`. An agent profile supplies the configuration for an agent launch.
 
 ## Components
 
@@ -40,4 +40,4 @@ Over the [overlay](workload-overlay.md), workload proxies connect directly, each
 
 ## Lifecycle
 
-A workload runs exactly one agent launch, and afakt destroys it afterwards. A follow-up or relaunch is a new launch on a new workload. The [lifecycle owner and states](agent-open-questions.md#%60OQ-SBX-71%60) remain open.
+An agent workload runs exactly one agent launch, and afakt destroys it afterwards. App and user code worker lifetimes remain [open](agent-open-questions.md#%60OQ-WLD-2%60). A follow-up or relaunch is a new launch on a new workload. The [lifecycle owner and states](agent-open-questions.md#%60OQ-SBX-71%60) remain open.

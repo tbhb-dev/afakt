@@ -85,3 +85,7 @@ okf_version: "0.2"
 # Glossary
 
 * [Glossary](glossary.md) - Short definitions of afakt's terms, each linked to the section that describes it.
+
+## Workload resources
+
+* [Workload resource](workload-resource.md) - Immutable creation fields and lifecycle observations.

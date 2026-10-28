@@ -23,14 +23,6 @@ The ACP relay is the [guest relay](#Guest%20relay) inside the workload guest. It
 
 Through the built-in afakt Model Context Protocol (MCP) server, an agent can start a child agent launch or session and message another session. It can also read agent launch status and results or declare a forwarded port. Each call uses the calling agent launch's capabilities and scopes, and profiles allowlist these tools like any upstream server. See [Built-in afakt MCP server](agent-mcp-gateway.md#Built-in%20afakt%20MCP%20server).
 
-## Workload host worker
-
-The workload host worker is the daemon that runs the agent launcher workflow on a workload host and connects that host to the control plane. It registers capacity and polls its host task queue. The worker also reconciles agent launch records. It stays outside launch data paths, including traffic between launches on its host. Each host also supplies [host-level name resolution and connectivity](workload-overlay.md#Workload%20host%20access). See [Workload host](workload-host.md). [Workload host caches and startup](agent-workspace-lifecycle.md#Workload%20host%20caches%20and%20startup).
-
-## Workload proxy mediator
-
-Each workload's proxy mediator decides every inbound and outbound connection without transmitting traffic. It controls guest Domain Name System (DNS) resolution through the proxy with no host fallback and stamps launch identity on control requests. Its control plane connections pass through its proxy under a fixed rule set that neither the launch's policy nor the guest can change. See [Workload proxy mediator](workload-proxy-mediator.md) and [ACP message policy](agent-acp.md#ACP%20message%20policy).
-
 ## Agentmail
 
 Agentmail manages messages addressed to durable agents. These include incoming and outgoing mail. Delivery and signing semantics remain [open](agent-open-questions.md#Agents). See [Agentmail, groups, and subscriptions](agent.md#Agentmail,%20groups,%20and%20subscriptions).
@@ -91,10 +83,6 @@ The object store supplies the S3 API compatible endpoint used by the registry an
 
 An overlay node represents one workload proxy, workload host, or control plane service instance in the isolated cluster overlay. Service instances share a service tag but keep separate node identities. Guests aren't nodes. See [Overlay transport](workload-overlay.md#Overlay%20transport).
 
-## Workload proxy
-
-Each workload's proxy transmits guest traffic in both directions and requests a mediator decision for each connection. It has its own overlay node and holds the launch's X.509 SPIFFE Verifiable Identity Document (SVID) and private key outside the guest. The ingress gateway and permitted peers dial it directly with SPIFFE mutual TLS. For inspected outbound destinations, it ends TLS under mediator decisions using a per-workload certificate authority trusted by the guest. The credential broker injects credentials there, outside the guest. See [Workload proxy](workload-proxy.md).
-
 ## Port forwarder
 
 Port forwarding requires authorization of the current publication and agent launch before reaching a guest loopback listener. Its [path through the workload proxy](agent-open-questions.md#%60OQ-PORT-14%60) remains open. See [Port discovery and records](workload-ports.md#Port%20discovery%20and%20records).
@@ -106,12 +94,6 @@ The preview server serves authorized preview requests as a client of published p
 ## Registry
 
 The registry stores workspace image manifests, config blobs, and layers in the object store. An afakt-owned interface supplies scoped token authentication, upstream caching, and collection of unreferenced content. Registry software and process placement remain [`OQ-IMG-16`](agent-open-questions.md#%60OQ-IMG-16%60). See [Registry](agent-workspace-image.md#Registry) and [registry admission](agent-workspace-lifecycle.md#Registry%20admission).
-
-## Workload guest
-
-The [workload guest](workload-guest.md) is the VM that runs the workload on a VM provider. Guest routing components don't decide policy. External traffic, including DNS, uses only the workload proxy.
-
-A workload guest is the isolation boundary, with a guest kernel, read-only operating system disk, and writable workspace disk. The workload host supervisor controls its virtual machine monitors (VMMs) independently of ACP and guest policy. See [Enforcement](workload-sandbox.md#Enforcement).
 
 ## Snapshot registry
 
@@ -152,6 +134,24 @@ The agent dispatcher workflow starts by default as a child of the caller's workf
 ### Agent session
 
 The agent session workflow holds an interactive session's control state, including its lifecycle, writer, attached clients, idle timer, and relay connection location. Prompt queue ownership remains [`OQ-SES-14`](agent-open-questions.md#%60OQ-SES-14%60). It doesn't hold the message stream. See [Agent session](agent-session.md).
+
+## Workload guest
+
+The [workload guest](workload-guest.md) is the VM that runs the workload on a VM provider. Guest routing components don't decide policy. External traffic, including DNS, uses only the workload proxy.
+
+A workload guest is the isolation boundary, with a guest kernel, read-only operating system disk, and writable workspace disk. The workload host supervisor controls its virtual machine monitors (VMMs) independently of ACP and guest policy. See [Enforcement](workload-sandbox.md#Enforcement).
+
+## Workload host worker
+
+The workload host worker is the daemon that runs the agent launcher workflow on a workload host and connects that host to the control plane. It registers capacity and polls its host task queue. Alongside reconciliation of agent launch records, the worker observes [workload lifecycle](workload-lifecycle.md) state under the [open ownership contract](agent-open-questions.md#%60OQ-SBX-71%60). It stays outside launch data paths, including traffic between launches on its host. Each host also supplies [host-level name resolution and connectivity](workload-overlay.md#Workload%20host%20access). See [Workload host](workload-host.md). [Workload host caches and startup](agent-workspace-lifecycle.md#Workload%20host%20caches%20and%20startup).
+
+## Workload proxy
+
+Each workload's proxy transmits guest traffic in both directions and requests a mediator decision for each connection. It has its own overlay node and holds the launch's X.509 SPIFFE Verifiable Identity Document (SVID) and private key outside the guest. The ingress gateway and permitted peers dial it directly with SPIFFE mutual TLS. For inspected outbound destinations, it ends TLS under mediator decisions using a per-workload certificate authority trusted by the guest. The credential broker injects credentials there, outside the guest. See [Workload proxy](workload-proxy.md).
+
+## Workload proxy mediator
+
+Each workload's proxy mediator decides every inbound and outbound connection without transmitting traffic and stamps launch identity on control requests. The proposed workload Domain Name System (DNS) design puts resolution under mediator control with no host fallback. Its contract remains [open](agent-open-questions.md#%60OQ-SBX-21%60). The mediator's control plane connections pass through its proxy under a fixed rule set that neither the launch's policy nor the guest can change. See [Workload proxy mediator](workload-proxy-mediator.md) and [ACP message policy](agent-acp.md#ACP%20message%20policy).
 
 ## Workspace image builder
 

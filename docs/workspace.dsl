@@ -36,7 +36,7 @@ workspace "afakt" "Architecture of the afakt modular monolith." {
                 edge = container "External ingress gateway" "Accepts public and attached-tailnet application requests; never routes packets between tailnets and the cluster." "Application proxy" "Topology"
             }
             group "Host management boundary" {
-                hostWorker = container "Workload host worker" "Controls launch lifecycle as a dedicated user; stays outside every launch data path." "Host service" "Topology"
+                hostWorker = container "Workload host worker" "Observes workload execution as a dedicated non-root user; workload lifecycle ownership remains open." "Host service" "Topology"
                 helper = container "Privileged helper" "Performs narrowly authorized setup and launch operations; caller binding is undecided." "Host privilege boundary" "Topology"
                 hostResolver = container "Host name resolver" "Resolves names under *.afakt.internal for host clients." "Domain Name System" "Topology"
             }
@@ -102,6 +102,7 @@ workspace "afakt" "Architecture of the afakt modular monolith." {
         browser -> loopbackProxy "Requests service, preview or port" "Host access mechanism undecided" "TopologyConnection,OverviewHidden"
         loopbackProxy -> hostNetwork "Uses host-level authorization" "Connection mechanism undecided" "TopologyConnection,OverviewHidden"
         hostNetwork -> previewServer "Requests preview as host identity" "Workload mutual TLS over overlay" "TopologyConnection,OverviewHidden"
+        hostWorker -> guest "Observes workload execution and reclaim; lifecycle owner undecided" "Local observation" "LifecycleDetail,TopologyConnection,OverviewHidden"
         hostWorker -> helper "Requests authorized setup and launch operations" "Authenticated local control" "TopologyConnection"
         hostWorker -> hostResolver "Requires host name resolution" "Local control" "TopologyConnection,OverviewHidden"
         hostWorker -> mediator "Starts and manages launch; no data forwarding" "Local lifecycle control" "LifecycleDetail,TopologyConnection,OverviewHidden"

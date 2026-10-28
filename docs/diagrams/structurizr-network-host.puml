@@ -53,7 +53,7 @@ skinparam {
 
 rectangle "Workload host trust boundary\n<size:16>[Deployment Node: Workload host]</size>" <<DeploymentNode-RWxlbWVudCxEZXBsb3ltZW50IE5vZGU=>> as Topologyhost.Workloadhosttrustboundary {
   rectangle "Dedicated worker user\n<size:16>[Deployment Node: User boundary]</size>" <<DeploymentNode-RWxlbWVudCxEZXBsb3ltZW50IE5vZGU=>> as Topologyhost.Workloadhosttrustboundary.Dedicatedworkeruser {
-    rectangle "==Workload host worker\n<size:16>[Container: Host service]</size>\n\nControls launch lifecycle as a dedicated user; stays outside every launch data path." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as Topologyhost.Workloadhosttrustboundary.Dedicatedworkeruser.Workloadhostworker_1
+    rectangle "==Workload host worker\n<size:16>[Container: Host service]</size>\n\nObserves workload execution as a dedicated non-root user; workload lifecycle ownership remains open." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as Topologyhost.Workloadhosttrustboundary.Dedicatedworkeruser.Workloadhostworker_1
   }
 
   rectangle "Privileged setup boundary\n<size:16>[Deployment Node: Privilege boundary]</size>" <<DeploymentNode-RWxlbWVudCxEZXBsb3ltZW50IE5vZGU=>> as Topologyhost.Workloadhosttrustboundary.Privilegedsetupboundary {

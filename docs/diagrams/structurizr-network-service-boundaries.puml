@@ -82,7 +82,7 @@ rectangle "afakt\n<size:16>[Software System]</size>" <<Boundary-YWZha3Q=>> {
   }
 
   rectangle "Host management boundary" <<Group-SG9zdCBtYW5hZ2VtZW50IGJvdW5kYXJ5>> as group2 {
-    rectangle "==Workload host worker\n<size:16>[Container: Host service]</size>\n\nControls launch lifecycle as a dedicated user; stays outside every launch data path." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Workloadhostworker
+    rectangle "==Workload host worker\n<size:16>[Container: Host service]</size>\n\nObserves workload execution as a dedicated non-root user; workload lifecycle ownership remains open." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Workloadhostworker
     rectangle "==Privileged helper\n<size:16>[Container: Host privilege boundary]</size>\n\nPerforms narrowly authorized setup and launch operations; caller binding is undecided." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Privilegedhelper
   }
 
