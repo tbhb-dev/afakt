@@ -75,13 +75,13 @@ The gateway exposes a built-in afakt MCP server under the reserved `afakt` ident
 
 | Tool operation | Authority check |
 | --- | --- |
-| Start a child agent launch | The calling agent launch must have permission to start the requested child, whose authority can't exceed the caller's capabilities and scopes and may narrow further under its own pinned profile and specification. |
+| Start a child agent launch | The calling agent launch must have permission to create agents from the requested template or role. The child's authority comes from its own role, pinned profile and specification, not from the caller's capabilities and scopes, so a caller without web access can start a child that has it. |
 | Start a session | The same caller authority bounds the requested session and its profile. |
 | Send a message to another session | The caller's `sessions.message` capability and target scopes apply, including the [agent message rules](agent-session-attachment.md#Agent%20messages). |
 | Read another agent launch's status and results | The caller must have read access to that agent launch and its result or evidence. |
 | Declare a forwarded port | The exposure belongs to the calling agent and agent launch. The agent mediator stamps the identity and evaluates policy for that port. The guest relay checks listener ownership and guest loopback scope under [Port discovery and records](agent-ports.md#Port%20discovery%20and%20records). |
 
-Each call acts as the agent and agent launch authenticated by its mediator, with that agent launch's capabilities and scopes. An upstream credential or a gateway service identity never adds afakt authority. The API applies the same checks as for the [afakt command-line interface (CLI)](agent-profile.md#Capabilities). Selecting a more permissive child profile can't grant more authority to a child. Neither can tool approval.
+Each call acts as the agent and agent launch authenticated by its mediator, with that agent launch's capabilities and scopes. An upstream credential or a gateway service identity never adds afakt authority. The API applies the same checks as for the [afakt command-line interface (CLI)](agent-profile.md#Capabilities). A caller can start a child only from a template or role it's permitted to use, so selecting a different child profile can't grant a child more authority than that template or role allows. Neither can tool approval.
 
 ## Audit and telemetry
 
