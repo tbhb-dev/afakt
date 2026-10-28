@@ -6,6 +6,1544 @@
   "documentation": {},
   "id": 0,
   "model": {
+    "deploymentNodes": [
+      {
+        "description": "Operator-controlled clients.",
+        "environment": "Topology context",
+        "id": "110",
+        "infrastructureNodes": [
+          {
+            "description": "Operator and device identities.",
+            "environment": "Topology context",
+            "id": "111",
+            "name": "Browser, phone, tablet and native apps",
+            "properties": {
+              "structurizr.dsl.identifier": "contextClients"
+            },
+            "relationships": [
+              {
+                "description": "Device identity",
+                "destinationId": "113",
+                "id": "120",
+                "sourceId": "111",
+                "tags": "Relationship",
+                "technology": "User tailnet"
+              },
+              {
+                "description": "Signed-in user",
+                "destinationId": "116",
+                "id": "121",
+                "sourceId": "111",
+                "tags": "Relationship",
+                "technology": "Public application request"
+              }
+            ],
+            "tags": "Element,Infrastructure Node",
+            "technology": "Application clients"
+          }
+        ],
+        "instances": "1",
+        "name": "Operator device boundary",
+        "properties": {
+          "structurizr.dsl.identifier": "context_operatorDeviceBoundaryNode"
+        },
+        "tags": "Element,Deployment Node",
+        "technology": "Client devices"
+      },
+      {
+        "description": "User-owned network; no cluster routing.",
+        "environment": "Topology context",
+        "id": "112",
+        "infrastructureNodes": [
+          {
+            "description": "Private application access to attached gateways.",
+            "environment": "Topology context",
+            "id": "113",
+            "name": "Attached user tailnets",
+            "properties": {
+              "structurizr.dsl.identifier": "contextTailnet"
+            },
+            "relationships": [
+              {
+                "description": "User context; no packet routing",
+                "destinationId": "116",
+                "id": "122",
+                "sourceId": "113",
+                "tags": "Relationship",
+                "technology": "Private application request"
+              }
+            ],
+            "tags": "Element,Infrastructure Node",
+            "technology": "Tailscale"
+          }
+        ],
+        "instances": "1",
+        "name": "User tailnet boundary",
+        "properties": {
+          "structurizr.dsl.identifier": "context_userTailnetBoundaryNode"
+        },
+        "tags": "Element,Deployment Node",
+        "technology": "User network"
+      },
+      {
+        "children": [
+          {
+            "description": "Application entry only.",
+            "environment": "Topology context",
+            "id": "115",
+            "infrastructureNodes": [
+              {
+                "description": "Public and user-tailnet application traffic; no packet routing.",
+                "environment": "Topology context",
+                "id": "116",
+                "name": "External ingress gateway",
+                "properties": {
+                  "structurizr.dsl.identifier": "contextIngress"
+                },
+                "relationships": [
+                  {
+                    "description": "Authenticated application request",
+                    "destinationId": "117",
+                    "id": "123",
+                    "sourceId": "116",
+                    "tags": "Relationship",
+                    "technology": "Cluster overlay"
+                  }
+                ],
+                "tags": "Element,Infrastructure Node",
+                "technology": "Application proxy"
+              }
+            ],
+            "instances": "1",
+            "name": "External ingress boundary",
+            "properties": {
+              "structurizr.dsl.identifier": "context_externalIngressBoundaryNode"
+            },
+            "tags": "Element,Deployment Node",
+            "technology": "Gateway node"
+          }
+        ],
+        "description": "Control plane and agent hosts share authenticated overlay reachability.",
+        "environment": "Topology context",
+        "id": "114",
+        "infrastructureNodes": [
+          {
+            "description": "Per-service, per-host and per-launch nodes; guests have no overlay membership.",
+            "environment": "Topology context",
+            "id": "117",
+            "name": "Control plane and agent hosts",
+            "properties": {
+              "structurizr.dsl.identifier": "contextCluster"
+            },
+            "relationships": [
+              {
+                "description": "Permitted destination request",
+                "destinationId": "119",
+                "id": "124",
+                "sourceId": "117",
+                "tags": "Relationship",
+                "technology": "Agent proxy egress"
+              }
+            ],
+            "tags": "Element,Infrastructure Node",
+            "technology": "Isolated Headscale overlay"
+          }
+        ],
+        "instances": "1",
+        "name": "Cluster trust domain",
+        "properties": {
+          "structurizr.dsl.identifier": "context_clusterTrustDomainNode"
+        },
+        "tags": "Element,Deployment Node",
+        "technology": "Private cluster"
+      },
+      {
+        "description": "Upstream destinations outside cluster trust.",
+        "environment": "Topology context",
+        "id": "118",
+        "infrastructureNodes": [
+          {
+            "description": "Only permitted egress leaves an agent host.",
+            "environment": "Topology context",
+            "id": "119",
+            "name": "Internet services",
+            "properties": {
+              "structurizr.dsl.identifier": "contextInternet"
+            },
+            "tags": "Element,Infrastructure Node",
+            "technology": "Destination services"
+          }
+        ],
+        "instances": "1",
+        "name": "Internet boundary",
+        "properties": {
+          "structurizr.dsl.identifier": "context_internetBoundaryNode"
+        },
+        "tags": "Element,Deployment Node",
+        "technology": "External network"
+      },
+      {
+        "description": "Separate user network.",
+        "environment": "Topology cluster",
+        "id": "125",
+        "instances": "1",
+        "name": "User tailnet boundary",
+        "properties": {
+          "structurizr.dsl.identifier": "cluster_userTailnetBoundaryNode"
+        },
+        "softwareSystemInstances": [
+          {
+            "environment": "Topology cluster",
+            "id": "126",
+            "instanceId": 1,
+            "properties": {
+              "structurizr.dsl.identifier": "clusterTailnet"
+            },
+            "relationships": [
+              {
+                "description": "Delivers application requests",
+                "destinationId": "128",
+                "id": "129",
+                "linkedRelationshipId": "82",
+                "sourceId": "126",
+                "technology": "Transport Layer Security"
+              },
+              {
+                "description": "Optional host attachment; application access only",
+                "destinationId": "154",
+                "id": "155",
+                "linkedRelationshipId": "83",
+                "sourceId": "126",
+                "technology": "User tailnet"
+              },
+              {
+                "description": "Optional host attachment; application access only",
+                "destinationId": "170",
+                "id": "171",
+                "linkedRelationshipId": "83",
+                "sourceId": "126",
+                "technology": "User tailnet"
+              }
+            ],
+            "softwareSystemId": "68",
+            "tags": "Software System Instance"
+          }
+        ],
+        "tags": "Element,Deployment Node",
+        "technology": "User tailnet"
+      },
+      {
+        "containerInstances": [
+          {
+            "containerId": "22",
+            "environment": "Topology cluster",
+            "id": "128",
+            "instanceId": 1,
+            "properties": {
+              "structurizr.dsl.identifier": "clusterEdge"
+            },
+            "relationships": [
+              {
+                "description": "Forwards authenticated dashboard and API requests",
+                "destinationId": "136",
+                "id": "137",
+                "linkedRelationshipId": "85",
+                "sourceId": "128",
+                "technology": "Application protocol over overlay"
+              },
+              {
+                "description": "Forwards preview requests with user context",
+                "destinationId": "140",
+                "id": "141",
+                "linkedRelationshipId": "86",
+                "sourceId": "128",
+                "technology": "Application protocol over overlay"
+              },
+              {
+                "description": "Authenticated app requests",
+                "destinationId": "131",
+                "id": "180",
+                "sourceId": "128",
+                "tags": "Relationship",
+                "technology": "Overlay access"
+              }
+            ],
+            "tags": "Container Instance"
+          }
+        ],
+        "description": "User-tailnet attachments do not route cluster packets.",
+        "environment": "Topology cluster",
+        "id": "127",
+        "instances": "1",
+        "name": "External ingress boundary",
+        "properties": {
+          "structurizr.dsl.identifier": "cluster_externalIngressBoundaryNode"
+        },
+        "tags": "Element,Deployment Node",
+        "technology": "Gateway node"
+      },
+      {
+        "children": [
+          {
+            "children": [
+              {
+                "containerInstances": [
+                  {
+                    "containerId": "16",
+                    "environment": "Topology cluster",
+                    "id": "134",
+                    "instanceId": 1,
+                    "properties": {
+                      "structurizr.dsl.identifier": "cluster_hub"
+                    },
+                    "relationships": [
+                      {
+                        "description": "Obtains overlay coordination through afakt interface",
+                        "destinationId": "147",
+                        "id": "148",
+                        "linkedRelationshipId": "107",
+                        "sourceId": "134",
+                        "technology": "Overlay control"
+                      },
+                      {
+                        "description": "Uses encrypted relay transport when needed",
+                        "destinationId": "150",
+                        "id": "151",
+                        "linkedRelationshipId": "109",
+                        "sourceId": "134",
+                        "technology": "Overlay transport"
+                      },
+                      {
+                        "description": "Returns authorized stream over launch's existing connection",
+                        "destinationId": "161",
+                        "id": "163",
+                        "linkedRelationshipId": "96",
+                        "sourceId": "134",
+                        "technology": "Workload mutual TLS over overlay"
+                      },
+                      {
+                        "description": "Service identity",
+                        "destinationId": "131",
+                        "id": "184",
+                        "sourceId": "134",
+                        "tags": "Relationship",
+                        "technology": "Overlay membership"
+                      }
+                    ],
+                    "tags": "Container Instance"
+                  }
+                ],
+                "description": "Independent service identity.",
+                "environment": "Topology cluster",
+                "id": "133",
+                "instances": "1",
+                "name": "Agent hub node",
+                "properties": {
+                  "structurizr.dsl.identifier": "cluster_agentHubNodeNode"
+                },
+                "tags": "Element,Deployment Node",
+                "technology": "tsnet node"
+              },
+              {
+                "containerInstances": [
+                  {
+                    "containerId": "17",
+                    "environment": "Topology cluster",
+                    "id": "136",
+                    "instanceId": 1,
+                    "properties": {
+                      "structurizr.dsl.identifier": "cluster_controlApi"
+                    },
+                    "relationships": [
+                      {
+                        "description": "Uses agent streams; endpoint ownership undecided",
+                        "destinationId": "134",
+                        "id": "138",
+                        "linkedRelationshipId": "87",
+                        "sourceId": "136",
+                        "technology": "Authenticated service connection"
+                      },
+                      {
+                        "description": "Service identity",
+                        "destinationId": "131",
+                        "id": "181",
+                        "sourceId": "136",
+                        "tags": "Relationship",
+                        "technology": "Overlay membership"
+                      }
+                    ],
+                    "tags": "Container Instance"
+                  }
+                ],
+                "description": "Independent service identity; dashboard shares its origin.",
+                "environment": "Topology cluster",
+                "id": "135",
+                "instances": "1",
+                "name": "API service node",
+                "properties": {
+                  "structurizr.dsl.identifier": "cluster_apiServiceNodeNode"
+                },
+                "tags": "Element,Deployment Node",
+                "technology": "tsnet node"
+              },
+              {
+                "containerInstances": [
+                  {
+                    "containerId": "18",
+                    "environment": "Topology cluster",
+                    "id": "140",
+                    "instanceId": 1,
+                    "properties": {
+                      "structurizr.dsl.identifier": "cluster_previewServer"
+                    },
+                    "relationships": [
+                      {
+                        "description": "Opens authorized published port as preview service",
+                        "destinationId": "134",
+                        "id": "142",
+                        "linkedRelationshipId": "95",
+                        "sourceId": "140",
+                        "technology": "Authenticated service connection"
+                      },
+                      {
+                        "description": "Service identity",
+                        "destinationId": "131",
+                        "id": "182",
+                        "sourceId": "140",
+                        "tags": "Relationship",
+                        "technology": "Overlay membership"
+                      }
+                    ],
+                    "tags": "Container Instance"
+                  }
+                ],
+                "description": "Independent service identity.",
+                "environment": "Topology cluster",
+                "id": "139",
+                "instances": "1",
+                "name": "Preview service node",
+                "properties": {
+                  "structurizr.dsl.identifier": "cluster_previewServiceNodeNode"
+                },
+                "tags": "Element,Deployment Node",
+                "technology": "tsnet node"
+              },
+              {
+                "containerInstances": [
+                  {
+                    "containerId": "19",
+                    "environment": "Topology cluster",
+                    "id": "144",
+                    "instanceId": 1,
+                    "properties": {
+                      "structurizr.dsl.identifier": "cluster_mcpGateway"
+                    },
+                    "relationships": [
+                      {
+                        "description": "Calls permitted operations with launch context",
+                        "destinationId": "136",
+                        "id": "145",
+                        "linkedRelationshipId": "88",
+                        "sourceId": "144",
+                        "technology": "Authenticated service connection"
+                      },
+                      {
+                        "description": "Service identity",
+                        "destinationId": "131",
+                        "id": "183",
+                        "sourceId": "144",
+                        "tags": "Relationship",
+                        "technology": "Overlay membership"
+                      }
+                    ],
+                    "tags": "Container Instance"
+                  }
+                ],
+                "description": "Independent service identity.",
+                "environment": "Topology cluster",
+                "id": "143",
+                "instances": "1",
+                "name": "MCP service node",
+                "properties": {
+                  "structurizr.dsl.identifier": "cluster_mcpServiceNodeNode"
+                },
+                "tags": "Element,Deployment Node",
+                "technology": "tsnet node"
+              },
+              {
+                "containerInstances": [
+                  {
+                    "containerId": "20",
+                    "environment": "Topology cluster",
+                    "id": "147",
+                    "instanceId": 1,
+                    "properties": {
+                      "structurizr.dsl.identifier": "cluster_coordination"
+                    },
+                    "relationships": [
+                      {
+                        "description": "Node coordination",
+                        "destinationId": "131",
+                        "id": "185",
+                        "sourceId": "147",
+                        "tags": "Relationship",
+                        "technology": "afakt interface"
+                      }
+                    ],
+                    "tags": "Container Instance"
+                  }
+                ],
+                "description": "Isolated Headscale behind an afakt interface; instance count undecided.",
+                "environment": "Topology cluster",
+                "id": "146",
+                "instances": "1",
+                "name": "Coordination node",
+                "properties": {
+                  "structurizr.dsl.identifier": "cluster_coordinationNodeNode"
+                },
+                "tags": "Element,Deployment Node",
+                "technology": "Coordination service"
+              },
+              {
+                "containerInstances": [
+                  {
+                    "containerId": "21",
+                    "environment": "Topology cluster",
+                    "id": "150",
+                    "instanceId": 1,
+                    "properties": {
+                      "structurizr.dsl.identifier": "cluster_overlayRelay"
+                    },
+                    "relationships": [
+                      {
+                        "description": "Encrypted transport",
+                        "destinationId": "131",
+                        "id": "186",
+                        "sourceId": "150",
+                        "tags": "Relationship",
+                        "technology": "Relay path"
+                      }
+                    ],
+                    "tags": "Container Instance"
+                  }
+                ],
+                "description": "Encrypted overlay transport.",
+                "environment": "Topology cluster",
+                "id": "149",
+                "instances": "1",
+                "name": "Relay node",
+                "properties": {
+                  "structurizr.dsl.identifier": "cluster_relayNodeNode"
+                },
+                "tags": "Element,Deployment Node",
+                "technology": "Relay service"
+              }
+            ],
+            "description": "One overlay node for each service.",
+            "environment": "Topology cluster",
+            "id": "132",
+            "instances": "1",
+            "name": "Control plane boundary",
+            "properties": {
+              "structurizr.dsl.identifier": "cluster_controlPlaneBoundaryNode"
+            },
+            "tags": "Element,Deployment Node",
+            "technology": "Control plane"
+          },
+          {
+            "children": [
+              {
+                "containerInstances": [
+                  {
+                    "containerId": "27",
+                    "environment": "Topology cluster",
+                    "id": "154",
+                    "instanceId": 1,
+                    "properties": {
+                      "structurizr.dsl.identifier": "cluster_hostNetwork"
+                    },
+                    "relationships": [
+                      {
+                        "description": "Requests authorized port or service as host identity",
+                        "destinationId": "134",
+                        "id": "156",
+                        "linkedRelationshipId": "74",
+                        "sourceId": "154",
+                        "technology": "Workload mutual TLS over overlay"
+                      },
+                      {
+                        "description": "Registers host and reports capacity as host identity",
+                        "destinationId": "136",
+                        "id": "157",
+                        "linkedRelationshipId": "80",
+                        "sourceId": "154",
+                        "technology": "Workload mutual TLS over overlay"
+                      },
+                      {
+                        "description": "Requests preview as host identity",
+                        "destinationId": "140",
+                        "id": "158",
+                        "linkedRelationshipId": "73",
+                        "sourceId": "154",
+                        "technology": "Workload mutual TLS over overlay"
+                      },
+                      {
+                        "description": "Obtains overlay coordination through afakt interface",
+                        "destinationId": "147",
+                        "id": "159",
+                        "linkedRelationshipId": "106",
+                        "sourceId": "154",
+                        "technology": "Overlay control"
+                      },
+                      {
+                        "description": "Host identity",
+                        "destinationId": "131",
+                        "id": "187",
+                        "sourceId": "154",
+                        "tags": "Relationship",
+                        "technology": "Overlay membership"
+                      }
+                    ],
+                    "tags": "Container Instance"
+                  }
+                ],
+                "description": "Host identity; optional user-tailnet attachment.",
+                "environment": "Topology cluster",
+                "id": "153",
+                "instances": "1",
+                "name": "Host node",
+                "properties": {
+                  "structurizr.dsl.identifier": "cluster_hostNodeNode"
+                },
+                "tags": "Element,Deployment Node",
+                "technology": "tsnet node"
+              },
+              {
+                "containerInstances": [
+                  {
+                    "containerId": "30",
+                    "environment": "Topology cluster",
+                    "id": "161",
+                    "instanceId": 1,
+                    "properties": {
+                      "structurizr.dsl.identifier": "cluster_agent-proxy"
+                    },
+                    "relationships": [
+                      {
+                        "description": "Opens own multiplexed connection with launch X.509-SVID",
+                        "destinationId": "134",
+                        "id": "162",
+                        "linkedRelationshipId": "91",
+                        "sourceId": "161",
+                        "technology": "Workload mutual TLS over overlay"
+                      },
+                      {
+                        "description": "Calls authorized operations with launch X.509-SVID",
+                        "destinationId": "136",
+                        "id": "164",
+                        "linkedRelationshipId": "92",
+                        "sourceId": "161",
+                        "technology": "Workload mutual TLS over overlay"
+                      },
+                      {
+                        "description": "Calls allowed tools with launch X.509-SVID",
+                        "destinationId": "144",
+                        "id": "165",
+                        "linkedRelationshipId": "93",
+                        "sourceId": "161",
+                        "technology": "Workload mutual TLS over overlay"
+                      },
+                      {
+                        "description": "Obtains overlay coordination through afakt interface",
+                        "destinationId": "147",
+                        "id": "166",
+                        "linkedRelationshipId": "105",
+                        "sourceId": "161",
+                        "technology": "Overlay control"
+                      },
+                      {
+                        "description": "Uses encrypted relay transport when needed",
+                        "destinationId": "150",
+                        "id": "167",
+                        "linkedRelationshipId": "108",
+                        "sourceId": "161",
+                        "technology": "Overlay transport"
+                      },
+                      {
+                        "description": "Logical grant-bound stream; direct overlay or agent hub undecided",
+                        "destinationId": "177",
+                        "id": "179",
+                        "linkedRelationshipId": "104",
+                        "sourceId": "161",
+                        "technology": "Transport undecided"
+                      },
+                      {
+                        "description": "Launch identity",
+                        "destinationId": "131",
+                        "id": "189",
+                        "sourceId": "161",
+                        "tags": "Relationship",
+                        "technology": "Coarse service access"
+                      }
+                    ],
+                    "tags": "Container Instance"
+                  }
+                ],
+                "description": "Independent mediator, agent proxy and guest; no shared launch data path.",
+                "environment": "Topology cluster",
+                "id": "160",
+                "instances": "1",
+                "name": "Agent launch boundary",
+                "properties": {
+                  "structurizr.dsl.identifier": "cluster_agentLaunchBoundaryNode"
+                },
+                "tags": "Element,Deployment Node",
+                "technology": "Launch isolation"
+              }
+            ],
+            "description": "Host management is separate from launch traffic.",
+            "environment": "Topology cluster",
+            "id": "152",
+            "instances": "1",
+            "name": "Agent host boundary",
+            "properties": {
+              "structurizr.dsl.identifier": "cluster_agentHostBoundaryNode"
+            },
+            "tags": "Element,Deployment Node",
+            "technology": "Agent host"
+          },
+          {
+            "children": [
+              {
+                "containerInstances": [
+                  {
+                    "containerId": "27",
+                    "environment": "Topology cluster",
+                    "id": "170",
+                    "instanceId": 1,
+                    "properties": {
+                      "structurizr.dsl.identifier": "cluster_otherHost"
+                    },
+                    "relationships": [
+                      {
+                        "description": "Requests authorized port or service as host identity",
+                        "destinationId": "134",
+                        "id": "172",
+                        "linkedRelationshipId": "74",
+                        "sourceId": "170",
+                        "technology": "Workload mutual TLS over overlay"
+                      },
+                      {
+                        "description": "Registers host and reports capacity as host identity",
+                        "destinationId": "136",
+                        "id": "173",
+                        "linkedRelationshipId": "80",
+                        "sourceId": "170",
+                        "technology": "Workload mutual TLS over overlay"
+                      },
+                      {
+                        "description": "Requests preview as host identity",
+                        "destinationId": "140",
+                        "id": "174",
+                        "linkedRelationshipId": "73",
+                        "sourceId": "170",
+                        "technology": "Workload mutual TLS over overlay"
+                      },
+                      {
+                        "description": "Obtains overlay coordination through afakt interface",
+                        "destinationId": "147",
+                        "id": "175",
+                        "linkedRelationshipId": "106",
+                        "sourceId": "170",
+                        "technology": "Overlay control"
+                      },
+                      {
+                        "description": "Host identity",
+                        "destinationId": "131",
+                        "id": "188",
+                        "sourceId": "170",
+                        "tags": "Relationship",
+                        "technology": "Overlay membership"
+                      }
+                    ],
+                    "tags": "Container Instance"
+                  }
+                ],
+                "description": "Independent host identity; optional attached user tailnet.",
+                "environment": "Topology cluster",
+                "id": "169",
+                "instances": "1",
+                "name": "Another host node",
+                "properties": {
+                  "structurizr.dsl.identifier": "cluster_anotherHostNodeNode"
+                },
+                "tags": "Element,Deployment Node",
+                "technology": "tsnet node"
+              },
+              {
+                "containerInstances": [
+                  {
+                    "containerId": "33",
+                    "environment": "Topology cluster",
+                    "id": "177",
+                    "instanceId": 1,
+                    "properties": {
+                      "structurizr.dsl.identifier": "cluster_destination-agent-proxy"
+                    },
+                    "relationships": [
+                      {
+                        "description": "Opens independent connection with destination launch X.509-SVID",
+                        "destinationId": "134",
+                        "id": "178",
+                        "linkedRelationshipId": "99",
+                        "sourceId": "177",
+                        "technology": "Workload mutual TLS over overlay"
+                      },
+                      {
+                        "description": "Destination launch identity",
+                        "destinationId": "131",
+                        "id": "190",
+                        "sourceId": "177",
+                        "tags": "Relationship",
+                        "technology": "Coarse service access"
+                      }
+                    ],
+                    "tags": "Container Instance"
+                  }
+                ],
+                "description": "Independent launch connection.",
+                "environment": "Topology cluster",
+                "id": "176",
+                "instances": "1",
+                "name": "Another launch boundary",
+                "properties": {
+                  "structurizr.dsl.identifier": "cluster_anotherLaunchBoundaryNode"
+                },
+                "tags": "Element,Deployment Node",
+                "technology": "Launch isolation"
+              }
+            ],
+            "description": "Independent host and launch identities.",
+            "environment": "Topology cluster",
+            "id": "168",
+            "instances": "1",
+            "name": "Another agent host boundary",
+            "properties": {
+              "structurizr.dsl.identifier": "cluster_anotherAgentHostBoundaryNode"
+            },
+            "tags": "Element,Deployment Node",
+            "technology": "Agent host"
+          }
+        ],
+        "description": "Tailscale tsnet nodes use isolated Headscale; every node retains a static stable-node map.",
+        "environment": "Topology cluster",
+        "id": "130",
+        "infrastructureNodes": [
+          {
+            "description": "Each cluster node retains a static map of stable nodes. Launch access is limited to the hub and permitted service groups.",
+            "environment": "Topology cluster",
+            "id": "131",
+            "name": "Private overlay reachability",
+            "properties": {
+              "structurizr.dsl.identifier": "clusterOverlay"
+            },
+            "tags": "Element,Infrastructure Node",
+            "technology": "Tailscale tsnet"
+          }
+        ],
+        "instances": "1",
+        "name": "Cluster overlay boundary",
+        "properties": {
+          "structurizr.dsl.identifier": "cluster_clusterOverlayBoundaryNode"
+        },
+        "tags": "Element,Deployment Node",
+        "technology": "Private overlay"
+      },
+      {
+        "children": [
+          {
+            "containerInstances": [
+              {
+                "containerId": "23",
+                "environment": "Topology host",
+                "id": "193",
+                "instanceId": 1,
+                "properties": {
+                  "structurizr.dsl.identifier": "host_hostWorker"
+                },
+                "relationships": [
+                  {
+                    "description": "Requests authorized setup and launch operations",
+                    "destinationId": "195",
+                    "id": "196",
+                    "linkedRelationshipId": "75",
+                    "sourceId": "193",
+                    "technology": "Authenticated local control"
+                  },
+                  {
+                    "description": "Requires host name resolution",
+                    "destinationId": "197",
+                    "id": "198",
+                    "linkedRelationshipId": "76",
+                    "sourceId": "193",
+                    "technology": "Local control"
+                  },
+                  {
+                    "description": "Sends host management requests",
+                    "destinationId": "201",
+                    "id": "202",
+                    "linkedRelationshipId": "79",
+                    "sourceId": "193",
+                    "technology": "Local channel"
+                  },
+                  {
+                    "description": "Starts and manages launch; no data forwarding",
+                    "destinationId": "208",
+                    "id": "209",
+                    "linkedRelationshipId": "77",
+                    "sourceId": "193",
+                    "technology": "Local lifecycle control"
+                  },
+                  {
+                    "description": "Starts and manages destination launch; no data forwarding",
+                    "destinationId": "220",
+                    "id": "221",
+                    "linkedRelationshipId": "78",
+                    "sourceId": "193",
+                    "technology": "Local lifecycle control"
+                  }
+                ],
+                "tags": "Container Instance"
+              }
+            ],
+            "description": "Separate from the host-mode agent user.",
+            "environment": "Topology host",
+            "id": "192",
+            "instances": "1",
+            "name": "Dedicated worker user",
+            "properties": {
+              "structurizr.dsl.identifier": "host_dedicatedWorkerUserNode"
+            },
+            "tags": "Element,Deployment Node",
+            "technology": "User boundary"
+          },
+          {
+            "containerInstances": [
+              {
+                "containerId": "24",
+                "environment": "Topology host",
+                "id": "195",
+                "instanceId": 1,
+                "properties": {
+                  "structurizr.dsl.identifier": "host_helper"
+                },
+                "tags": "Container Instance"
+              }
+            ],
+            "description": "Helper authority and caller binding remain undecided.",
+            "environment": "Topology host",
+            "id": "194",
+            "instances": "1",
+            "name": "Privileged setup boundary",
+            "properties": {
+              "structurizr.dsl.identifier": "host_privilegedSetupBoundaryNode"
+            },
+            "tags": "Element,Deployment Node",
+            "technology": "Privilege boundary"
+          },
+          {
+            "containerInstances": [
+              {
+                "containerId": "26",
+                "environment": "Topology host",
+                "id": "200",
+                "instanceId": 1,
+                "properties": {
+                  "structurizr.dsl.identifier": "host_loopbackProxy"
+                },
+                "relationships": [
+                  {
+                    "description": "Uses host-level authorization",
+                    "destinationId": "201",
+                    "id": "203",
+                    "linkedRelationshipId": "72",
+                    "sourceId": "200",
+                    "technology": "Connection mechanism undecided"
+                  }
+                ],
+                "tags": "Container Instance"
+              },
+              {
+                "containerId": "27",
+                "environment": "Topology host",
+                "id": "201",
+                "instanceId": 1,
+                "properties": {
+                  "structurizr.dsl.identifier": "host_hostNetwork"
+                },
+                "tags": "Container Instance"
+              }
+            ],
+            "description": "Host access requires authorization; name resolution grants none.",
+            "environment": "Topology host",
+            "id": "199",
+            "instances": "1",
+            "name": "Operator access boundary",
+            "properties": {
+              "structurizr.dsl.identifier": "host_operatorAccessBoundaryNode"
+            },
+            "tags": "Element,Deployment Node",
+            "technology": "Host service"
+          },
+          {
+            "children": [
+              {
+                "containerInstances": [
+                  {
+                    "containerId": "28",
+                    "environment": "Topology host",
+                    "id": "206",
+                    "instanceId": 1,
+                    "properties": {
+                      "structurizr.dsl.identifier": "host_guest"
+                    },
+                    "relationships": [
+                      {
+                        "description": "Sends traffic bound to this launch",
+                        "destinationId": "208",
+                        "id": "211",
+                        "linkedRelationshipId": "89",
+                        "sourceId": "206",
+                        "technology": "Local provider carrier"
+                      }
+                    ],
+                    "tags": "Container Instance"
+                  }
+                ],
+                "description": "Host mode uses the dedicated agent user, separate from the worker.",
+                "environment": "Topology host",
+                "id": "205",
+                "instances": "1",
+                "name": "Guest A",
+                "properties": {
+                  "structurizr.dsl.identifier": "host_guestANode"
+                },
+                "tags": "Element,Deployment Node",
+                "technology": "Dedicated agent user in host mode"
+              },
+              {
+                "containerInstances": [
+                  {
+                    "containerId": "29",
+                    "environment": "Topology host",
+                    "id": "208",
+                    "instanceId": 1,
+                    "properties": {
+                      "structurizr.dsl.identifier": "host_mediator"
+                    },
+                    "relationships": [
+                      {
+                        "description": "Connects permitted stream to current guest listener",
+                        "destinationId": "206",
+                        "id": "210",
+                        "linkedRelationshipId": "98",
+                        "sourceId": "208",
+                        "technology": "Local provider carrier"
+                      },
+                      {
+                        "description": "Sends policy-permitted traffic and stamped launch identity",
+                        "destinationId": "213",
+                        "id": "215",
+                        "linkedRelationshipId": "90",
+                        "sourceId": "208",
+                        "technology": "Local channel"
+                      }
+                    ],
+                    "tags": "Container Instance"
+                  }
+                ],
+                "description": "Policy boundary; no independent network.",
+                "environment": "Topology host",
+                "id": "207",
+                "instances": "1",
+                "name": "Mediator A",
+                "properties": {
+                  "structurizr.dsl.identifier": "host_mediatorANode"
+                },
+                "tags": "Element,Deployment Node",
+                "technology": "Local confinement; user undecided"
+              },
+              {
+                "containerInstances": [
+                  {
+                    "containerId": "30",
+                    "environment": "Topology host",
+                    "id": "213",
+                    "instanceId": 1,
+                    "properties": {
+                      "structurizr.dsl.identifier": "host_agent-proxy"
+                    },
+                    "relationships": [
+                      {
+                        "description": "Delivers stream with authenticated caller and target launch",
+                        "destinationId": "208",
+                        "id": "214",
+                        "linkedRelationshipId": "97",
+                        "sourceId": "213",
+                        "technology": "Local channel"
+                      },
+                      {
+                        "description": "Logical grant-bound stream; direct overlay or agent hub undecided",
+                        "destinationId": "225",
+                        "id": "226",
+                        "linkedRelationshipId": "104",
+                        "sourceId": "213",
+                        "technology": "Transport undecided"
+                      }
+                    ],
+                    "tags": "Container Instance"
+                  }
+                ],
+                "description": "Own node, hub connection and launch X.509-SVID.",
+                "environment": "Topology host",
+                "id": "212",
+                "instances": "1",
+                "name": "Agent proxy A",
+                "properties": {
+                  "structurizr.dsl.identifier": "host_agentProxyANode"
+                },
+                "tags": "Element,Deployment Node",
+                "technology": "tsnet node; user undecided"
+              }
+            ],
+            "description": "Independent data path; mediation and network users undecided.",
+            "environment": "Topology host",
+            "id": "204",
+            "instances": "1",
+            "name": "Agent launch A",
+            "properties": {
+              "structurizr.dsl.identifier": "host_agentLaunchANode"
+            },
+            "tags": "Element,Deployment Node",
+            "technology": "Launch boundary"
+          },
+          {
+            "children": [
+              {
+                "containerInstances": [
+                  {
+                    "containerId": "31",
+                    "environment": "Topology host",
+                    "id": "218",
+                    "instanceId": 1,
+                    "properties": {
+                      "structurizr.dsl.identifier": "host_destinationGuest"
+                    },
+                    "relationships": [
+                      {
+                        "description": "Requests access bound to destination launch",
+                        "destinationId": "220",
+                        "id": "223",
+                        "linkedRelationshipId": "100",
+                        "sourceId": "218",
+                        "technology": "Local provider carrier"
+                      }
+                    ],
+                    "tags": "Container Instance"
+                  }
+                ],
+                "description": "Host mode uses the dedicated agent user, separate from the worker.",
+                "environment": "Topology host",
+                "id": "217",
+                "instances": "1",
+                "name": "Guest B",
+                "properties": {
+                  "structurizr.dsl.identifier": "host_guestBNode"
+                },
+                "tags": "Element,Deployment Node",
+                "technology": "Dedicated agent user in host mode"
+              },
+              {
+                "containerInstances": [
+                  {
+                    "containerId": "32",
+                    "environment": "Topology host",
+                    "id": "220",
+                    "instanceId": 1,
+                    "properties": {
+                      "structurizr.dsl.identifier": "host_destinationMediator"
+                    },
+                    "relationships": [
+                      {
+                        "description": "Connects grant-permitted stream to bound listener",
+                        "destinationId": "218",
+                        "id": "222",
+                        "linkedRelationshipId": "103",
+                        "sourceId": "220",
+                        "technology": "Local provider carrier"
+                      },
+                      {
+                        "description": "Sends policy-permitted destination traffic",
+                        "destinationId": "225",
+                        "id": "228",
+                        "linkedRelationshipId": "101",
+                        "sourceId": "220",
+                        "technology": "Local channel"
+                      }
+                    ],
+                    "tags": "Container Instance"
+                  }
+                ],
+                "description": "Policy boundary; no independent network.",
+                "environment": "Topology host",
+                "id": "219",
+                "instances": "1",
+                "name": "Mediator B",
+                "properties": {
+                  "structurizr.dsl.identifier": "host_mediatorBNode"
+                },
+                "tags": "Element,Deployment Node",
+                "technology": "Local confinement; user undecided"
+              },
+              {
+                "containerInstances": [
+                  {
+                    "containerId": "33",
+                    "environment": "Topology host",
+                    "id": "225",
+                    "instanceId": 1,
+                    "properties": {
+                      "structurizr.dsl.identifier": "host_destination-agent-proxy"
+                    },
+                    "relationships": [
+                      {
+                        "description": "Delivers stream with source identity and target grant",
+                        "destinationId": "220",
+                        "id": "227",
+                        "linkedRelationshipId": "102",
+                        "sourceId": "225",
+                        "technology": "Local channel"
+                      }
+                    ],
+                    "tags": "Container Instance"
+                  }
+                ],
+                "description": "Own node, hub connection and launch X.509-SVID.",
+                "environment": "Topology host",
+                "id": "224",
+                "instances": "1",
+                "name": "Agent proxy B",
+                "properties": {
+                  "structurizr.dsl.identifier": "host_agentProxyBNode"
+                },
+                "tags": "Element,Deployment Node",
+                "technology": "tsnet node; user undecided"
+              }
+            ],
+            "description": "Independent data path; same-host traffic uses the overlay.",
+            "environment": "Topology host",
+            "id": "216",
+            "instances": "1",
+            "name": "Agent launch B",
+            "properties": {
+              "structurizr.dsl.identifier": "host_agentLaunchBNode"
+            },
+            "tags": "Element,Deployment Node",
+            "technology": "Launch boundary"
+          }
+        ],
+        "containerInstances": [
+          {
+            "containerId": "25",
+            "environment": "Topology host",
+            "id": "197",
+            "instanceId": 1,
+            "properties": {
+              "structurizr.dsl.identifier": "host_hostResolver"
+            },
+            "tags": "Container Instance"
+          }
+        ],
+        "description": "Privileged host control remains outside every guest.",
+        "environment": "Topology host",
+        "id": "191",
+        "instances": "1",
+        "name": "Agent host trust boundary",
+        "properties": {
+          "structurizr.dsl.identifier": "host_agentHostTrustBoundaryNode"
+        },
+        "tags": "Element,Deployment Node",
+        "technology": "Agent host"
+      },
+      {
+        "children": [
+          {
+            "children": [
+              {
+                "containerInstances": [
+                  {
+                    "containerId": "28",
+                    "environment": "Topology launch",
+                    "id": "232",
+                    "instanceId": 1,
+                    "properties": {
+                      "structurizr.dsl.identifier": "launch_guest"
+                    },
+                    "relationships": [
+                      {
+                        "description": "Sends traffic bound to this launch",
+                        "destinationId": "234",
+                        "id": "236",
+                        "linkedRelationshipId": "89",
+                        "sourceId": "232",
+                        "technology": "Local provider carrier"
+                      }
+                    ],
+                    "tags": "Container Instance"
+                  }
+                ],
+                "description": "Guest has no overlay node or workload key.",
+                "environment": "Topology launch",
+                "id": "231",
+                "instances": "1",
+                "name": "Guest trust boundary",
+                "properties": {
+                  "structurizr.dsl.identifier": "launch_guestTrustBoundaryNode"
+                },
+                "tags": "Element,Deployment Node",
+                "technology": "Provider confinement"
+              },
+              {
+                "containerInstances": [
+                  {
+                    "containerId": "29",
+                    "environment": "Topology launch",
+                    "id": "234",
+                    "instanceId": 1,
+                    "properties": {
+                      "structurizr.dsl.identifier": "launch_mediator"
+                    },
+                    "relationships": [
+                      {
+                        "description": "Connects permitted stream to current guest listener",
+                        "destinationId": "232",
+                        "id": "235",
+                        "linkedRelationshipId": "98",
+                        "sourceId": "234",
+                        "technology": "Local provider carrier"
+                      },
+                      {
+                        "description": "Sends policy-permitted traffic and stamped launch identity",
+                        "destinationId": "238",
+                        "id": "240",
+                        "linkedRelationshipId": "90",
+                        "sourceId": "234",
+                        "technology": "Local channel"
+                      }
+                    ],
+                    "tags": "Container Instance"
+                  }
+                ],
+                "description": "Enforces connection and message policy; no independent network.",
+                "environment": "Topology launch",
+                "id": "233",
+                "instances": "1",
+                "name": "Mediation trust boundary",
+                "properties": {
+                  "structurizr.dsl.identifier": "launch_mediationTrustBoundaryNode"
+                },
+                "tags": "Element,Deployment Node",
+                "technology": "Local confinement; user undecided"
+              },
+              {
+                "containerInstances": [
+                  {
+                    "containerId": "30",
+                    "environment": "Topology launch",
+                    "id": "238",
+                    "instanceId": 1,
+                    "properties": {
+                      "structurizr.dsl.identifier": "launch_agent-proxy"
+                    },
+                    "relationships": [
+                      {
+                        "description": "Delivers stream with authenticated caller and target launch",
+                        "destinationId": "234",
+                        "id": "239",
+                        "linkedRelationshipId": "97",
+                        "sourceId": "238",
+                        "technology": "Local channel"
+                      },
+                      {
+                        "description": "Opens own multiplexed connection with launch X.509-SVID",
+                        "destinationId": "243",
+                        "id": "245",
+                        "linkedRelationshipId": "91",
+                        "sourceId": "238",
+                        "technology": "Workload mutual TLS over overlay"
+                      },
+                      {
+                        "description": "Calls authorized operations with launch X.509-SVID",
+                        "destinationId": "247",
+                        "id": "248",
+                        "linkedRelationshipId": "92",
+                        "sourceId": "238",
+                        "technology": "Workload mutual TLS over overlay"
+                      },
+                      {
+                        "description": "Opens permitted egress; inspection where required",
+                        "destinationId": "251",
+                        "id": "252",
+                        "linkedRelationshipId": "94",
+                        "sourceId": "238",
+                        "technology": "Destination protocol"
+                      }
+                    ],
+                    "tags": "Container Instance"
+                  }
+                ],
+                "description": "Only launch component opening off-host connections.",
+                "environment": "Topology launch",
+                "id": "237",
+                "instances": "1",
+                "name": "Agent proxy trust boundary",
+                "properties": {
+                  "structurizr.dsl.identifier": "launch_agentProxyTrustBoundaryNode"
+                },
+                "tags": "Element,Deployment Node",
+                "technology": "tsnet node; user undecided"
+              }
+            ],
+            "description": "Launch-bound local carriers; private keys stay outside the guest.",
+            "environment": "Topology launch",
+            "id": "230",
+            "instances": "1",
+            "name": "Agent launch boundary",
+            "properties": {
+              "structurizr.dsl.identifier": "launch_agentLaunchBoundaryNode"
+            },
+            "tags": "Element,Deployment Node",
+            "technology": "Launch isolation"
+          }
+        ],
+        "description": "Worker stays outside this data path; service users undecided.",
+        "environment": "Topology launch",
+        "id": "229",
+        "instances": "1",
+        "name": "Agent host trust boundary",
+        "properties": {
+          "structurizr.dsl.identifier": "launch_agentHostTrustBoundaryNode"
+        },
+        "tags": "Element,Deployment Node",
+        "technology": "Agent host"
+      },
+      {
+        "children": [
+          {
+            "containerInstances": [
+              {
+                "containerId": "16",
+                "environment": "Topology launch",
+                "id": "243",
+                "instanceId": 1,
+                "properties": {
+                  "structurizr.dsl.identifier": "launch_hub"
+                },
+                "relationships": [
+                  {
+                    "description": "Returns authorized stream over launch's existing connection",
+                    "destinationId": "238",
+                    "id": "244",
+                    "linkedRelationshipId": "96",
+                    "sourceId": "243",
+                    "technology": "Workload mutual TLS over overlay"
+                  }
+                ],
+                "tags": "Container Instance"
+              }
+            ],
+            "description": "One multiplexed connection per launch.",
+            "environment": "Topology launch",
+            "id": "242",
+            "instances": "1",
+            "name": "Agent hub node",
+            "properties": {
+              "structurizr.dsl.identifier": "launch_agentHubNodeNode"
+            },
+            "tags": "Element,Deployment Node",
+            "technology": "tsnet node"
+          },
+          {
+            "containerInstances": [
+              {
+                "containerId": "17",
+                "environment": "Topology launch",
+                "id": "247",
+                "instanceId": 1,
+                "properties": {
+                  "structurizr.dsl.identifier": "launch_controlApi"
+                },
+                "relationships": [
+                  {
+                    "description": "Uses agent streams; endpoint ownership undecided",
+                    "destinationId": "243",
+                    "id": "249",
+                    "linkedRelationshipId": "87",
+                    "sourceId": "247",
+                    "technology": "Authenticated service connection"
+                  }
+                ],
+                "tags": "Container Instance"
+              }
+            ],
+            "description": "Checks live launch capabilities and scopes.",
+            "environment": "Topology launch",
+            "id": "246",
+            "instances": "1",
+            "name": "API service node",
+            "properties": {
+              "structurizr.dsl.identifier": "launch_apiServiceNodeNode"
+            },
+            "tags": "Element,Deployment Node",
+            "technology": "tsnet node"
+          }
+        ],
+        "description": "Service identities authenticate workload connections.",
+        "environment": "Topology launch",
+        "id": "241",
+        "instances": "1",
+        "name": "Control plane trust boundary",
+        "properties": {
+          "structurizr.dsl.identifier": "launch_controlPlaneTrustBoundaryNode"
+        },
+        "tags": "Element,Deployment Node",
+        "technology": "Cluster overlay"
+      },
+      {
+        "description": "Destination authentication differs from workload identity.",
+        "environment": "Topology launch",
+        "id": "250",
+        "instances": "1",
+        "name": "Internet boundary",
+        "properties": {
+          "structurizr.dsl.identifier": "launch_internetBoundaryNode"
+        },
+        "softwareSystemInstances": [
+          {
+            "environment": "Topology launch",
+            "id": "251",
+            "instanceId": 1,
+            "properties": {
+              "structurizr.dsl.identifier": "launch_internet"
+            },
+            "softwareSystemId": "69",
+            "tags": "Software System Instance"
+          }
+        ],
+        "tags": "Element,Deployment Node",
+        "technology": "External services"
+      }
+    ],
     "people": [
       {
         "description": "Runs afakt and inspects its workflows.",
@@ -18,7 +1556,7 @@
           {
             "description": "Runs commands",
             "destinationId": "8",
-            "id": "16",
+            "id": "34",
             "sourceId": "1",
             "tags": "Relationship",
             "technology": "CLI"
@@ -26,23 +1564,23 @@
           {
             "description": "Runs commands",
             "destinationId": "7",
-            "id": "17",
-            "linkedRelationshipId": "16",
+            "id": "35",
+            "linkedRelationshipId": "34",
             "sourceId": "1",
             "technology": "CLI"
           },
           {
             "description": "Runs commands",
             "destinationId": "6",
-            "id": "18",
-            "linkedRelationshipId": "16",
+            "id": "36",
+            "linkedRelationshipId": "34",
             "sourceId": "1",
             "technology": "CLI"
           },
           {
             "description": "Uses the dashboard",
             "destinationId": "11",
-            "id": "19",
+            "id": "37",
             "sourceId": "1",
             "tags": "Relationship",
             "technology": "HTTP"
@@ -50,7 +1588,7 @@
           {
             "description": "Inspects workflows",
             "destinationId": "15",
-            "id": "20",
+            "id": "38",
             "sourceId": "1",
             "tags": "Relationship",
             "technology": "HTTP"
@@ -72,7 +1610,7 @@
           {
             "description": "Delivers webhooks",
             "destinationId": "10",
-            "id": "26",
+            "id": "44",
             "sourceId": "2",
             "tags": "Relationship",
             "technology": "HTTP"
@@ -80,16 +1618,16 @@
           {
             "description": "Delivers webhooks",
             "destinationId": "7",
-            "id": "27",
-            "linkedRelationshipId": "26",
+            "id": "45",
+            "linkedRelationshipId": "44",
             "sourceId": "2",
             "technology": "HTTP"
           },
           {
             "description": "Delivers webhooks",
             "destinationId": "6",
-            "id": "28",
-            "linkedRelationshipId": "26",
+            "id": "46",
+            "linkedRelationshipId": "44",
             "sourceId": "2",
             "technology": "HTTP"
           }
@@ -108,7 +1646,7 @@
           {
             "description": "Calls the REST API",
             "destinationId": "9",
-            "id": "21",
+            "id": "39",
             "sourceId": "3",
             "tags": "Relationship",
             "technology": "HTTP"
@@ -116,16 +1654,16 @@
           {
             "description": "Calls the REST API",
             "destinationId": "7",
-            "id": "22",
-            "linkedRelationshipId": "21",
+            "id": "40",
+            "linkedRelationshipId": "39",
             "sourceId": "3",
             "technology": "HTTP"
           },
           {
             "description": "Calls the REST API",
             "destinationId": "6",
-            "id": "23",
-            "linkedRelationshipId": "21",
+            "id": "41",
+            "linkedRelationshipId": "39",
             "sourceId": "3",
             "technology": "HTTP"
           }
@@ -168,7 +1706,7 @@
                   {
                     "description": "Calls the REST API",
                     "destinationId": "9",
-                    "id": "24",
+                    "id": "42",
                     "sourceId": "8",
                     "tags": "Relationship",
                     "technology": "HTTP"
@@ -189,7 +1727,7 @@
                   {
                     "description": "Starts workflows in embedded mode",
                     "destinationId": "12",
-                    "id": "34",
+                    "id": "52",
                     "sourceId": "9",
                     "tags": "Relationship",
                     "technology": "Temporal"
@@ -197,7 +1735,7 @@
                   {
                     "description": "Starts workflows in external mode",
                     "destinationId": "5",
-                    "id": "35",
+                    "id": "53",
                     "sourceId": "9",
                     "tags": "Relationship",
                     "technology": "Temporal"
@@ -205,7 +1743,7 @@
                   {
                     "description": "Calls the GitHub API",
                     "destinationId": "2",
-                    "id": "36",
+                    "id": "54",
                     "sourceId": "9",
                     "tags": "Relationship",
                     "technology": "HTTP"
@@ -226,7 +1764,7 @@
                   {
                     "description": "Calls the REST API",
                     "destinationId": "9",
-                    "id": "29",
+                    "id": "47",
                     "sourceId": "10",
                     "tags": "Relationship",
                     "technology": "HTTP"
@@ -234,7 +1772,7 @@
                   {
                     "description": "Starts workflows in embedded mode",
                     "destinationId": "12",
-                    "id": "30",
+                    "id": "48",
                     "sourceId": "10",
                     "tags": "Relationship",
                     "technology": "Temporal"
@@ -242,7 +1780,7 @@
                   {
                     "description": "Starts workflows in external mode",
                     "destinationId": "5",
-                    "id": "31",
+                    "id": "49",
                     "sourceId": "10",
                     "tags": "Relationship",
                     "technology": "Temporal"
@@ -263,7 +1801,7 @@
                   {
                     "description": "Calls the REST API",
                     "destinationId": "9",
-                    "id": "25",
+                    "id": "43",
                     "sourceId": "11",
                     "tags": "Relationship",
                     "technology": "HTTP"
@@ -295,7 +1833,7 @@
                   {
                     "description": "Calls the REST API",
                     "destinationId": "9",
-                    "id": "39",
+                    "id": "57",
                     "sourceId": "13",
                     "tags": "Relationship",
                     "technology": "HTTP"
@@ -303,7 +1841,7 @@
                   {
                     "description": "Calls the GitHub API",
                     "destinationId": "2",
-                    "id": "40",
+                    "id": "58",
                     "sourceId": "13",
                     "tags": "Relationship",
                     "technology": "HTTP"
@@ -311,7 +1849,7 @@
                   {
                     "description": "Uses durable execution in embedded mode",
                     "destinationId": "12",
-                    "id": "41",
+                    "id": "59",
                     "sourceId": "13",
                     "tags": "Relationship",
                     "technology": "Temporal"
@@ -319,7 +1857,7 @@
                   {
                     "description": "Uses durable execution in external mode",
                     "destinationId": "5",
-                    "id": "42",
+                    "id": "60",
                     "sourceId": "13",
                     "tags": "Relationship",
                     "technology": "Temporal"
@@ -327,7 +1865,7 @@
                   {
                     "description": "Starts agent work",
                     "destinationId": "14",
-                    "id": "43",
+                    "id": "61",
                     "sourceId": "13",
                     "tags": "Relationship",
                     "technology": "Temporal"
@@ -348,7 +1886,7 @@
                   {
                     "description": "Runs coding agents",
                     "destinationId": "4",
-                    "id": "44",
+                    "id": "62",
                     "sourceId": "14",
                     "tags": "Relationship",
                     "technology": "Process"
@@ -369,7 +1907,7 @@
                   {
                     "description": "Reads namespaces and workflow histories",
                     "destinationId": "12",
-                    "id": "47",
+                    "id": "65",
                     "sourceId": "15",
                     "tags": "Relationship",
                     "technology": "Temporal"
@@ -390,30 +1928,546 @@
               {
                 "description": "Starts workflows in external mode",
                 "destinationId": "5",
-                "id": "32",
-                "linkedRelationshipId": "31",
+                "id": "50",
+                "linkedRelationshipId": "49",
                 "sourceId": "7",
                 "technology": "Temporal"
               },
               {
                 "description": "Calls the GitHub API",
                 "destinationId": "2",
-                "id": "37",
-                "linkedRelationshipId": "36",
+                "id": "55",
+                "linkedRelationshipId": "54",
                 "sourceId": "7",
                 "technology": "HTTP"
               },
               {
                 "description": "Runs coding agents",
                 "destinationId": "4",
-                "id": "45",
-                "linkedRelationshipId": "44",
+                "id": "63",
+                "linkedRelationshipId": "62",
                 "sourceId": "7",
                 "technology": "Process"
               }
             ],
             "tags": "Element,Container",
             "technology": "Go"
+          },
+          {
+            "description": "Joins per-launch connections carrying sessions, remote control, ports and previews.",
+            "documentation": {},
+            "group": "Control plane services",
+            "id": "16",
+            "name": "Agent hub",
+            "properties": {
+              "structurizr.dsl.identifier": "hub"
+            },
+            "relationships": [
+              {
+                "description": "Returns authorized stream over launch's existing connection",
+                "destinationId": "30",
+                "id": "96",
+                "sourceId": "16",
+                "tags": "Relationship,TopologyConnection,ReturnDetail,OverviewHidden",
+                "technology": "Workload mutual TLS over overlay"
+              },
+              {
+                "description": "Obtains overlay coordination through afakt interface",
+                "destinationId": "20",
+                "id": "107",
+                "sourceId": "16",
+                "tags": "Relationship,TopologyConnection",
+                "technology": "Overlay control"
+              },
+              {
+                "description": "Uses encrypted relay transport when needed",
+                "destinationId": "21",
+                "id": "109",
+                "sourceId": "16",
+                "tags": "Relationship,TopologyConnection",
+                "technology": "Overlay transport"
+              }
+            ],
+            "tags": "Element,Container,Topology",
+            "technology": "Application service"
+          },
+          {
+            "description": "Authorizes operations and serves the dashboard from its own origin.",
+            "documentation": {},
+            "group": "Control plane services",
+            "id": "17",
+            "name": "API server and web dashboard",
+            "properties": {
+              "structurizr.dsl.identifier": "controlApi"
+            },
+            "relationships": [
+              {
+                "description": "Uses agent streams; endpoint ownership undecided",
+                "destinationId": "16",
+                "id": "87",
+                "sourceId": "17",
+                "tags": "Relationship,TopologyConnection,ReturnDetail",
+                "technology": "Authenticated service connection"
+              }
+            ],
+            "tags": "Element,Container,Topology",
+            "technology": "Application service"
+          },
+          {
+            "description": "Serves previews as a client of authorized published ports through the agent hub.",
+            "documentation": {},
+            "group": "Control plane services",
+            "id": "18",
+            "name": "Preview server",
+            "properties": {
+              "structurizr.dsl.identifier": "previewServer"
+            },
+            "relationships": [
+              {
+                "description": "Opens authorized published port as preview service",
+                "destinationId": "16",
+                "id": "95",
+                "sourceId": "18",
+                "tags": "Relationship,TopologyConnection,OverviewHidden",
+                "technology": "Authenticated service connection"
+              }
+            ],
+            "tags": "Element,Container,Topology",
+            "technology": "Application service"
+          },
+          {
+            "description": "Checks launch tool grants and keeps upstream credentials outside guests.",
+            "documentation": {},
+            "group": "Control plane services",
+            "id": "19",
+            "name": "MCP gateway",
+            "properties": {
+              "structurizr.dsl.identifier": "mcpGateway"
+            },
+            "relationships": [
+              {
+                "description": "Calls permitted operations with launch context",
+                "destinationId": "17",
+                "id": "88",
+                "sourceId": "19",
+                "tags": "Relationship,TopologyConnection",
+                "technology": "Authenticated service connection"
+              }
+            ],
+            "tags": "Element,Container,Topology",
+            "technology": "Application service"
+          },
+          {
+            "description": "An afakt interface fronts isolated Headscale coordination; cluster nodes retain a static map of stable nodes.",
+            "documentation": {},
+            "group": "Control plane services",
+            "id": "20",
+            "name": "Overlay coordination",
+            "properties": {
+              "structurizr.dsl.identifier": "coordination"
+            },
+            "tags": "Element,Container,Topology",
+            "technology": "Headscale"
+          },
+          {
+            "description": "Carries encrypted overlay traffic when a relay path is needed.",
+            "documentation": {},
+            "group": "Control plane services",
+            "id": "21",
+            "name": "Overlay relay",
+            "properties": {
+              "structurizr.dsl.identifier": "overlayRelay"
+            },
+            "tags": "Element,Container,Topology",
+            "technology": "Overlay transport"
+          },
+          {
+            "description": "Accepts public and attached-tailnet application requests; never routes packets between tailnets and the cluster.",
+            "documentation": {},
+            "group": "External ingress boundary",
+            "id": "22",
+            "name": "External ingress gateway",
+            "properties": {
+              "structurizr.dsl.identifier": "edge"
+            },
+            "relationships": [
+              {
+                "description": "Forwards authenticated dashboard and API requests",
+                "destinationId": "17",
+                "id": "85",
+                "sourceId": "22",
+                "tags": "Relationship,TopologyConnection,OverviewHidden",
+                "technology": "Application protocol over overlay"
+              },
+              {
+                "description": "Forwards preview requests with user context",
+                "destinationId": "18",
+                "id": "86",
+                "sourceId": "22",
+                "tags": "Relationship,TopologyConnection,OverviewHidden",
+                "technology": "Application protocol over overlay"
+              }
+            ],
+            "tags": "Element,Container,Topology",
+            "technology": "Application proxy"
+          },
+          {
+            "description": "Controls launch lifecycle as a dedicated user; stays outside every launch data path.",
+            "documentation": {},
+            "group": "Host management boundary",
+            "id": "23",
+            "name": "Agent host worker",
+            "properties": {
+              "structurizr.dsl.identifier": "hostWorker"
+            },
+            "relationships": [
+              {
+                "description": "Requests authorized setup and launch operations",
+                "destinationId": "24",
+                "id": "75",
+                "sourceId": "23",
+                "tags": "Relationship,TopologyConnection",
+                "technology": "Authenticated local control"
+              },
+              {
+                "description": "Requires host name resolution",
+                "destinationId": "25",
+                "id": "76",
+                "sourceId": "23",
+                "tags": "Relationship,TopologyConnection,OverviewHidden",
+                "technology": "Local control"
+              },
+              {
+                "description": "Starts and manages launch; no data forwarding",
+                "destinationId": "29",
+                "id": "77",
+                "sourceId": "23",
+                "tags": "Relationship,LifecycleDetail,TopologyConnection,OverviewHidden",
+                "technology": "Local lifecycle control"
+              },
+              {
+                "description": "Starts and manages destination launch; no data forwarding",
+                "destinationId": "32",
+                "id": "78",
+                "sourceId": "23",
+                "tags": "Relationship,LifecycleDetail,TopologyConnection,OverviewHidden",
+                "technology": "Local lifecycle control"
+              },
+              {
+                "description": "Sends host management requests",
+                "destinationId": "27",
+                "id": "79",
+                "sourceId": "23",
+                "tags": "Relationship,TopologyConnection",
+                "technology": "Local channel"
+              }
+            ],
+            "tags": "Element,Container,Topology",
+            "technology": "Host service"
+          },
+          {
+            "description": "Performs narrowly authorized setup and launch operations; caller binding is undecided.",
+            "documentation": {},
+            "group": "Host management boundary",
+            "id": "24",
+            "name": "Privileged helper",
+            "properties": {
+              "structurizr.dsl.identifier": "helper"
+            },
+            "tags": "Element,Container,Topology",
+            "technology": "Host privilege boundary"
+          },
+          {
+            "description": "Resolves names under *.afakt.internal for host clients.",
+            "documentation": {},
+            "group": "Host management boundary",
+            "id": "25",
+            "name": "Host name resolver",
+            "properties": {
+              "structurizr.dsl.identifier": "hostResolver"
+            },
+            "tags": "Element,Container,Topology",
+            "technology": "Domain Name System"
+          },
+          {
+            "description": "Host-level authorization for services, previews and ports; local caller and connection mechanisms undecided.",
+            "documentation": {},
+            "group": "Operator access on the agent host",
+            "id": "26",
+            "name": "Host access boundary",
+            "properties": {
+              "structurizr.dsl.identifier": "loopbackProxy"
+            },
+            "relationships": [
+              {
+                "description": "Uses host-level authorization",
+                "destinationId": "27",
+                "id": "72",
+                "sourceId": "26",
+                "tags": "Relationship,TopologyConnection,OverviewHidden",
+                "technology": "Connection mechanism undecided"
+              }
+            ],
+            "tags": "Element,Container,Topology",
+            "technology": "Access mechanism undecided"
+          },
+          {
+            "description": "Host authorization for agent and cluster services; connection mechanism undecided; optional user tailnet attachment.",
+            "documentation": {},
+            "group": "Operator access on the agent host",
+            "id": "27",
+            "name": "Host-level connectivity",
+            "properties": {
+              "structurizr.dsl.identifier": "hostNetwork"
+            },
+            "relationships": [
+              {
+                "description": "Requests preview as host identity",
+                "destinationId": "18",
+                "id": "73",
+                "sourceId": "27",
+                "tags": "Relationship,TopologyConnection,OverviewHidden",
+                "technology": "Workload mutual TLS over overlay"
+              },
+              {
+                "description": "Requests authorized port or service as host identity",
+                "destinationId": "16",
+                "id": "74",
+                "sourceId": "27",
+                "tags": "Relationship,TopologyConnection,OverviewHidden",
+                "technology": "Workload mutual TLS over overlay"
+              },
+              {
+                "description": "Registers host and reports capacity as host identity",
+                "destinationId": "17",
+                "id": "80",
+                "sourceId": "27",
+                "tags": "Relationship,TopologyConnection",
+                "technology": "Workload mutual TLS over overlay"
+              },
+              {
+                "description": "Obtains overlay coordination through afakt interface",
+                "destinationId": "20",
+                "id": "106",
+                "sourceId": "27",
+                "tags": "Relationship,TopologyConnection,OverviewHidden",
+                "technology": "Overlay control"
+              }
+            ],
+            "tags": "Element,Container,Topology",
+            "technology": "Host access role"
+          },
+          {
+            "description": "Untrusted harness, relay and loopback listeners; no overlay membership or workload keys.",
+            "documentation": {},
+            "group": "Launch guest boundary",
+            "id": "28",
+            "name": "Guest workload",
+            "properties": {
+              "structurizr.dsl.identifier": "guest"
+            },
+            "relationships": [
+              {
+                "description": "Sends traffic bound to this launch",
+                "destinationId": "29",
+                "id": "89",
+                "sourceId": "28",
+                "tags": "Relationship,TopologyConnection,OverviewHidden",
+                "technology": "Local provider carrier"
+              }
+            ],
+            "tags": "Element,Container,Topology",
+            "technology": "Provider confinement"
+          },
+          {
+            "description": "Enforces this launch's policy and stamps identity; has no network access of its own.",
+            "documentation": {},
+            "group": "Launch mediation boundary",
+            "id": "29",
+            "name": "Agent mediator",
+            "properties": {
+              "structurizr.dsl.identifier": "mediator"
+            },
+            "relationships": [
+              {
+                "description": "Sends policy-permitted traffic and stamped launch identity",
+                "destinationId": "30",
+                "id": "90",
+                "sourceId": "29",
+                "tags": "Relationship,TopologyConnection,OverviewHidden",
+                "technology": "Local channel"
+              },
+              {
+                "description": "Connects permitted stream to current guest listener",
+                "destinationId": "28",
+                "id": "98",
+                "sourceId": "29",
+                "tags": "Relationship,TopologyConnection,ReturnDetail,OverviewHidden",
+                "technology": "Local provider carrier"
+              }
+            ],
+            "tags": "Element,Container,Topology",
+            "technology": "Local policy enforcement"
+          },
+          {
+            "description": "Own overlay node, hub connection and launch X.509-SVID; only launch component opening connections off the host.",
+            "documentation": {},
+            "group": "Launch agent proxy boundary",
+            "id": "30",
+            "name": "Agent proxy",
+            "properties": {
+              "structurizr.dsl.identifier": "agent-proxy"
+            },
+            "relationships": [
+              {
+                "description": "Opens own multiplexed connection with launch X.509-SVID",
+                "destinationId": "16",
+                "id": "91",
+                "sourceId": "30",
+                "tags": "Relationship,TopologyConnection,OverviewHidden",
+                "technology": "Workload mutual TLS over overlay"
+              },
+              {
+                "description": "Calls authorized operations with launch X.509-SVID",
+                "destinationId": "17",
+                "id": "92",
+                "sourceId": "30",
+                "tags": "Relationship,TopologyConnection,OverviewHidden",
+                "technology": "Workload mutual TLS over overlay"
+              },
+              {
+                "description": "Calls allowed tools with launch X.509-SVID",
+                "destinationId": "19",
+                "id": "93",
+                "sourceId": "30",
+                "tags": "Relationship,TopologyConnection,OverviewHidden",
+                "technology": "Workload mutual TLS over overlay"
+              },
+              {
+                "description": "Opens permitted egress; inspection where required",
+                "destinationId": "69",
+                "id": "94",
+                "sourceId": "30",
+                "tags": "Relationship,TopologyConnection,OverviewHidden",
+                "technology": "Destination protocol"
+              },
+              {
+                "description": "Delivers stream with authenticated caller and target launch",
+                "destinationId": "29",
+                "id": "97",
+                "sourceId": "30",
+                "tags": "Relationship,TopologyConnection,ReturnDetail,OverviewHidden",
+                "technology": "Local channel"
+              },
+              {
+                "description": "Logical grant-bound stream; direct overlay or agent hub undecided",
+                "destinationId": "33",
+                "id": "104",
+                "sourceId": "30",
+                "tags": "Relationship,TopologyConnection,OverviewHidden,Undecided",
+                "technology": "Transport undecided"
+              },
+              {
+                "description": "Obtains overlay coordination through afakt interface",
+                "destinationId": "20",
+                "id": "105",
+                "sourceId": "30",
+                "tags": "Relationship,TopologyConnection,OverviewHidden",
+                "technology": "Overlay control"
+              },
+              {
+                "description": "Uses encrypted relay transport when needed",
+                "destinationId": "21",
+                "id": "108",
+                "sourceId": "30",
+                "tags": "Relationship,TopologyConnection,OverviewHidden",
+                "technology": "Overlay transport"
+              }
+            ],
+            "tags": "Element,Container,Topology",
+            "technology": "Tailscale tsnet"
+          },
+          {
+            "description": "Untrusted workload and published loopback listener; no overlay membership or workload keys.",
+            "documentation": {},
+            "group": "Destination launch guest boundary",
+            "id": "31",
+            "name": "Destination guest",
+            "properties": {
+              "structurizr.dsl.identifier": "destinationGuest"
+            },
+            "relationships": [
+              {
+                "description": "Requests access bound to destination launch",
+                "destinationId": "32",
+                "id": "100",
+                "sourceId": "31",
+                "tags": "Relationship,TopologyConnection,OverviewHidden",
+                "technology": "Local provider carrier"
+              }
+            ],
+            "tags": "Element,Container,Topology",
+            "technology": "Provider confinement"
+          },
+          {
+            "description": "Checks the source grant and current destination launch before listener access; no independent network.",
+            "documentation": {},
+            "group": "Destination launch mediation boundary",
+            "id": "32",
+            "name": "Destination mediator",
+            "properties": {
+              "structurizr.dsl.identifier": "destinationMediator"
+            },
+            "relationships": [
+              {
+                "description": "Sends policy-permitted destination traffic",
+                "destinationId": "33",
+                "id": "101",
+                "sourceId": "32",
+                "tags": "Relationship,TopologyConnection,OverviewHidden",
+                "technology": "Local channel"
+              },
+              {
+                "description": "Connects grant-permitted stream to bound listener",
+                "destinationId": "31",
+                "id": "103",
+                "sourceId": "32",
+                "tags": "Relationship,TopologyConnection,ReturnDetail,OverviewHidden",
+                "technology": "Local provider carrier"
+              }
+            ],
+            "tags": "Element,Container,Topology",
+            "technology": "Local policy enforcement"
+          },
+          {
+            "description": "Independent overlay node, hub connection and destination launch X.509-SVID.",
+            "documentation": {},
+            "group": "Destination launch network boundary",
+            "id": "33",
+            "name": "Destination agent proxy",
+            "properties": {
+              "structurizr.dsl.identifier": "destination-agent-proxy"
+            },
+            "relationships": [
+              {
+                "description": "Opens independent connection with destination launch X.509-SVID",
+                "destinationId": "16",
+                "id": "99",
+                "sourceId": "33",
+                "tags": "Relationship,TopologyConnection,OverviewHidden",
+                "technology": "Workload mutual TLS over overlay"
+              },
+              {
+                "description": "Delivers stream with source identity and target grant",
+                "destinationId": "32",
+                "id": "102",
+                "sourceId": "33",
+                "tags": "Relationship,TopologyConnection,ReturnDetail,OverviewHidden",
+                "technology": "Local channel"
+              }
+            ],
+            "tags": "Element,Container,Topology",
+            "technology": "Tailscale tsnet"
           }
         ],
         "description": "Coordinates coding work through its API and workflows.",
@@ -427,29 +2481,127 @@
           {
             "description": "Starts workflows in external mode",
             "destinationId": "5",
-            "id": "33",
-            "linkedRelationshipId": "31",
+            "id": "51",
+            "linkedRelationshipId": "49",
             "sourceId": "6",
             "technology": "Temporal"
           },
           {
             "description": "Calls the GitHub API",
             "destinationId": "2",
-            "id": "38",
-            "linkedRelationshipId": "36",
+            "id": "56",
+            "linkedRelationshipId": "54",
             "sourceId": "6",
             "technology": "HTTP"
           },
           {
             "description": "Runs coding agents",
             "destinationId": "4",
-            "id": "46",
-            "linkedRelationshipId": "44",
+            "id": "64",
+            "linkedRelationshipId": "62",
             "sourceId": "6",
             "technology": "Process"
           }
         ],
         "tags": "Element,Software System"
+      },
+      {
+        "description": "A browser under the operator's local user identity.",
+        "documentation": {},
+        "group": "Operator devices",
+        "id": "66",
+        "name": "Operator browser",
+        "properties": {
+          "structurizr.dsl.identifier": "browser"
+        },
+        "relationships": [
+          {
+            "description": "Resolves *.afakt.internal",
+            "destinationId": "25",
+            "id": "70",
+            "sourceId": "66",
+            "tags": "Relationship,TopologyConnection,OverviewHidden",
+            "technology": "Local name query"
+          },
+          {
+            "description": "Requests service, preview or port",
+            "destinationId": "26",
+            "id": "71",
+            "sourceId": "66",
+            "tags": "Relationship,TopologyConnection,OverviewHidden",
+            "technology": "Host access mechanism undecided"
+          },
+          {
+            "description": "Sends public application requests as signed-in user",
+            "destinationId": "22",
+            "id": "84",
+            "sourceId": "66",
+            "tags": "Relationship,TopologyConnection,OverviewHidden",
+            "technology": "Transport Layer Security"
+          }
+        ],
+        "tags": "Element,Software System,Topology"
+      },
+      {
+        "description": "Operator devices using their attached user tailnet and afakt sign-in.",
+        "documentation": {},
+        "group": "Operator devices",
+        "id": "67",
+        "name": "Phone and native clients",
+        "properties": {
+          "structurizr.dsl.identifier": "phone"
+        },
+        "relationships": [
+          {
+            "description": "Connects with device identity",
+            "destinationId": "68",
+            "id": "81",
+            "sourceId": "67",
+            "tags": "Relationship,TopologyConnection,OverviewHidden",
+            "technology": "User tailnet"
+          }
+        ],
+        "tags": "Element,Software System,Topology"
+      },
+      {
+        "description": "User-controlled private connectivity; separate from the cluster overlay.",
+        "documentation": {},
+        "group": "User network boundary",
+        "id": "68",
+        "name": "Attached user tailnet",
+        "properties": {
+          "structurizr.dsl.identifier": "userTailnet"
+        },
+        "relationships": [
+          {
+            "description": "Delivers application requests",
+            "destinationId": "22",
+            "id": "82",
+            "sourceId": "68",
+            "tags": "Relationship,ClusterAttachment,OverviewHidden",
+            "technology": "Transport Layer Security"
+          },
+          {
+            "description": "Optional host attachment; application access only",
+            "destinationId": "27",
+            "id": "83",
+            "sourceId": "68",
+            "tags": "Relationship,ClusterAttachment,OverviewHidden",
+            "technology": "User tailnet"
+          }
+        ],
+        "tags": "Element,Software System,Topology"
+      },
+      {
+        "description": "Permitted upstream destinations outside the cluster trust domain.",
+        "documentation": {},
+        "group": "External service boundary",
+        "id": "69",
+        "name": "Internet services",
+        "properties": {
+          "structurizr.dsl.identifier": "internet"
+        },
+        "tags": "Element,Software System,Topology"
       }
     ]
   },
@@ -457,7 +2609,7 @@
   "properties": {
     "structurizr.inspection.error": "0",
     "structurizr.inspection.model.softwaresystem.documentation": "ignore",
-    "structurizr.dsl": "d29ya3NwYWNlICJhZmFrdCIgIkFyY2hpdGVjdHVyZSBvZiB0aGUgYWZha3QgbW9kdWxhciBtb25vbGl0aC4iIHsKICAgIHByb3BlcnRpZXMgewogICAgICAgIC8vIERvY3VtZW50YXRpb24gYW5kIGRlY2lzaW9ucyBzdGF5IGluIHRoZSByZXBvc2l0b3J5J3MgZG9jcyBidW5kbGUuCiAgICAgICAgc3RydWN0dXJpenIuaW5zcGVjdGlvbi5tb2RlbC5zb2Z0d2FyZXN5c3RlbS5kb2N1bWVudGF0aW9uIGlnbm9yZQogICAgICAgIHN0cnVjdHVyaXpyLmluc3BlY3Rpb24ubW9kZWwuc29mdHdhcmVzeXN0ZW0uZGVjaXNpb25zIGlnbm9yZQogICAgfQoKICAgIG1vZGVsIHsKICAgICAgICBkZXZlbG9wZXIgPSBwZXJzb24gIkRldmVsb3BlciBvciB0ZXN0ZXIiICJSdW5zIGFmYWt0IGFuZCBpbnNwZWN0cyBpdHMgd29ya2Zsb3dzLiIKICAgICAgICBnaXRodWIgPSBzb2Z0d2FyZVN5c3RlbSAiR2l0SHViIiAiRGVsaXZlcnMgd2ViaG9va3MgYW5kIGV4cG9zZXMgdGhlIEdpdEh1YiBBUEkuIgogICAgICAgIG5hdGl2ZSA9IHNvZnR3YXJlU3lzdGVtICJOYXRpdmUgYXBwcyIgIkNsaWVudHMgb2YgYWZha3QncyBSRVNUIEFQSS4iCiAgICAgICAgYWdlbnRzID0gc29mdHdhcmVTeXN0ZW0gIkFJIGNvZGluZyBhZ2VudHMiICJQZXJmb3JtIGNvZGluZyB3b3JrIHN0YXJ0ZWQgYnkgQWdlbnQgcnVubmVyLiIKICAgICAgICB0ZW1wb3JhbCA9IHNvZnR3YXJlU3lzdGVtICJFeHRlcm5hbCBUZW1wb3JhbCIgIlByb3ZpZGVzIGR1cmFibGUgZXhlY3V0aW9uIHdoZW4gd29ya2VycyB1c2UgYW4gZXh0ZXJuYWwgc2VydmVyLiIKCiAgICAgICAgYWZha3QgPSBzb2Z0d2FyZVN5c3RlbSAiYWZha3QiICJDb29yZGluYXRlcyBjb2Rpbmcgd29yayB0aHJvdWdoIGl0cyBBUEkgYW5kIHdvcmtmbG93cy4iIHsKICAgICAgICAgICAgcnVudGltZSA9IGNvbnRhaW5lciAiYWZha3QgcHJvY2VzcyIgIlJ1bnMgdGhlIHNlbGVjdGVkIHJ1bnRpbWUgcm9sZXMgdG9nZXRoZXIgb3Igc2VwYXJhdGVseSBmcm9tIHRoZSBzYW1lIGJpbmFyeS4iICJHbyIgewogICAgICAgICAgICAgICAgY2xpID0gY29tcG9uZW50ICJDb21tYW5kLWxpbmUgaW50ZXJmYWNlIiAiUnVucyBzZXJ2ZXIgcm9sZXMgYW5kIGNvbW11bmljYXRlcyB3aXRoIHRoZSBBUEkuIiAiR28iCiAgICAgICAgICAgICAgICBhcGkgPSBjb21wb25lbnQgIkFQSSBzZXJ2ZXIiICJTZXJ2ZXMgdGhlIFJFU1QgQVBJIGFuZCBzdGFydHMgd29ya2Zsb3dzLiIgIkdvIgogICAgICAgICAgICAgICAgd2ViaG9vayA9IGNvbXBvbmVudCAiR2l0SHViIHdlYmhvb2sgcmVjZWl2ZXIiICJBY2NlcHRzIHdlYmhvb2sgZGVsaXZlcmllcyBhbmQgc3RhcnRzIGNvb3JkaW5hdGlvbiB3b3JrLiIgIkdvIgogICAgICAgICAgICAgICAgZGFzaGJvYXJkID0gY29tcG9uZW50ICJXZWIgZGFzaGJvYXJkIiAiUHJvdmlkZXMgdGhlIHdlYiBVSSBmcm9tIHRoZSBBUEkncyBvcmlnaW4uIiAiUmVhY3QiCiAgICAgICAgICAgICAgICBvcmNoZXN0cmF0b3IgPSBjb21wb25lbnQgIkVtYmVkZGVkIHdvcmtmbG93IG9yY2hlc3RyYXRvciIgIlByb3ZpZGVzIGR1cmFibGUgZXhlY3V0aW9uIGluc2lkZSB0aGUgcHJvY2VzcyBmb3IgZGV2ZWxvcG1lbnQgYW5kIHRlc3RzLiIgIlRlbXBvcmFsIgogICAgICAgICAgICAgICAgd29ya2Zsb3dzID0gY29tcG9uZW50ICJDb29yZGluYXRpb24gd29ya2Zsb3dzIiAiQ29vcmRpbmF0ZSB3b3JrIG9uIHdvcmtlcnMgaW5zaWRlIHRoZSBiaW5hcnkgYW5kIHN0YXJ0IG90aGVyIHdvcmtmbG93cy4iICJUZW1wb3JhbCIKICAgICAgICAgICAgICAgIHJ1bm5lciA9IGNvbXBvbmVudCAiQWdlbnQgcnVubmVyIiAiUnVucyBBSSBjb2RpbmcgYWdlbnRzIGFzIGEgd29ya2Zsb3cuIiAiVGVtcG9yYWwiCiAgICAgICAgICAgICAgICB0ZW1wb3JhbFVJID0gY29tcG9uZW50ICJUZW1wb3JhbCBXZWIgVUkiICJTaG93cyB0aGUgZW1iZWRkZWQgc2VydmVyJ3MgbmFtZXNwYWNlcywgd29ya2Zsb3dzLCBhbmQgaGlzdG9yaWVzLiIgIlRlbXBvcmFsIgogICAgICAgICAgICB9CiAgICAgICAgfQoKICAgICAgICBkZXZlbG9wZXIgLT4gY2xpICJSdW5zIGNvbW1hbmRzIiAiQ0xJIgogICAgICAgIGRldmVsb3BlciAtPiBkYXNoYm9hcmQgIlVzZXMgdGhlIGRhc2hib2FyZCIgIkhUVFAiCiAgICAgICAgZGV2ZWxvcGVyIC0+IHRlbXBvcmFsVUkgIkluc3BlY3RzIHdvcmtmbG93cyIgIkhUVFAiCiAgICAgICAgbmF0aXZlIC0+IGFwaSAiQ2FsbHMgdGhlIFJFU1QgQVBJIiAiSFRUUCIKICAgICAgICBjbGkgLT4gYXBpICJDYWxscyB0aGUgUkVTVCBBUEkiICJIVFRQIgogICAgICAgIGRhc2hib2FyZCAtPiBhcGkgIkNhbGxzIHRoZSBSRVNUIEFQSSIgIkhUVFAiCiAgICAgICAgZ2l0aHViIC0+IHdlYmhvb2sgIkRlbGl2ZXJzIHdlYmhvb2tzIiAiSFRUUCIKICAgICAgICB3ZWJob29rIC0+IGFwaSAiQ2FsbHMgdGhlIFJFU1QgQVBJIiAiSFRUUCIKICAgICAgICB3ZWJob29rIC0+IG9yY2hlc3RyYXRvciAiU3RhcnRzIHdvcmtmbG93cyBpbiBlbWJlZGRlZCBtb2RlIiAiVGVtcG9yYWwiCiAgICAgICAgd2ViaG9vayAtPiB0ZW1wb3JhbCAiU3RhcnRzIHdvcmtmbG93cyBpbiBleHRlcm5hbCBtb2RlIiAiVGVtcG9yYWwiCiAgICAgICAgYXBpIC0+IG9yY2hlc3RyYXRvciAiU3RhcnRzIHdvcmtmbG93cyBpbiBlbWJlZGRlZCBtb2RlIiAiVGVtcG9yYWwiCiAgICAgICAgYXBpIC0+IHRlbXBvcmFsICJTdGFydHMgd29ya2Zsb3dzIGluIGV4dGVybmFsIG1vZGUiICJUZW1wb3JhbCIKICAgICAgICBhcGkgLT4gZ2l0aHViICJDYWxscyB0aGUgR2l0SHViIEFQSSIgIkhUVFAiCiAgICAgICAgd29ya2Zsb3dzIC0+IGFwaSAiQ2FsbHMgdGhlIFJFU1QgQVBJIiAiSFRUUCIKICAgICAgICB3b3JrZmxvd3MgLT4gZ2l0aHViICJDYWxscyB0aGUgR2l0SHViIEFQSSIgIkhUVFAiCiAgICAgICAgd29ya2Zsb3dzIC0+IG9yY2hlc3RyYXRvciAiVXNlcyBkdXJhYmxlIGV4ZWN1dGlvbiBpbiBlbWJlZGRlZCBtb2RlIiAiVGVtcG9yYWwiCiAgICAgICAgd29ya2Zsb3dzIC0+IHRlbXBvcmFsICJVc2VzIGR1cmFibGUgZXhlY3V0aW9uIGluIGV4dGVybmFsIG1vZGUiICJUZW1wb3JhbCIKICAgICAgICB3b3JrZmxvd3MgLT4gcnVubmVyICJTdGFydHMgYWdlbnQgd29yayIgIlRlbXBvcmFsIgogICAgICAgIHJ1bm5lciAtPiBhZ2VudHMgIlJ1bnMgY29kaW5nIGFnZW50cyIgIlByb2Nlc3MiCiAgICAgICAgdGVtcG9yYWxVSSAtPiBvcmNoZXN0cmF0b3IgIlJlYWRzIG5hbWVzcGFjZXMgYW5kIHdvcmtmbG93IGhpc3RvcmllcyIgIlRlbXBvcmFsIgogICAgfQoKICAgIHZpZXdzIHsKICAgICAgICBwcm9wZXJ0aWVzIHsKICAgICAgICAgICAgcGxhbnR1bWwuc2tpbnBhcmFtcyAibm9kZXNlcD04MCxyYW5rc2VwPTE2MCIKICAgICAgICB9CiAgICAgICAgc3lzdGVtQ29udGV4dCBhZmFrdCAiYWZha3QtY29udGV4dCIgImFmYWt0IGFuZCB0aGUgcGVvcGxlIGFuZCBzeXN0ZW1zIGl0IGludGVyYWN0cyB3aXRoLiIgewogICAgICAgICAgICBpbmNsdWRlICoKICAgICAgICAgICAgYXV0b0xheW91dCBscgogICAgICAgIH0KICAgICAgICBjb250YWluZXIgYWZha3QgImFmYWt0LWNvbnRhaW5lcnMiICJUaGUgYWZha3QgcHJvY2VzcyBhbmQgaXRzIGV4dGVybmFsIGRlcGVuZGVuY2llcy4iIHsKICAgICAgICAgICAgaW5jbHVkZSAqCiAgICAgICAgICAgIGF1dG9MYXlvdXQgbHIKICAgICAgICB9CiAgICAgICAgY29tcG9uZW50IHJ1bnRpbWUgImFmYWt0LWNvbXBvbmVudHMiICJUaGUgcm9sZXMgaW5zaWRlIHRoZSBjb21iaW5lZCBhZmFrdCBwcm9jZXNzLiIgewogICAgICAgICAgICBpbmNsdWRlICoKICAgICAgICAgICAgYXV0b0xheW91dCBscgogICAgICAgIH0KICAgIH0KCiAgICBjb25maWd1cmF0aW9uIHsKICAgICAgICBzY29wZSBzb2Z0d2FyZXN5c3RlbQogICAgfQp9",
+    "structurizr.dsl": "d29ya3NwYWNlICJhZmFrdCIgIkFyY2hpdGVjdHVyZSBvZiB0aGUgYWZha3QgbW9kdWxhciBtb25vbGl0aC4iIHsKICAgIHByb3BlcnRpZXMgewogICAgICAgIC8vIERvY3VtZW50YXRpb24gYW5kIGRlY2lzaW9ucyBzdGF5IGluIHRoZSByZXBvc2l0b3J5J3MgZG9jcyBidW5kbGUuCiAgICAgICAgc3RydWN0dXJpenIuaW5zcGVjdGlvbi5tb2RlbC5zb2Z0d2FyZXN5c3RlbS5kb2N1bWVudGF0aW9uIGlnbm9yZQogICAgICAgIHN0cnVjdHVyaXpyLmluc3BlY3Rpb24ubW9kZWwuc29mdHdhcmVzeXN0ZW0uZGVjaXNpb25zIGlnbm9yZQogICAgfQoKICAgIG1vZGVsIHsKICAgICAgICBkZXZlbG9wZXIgPSBwZXJzb24gIkRldmVsb3BlciBvciB0ZXN0ZXIiICJSdW5zIGFmYWt0IGFuZCBpbnNwZWN0cyBpdHMgd29ya2Zsb3dzLiIKICAgICAgICBnaXRodWIgPSBzb2Z0d2FyZVN5c3RlbSAiR2l0SHViIiAiRGVsaXZlcnMgd2ViaG9va3MgYW5kIGV4cG9zZXMgdGhlIEdpdEh1YiBBUEkuIgogICAgICAgIG5hdGl2ZSA9IHNvZnR3YXJlU3lzdGVtICJOYXRpdmUgYXBwcyIgIkNsaWVudHMgb2YgYWZha3QncyBSRVNUIEFQSS4iCiAgICAgICAgYWdlbnRzID0gc29mdHdhcmVTeXN0ZW0gIkFJIGNvZGluZyBhZ2VudHMiICJQZXJmb3JtIGNvZGluZyB3b3JrIHN0YXJ0ZWQgYnkgQWdlbnQgcnVubmVyLiIKICAgICAgICB0ZW1wb3JhbCA9IHNvZnR3YXJlU3lzdGVtICJFeHRlcm5hbCBUZW1wb3JhbCIgIlByb3ZpZGVzIGR1cmFibGUgZXhlY3V0aW9uIHdoZW4gd29ya2VycyB1c2UgYW4gZXh0ZXJuYWwgc2VydmVyLiIKCiAgICAgICAgYWZha3QgPSBzb2Z0d2FyZVN5c3RlbSAiYWZha3QiICJDb29yZGluYXRlcyBjb2Rpbmcgd29yayB0aHJvdWdoIGl0cyBBUEkgYW5kIHdvcmtmbG93cy4iIHsKICAgICAgICAgICAgcnVudGltZSA9IGNvbnRhaW5lciAiYWZha3QgcHJvY2VzcyIgIlJ1bnMgdGhlIHNlbGVjdGVkIHJ1bnRpbWUgcm9sZXMgdG9nZXRoZXIgb3Igc2VwYXJhdGVseSBmcm9tIHRoZSBzYW1lIGJpbmFyeS4iICJHbyIgewogICAgICAgICAgICAgICAgY2xpID0gY29tcG9uZW50ICJDb21tYW5kLWxpbmUgaW50ZXJmYWNlIiAiUnVucyBzZXJ2ZXIgcm9sZXMgYW5kIGNvbW11bmljYXRlcyB3aXRoIHRoZSBBUEkuIiAiR28iCiAgICAgICAgICAgICAgICBhcGkgPSBjb21wb25lbnQgIkFQSSBzZXJ2ZXIiICJTZXJ2ZXMgdGhlIFJFU1QgQVBJIGFuZCBzdGFydHMgd29ya2Zsb3dzLiIgIkdvIgogICAgICAgICAgICAgICAgd2ViaG9vayA9IGNvbXBvbmVudCAiR2l0SHViIHdlYmhvb2sgcmVjZWl2ZXIiICJBY2NlcHRzIHdlYmhvb2sgZGVsaXZlcmllcyBhbmQgc3RhcnRzIGNvb3JkaW5hdGlvbiB3b3JrLiIgIkdvIgogICAgICAgICAgICAgICAgZGFzaGJvYXJkID0gY29tcG9uZW50ICJXZWIgZGFzaGJvYXJkIiAiUHJvdmlkZXMgdGhlIHdlYiBVSSBmcm9tIHRoZSBBUEkncyBvcmlnaW4uIiAiUmVhY3QiCiAgICAgICAgICAgICAgICBvcmNoZXN0cmF0b3IgPSBjb21wb25lbnQgIkVtYmVkZGVkIHdvcmtmbG93IG9yY2hlc3RyYXRvciIgIlByb3ZpZGVzIGR1cmFibGUgZXhlY3V0aW9uIGluc2lkZSB0aGUgcHJvY2VzcyBmb3IgZGV2ZWxvcG1lbnQgYW5kIHRlc3RzLiIgIlRlbXBvcmFsIgogICAgICAgICAgICAgICAgd29ya2Zsb3dzID0gY29tcG9uZW50ICJDb29yZGluYXRpb24gd29ya2Zsb3dzIiAiQ29vcmRpbmF0ZSB3b3JrIG9uIHdvcmtlcnMgaW5zaWRlIHRoZSBiaW5hcnkgYW5kIHN0YXJ0IG90aGVyIHdvcmtmbG93cy4iICJUZW1wb3JhbCIKICAgICAgICAgICAgICAgIHJ1bm5lciA9IGNvbXBvbmVudCAiQWdlbnQgcnVubmVyIiAiUnVucyBBSSBjb2RpbmcgYWdlbnRzIGFzIGEgd29ya2Zsb3cuIiAiVGVtcG9yYWwiCiAgICAgICAgICAgICAgICB0ZW1wb3JhbFVJID0gY29tcG9uZW50ICJUZW1wb3JhbCBXZWIgVUkiICJTaG93cyB0aGUgZW1iZWRkZWQgc2VydmVyJ3MgbmFtZXNwYWNlcywgd29ya2Zsb3dzLCBhbmQgaGlzdG9yaWVzLiIgIlRlbXBvcmFsIgogICAgICAgICAgICB9CgogICAgICAgICAgICBncm91cCAiQ29udHJvbCBwbGFuZSBzZXJ2aWNlcyIgewogICAgICAgICAgICAgICAgaHViID0gY29udGFpbmVyICJBZ2VudCBodWIiICJKb2lucyBwZXItbGF1bmNoIGNvbm5lY3Rpb25zIGNhcnJ5aW5nIHNlc3Npb25zLCByZW1vdGUgY29udHJvbCwgcG9ydHMgYW5kIHByZXZpZXdzLiIgIkFwcGxpY2F0aW9uIHNlcnZpY2UiICJUb3BvbG9neSIKICAgICAgICAgICAgICAgIGNvbnRyb2xBcGkgPSBjb250YWluZXIgIkFQSSBzZXJ2ZXIgYW5kIHdlYiBkYXNoYm9hcmQiICJBdXRob3JpemVzIG9wZXJhdGlvbnMgYW5kIHNlcnZlcyB0aGUgZGFzaGJvYXJkIGZyb20gaXRzIG93biBvcmlnaW4uIiAiQXBwbGljYXRpb24gc2VydmljZSIgIlRvcG9sb2d5IgogICAgICAgICAgICAgICAgcHJldmlld1NlcnZlciA9IGNvbnRhaW5lciAiUHJldmlldyBzZXJ2ZXIiICJTZXJ2ZXMgcHJldmlld3MgYXMgYSBjbGllbnQgb2YgYXV0aG9yaXplZCBwdWJsaXNoZWQgcG9ydHMgdGhyb3VnaCB0aGUgYWdlbnQgaHViLiIgIkFwcGxpY2F0aW9uIHNlcnZpY2UiICJUb3BvbG9neSIKICAgICAgICAgICAgICAgIG1jcEdhdGV3YXkgPSBjb250YWluZXIgIk1DUCBnYXRld2F5IiAiQ2hlY2tzIGxhdW5jaCB0b29sIGdyYW50cyBhbmQga2VlcHMgdXBzdHJlYW0gY3JlZGVudGlhbHMgb3V0c2lkZSBndWVzdHMuIiAiQXBwbGljYXRpb24gc2VydmljZSIgIlRvcG9sb2d5IgogICAgICAgICAgICAgICAgY29vcmRpbmF0aW9uID0gY29udGFpbmVyICJPdmVybGF5IGNvb3JkaW5hdGlvbiIgIkFuIGFmYWt0IGludGVyZmFjZSBmcm9udHMgaXNvbGF0ZWQgSGVhZHNjYWxlIGNvb3JkaW5hdGlvbjsgY2x1c3RlciBub2RlcyByZXRhaW4gYSBzdGF0aWMgbWFwIG9mIHN0YWJsZSBub2Rlcy4iICJIZWFkc2NhbGUiICJUb3BvbG9neSIKICAgICAgICAgICAgICAgIG92ZXJsYXlSZWxheSA9IGNvbnRhaW5lciAiT3ZlcmxheSByZWxheSIgIkNhcnJpZXMgZW5jcnlwdGVkIG92ZXJsYXkgdHJhZmZpYyB3aGVuIGEgcmVsYXkgcGF0aCBpcyBuZWVkZWQuIiAiT3ZlcmxheSB0cmFuc3BvcnQiICJUb3BvbG9neSIKICAgICAgICAgICAgfQogICAgICAgICAgICBncm91cCAiRXh0ZXJuYWwgaW5ncmVzcyBib3VuZGFyeSIgewogICAgICAgICAgICAgICAgZWRnZSA9IGNvbnRhaW5lciAiRXh0ZXJuYWwgaW5ncmVzcyBnYXRld2F5IiAiQWNjZXB0cyBwdWJsaWMgYW5kIGF0dGFjaGVkLXRhaWxuZXQgYXBwbGljYXRpb24gcmVxdWVzdHM7IG5ldmVyIHJvdXRlcyBwYWNrZXRzIGJldHdlZW4gdGFpbG5ldHMgYW5kIHRoZSBjbHVzdGVyLiIgIkFwcGxpY2F0aW9uIHByb3h5IiAiVG9wb2xvZ3kiCiAgICAgICAgICAgIH0KICAgICAgICAgICAgZ3JvdXAgIkhvc3QgbWFuYWdlbWVudCBib3VuZGFyeSIgewogICAgICAgICAgICAgICAgaG9zdFdvcmtlciA9IGNvbnRhaW5lciAiQWdlbnQgaG9zdCB3b3JrZXIiICJDb250cm9scyBsYXVuY2ggbGlmZWN5Y2xlIGFzIGEgZGVkaWNhdGVkIHVzZXI7IHN0YXlzIG91dHNpZGUgZXZlcnkgbGF1bmNoIGRhdGEgcGF0aC4iICJIb3N0IHNlcnZpY2UiICJUb3BvbG9neSIKICAgICAgICAgICAgICAgIGhlbHBlciA9IGNvbnRhaW5lciAiUHJpdmlsZWdlZCBoZWxwZXIiICJQZXJmb3JtcyBuYXJyb3dseSBhdXRob3JpemVkIHNldHVwIGFuZCBsYXVuY2ggb3BlcmF0aW9uczsgY2FsbGVyIGJpbmRpbmcgaXMgdW5kZWNpZGVkLiIgIkhvc3QgcHJpdmlsZWdlIGJvdW5kYXJ5IiAiVG9wb2xvZ3kiCiAgICAgICAgICAgICAgICBob3N0UmVzb2x2ZXIgPSBjb250YWluZXIgIkhvc3QgbmFtZSByZXNvbHZlciIgIlJlc29sdmVzIG5hbWVzIHVuZGVyICouYWZha3QuaW50ZXJuYWwgZm9yIGhvc3QgY2xpZW50cy4iICJEb21haW4gTmFtZSBTeXN0ZW0iICJUb3BvbG9neSIKICAgICAgICAgICAgfQogICAgICAgICAgICBncm91cCAiT3BlcmF0b3IgYWNjZXNzIG9uIHRoZSBhZ2VudCBob3N0IiB7CiAgICAgICAgICAgICAgICBsb29wYmFja1Byb3h5ID0gY29udGFpbmVyICJIb3N0IGFjY2VzcyBib3VuZGFyeSIgIkhvc3QtbGV2ZWwgYXV0aG9yaXphdGlvbiBmb3Igc2VydmljZXMsIHByZXZpZXdzIGFuZCBwb3J0czsgbG9jYWwgY2FsbGVyIGFuZCBjb25uZWN0aW9uIG1lY2hhbmlzbXMgdW5kZWNpZGVkLiIgIkFjY2VzcyBtZWNoYW5pc20gdW5kZWNpZGVkIiAiVG9wb2xvZ3kiCiAgICAgICAgICAgICAgICBob3N0TmV0d29yayA9IGNvbnRhaW5lciAiSG9zdC1sZXZlbCBjb25uZWN0aXZpdHkiICJIb3N0IGF1dGhvcml6YXRpb24gZm9yIGFnZW50IGFuZCBjbHVzdGVyIHNlcnZpY2VzOyBjb25uZWN0aW9uIG1lY2hhbmlzbSB1bmRlY2lkZWQ7IG9wdGlvbmFsIHVzZXIgdGFpbG5ldCBhdHRhY2htZW50LiIgIkhvc3QgYWNjZXNzIHJvbGUiICJUb3BvbG9neSIKICAgICAgICAgICAgfQogICAgICAgICAgICBncm91cCAiTGF1bmNoIGd1ZXN0IGJvdW5kYXJ5IiB7CiAgICAgICAgICAgICAgICBndWVzdCA9IGNvbnRhaW5lciAiR3Vlc3Qgd29ya2xvYWQiICJVbnRydXN0ZWQgaGFybmVzcywgcmVsYXkgYW5kIGxvb3BiYWNrIGxpc3RlbmVyczsgbm8gb3ZlcmxheSBtZW1iZXJzaGlwIG9yIHdvcmtsb2FkIGtleXMuIiAiUHJvdmlkZXIgY29uZmluZW1lbnQiICJUb3BvbG9neSIKICAgICAgICAgICAgfQogICAgICAgICAgICBncm91cCAiTGF1bmNoIG1lZGlhdGlvbiBib3VuZGFyeSIgewogICAgICAgICAgICAgICAgbWVkaWF0b3IgPSBjb250YWluZXIgIkFnZW50IG1lZGlhdG9yIiAiRW5mb3JjZXMgdGhpcyBsYXVuY2gncyBwb2xpY3kgYW5kIHN0YW1wcyBpZGVudGl0eTsgaGFzIG5vIG5ldHdvcmsgYWNjZXNzIG9mIGl0cyBvd24uIiAiTG9jYWwgcG9saWN5IGVuZm9yY2VtZW50IiAiVG9wb2xvZ3kiCiAgICAgICAgICAgIH0KICAgICAgICAgICAgZ3JvdXAgIkxhdW5jaCBhZ2VudCBwcm94eSBib3VuZGFyeSIgewogICAgICAgICAgICAgICAgYWdlbnQtcHJveHkgPSBjb250YWluZXIgIkFnZW50IHByb3h5IiAiT3duIG92ZXJsYXkgbm9kZSwgaHViIGNvbm5lY3Rpb24gYW5kIGxhdW5jaCBYLjUwOS1TVklEOyBvbmx5IGxhdW5jaCBjb21wb25lbnQgb3BlbmluZyBjb25uZWN0aW9ucyBvZmYgdGhlIGhvc3QuIiAiVGFpbHNjYWxlIHRzbmV0IiAiVG9wb2xvZ3kiCiAgICAgICAgICAgIH0KICAgICAgICAgICAgZ3JvdXAgIkRlc3RpbmF0aW9uIGxhdW5jaCBndWVzdCBib3VuZGFyeSIgewogICAgICAgICAgICAgICAgZGVzdGluYXRpb25HdWVzdCA9IGNvbnRhaW5lciAiRGVzdGluYXRpb24gZ3Vlc3QiICJVbnRydXN0ZWQgd29ya2xvYWQgYW5kIHB1Ymxpc2hlZCBsb29wYmFjayBsaXN0ZW5lcjsgbm8gb3ZlcmxheSBtZW1iZXJzaGlwIG9yIHdvcmtsb2FkIGtleXMuIiAiUHJvdmlkZXIgY29uZmluZW1lbnQiICJUb3BvbG9neSIKICAgICAgICAgICAgfQogICAgICAgICAgICBncm91cCAiRGVzdGluYXRpb24gbGF1bmNoIG1lZGlhdGlvbiBib3VuZGFyeSIgewogICAgICAgICAgICAgICAgZGVzdGluYXRpb25NZWRpYXRvciA9IGNvbnRhaW5lciAiRGVzdGluYXRpb24gbWVkaWF0b3IiICJDaGVja3MgdGhlIHNvdXJjZSBncmFudCBhbmQgY3VycmVudCBkZXN0aW5hdGlvbiBsYXVuY2ggYmVmb3JlIGxpc3RlbmVyIGFjY2Vzczsgbm8gaW5kZXBlbmRlbnQgbmV0d29yay4iICJMb2NhbCBwb2xpY3kgZW5mb3JjZW1lbnQiICJUb3BvbG9neSIKICAgICAgICAgICAgfQogICAgICAgICAgICBncm91cCAiRGVzdGluYXRpb24gbGF1bmNoIG5ldHdvcmsgYm91bmRhcnkiIHsKICAgICAgICAgICAgICAgIGRlc3RpbmF0aW9uLWFnZW50LXByb3h5ID0gY29udGFpbmVyICJEZXN0aW5hdGlvbiBhZ2VudCBwcm94eSIgIkluZGVwZW5kZW50IG92ZXJsYXkgbm9kZSwgaHViIGNvbm5lY3Rpb24gYW5kIGRlc3RpbmF0aW9uIGxhdW5jaCBYLjUwOS1TVklELiIgIlRhaWxzY2FsZSB0c25ldCIgIlRvcG9sb2d5IgogICAgICAgICAgICB9CiAgICAgICAgfQoKICAgICAgICBkZXZlbG9wZXIgLT4gY2xpICJSdW5zIGNvbW1hbmRzIiAiQ0xJIgogICAgICAgIGRldmVsb3BlciAtPiBkYXNoYm9hcmQgIlVzZXMgdGhlIGRhc2hib2FyZCIgIkhUVFAiCiAgICAgICAgZGV2ZWxvcGVyIC0+IHRlbXBvcmFsVUkgIkluc3BlY3RzIHdvcmtmbG93cyIgIkhUVFAiCiAgICAgICAgbmF0aXZlIC0+IGFwaSAiQ2FsbHMgdGhlIFJFU1QgQVBJIiAiSFRUUCIKICAgICAgICBjbGkgLT4gYXBpICJDYWxscyB0aGUgUkVTVCBBUEkiICJIVFRQIgogICAgICAgIGRhc2hib2FyZCAtPiBhcGkgIkNhbGxzIHRoZSBSRVNUIEFQSSIgIkhUVFAiCiAgICAgICAgZ2l0aHViIC0+IHdlYmhvb2sgIkRlbGl2ZXJzIHdlYmhvb2tzIiAiSFRUUCIKICAgICAgICB3ZWJob29rIC0+IGFwaSAiQ2FsbHMgdGhlIFJFU1QgQVBJIiAiSFRUUCIKICAgICAgICB3ZWJob29rIC0+IG9yY2hlc3RyYXRvciAiU3RhcnRzIHdvcmtmbG93cyBpbiBlbWJlZGRlZCBtb2RlIiAiVGVtcG9yYWwiCiAgICAgICAgd2ViaG9vayAtPiB0ZW1wb3JhbCAiU3RhcnRzIHdvcmtmbG93cyBpbiBleHRlcm5hbCBtb2RlIiAiVGVtcG9yYWwiCiAgICAgICAgYXBpIC0+IG9yY2hlc3RyYXRvciAiU3RhcnRzIHdvcmtmbG93cyBpbiBlbWJlZGRlZCBtb2RlIiAiVGVtcG9yYWwiCiAgICAgICAgYXBpIC0+IHRlbXBvcmFsICJTdGFydHMgd29ya2Zsb3dzIGluIGV4dGVybmFsIG1vZGUiICJUZW1wb3JhbCIKICAgICAgICBhcGkgLT4gZ2l0aHViICJDYWxscyB0aGUgR2l0SHViIEFQSSIgIkhUVFAiCiAgICAgICAgd29ya2Zsb3dzIC0+IGFwaSAiQ2FsbHMgdGhlIFJFU1QgQVBJIiAiSFRUUCIKICAgICAgICB3b3JrZmxvd3MgLT4gZ2l0aHViICJDYWxscyB0aGUgR2l0SHViIEFQSSIgIkhUVFAiCiAgICAgICAgd29ya2Zsb3dzIC0+IG9yY2hlc3RyYXRvciAiVXNlcyBkdXJhYmxlIGV4ZWN1dGlvbiBpbiBlbWJlZGRlZCBtb2RlIiAiVGVtcG9yYWwiCiAgICAgICAgd29ya2Zsb3dzIC0+IHRlbXBvcmFsICJVc2VzIGR1cmFibGUgZXhlY3V0aW9uIGluIGV4dGVybmFsIG1vZGUiICJUZW1wb3JhbCIKICAgICAgICB3b3JrZmxvd3MgLT4gcnVubmVyICJTdGFydHMgYWdlbnQgd29yayIgIlRlbXBvcmFsIgogICAgICAgIHJ1bm5lciAtPiBhZ2VudHMgIlJ1bnMgY29kaW5nIGFnZW50cyIgIlByb2Nlc3MiCiAgICAgICAgdGVtcG9yYWxVSSAtPiBvcmNoZXN0cmF0b3IgIlJlYWRzIG5hbWVzcGFjZXMgYW5kIHdvcmtmbG93IGhpc3RvcmllcyIgIlRlbXBvcmFsIgoKICAgICAgICAvLyBFeGlzdGluZyBpbXBsaWVkIHJlbGF0aW9uc2hpcHMgcHJlY2VkZSB0aGlzIHBvaW50IGFuZCByZW1haW4gdW5jaGFuZ2VkLgogICAgICAgICFpbXBsaWVkUmVsYXRpb25zaGlwcyBmYWxzZQogICAgICAgIGdyb3VwICJPcGVyYXRvciBkZXZpY2VzIiB7CiAgICAgICAgICAgIGJyb3dzZXIgPSBzb2Z0d2FyZVN5c3RlbSAiT3BlcmF0b3IgYnJvd3NlciIgIkEgYnJvd3NlciB1bmRlciB0aGUgb3BlcmF0b3IncyBsb2NhbCB1c2VyIGlkZW50aXR5LiIgIlRvcG9sb2d5IgogICAgICAgICAgICBwaG9uZSA9IHNvZnR3YXJlU3lzdGVtICJQaG9uZSBhbmQgbmF0aXZlIGNsaWVudHMiICJPcGVyYXRvciBkZXZpY2VzIHVzaW5nIHRoZWlyIGF0dGFjaGVkIHVzZXIgdGFpbG5ldCBhbmQgYWZha3Qgc2lnbi1pbi4iICJUb3BvbG9neSIKICAgICAgICB9CiAgICAgICAgZ3JvdXAgIlVzZXIgbmV0d29yayBib3VuZGFyeSIgewogICAgICAgICAgICB1c2VyVGFpbG5ldCA9IHNvZnR3YXJlU3lzdGVtICJBdHRhY2hlZCB1c2VyIHRhaWxuZXQiICJVc2VyLWNvbnRyb2xsZWQgcHJpdmF0ZSBjb25uZWN0aXZpdHk7IHNlcGFyYXRlIGZyb20gdGhlIGNsdXN0ZXIgb3ZlcmxheS4iICJUb3BvbG9neSIKICAgICAgICB9CiAgICAgICAgZ3JvdXAgIkV4dGVybmFsIHNlcnZpY2UgYm91bmRhcnkiIHsKICAgICAgICAgICAgaW50ZXJuZXQgPSBzb2Z0d2FyZVN5c3RlbSAiSW50ZXJuZXQgc2VydmljZXMiICJQZXJtaXR0ZWQgdXBzdHJlYW0gZGVzdGluYXRpb25zIG91dHNpZGUgdGhlIGNsdXN0ZXIgdHJ1c3QgZG9tYWluLiIgIlRvcG9sb2d5IgogICAgICAgIH0KCiAgICAgICAgYnJvd3NlciAtPiBob3N0UmVzb2x2ZXIgIlJlc29sdmVzICouYWZha3QuaW50ZXJuYWwiICJMb2NhbCBuYW1lIHF1ZXJ5IiAiVG9wb2xvZ3lDb25uZWN0aW9uLE92ZXJ2aWV3SGlkZGVuIgogICAgICAgIGJyb3dzZXIgLT4gbG9vcGJhY2tQcm94eSAiUmVxdWVzdHMgc2VydmljZSwgcHJldmlldyBvciBwb3J0IiAiSG9zdCBhY2Nlc3MgbWVjaGFuaXNtIHVuZGVjaWRlZCIgIlRvcG9sb2d5Q29ubmVjdGlvbixPdmVydmlld0hpZGRlbiIKICAgICAgICBsb29wYmFja1Byb3h5IC0+IGhvc3ROZXR3b3JrICJVc2VzIGhvc3QtbGV2ZWwgYXV0aG9yaXphdGlvbiIgIkNvbm5lY3Rpb24gbWVjaGFuaXNtIHVuZGVjaWRlZCIgIlRvcG9sb2d5Q29ubmVjdGlvbixPdmVydmlld0hpZGRlbiIKICAgICAgICBob3N0TmV0d29yayAtPiBwcmV2aWV3U2VydmVyICJSZXF1ZXN0cyBwcmV2aWV3IGFzIGhvc3QgaWRlbnRpdHkiICJXb3JrbG9hZCBtdXR1YWwgVExTIG92ZXIgb3ZlcmxheSIgIlRvcG9sb2d5Q29ubmVjdGlvbixPdmVydmlld0hpZGRlbiIKICAgICAgICBob3N0TmV0d29yayAtPiBodWIgIlJlcXVlc3RzIGF1dGhvcml6ZWQgcG9ydCBvciBzZXJ2aWNlIGFzIGhvc3QgaWRlbnRpdHkiICJXb3JrbG9hZCBtdXR1YWwgVExTIG92ZXIgb3ZlcmxheSIgIlRvcG9sb2d5Q29ubmVjdGlvbixPdmVydmlld0hpZGRlbiIKICAgICAgICBob3N0V29ya2VyIC0+IGhlbHBlciAiUmVxdWVzdHMgYXV0aG9yaXplZCBzZXR1cCBhbmQgbGF1bmNoIG9wZXJhdGlvbnMiICJBdXRoZW50aWNhdGVkIGxvY2FsIGNvbnRyb2wiICJUb3BvbG9neUNvbm5lY3Rpb24iCiAgICAgICAgaG9zdFdvcmtlciAtPiBob3N0UmVzb2x2ZXIgIlJlcXVpcmVzIGhvc3QgbmFtZSByZXNvbHV0aW9uIiAiTG9jYWwgY29udHJvbCIgIlRvcG9sb2d5Q29ubmVjdGlvbixPdmVydmlld0hpZGRlbiIKICAgICAgICBob3N0V29ya2VyIC0+IG1lZGlhdG9yICJTdGFydHMgYW5kIG1hbmFnZXMgbGF1bmNoOyBubyBkYXRhIGZvcndhcmRpbmciICJMb2NhbCBsaWZlY3ljbGUgY29udHJvbCIgIkxpZmVjeWNsZURldGFpbCxUb3BvbG9neUNvbm5lY3Rpb24sT3ZlcnZpZXdIaWRkZW4iCiAgICAgICAgaG9zdFdvcmtlciAtPiBkZXN0aW5hdGlvbk1lZGlhdG9yICJTdGFydHMgYW5kIG1hbmFnZXMgZGVzdGluYXRpb24gbGF1bmNoOyBubyBkYXRhIGZvcndhcmRpbmciICJMb2NhbCBsaWZlY3ljbGUgY29udHJvbCIgIkxpZmVjeWNsZURldGFpbCxUb3BvbG9neUNvbm5lY3Rpb24sT3ZlcnZpZXdIaWRkZW4iCiAgICAgICAgaG9zdFdvcmtlciAtPiBob3N0TmV0d29yayAiU2VuZHMgaG9zdCBtYW5hZ2VtZW50IHJlcXVlc3RzIiAiTG9jYWwgY2hhbm5lbCIgIlRvcG9sb2d5Q29ubmVjdGlvbiIKICAgICAgICBob3N0TmV0d29yayAtPiBjb250cm9sQXBpICJSZWdpc3RlcnMgaG9zdCBhbmQgcmVwb3J0cyBjYXBhY2l0eSBhcyBob3N0IGlkZW50aXR5IiAiV29ya2xvYWQgbXV0dWFsIFRMUyBvdmVyIG92ZXJsYXkiICJUb3BvbG9neUNvbm5lY3Rpb24iCiAgICAgICAgcGhvbmUgLT4gdXNlclRhaWxuZXQgIkNvbm5lY3RzIHdpdGggZGV2aWNlIGlkZW50aXR5IiAiVXNlciB0YWlsbmV0IiAiVG9wb2xvZ3lDb25uZWN0aW9uLE92ZXJ2aWV3SGlkZGVuIgogICAgICAgIHVzZXJUYWlsbmV0IC0+IGVkZ2UgIkRlbGl2ZXJzIGFwcGxpY2F0aW9uIHJlcXVlc3RzIiAiVHJhbnNwb3J0IExheWVyIFNlY3VyaXR5IiAiQ2x1c3RlckF0dGFjaG1lbnQsT3ZlcnZpZXdIaWRkZW4iCiAgICAgICAgdXNlclRhaWxuZXQgLT4gaG9zdE5ldHdvcmsgIk9wdGlvbmFsIGhvc3QgYXR0YWNobWVudDsgYXBwbGljYXRpb24gYWNjZXNzIG9ubHkiICJVc2VyIHRhaWxuZXQiICJDbHVzdGVyQXR0YWNobWVudCxPdmVydmlld0hpZGRlbiIKICAgICAgICBicm93c2VyIC0+IGVkZ2UgIlNlbmRzIHB1YmxpYyBhcHBsaWNhdGlvbiByZXF1ZXN0cyBhcyBzaWduZWQtaW4gdXNlciIgIlRyYW5zcG9ydCBMYXllciBTZWN1cml0eSIgIlRvcG9sb2d5Q29ubmVjdGlvbixPdmVydmlld0hpZGRlbiIKICAgICAgICBlZGdlIC0+IGNvbnRyb2xBcGkgIkZvcndhcmRzIGF1dGhlbnRpY2F0ZWQgZGFzaGJvYXJkIGFuZCBBUEkgcmVxdWVzdHMiICJBcHBsaWNhdGlvbiBwcm90b2NvbCBvdmVyIG92ZXJsYXkiICJUb3BvbG9neUNvbm5lY3Rpb24sT3ZlcnZpZXdIaWRkZW4iCiAgICAgICAgZWRnZSAtPiBwcmV2aWV3U2VydmVyICJGb3J3YXJkcyBwcmV2aWV3IHJlcXVlc3RzIHdpdGggdXNlciBjb250ZXh0IiAiQXBwbGljYXRpb24gcHJvdG9jb2wgb3ZlciBvdmVybGF5IiAiVG9wb2xvZ3lDb25uZWN0aW9uLE92ZXJ2aWV3SGlkZGVuIgogICAgICAgIGNvbnRyb2xBcGkgLT4gaHViICJVc2VzIGFnZW50IHN0cmVhbXM7IGVuZHBvaW50IG93bmVyc2hpcCB1bmRlY2lkZWQiICJBdXRoZW50aWNhdGVkIHNlcnZpY2UgY29ubmVjdGlvbiIgIlRvcG9sb2d5Q29ubmVjdGlvbixSZXR1cm5EZXRhaWwiCiAgICAgICAgbWNwR2F0ZXdheSAtPiBjb250cm9sQXBpICJDYWxscyBwZXJtaXR0ZWQgb3BlcmF0aW9ucyB3aXRoIGxhdW5jaCBjb250ZXh0IiAiQXV0aGVudGljYXRlZCBzZXJ2aWNlIGNvbm5lY3Rpb24iICJUb3BvbG9neUNvbm5lY3Rpb24iCiAgICAgICAgZ3Vlc3QgLT4gbWVkaWF0b3IgIlNlbmRzIHRyYWZmaWMgYm91bmQgdG8gdGhpcyBsYXVuY2giICJMb2NhbCBwcm92aWRlciBjYXJyaWVyIiAiVG9wb2xvZ3lDb25uZWN0aW9uLE92ZXJ2aWV3SGlkZGVuIgogICAgICAgIG1lZGlhdG9yIC0+IGFnZW50LXByb3h5ICJTZW5kcyBwb2xpY3ktcGVybWl0dGVkIHRyYWZmaWMgYW5kIHN0YW1wZWQgbGF1bmNoIGlkZW50aXR5IiAiTG9jYWwgY2hhbm5lbCIgIlRvcG9sb2d5Q29ubmVjdGlvbixPdmVydmlld0hpZGRlbiIKICAgICAgICBhZ2VudC1wcm94eSAtPiBodWIgIk9wZW5zIG93biBtdWx0aXBsZXhlZCBjb25uZWN0aW9uIHdpdGggbGF1bmNoIFguNTA5LVNWSUQiICJXb3JrbG9hZCBtdXR1YWwgVExTIG92ZXIgb3ZlcmxheSIgIlRvcG9sb2d5Q29ubmVjdGlvbixPdmVydmlld0hpZGRlbiIKICAgICAgICBhZ2VudC1wcm94eSAtPiBjb250cm9sQXBpICJDYWxscyBhdXRob3JpemVkIG9wZXJhdGlvbnMgd2l0aCBsYXVuY2ggWC41MDktU1ZJRCIgIldvcmtsb2FkIG11dHVhbCBUTFMgb3ZlciBvdmVybGF5IiAiVG9wb2xvZ3lDb25uZWN0aW9uLE92ZXJ2aWV3SGlkZGVuIgogICAgICAgIGFnZW50LXByb3h5IC0+IG1jcEdhdGV3YXkgIkNhbGxzIGFsbG93ZWQgdG9vbHMgd2l0aCBsYXVuY2ggWC41MDktU1ZJRCIgIldvcmtsb2FkIG11dHVhbCBUTFMgb3ZlciBvdmVybGF5IiAiVG9wb2xvZ3lDb25uZWN0aW9uLE92ZXJ2aWV3SGlkZGVuIgogICAgICAgIGFnZW50LXByb3h5IC0+IGludGVybmV0ICJPcGVucyBwZXJtaXR0ZWQgZWdyZXNzOyBpbnNwZWN0aW9uIHdoZXJlIHJlcXVpcmVkIiAiRGVzdGluYXRpb24gcHJvdG9jb2wiICJUb3BvbG9neUNvbm5lY3Rpb24sT3ZlcnZpZXdIaWRkZW4iCiAgICAgICAgcHJldmlld1NlcnZlciAtPiBodWIgIk9wZW5zIGF1dGhvcml6ZWQgcHVibGlzaGVkIHBvcnQgYXMgcHJldmlldyBzZXJ2aWNlIiAiQXV0aGVudGljYXRlZCBzZXJ2aWNlIGNvbm5lY3Rpb24iICJUb3BvbG9neUNvbm5lY3Rpb24sT3ZlcnZpZXdIaWRkZW4iCiAgICAgICAgaHViIC0+IGFnZW50LXByb3h5ICJSZXR1cm5zIGF1dGhvcml6ZWQgc3RyZWFtIG92ZXIgbGF1bmNoJ3MgZXhpc3RpbmcgY29ubmVjdGlvbiIgIldvcmtsb2FkIG11dHVhbCBUTFMgb3ZlciBvdmVybGF5IiAiVG9wb2xvZ3lDb25uZWN0aW9uLFJldHVybkRldGFpbCxPdmVydmlld0hpZGRlbiIKICAgICAgICBhZ2VudC1wcm94eSAtPiBtZWRpYXRvciAiRGVsaXZlcnMgc3RyZWFtIHdpdGggYXV0aGVudGljYXRlZCBjYWxsZXIgYW5kIHRhcmdldCBsYXVuY2giICJMb2NhbCBjaGFubmVsIiAiVG9wb2xvZ3lDb25uZWN0aW9uLFJldHVybkRldGFpbCxPdmVydmlld0hpZGRlbiIKICAgICAgICBtZWRpYXRvciAtPiBndWVzdCAiQ29ubmVjdHMgcGVybWl0dGVkIHN0cmVhbSB0byBjdXJyZW50IGd1ZXN0IGxpc3RlbmVyIiAiTG9jYWwgcHJvdmlkZXIgY2FycmllciIgIlRvcG9sb2d5Q29ubmVjdGlvbixSZXR1cm5EZXRhaWwsT3ZlcnZpZXdIaWRkZW4iCiAgICAgICAgZGVzdGluYXRpb24tYWdlbnQtcHJveHkgLT4gaHViICJPcGVucyBpbmRlcGVuZGVudCBjb25uZWN0aW9uIHdpdGggZGVzdGluYXRpb24gbGF1bmNoIFguNTA5LVNWSUQiICJXb3JrbG9hZCBtdXR1YWwgVExTIG92ZXIgb3ZlcmxheSIgIlRvcG9sb2d5Q29ubmVjdGlvbixPdmVydmlld0hpZGRlbiIKICAgICAgICBkZXN0aW5hdGlvbkd1ZXN0IC0+IGRlc3RpbmF0aW9uTWVkaWF0b3IgIlJlcXVlc3RzIGFjY2VzcyBib3VuZCB0byBkZXN0aW5hdGlvbiBsYXVuY2giICJMb2NhbCBwcm92aWRlciBjYXJyaWVyIiAiVG9wb2xvZ3lDb25uZWN0aW9uLE92ZXJ2aWV3SGlkZGVuIgogICAgICAgIGRlc3RpbmF0aW9uTWVkaWF0b3IgLT4gZGVzdGluYXRpb24tYWdlbnQtcHJveHkgIlNlbmRzIHBvbGljeS1wZXJtaXR0ZWQgZGVzdGluYXRpb24gdHJhZmZpYyIgIkxvY2FsIGNoYW5uZWwiICJUb3BvbG9neUNvbm5lY3Rpb24sT3ZlcnZpZXdIaWRkZW4iCiAgICAgICAgZGVzdGluYXRpb24tYWdlbnQtcHJveHkgLT4gZGVzdGluYXRpb25NZWRpYXRvciAiRGVsaXZlcnMgc3RyZWFtIHdpdGggc291cmNlIGlkZW50aXR5IGFuZCB0YXJnZXQgZ3JhbnQiICJMb2NhbCBjaGFubmVsIiAiVG9wb2xvZ3lDb25uZWN0aW9uLFJldHVybkRldGFpbCxPdmVydmlld0hpZGRlbiIKICAgICAgICBkZXN0aW5hdGlvbk1lZGlhdG9yIC0+IGRlc3RpbmF0aW9uR3Vlc3QgIkNvbm5lY3RzIGdyYW50LXBlcm1pdHRlZCBzdHJlYW0gdG8gYm91bmQgbGlzdGVuZXIiICJMb2NhbCBwcm92aWRlciBjYXJyaWVyIiAiVG9wb2xvZ3lDb25uZWN0aW9uLFJldHVybkRldGFpbCxPdmVydmlld0hpZGRlbiIKICAgICAgICBhZ2VudC1wcm94eSAtPiBkZXN0aW5hdGlvbi1hZ2VudC1wcm94eSAiTG9naWNhbCBncmFudC1ib3VuZCBzdHJlYW07IGRpcmVjdCBvdmVybGF5IG9yIGFnZW50IGh1YiB1bmRlY2lkZWQiICJUcmFuc3BvcnQgdW5kZWNpZGVkIiAiVG9wb2xvZ3lDb25uZWN0aW9uLE92ZXJ2aWV3SGlkZGVuLFVuZGVjaWRlZCIKICAgICAgICBhZ2VudC1wcm94eSAtPiBjb29yZGluYXRpb24gIk9idGFpbnMgb3ZlcmxheSBjb29yZGluYXRpb24gdGhyb3VnaCBhZmFrdCBpbnRlcmZhY2UiICJPdmVybGF5IGNvbnRyb2wiICJUb3BvbG9neUNvbm5lY3Rpb24sT3ZlcnZpZXdIaWRkZW4iCiAgICAgICAgaG9zdE5ldHdvcmsgLT4gY29vcmRpbmF0aW9uICJPYnRhaW5zIG92ZXJsYXkgY29vcmRpbmF0aW9uIHRocm91Z2ggYWZha3QgaW50ZXJmYWNlIiAiT3ZlcmxheSBjb250cm9sIiAiVG9wb2xvZ3lDb25uZWN0aW9uLE92ZXJ2aWV3SGlkZGVuIgogICAgICAgIGh1YiAtPiBjb29yZGluYXRpb24gIk9idGFpbnMgb3ZlcmxheSBjb29yZGluYXRpb24gdGhyb3VnaCBhZmFrdCBpbnRlcmZhY2UiICJPdmVybGF5IGNvbnRyb2wiICJUb3BvbG9neUNvbm5lY3Rpb24iCiAgICAgICAgYWdlbnQtcHJveHkgLT4gb3ZlcmxheVJlbGF5ICJVc2VzIGVuY3J5cHRlZCByZWxheSB0cmFuc3BvcnQgd2hlbiBuZWVkZWQiICJPdmVybGF5IHRyYW5zcG9ydCIgIlRvcG9sb2d5Q29ubmVjdGlvbixPdmVydmlld0hpZGRlbiIKICAgICAgICBodWIgLT4gb3ZlcmxheVJlbGF5ICJVc2VzIGVuY3J5cHRlZCByZWxheSB0cmFuc3BvcnQgd2hlbiBuZWVkZWQiICJPdmVybGF5IHRyYW5zcG9ydCIgIlRvcG9sb2d5Q29ubmVjdGlvbiIKCiAgICAgICAgZGVwbG95bWVudEVudmlyb25tZW50ICJUb3BvbG9neSBjb250ZXh0IiB7CiAgICAgICAgICAgIGNvbnRleHRfb3BlcmF0b3JEZXZpY2VCb3VuZGFyeU5vZGUgPSBkZXBsb3ltZW50Tm9kZSAiT3BlcmF0b3IgZGV2aWNlIGJvdW5kYXJ5IiAiT3BlcmF0b3ItY29udHJvbGxlZCBjbGllbnRzLiIgIkNsaWVudCBkZXZpY2VzIiB7CiAgICAgICAgICAgICAgICBjb250ZXh0Q2xpZW50cyA9IGluZnJhc3RydWN0dXJlTm9kZSAiQnJvd3NlciwgcGhvbmUsIHRhYmxldCBhbmQgbmF0aXZlIGFwcHMiICJPcGVyYXRvciBhbmQgZGV2aWNlIGlkZW50aXRpZXMuIiAiQXBwbGljYXRpb24gY2xpZW50cyIKICAgICAgICAgICAgfQogICAgICAgICAgICBjb250ZXh0X3VzZXJUYWlsbmV0Qm91bmRhcnlOb2RlID0gZGVwbG95bWVudE5vZGUgIlVzZXIgdGFpbG5ldCBib3VuZGFyeSIgIlVzZXItb3duZWQgbmV0d29yazsgbm8gY2x1c3RlciByb3V0aW5nLiIgIlVzZXIgbmV0d29yayIgewogICAgICAgICAgICAgICAgY29udGV4dFRhaWxuZXQgPSBpbmZyYXN0cnVjdHVyZU5vZGUgIkF0dGFjaGVkIHVzZXIgdGFpbG5ldHMiICJQcml2YXRlIGFwcGxpY2F0aW9uIGFjY2VzcyB0byBhdHRhY2hlZCBnYXRld2F5cy4iICJUYWlsc2NhbGUiCiAgICAgICAgICAgIH0KICAgICAgICAgICAgY29udGV4dF9jbHVzdGVyVHJ1c3REb21haW5Ob2RlID0gZGVwbG95bWVudE5vZGUgIkNsdXN0ZXIgdHJ1c3QgZG9tYWluIiAiQ29udHJvbCBwbGFuZSBhbmQgYWdlbnQgaG9zdHMgc2hhcmUgYXV0aGVudGljYXRlZCBvdmVybGF5IHJlYWNoYWJpbGl0eS4iICJQcml2YXRlIGNsdXN0ZXIiIHsKICAgICAgICAgICAgICAgIGNvbnRleHRfZXh0ZXJuYWxJbmdyZXNzQm91bmRhcnlOb2RlID0gZGVwbG95bWVudE5vZGUgIkV4dGVybmFsIGluZ3Jlc3MgYm91bmRhcnkiICJBcHBsaWNhdGlvbiBlbnRyeSBvbmx5LiIgIkdhdGV3YXkgbm9kZSIgewogICAgICAgICAgICAgICAgICAgIGNvbnRleHRJbmdyZXNzID0gaW5mcmFzdHJ1Y3R1cmVOb2RlICJFeHRlcm5hbCBpbmdyZXNzIGdhdGV3YXkiICJQdWJsaWMgYW5kIHVzZXItdGFpbG5ldCBhcHBsaWNhdGlvbiB0cmFmZmljOyBubyBwYWNrZXQgcm91dGluZy4iICJBcHBsaWNhdGlvbiBwcm94eSIKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgIGNvbnRleHRDbHVzdGVyID0gaW5mcmFzdHJ1Y3R1cmVOb2RlICJDb250cm9sIHBsYW5lIGFuZCBhZ2VudCBob3N0cyIgIlBlci1zZXJ2aWNlLCBwZXItaG9zdCBhbmQgcGVyLWxhdW5jaCBub2RlczsgZ3Vlc3RzIGhhdmUgbm8gb3ZlcmxheSBtZW1iZXJzaGlwLiIgIklzb2xhdGVkIEhlYWRzY2FsZSBvdmVybGF5IgogICAgICAgICAgICB9CiAgICAgICAgICAgIGNvbnRleHRfaW50ZXJuZXRCb3VuZGFyeU5vZGUgPSBkZXBsb3ltZW50Tm9kZSAiSW50ZXJuZXQgYm91bmRhcnkiICJVcHN0cmVhbSBkZXN0aW5hdGlvbnMgb3V0c2lkZSBjbHVzdGVyIHRydXN0LiIgIkV4dGVybmFsIG5ldHdvcmsiIHsKICAgICAgICAgICAgICAgIGNvbnRleHRJbnRlcm5ldCA9IGluZnJhc3RydWN0dXJlTm9kZSAiSW50ZXJuZXQgc2VydmljZXMiICJPbmx5IHBlcm1pdHRlZCBlZ3Jlc3MgbGVhdmVzIGFuIGFnZW50IGhvc3QuIiAiRGVzdGluYXRpb24gc2VydmljZXMiCiAgICAgICAgICAgIH0KICAgICAgICAgICAgY29udGV4dENsaWVudHMgLT4gY29udGV4dFRhaWxuZXQgIkRldmljZSBpZGVudGl0eSIgIlVzZXIgdGFpbG5ldCIKICAgICAgICAgICAgY29udGV4dENsaWVudHMgLT4gY29udGV4dEluZ3Jlc3MgIlNpZ25lZC1pbiB1c2VyIiAiUHVibGljIGFwcGxpY2F0aW9uIHJlcXVlc3QiCiAgICAgICAgICAgIGNvbnRleHRUYWlsbmV0IC0+IGNvbnRleHRJbmdyZXNzICJVc2VyIGNvbnRleHQ7IG5vIHBhY2tldCByb3V0aW5nIiAiUHJpdmF0ZSBhcHBsaWNhdGlvbiByZXF1ZXN0IgogICAgICAgICAgICBjb250ZXh0SW5ncmVzcyAtPiBjb250ZXh0Q2x1c3RlciAiQXV0aGVudGljYXRlZCBhcHBsaWNhdGlvbiByZXF1ZXN0IiAiQ2x1c3RlciBvdmVybGF5IgogICAgICAgICAgICBjb250ZXh0Q2x1c3RlciAtPiBjb250ZXh0SW50ZXJuZXQgIlBlcm1pdHRlZCBkZXN0aW5hdGlvbiByZXF1ZXN0IiAiQWdlbnQgcHJveHkgZWdyZXNzIgogICAgICAgIH0KICAgICAgICBkZXBsb3ltZW50RW52aXJvbm1lbnQgIlRvcG9sb2d5IGNsdXN0ZXIiIHsKICAgICAgICAgICAgY2x1c3Rlcl91c2VyVGFpbG5ldEJvdW5kYXJ5Tm9kZSA9IGRlcGxveW1lbnROb2RlICJVc2VyIHRhaWxuZXQgYm91bmRhcnkiICJTZXBhcmF0ZSB1c2VyIG5ldHdvcmsuIiAiVXNlciB0YWlsbmV0IiB7CiAgICAgICAgICAgICAgICBjbHVzdGVyVGFpbG5ldCA9IHNvZnR3YXJlU3lzdGVtSW5zdGFuY2UgdXNlclRhaWxuZXQKICAgICAgICAgICAgfQogICAgICAgICAgICBjbHVzdGVyX2V4dGVybmFsSW5ncmVzc0JvdW5kYXJ5Tm9kZSA9IGRlcGxveW1lbnROb2RlICJFeHRlcm5hbCBpbmdyZXNzIGJvdW5kYXJ5IiAiVXNlci10YWlsbmV0IGF0dGFjaG1lbnRzIGRvIG5vdCByb3V0ZSBjbHVzdGVyIHBhY2tldHMuIiAiR2F0ZXdheSBub2RlIiB7CiAgICAgICAgICAgICAgICBjbHVzdGVyRWRnZSA9IGNvbnRhaW5lckluc3RhbmNlIGVkZ2UKICAgICAgICAgICAgfQogICAgICAgICAgICBjbHVzdGVyX2NsdXN0ZXJPdmVybGF5Qm91bmRhcnlOb2RlID0gZGVwbG95bWVudE5vZGUgIkNsdXN0ZXIgb3ZlcmxheSBib3VuZGFyeSIgIlRhaWxzY2FsZSB0c25ldCBub2RlcyB1c2UgaXNvbGF0ZWQgSGVhZHNjYWxlOyBldmVyeSBub2RlIHJldGFpbnMgYSBzdGF0aWMgc3RhYmxlLW5vZGUgbWFwLiIgIlByaXZhdGUgb3ZlcmxheSIgewogICAgICAgICAgICAgICAgY2x1c3Rlck92ZXJsYXkgPSBpbmZyYXN0cnVjdHVyZU5vZGUgIlByaXZhdGUgb3ZlcmxheSByZWFjaGFiaWxpdHkiICJFYWNoIGNsdXN0ZXIgbm9kZSByZXRhaW5zIGEgc3RhdGljIG1hcCBvZiBzdGFibGUgbm9kZXMuIExhdW5jaCBhY2Nlc3MgaXMgbGltaXRlZCB0byB0aGUgaHViIGFuZCBwZXJtaXR0ZWQgc2VydmljZSBncm91cHMuIiAiVGFpbHNjYWxlIHRzbmV0IgogICAgICAgICAgICAgICAgY2x1c3Rlcl9jb250cm9sUGxhbmVCb3VuZGFyeU5vZGUgPSBkZXBsb3ltZW50Tm9kZSAiQ29udHJvbCBwbGFuZSBib3VuZGFyeSIgIk9uZSBvdmVybGF5IG5vZGUgZm9yIGVhY2ggc2VydmljZS4iICJDb250cm9sIHBsYW5lIiB7CiAgICAgICAgICAgICAgICAgICAgY2x1c3Rlcl9hZ2VudEh1Yk5vZGVOb2RlID0gZGVwbG95bWVudE5vZGUgIkFnZW50IGh1YiBub2RlIiAiSW5kZXBlbmRlbnQgc2VydmljZSBpZGVudGl0eS4iICJ0c25ldCBub2RlIiB7CiAgICAgICAgICAgICAgICAgICAgICAgIGNsdXN0ZXJfaHViID0gY29udGFpbmVySW5zdGFuY2UgaHViCiAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgICAgIGNsdXN0ZXJfYXBpU2VydmljZU5vZGVOb2RlID0gZGVwbG95bWVudE5vZGUgIkFQSSBzZXJ2aWNlIG5vZGUiICJJbmRlcGVuZGVudCBzZXJ2aWNlIGlkZW50aXR5OyBkYXNoYm9hcmQgc2hhcmVzIGl0cyBvcmlnaW4uIiAidHNuZXQgbm9kZSIgewogICAgICAgICAgICAgICAgICAgICAgICBjbHVzdGVyX2NvbnRyb2xBcGkgPSBjb250YWluZXJJbnN0YW5jZSBjb250cm9sQXBpCiAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgICAgIGNsdXN0ZXJfcHJldmlld1NlcnZpY2VOb2RlTm9kZSA9IGRlcGxveW1lbnROb2RlICJQcmV2aWV3IHNlcnZpY2Ugbm9kZSIgIkluZGVwZW5kZW50IHNlcnZpY2UgaWRlbnRpdHkuIiAidHNuZXQgbm9kZSIgewogICAgICAgICAgICAgICAgICAgICAgICBjbHVzdGVyX3ByZXZpZXdTZXJ2ZXIgPSBjb250YWluZXJJbnN0YW5jZSBwcmV2aWV3U2VydmVyCiAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgICAgIGNsdXN0ZXJfbWNwU2VydmljZU5vZGVOb2RlID0gZGVwbG95bWVudE5vZGUgIk1DUCBzZXJ2aWNlIG5vZGUiICJJbmRlcGVuZGVudCBzZXJ2aWNlIGlkZW50aXR5LiIgInRzbmV0IG5vZGUiIHsKICAgICAgICAgICAgICAgICAgICAgICAgY2x1c3Rlcl9tY3BHYXRld2F5ID0gY29udGFpbmVySW5zdGFuY2UgbWNwR2F0ZXdheQogICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgICAgICBjbHVzdGVyX2Nvb3JkaW5hdGlvbk5vZGVOb2RlID0gZGVwbG95bWVudE5vZGUgIkNvb3JkaW5hdGlvbiBub2RlIiAiSXNvbGF0ZWQgSGVhZHNjYWxlIGJlaGluZCBhbiBhZmFrdCBpbnRlcmZhY2U7IGluc3RhbmNlIGNvdW50IHVuZGVjaWRlZC4iICJDb29yZGluYXRpb24gc2VydmljZSIgewogICAgICAgICAgICAgICAgICAgICAgICBjbHVzdGVyX2Nvb3JkaW5hdGlvbiA9IGNvbnRhaW5lckluc3RhbmNlIGNvb3JkaW5hdGlvbgogICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgICAgICBjbHVzdGVyX3JlbGF5Tm9kZU5vZGUgPSBkZXBsb3ltZW50Tm9kZSAiUmVsYXkgbm9kZSIgIkVuY3J5cHRlZCBvdmVybGF5IHRyYW5zcG9ydC4iICJSZWxheSBzZXJ2aWNlIiB7CiAgICAgICAgICAgICAgICAgICAgICAgIGNsdXN0ZXJfb3ZlcmxheVJlbGF5ID0gY29udGFpbmVySW5zdGFuY2Ugb3ZlcmxheVJlbGF5CiAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgY2x1c3Rlcl9hZ2VudEhvc3RCb3VuZGFyeU5vZGUgPSBkZXBsb3ltZW50Tm9kZSAiQWdlbnQgaG9zdCBib3VuZGFyeSIgIkhvc3QgbWFuYWdlbWVudCBpcyBzZXBhcmF0ZSBmcm9tIGxhdW5jaCB0cmFmZmljLiIgIkFnZW50IGhvc3QiIHsKICAgICAgICAgICAgICAgICAgICBjbHVzdGVyX2hvc3ROb2RlTm9kZSA9IGRlcGxveW1lbnROb2RlICJIb3N0IG5vZGUiICJIb3N0IGlkZW50aXR5OyBvcHRpb25hbCB1c2VyLXRhaWxuZXQgYXR0YWNobWVudC4iICJ0c25ldCBub2RlIiB7CiAgICAgICAgICAgICAgICAgICAgICAgIGNsdXN0ZXJfaG9zdE5ldHdvcmsgPSBjb250YWluZXJJbnN0YW5jZSBob3N0TmV0d29yawogICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgICAgICBjbHVzdGVyX2FnZW50TGF1bmNoQm91bmRhcnlOb2RlID0gZGVwbG95bWVudE5vZGUgIkFnZW50IGxhdW5jaCBib3VuZGFyeSIgIkluZGVwZW5kZW50IG1lZGlhdG9yLCBhZ2VudCBwcm94eSBhbmQgZ3Vlc3Q7IG5vIHNoYXJlZCBsYXVuY2ggZGF0YSBwYXRoLiIgIkxhdW5jaCBpc29sYXRpb24iIHsKICAgICAgICAgICAgICAgICAgICAgICAgY2x1c3Rlcl9hZ2VudC1wcm94eSA9IGNvbnRhaW5lckluc3RhbmNlIGFnZW50LXByb3h5CiAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgY2x1c3Rlcl9hbm90aGVyQWdlbnRIb3N0Qm91bmRhcnlOb2RlID0gZGVwbG95bWVudE5vZGUgIkFub3RoZXIgYWdlbnQgaG9zdCBib3VuZGFyeSIgIkluZGVwZW5kZW50IGhvc3QgYW5kIGxhdW5jaCBpZGVudGl0aWVzLiIgIkFnZW50IGhvc3QiIHsKICAgICAgICAgICAgICAgICAgICBjbHVzdGVyX2Fub3RoZXJIb3N0Tm9kZU5vZGUgPSBkZXBsb3ltZW50Tm9kZSAiQW5vdGhlciBob3N0IG5vZGUiICJJbmRlcGVuZGVudCBob3N0IGlkZW50aXR5OyBvcHRpb25hbCBhdHRhY2hlZCB1c2VyIHRhaWxuZXQuIiAidHNuZXQgbm9kZSIgewogICAgICAgICAgICAgICAgICAgICAgICBjbHVzdGVyX290aGVySG9zdCA9IGNvbnRhaW5lckluc3RhbmNlIGhvc3ROZXR3b3JrCiAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgICAgIGNsdXN0ZXJfYW5vdGhlckxhdW5jaEJvdW5kYXJ5Tm9kZSA9IGRlcGxveW1lbnROb2RlICJBbm90aGVyIGxhdW5jaCBib3VuZGFyeSIgIkluZGVwZW5kZW50IGxhdW5jaCBjb25uZWN0aW9uLiIgIkxhdW5jaCBpc29sYXRpb24iIHsKICAgICAgICAgICAgICAgICAgICAgICAgY2x1c3Rlcl9kZXN0aW5hdGlvbi1hZ2VudC1wcm94eSA9IGNvbnRhaW5lckluc3RhbmNlIGRlc3RpbmF0aW9uLWFnZW50LXByb3h5CiAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgfQogICAgICAgICAgICB9CiAgICAgICAgICAgIGNsdXN0ZXJFZGdlIC0+IGNsdXN0ZXJPdmVybGF5ICJBdXRoZW50aWNhdGVkIGFwcCByZXF1ZXN0cyIgIk92ZXJsYXkgYWNjZXNzIgogICAgICAgICAgICBjbHVzdGVyX2NvbnRyb2xBcGkgLT4gY2x1c3Rlck92ZXJsYXkgIlNlcnZpY2UgaWRlbnRpdHkiICJPdmVybGF5IG1lbWJlcnNoaXAiCiAgICAgICAgICAgIGNsdXN0ZXJfcHJldmlld1NlcnZlciAtPiBjbHVzdGVyT3ZlcmxheSAiU2VydmljZSBpZGVudGl0eSIgIk92ZXJsYXkgbWVtYmVyc2hpcCIKICAgICAgICAgICAgY2x1c3Rlcl9tY3BHYXRld2F5IC0+IGNsdXN0ZXJPdmVybGF5ICJTZXJ2aWNlIGlkZW50aXR5IiAiT3ZlcmxheSBtZW1iZXJzaGlwIgogICAgICAgICAgICBjbHVzdGVyX2h1YiAtPiBjbHVzdGVyT3ZlcmxheSAiU2VydmljZSBpZGVudGl0eSIgIk92ZXJsYXkgbWVtYmVyc2hpcCIKICAgICAgICAgICAgY2x1c3Rlcl9jb29yZGluYXRpb24gLT4gY2x1c3Rlck92ZXJsYXkgIk5vZGUgY29vcmRpbmF0aW9uIiAiYWZha3QgaW50ZXJmYWNlIgogICAgICAgICAgICBjbHVzdGVyX292ZXJsYXlSZWxheSAtPiBjbHVzdGVyT3ZlcmxheSAiRW5jcnlwdGVkIHRyYW5zcG9ydCIgIlJlbGF5IHBhdGgiCiAgICAgICAgICAgIGNsdXN0ZXJfaG9zdE5ldHdvcmsgLT4gY2x1c3Rlck92ZXJsYXkgIkhvc3QgaWRlbnRpdHkiICJPdmVybGF5IG1lbWJlcnNoaXAiCiAgICAgICAgICAgIGNsdXN0ZXJfb3RoZXJIb3N0IC0+IGNsdXN0ZXJPdmVybGF5ICJIb3N0IGlkZW50aXR5IiAiT3ZlcmxheSBtZW1iZXJzaGlwIgogICAgICAgICAgICBjbHVzdGVyX2FnZW50LXByb3h5IC0+IGNsdXN0ZXJPdmVybGF5ICJMYXVuY2ggaWRlbnRpdHkiICJDb2Fyc2Ugc2VydmljZSBhY2Nlc3MiCiAgICAgICAgICAgIGNsdXN0ZXJfZGVzdGluYXRpb24tYWdlbnQtcHJveHkgLT4gY2x1c3Rlck92ZXJsYXkgIkRlc3RpbmF0aW9uIGxhdW5jaCBpZGVudGl0eSIgIkNvYXJzZSBzZXJ2aWNlIGFjY2VzcyIKICAgICAgICB9CiAgICAgICAgZGVwbG95bWVudEVudmlyb25tZW50ICJUb3BvbG9neSBob3N0IiB7CiAgICAgICAgICAgIGhvc3RfYWdlbnRIb3N0VHJ1c3RCb3VuZGFyeU5vZGUgPSBkZXBsb3ltZW50Tm9kZSAiQWdlbnQgaG9zdCB0cnVzdCBib3VuZGFyeSIgIlByaXZpbGVnZWQgaG9zdCBjb250cm9sIHJlbWFpbnMgb3V0c2lkZSBldmVyeSBndWVzdC4iICJBZ2VudCBob3N0IiB7CiAgICAgICAgICAgICAgICBob3N0X2RlZGljYXRlZFdvcmtlclVzZXJOb2RlID0gZGVwbG95bWVudE5vZGUgIkRlZGljYXRlZCB3b3JrZXIgdXNlciIgIlNlcGFyYXRlIGZyb20gdGhlIGhvc3QtbW9kZSBhZ2VudCB1c2VyLiIgIlVzZXIgYm91bmRhcnkiIHsKICAgICAgICAgICAgICAgICAgICBob3N0X2hvc3RXb3JrZXIgPSBjb250YWluZXJJbnN0YW5jZSBob3N0V29ya2VyCiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICBob3N0X3ByaXZpbGVnZWRTZXR1cEJvdW5kYXJ5Tm9kZSA9IGRlcGxveW1lbnROb2RlICJQcml2aWxlZ2VkIHNldHVwIGJvdW5kYXJ5IiAiSGVscGVyIGF1dGhvcml0eSBhbmQgY2FsbGVyIGJpbmRpbmcgcmVtYWluIHVuZGVjaWRlZC4iICJQcml2aWxlZ2UgYm91bmRhcnkiIHsKICAgICAgICAgICAgICAgICAgICBob3N0X2hlbHBlciA9IGNvbnRhaW5lckluc3RhbmNlIGhlbHBlcgogICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgaG9zdF9ob3N0UmVzb2x2ZXIgPSBjb250YWluZXJJbnN0YW5jZSBob3N0UmVzb2x2ZXIKICAgICAgICAgICAgICAgIGhvc3Rfb3BlcmF0b3JBY2Nlc3NCb3VuZGFyeU5vZGUgPSBkZXBsb3ltZW50Tm9kZSAiT3BlcmF0b3IgYWNjZXNzIGJvdW5kYXJ5IiAiSG9zdCBhY2Nlc3MgcmVxdWlyZXMgYXV0aG9yaXphdGlvbjsgbmFtZSByZXNvbHV0aW9uIGdyYW50cyBub25lLiIgIkhvc3Qgc2VydmljZSIgewogICAgICAgICAgICAgICAgICAgIGhvc3RfbG9vcGJhY2tQcm94eSA9IGNvbnRhaW5lckluc3RhbmNlIGxvb3BiYWNrUHJveHkKICAgICAgICAgICAgICAgICAgICBob3N0X2hvc3ROZXR3b3JrID0gY29udGFpbmVySW5zdGFuY2UgaG9zdE5ldHdvcmsKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgIGhvc3RfYWdlbnRMYXVuY2hBTm9kZSA9IGRlcGxveW1lbnROb2RlICJBZ2VudCBsYXVuY2ggQSIgIkluZGVwZW5kZW50IGRhdGEgcGF0aDsgbWVkaWF0aW9uIGFuZCBuZXR3b3JrIHVzZXJzIHVuZGVjaWRlZC4iICJMYXVuY2ggYm91bmRhcnkiIHsKICAgICAgICAgICAgICAgICAgICBob3N0X2d1ZXN0QU5vZGUgPSBkZXBsb3ltZW50Tm9kZSAiR3Vlc3QgQSIgIkhvc3QgbW9kZSB1c2VzIHRoZSBkZWRpY2F0ZWQgYWdlbnQgdXNlciwgc2VwYXJhdGUgZnJvbSB0aGUgd29ya2VyLiIgIkRlZGljYXRlZCBhZ2VudCB1c2VyIGluIGhvc3QgbW9kZSIgewogICAgICAgICAgICAgICAgICAgICAgICBob3N0X2d1ZXN0ID0gY29udGFpbmVySW5zdGFuY2UgZ3Vlc3QKICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgaG9zdF9tZWRpYXRvckFOb2RlID0gZGVwbG95bWVudE5vZGUgIk1lZGlhdG9yIEEiICJQb2xpY3kgYm91bmRhcnk7IG5vIGluZGVwZW5kZW50IG5ldHdvcmsuIiAiTG9jYWwgY29uZmluZW1lbnQ7IHVzZXIgdW5kZWNpZGVkIiB7CiAgICAgICAgICAgICAgICAgICAgICAgIGhvc3RfbWVkaWF0b3IgPSBjb250YWluZXJJbnN0YW5jZSBtZWRpYXRvcgogICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgICAgICBob3N0X2FnZW50UHJveHlBTm9kZSA9IGRlcGxveW1lbnROb2RlICJBZ2VudCBwcm94eSBBIiAiT3duIG5vZGUsIGh1YiBjb25uZWN0aW9uIGFuZCBsYXVuY2ggWC41MDktU1ZJRC4iICJ0c25ldCBub2RlOyB1c2VyIHVuZGVjaWRlZCIgewogICAgICAgICAgICAgICAgICAgICAgICBob3N0X2FnZW50LXByb3h5ID0gY29udGFpbmVySW5zdGFuY2UgYWdlbnQtcHJveHkKICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICBob3N0X2FnZW50TGF1bmNoQk5vZGUgPSBkZXBsb3ltZW50Tm9kZSAiQWdlbnQgbGF1bmNoIEIiICJJbmRlcGVuZGVudCBkYXRhIHBhdGg7IHNhbWUtaG9zdCB0cmFmZmljIHVzZXMgdGhlIG92ZXJsYXkuIiAiTGF1bmNoIGJvdW5kYXJ5IiB7CiAgICAgICAgICAgICAgICAgICAgaG9zdF9ndWVzdEJOb2RlID0gZGVwbG95bWVudE5vZGUgIkd1ZXN0IEIiICJIb3N0IG1vZGUgdXNlcyB0aGUgZGVkaWNhdGVkIGFnZW50IHVzZXIsIHNlcGFyYXRlIGZyb20gdGhlIHdvcmtlci4iICJEZWRpY2F0ZWQgYWdlbnQgdXNlciBpbiBob3N0IG1vZGUiIHsKICAgICAgICAgICAgICAgICAgICAgICAgaG9zdF9kZXN0aW5hdGlvbkd1ZXN0ID0gY29udGFpbmVySW5zdGFuY2UgZGVzdGluYXRpb25HdWVzdAogICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgICAgICBob3N0X21lZGlhdG9yQk5vZGUgPSBkZXBsb3ltZW50Tm9kZSAiTWVkaWF0b3IgQiIgIlBvbGljeSBib3VuZGFyeTsgbm8gaW5kZXBlbmRlbnQgbmV0d29yay4iICJMb2NhbCBjb25maW5lbWVudDsgdXNlciB1bmRlY2lkZWQiIHsKICAgICAgICAgICAgICAgICAgICAgICAgaG9zdF9kZXN0aW5hdGlvbk1lZGlhdG9yID0gY29udGFpbmVySW5zdGFuY2UgZGVzdGluYXRpb25NZWRpYXRvcgogICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgICAgICBob3N0X2FnZW50UHJveHlCTm9kZSA9IGRlcGxveW1lbnROb2RlICJBZ2VudCBwcm94eSBCIiAiT3duIG5vZGUsIGh1YiBjb25uZWN0aW9uIGFuZCBsYXVuY2ggWC41MDktU1ZJRC4iICJ0c25ldCBub2RlOyB1c2VyIHVuZGVjaWRlZCIgewogICAgICAgICAgICAgICAgICAgICAgICBob3N0X2Rlc3RpbmF0aW9uLWFnZW50LXByb3h5ID0gY29udGFpbmVySW5zdGFuY2UgZGVzdGluYXRpb24tYWdlbnQtcHJveHkKICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgIH0KICAgICAgICB9CiAgICAgICAgZGVwbG95bWVudEVudmlyb25tZW50ICJUb3BvbG9neSBsYXVuY2giIHsKICAgICAgICAgICAgbGF1bmNoX2FnZW50SG9zdFRydXN0Qm91bmRhcnlOb2RlID0gZGVwbG95bWVudE5vZGUgIkFnZW50IGhvc3QgdHJ1c3QgYm91bmRhcnkiICJXb3JrZXIgc3RheXMgb3V0c2lkZSB0aGlzIGRhdGEgcGF0aDsgc2VydmljZSB1c2VycyB1bmRlY2lkZWQuIiAiQWdlbnQgaG9zdCIgewogICAgICAgICAgICAgICAgbGF1bmNoX2FnZW50TGF1bmNoQm91bmRhcnlOb2RlID0gZGVwbG95bWVudE5vZGUgIkFnZW50IGxhdW5jaCBib3VuZGFyeSIgIkxhdW5jaC1ib3VuZCBsb2NhbCBjYXJyaWVyczsgcHJpdmF0ZSBrZXlzIHN0YXkgb3V0c2lkZSB0aGUgZ3Vlc3QuIiAiTGF1bmNoIGlzb2xhdGlvbiIgewogICAgICAgICAgICAgICAgICAgIGxhdW5jaF9ndWVzdFRydXN0Qm91bmRhcnlOb2RlID0gZGVwbG95bWVudE5vZGUgIkd1ZXN0IHRydXN0IGJvdW5kYXJ5IiAiR3Vlc3QgaGFzIG5vIG92ZXJsYXkgbm9kZSBvciB3b3JrbG9hZCBrZXkuIiAiUHJvdmlkZXIgY29uZmluZW1lbnQiIHsKICAgICAgICAgICAgICAgICAgICAgICAgbGF1bmNoX2d1ZXN0ID0gY29udGFpbmVySW5zdGFuY2UgZ3Vlc3QKICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgbGF1bmNoX21lZGlhdGlvblRydXN0Qm91bmRhcnlOb2RlID0gZGVwbG95bWVudE5vZGUgIk1lZGlhdGlvbiB0cnVzdCBib3VuZGFyeSIgIkVuZm9yY2VzIGNvbm5lY3Rpb24gYW5kIG1lc3NhZ2UgcG9saWN5OyBubyBpbmRlcGVuZGVudCBuZXR3b3JrLiIgIkxvY2FsIGNvbmZpbmVtZW50OyB1c2VyIHVuZGVjaWRlZCIgewogICAgICAgICAgICAgICAgICAgICAgICBsYXVuY2hfbWVkaWF0b3IgPSBjb250YWluZXJJbnN0YW5jZSBtZWRpYXRvcgogICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgICAgICBsYXVuY2hfYWdlbnRQcm94eVRydXN0Qm91bmRhcnlOb2RlID0gZGVwbG95bWVudE5vZGUgIkFnZW50IHByb3h5IHRydXN0IGJvdW5kYXJ5IiAiT25seSBsYXVuY2ggY29tcG9uZW50IG9wZW5pbmcgb2ZmLWhvc3QgY29ubmVjdGlvbnMuIiAidHNuZXQgbm9kZTsgdXNlciB1bmRlY2lkZWQiIHsKICAgICAgICAgICAgICAgICAgICAgICAgbGF1bmNoX2FnZW50LXByb3h5ID0gY29udGFpbmVySW5zdGFuY2UgYWdlbnQtcHJveHkKICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgIH0KICAgICAgICAgICAgbGF1bmNoX2NvbnRyb2xQbGFuZVRydXN0Qm91bmRhcnlOb2RlID0gZGVwbG95bWVudE5vZGUgIkNvbnRyb2wgcGxhbmUgdHJ1c3QgYm91bmRhcnkiICJTZXJ2aWNlIGlkZW50aXRpZXMgYXV0aGVudGljYXRlIHdvcmtsb2FkIGNvbm5lY3Rpb25zLiIgIkNsdXN0ZXIgb3ZlcmxheSIgewogICAgICAgICAgICAgICAgbGF1bmNoX2FnZW50SHViTm9kZU5vZGUgPSBkZXBsb3ltZW50Tm9kZSAiQWdlbnQgaHViIG5vZGUiICJPbmUgbXVsdGlwbGV4ZWQgY29ubmVjdGlvbiBwZXIgbGF1bmNoLiIgInRzbmV0IG5vZGUiIHsKICAgICAgICAgICAgICAgICAgICBsYXVuY2hfaHViID0gY29udGFpbmVySW5zdGFuY2UgaHViCiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICBsYXVuY2hfYXBpU2VydmljZU5vZGVOb2RlID0gZGVwbG95bWVudE5vZGUgIkFQSSBzZXJ2aWNlIG5vZGUiICJDaGVja3MgbGl2ZSBsYXVuY2ggY2FwYWJpbGl0aWVzIGFuZCBzY29wZXMuIiAidHNuZXQgbm9kZSIgewogICAgICAgICAgICAgICAgICAgIGxhdW5jaF9jb250cm9sQXBpID0gY29udGFpbmVySW5zdGFuY2UgY29udHJvbEFwaQogICAgICAgICAgICAgICAgfQogICAgICAgICAgICB9CiAgICAgICAgICAgIGxhdW5jaF9pbnRlcm5ldEJvdW5kYXJ5Tm9kZSA9IGRlcGxveW1lbnROb2RlICJJbnRlcm5ldCBib3VuZGFyeSIgIkRlc3RpbmF0aW9uIGF1dGhlbnRpY2F0aW9uIGRpZmZlcnMgZnJvbSB3b3JrbG9hZCBpZGVudGl0eS4iICJFeHRlcm5hbCBzZXJ2aWNlcyIgewogICAgICAgICAgICAgICAgbGF1bmNoX2ludGVybmV0ID0gc29mdHdhcmVTeXN0ZW1JbnN0YW5jZSBpbnRlcm5ldAogICAgICAgICAgICB9CiAgICAgICAgfQogICAgfQoKICAgIHZpZXdzIHsKICAgICAgICBwcm9wZXJ0aWVzIHsKICAgICAgICAgICAgcGxhbnR1bWwuc2tpbnBhcmFtcyAibm9kZXNlcD04MCxyYW5rc2VwPTE2MCIKICAgICAgICB9CiAgICAgICAgc3lzdGVtQ29udGV4dCBhZmFrdCAiYWZha3QtY29udGV4dCIgImFmYWt0IGFuZCB0aGUgcGVvcGxlIGFuZCBzeXN0ZW1zIGl0IGludGVyYWN0cyB3aXRoLiIgewogICAgICAgICAgICBpbmNsdWRlICoKICAgICAgICAgICAgZXhjbHVkZSAiZWxlbWVudC50YWc9PVRvcG9sb2d5IgogICAgICAgICAgICBhdXRvTGF5b3V0IGxyCiAgICAgICAgfQogICAgICAgIGNvbnRhaW5lciBhZmFrdCAiYWZha3QtY29udGFpbmVycyIgIlRoZSBhZmFrdCBwcm9jZXNzIGFuZCBpdHMgZXh0ZXJuYWwgZGVwZW5kZW5jaWVzLiIgewogICAgICAgICAgICBpbmNsdWRlICoKICAgICAgICAgICAgZXhjbHVkZSAiZWxlbWVudC50YWc9PVRvcG9sb2d5IgogICAgICAgICAgICBhdXRvTGF5b3V0IGxyCiAgICAgICAgfQogICAgICAgIGNvbXBvbmVudCBydW50aW1lICJhZmFrdC1jb21wb25lbnRzIiAiVGhlIHJvbGVzIGluc2lkZSB0aGUgY29tYmluZWQgYWZha3QgcHJvY2Vzcy4iIHsKICAgICAgICAgICAgaW5jbHVkZSAqCiAgICAgICAgICAgIGV4Y2x1ZGUgImVsZW1lbnQudGFnPT1Ub3BvbG9neSIKICAgICAgICAgICAgYXV0b0xheW91dCBscgogICAgICAgIH0KCiAgICAgICAgZGVwbG95bWVudCAqICJUb3BvbG9neSBjb250ZXh0IiAibmV0d29yay1jb250ZXh0IiAiT3BlcmF0b3IgZGV2aWNlcywgYXR0YWNoZWQgdGFpbG5ldHMsIGNsdXN0ZXIgYW5kIGludGVybmV0IHRydXN0IGJvdW5kYXJpZXMuIiB7CiAgICAgICAgICAgIGluY2x1ZGUgKgogICAgICAgICAgICBhdXRvTGF5b3V0IGxyCiAgICAgICAgfQogICAgICAgIGRlcGxveW1lbnQgKiAiVG9wb2xvZ3kgY2x1c3RlciIgIm5ldHdvcmstY2x1c3RlciIgIlNlcnZpY2Ugbm9kZXMgYW5kIGluZGVwZW5kZW50IGxhdW5jaCBub2RlcyBvbiB0aGUgcHJpdmF0ZSBvdmVybGF5LiIgewogICAgICAgICAgICBpbmNsdWRlICoKICAgICAgICAgICAgZXhjbHVkZSAicmVsYXRpb25zaGlwLnRhZz09VG9wb2xvZ3lDb25uZWN0aW9uIgogICAgICAgICAgICBhdXRvTGF5b3V0IGxyCiAgICAgICAgfQogICAgICAgIGRlcGxveW1lbnQgKiAiVG9wb2xvZ3kgaG9zdCIgIm5ldHdvcmstaG9zdCIgIkhvc3QgbWFuYWdlbWVudCwgb3BlcmF0b3IgYWNjZXNzIGFuZCBpbmRlcGVuZGVudCBsYXVuY2ggdHJ1c3QgYm91bmRhcmllcy4iIHsKICAgICAgICAgICAgaW5jbHVkZSAqCiAgICAgICAgICAgIGV4Y2x1ZGUgInJlbGF0aW9uc2hpcC50YWc9PUxpZmVjeWNsZURldGFpbCIKICAgICAgICAgICAgZXhjbHVkZSAicmVsYXRpb25zaGlwLnRhZz09UmV0dXJuRGV0YWlsIgogICAgICAgICAgICBleGNsdWRlICJyZWxhdGlvbnNoaXAudGFnPT1VbmRlY2lkZWQiCiAgICAgICAgICAgIGF1dG9MYXlvdXQgdGIKICAgICAgICB9CiAgICAgICAgZGVwbG95bWVudCAqICJUb3BvbG9neSBsYXVuY2giICJuZXR3b3JrLWxhdW5jaCIgIk9uZSBsYXVuY2ggY3Jvc3NlcyBndWVzdCwgbWVkaWF0aW9uLCBuZXR3b3JrIGFuZCBzZXJ2aWNlIGJvdW5kYXJpZXMuIiB7CiAgICAgICAgICAgIGluY2x1ZGUgKgogICAgICAgICAgICBleGNsdWRlICJyZWxhdGlvbnNoaXAudGFnPT1SZXR1cm5EZXRhaWwiCiAgICAgICAgICAgIGF1dG9MYXlvdXQgbHIKICAgICAgICB9CiAgICAgICAgZHluYW1pYyBhZmFrdCAibmV0d29yay1mbG93LWludGVybmV0IiAiR3Vlc3QgZWdyZXNzIHRocm91Z2ggaXRzIG1lZGlhdG9yIGFuZCBhZ2VudCBwcm94eS4iIHsKICAgICAgICAgICAgZ3Vlc3QgLT4gbWVkaWF0b3IgIkxhdW5jaC1ib3VuZCByZXF1ZXN0OyBubyBndWVzdCB3b3JrbG9hZCBrZXkiCiAgICAgICAgICAgIG1lZGlhdG9yIC0+IGFnZW50LXByb3h5ICJQb2xpY3ktcGVybWl0dGVkIGRlc3RpbmF0aW9uOyBpbnNwZWN0aW9uIHJlcXVpcmVkIGZvciBjcmVkZW50aWFsZWQgdHJhZmZpYyIKICAgICAgICAgICAgYWdlbnQtcHJveHkgLT4gaW50ZXJuZXQgIlBlcm1pdHRlZCByZXF1ZXN0OyBkZXN0aW5hdGlvbiBjcmVkZW50aWFscyB3aGVuIGF1dGhvcml6ZWQiCiAgICAgICAgICAgIGF1dG9MYXlvdXQgbHIKICAgICAgICB9CiAgICAgICAgZHluYW1pYyBhZmFrdCAibmV0d29yay1mbG93LWNvbnRyb2wiICJHdWVzdCByZXF1ZXN0IHRvIHRoZSBjb250cm9sIHBsYW5lIEFQSSBzZXJ2aWNlLiIgewogICAgICAgICAgICBndWVzdCAtPiBtZWRpYXRvciAiUmVxdWVzdCBib3VuZCB0byBjdXJyZW50IGxhdW5jaCIKICAgICAgICAgICAgbWVkaWF0b3IgLT4gYWdlbnQtcHJveHkgIlBvbGljeSBwZXJtaXQgYW5kIHN0YW1wZWQgbGF1bmNoIGlkZW50aXR5IgogICAgICAgICAgICBhZ2VudC1wcm94eSAtPiBjb250cm9sQXBpICJMYXVuY2ggWC41MDktU1ZJRDsgc2VydmljZSBjaGVja3MgY2FwYWJpbGl0aWVzIGFuZCBzY29wZXMiCiAgICAgICAgICAgIGF1dG9MYXlvdXQgbHIKICAgICAgICB9CiAgICAgICAgZHluYW1pYyBhZmFrdCAibmV0d29yay1mbG93LXByZXZpZXciICJPcGVyYXRvciBicm93c2VyIHJlYWNoZXMgYSBwcmV2aWV3IHRocm91Z2ggdGhlIGhvc3Qgbm9kZS4iIHsKICAgICAgICAgICAgYnJvd3NlciAtPiBob3N0UmVzb2x2ZXIgIlJlc29sdmUgaW50ZXJuYWwgcHJldmlldyBuYW1lIgogICAgICAgICAgICBicm93c2VyIC0+IGxvb3BiYWNrUHJveHkgIkhvc3QgYWNjZXNzIHJlcXVlc3Q7IG1lY2hhbmlzbSB1bmRlY2lkZWQiCiAgICAgICAgICAgIGxvb3BiYWNrUHJveHkgLT4gaG9zdE5ldHdvcmsgIlJlcXVlc3QgdW5kZXIgaG9zdC1sZXZlbCBhdXRob3JpemF0aW9uIgogICAgICAgICAgICBob3N0TmV0d29yayAtPiBwcmV2aWV3U2VydmVyICJIb3N0IHdvcmtsb2FkIGlkZW50aXR5OyBzZXJ2ZWQgYXBwIG1heSByZXF1aXJlIGl0cyBvd24gc2lnbi1pbiIKICAgICAgICAgICAgcHJldmlld1NlcnZlciAtPiBodWIgIlByZXZpZXcgc2VydmljZSBpZGVudGl0eTsgYXV0aG9yaXplZCBwdWJsaXNoZWQgcG9ydCIKICAgICAgICAgICAgaHViIC0+IGFnZW50LXByb3h5ICJUYXJnZXQgbGF1bmNoIFguNTA5LVNWSUQgb24gZXhpc3Rpbmcgb3V0Ym91bmQgY29ubmVjdGlvbiIKICAgICAgICAgICAgYWdlbnQtcHJveHkgLT4gbWVkaWF0b3IgIkF1dGhlbnRpY2F0ZWQgY2FsbGVyIGFuZCBjdXJyZW50IHB1YmxpY2F0aW9uIgogICAgICAgICAgICBtZWRpYXRvciAtPiBndWVzdCAiUGVybWl0dGVkIHN0cmVhbSB0byBib3VuZCBndWVzdCBsaXN0ZW5lciIKICAgICAgICAgICAgYXV0b0xheW91dCB0YgogICAgICAgIH0KICAgICAgICBkeW5hbWljIGFmYWt0ICJuZXR3b3JrLWZsb3ctcGhvbmUiICJQaG9uZSByZWFjaGVzIHRoZSBkYXNoYm9hcmQgdGhyb3VnaCBhbiBhdHRhY2hlZCB1c2VyIHRhaWxuZXQuIiB7CiAgICAgICAgICAgIHBob25lIC0+IHVzZXJUYWlsbmV0ICJEZXZpY2UgaWRlbnRpdHkgaW4gdXNlci1vd25lZCBuZXR3b3JrIgogICAgICAgICAgICB1c2VyVGFpbG5ldCAtPiBlZGdlICJQcml2YXRlIGFwcGxpY2F0aW9uIHJlcXVlc3Q7IGFmYWt0IHNpZ24taW4iCiAgICAgICAgICAgIGVkZ2UgLT4gY29udHJvbEFwaSAiQXV0aGVudGljYXRlZCB1c2VyIGNvbnRleHQgdG8gd2ViIGRhc2hib2FyZDsgbm8gcGFja2V0IHJvdXRpbmciCiAgICAgICAgICAgIGF1dG9MYXlvdXQgbHIKICAgICAgICB9CiAgICAgICAgZHluYW1pYyBhZmFrdCAibmV0d29yay1mbG93LWdyYW50IiAiTG9naWNhbCBncmFudCBmbG93OyBkaXJlY3Qgb3ZlcmxheSB2ZXJzdXMgYWdlbnQgaHViIHRyYW5zcG9ydCBpcyB1bmRlY2lkZWQuIiB7CiAgICAgICAgICAgIGd1ZXN0IC0+IG1lZGlhdG9yICJTb3VyY2UgbGF1bmNoIHJlcXVlc3RzIHB1Ymxpc2hlZCBkZXN0aW5hdGlvbiIKICAgICAgICAgICAgbWVkaWF0b3IgLT4gYWdlbnQtcHJveHkgIlNvdXJjZSBwb2xpY3kgcGVybWl0cyBkZXN0aW5hdGlvbiBuYW1lIGFuZCBwb3J0IgogICAgICAgICAgICBhZ2VudC1wcm94eSAtPiBkZXN0aW5hdGlvbi1hZ2VudC1wcm94eSAiU291cmNlIGFuZCBkZXN0aW5hdGlvbiB3b3JrbG9hZCBpZGVudGl0aWVzOyByb3V0ZSB1bmRlY2lkZWQiCiAgICAgICAgICAgIGRlc3RpbmF0aW9uLWFnZW50LXByb3h5IC0+IGRlc3RpbmF0aW9uTWVkaWF0b3IgIkF1dGhlbnRpY2F0ZWQgc291cmNlIGxhdW5jaCBhbmQgZGVzdGluYXRpb24gZ3JhbnQiCiAgICAgICAgICAgIGRlc3RpbmF0aW9uTWVkaWF0b3IgLT4gZGVzdGluYXRpb25HdWVzdCAiQ2hlY2sgY3VycmVudCBwdWJsaWNhdGlvbiBhbmQgZ3JhbnQgYmVmb3JlIGxpc3RlbmVyIGFjY2VzcyIKICAgICAgICAgICAgYXV0b0xheW91dCB0YgogICAgICAgIH0KICAgICAgICBjb250YWluZXIgYWZha3QgIm5ldHdvcmstc2VydmljZS1ib3VuZGFyaWVzIiAiU2VydmljZSByb2xlcyBzdXBwb3J0aW5nIHRoZSBkZXBsb3ltZW50IHRvcG9sb2d5OyBjb25uZWN0aW9ucyBhcmUgY29udHJvbCBvciB0cmFuc3BvcnQgZGVwZW5kZW5jaWVzLiIgewogICAgICAgICAgICBpbmNsdWRlIGhvc3RXb3JrZXIgaGVscGVyIGh1YiBjb250cm9sQXBpIG1jcEdhdGV3YXkgY29vcmRpbmF0aW9uIG92ZXJsYXlSZWxheQogICAgICAgICAgICBleGNsdWRlICJyZWxhdGlvbnNoaXAudGFnPT1PdmVydmlld0hpZGRlbiIKICAgICAgICAgICAgYXV0b0xheW91dCB0YgogICAgICAgIH0KICAgICAgICBzdHlsZXMgewogICAgICAgICAgICBlbGVtZW50ICJUb3BvbG9neSIgewogICAgICAgICAgICAgICAgYmFja2dyb3VuZCAjZThmMWZhCiAgICAgICAgICAgICAgICBjb2xvciAjMTIyYjQ0CiAgICAgICAgICAgICAgICBzdHJva2UgIzMxNWI3ZAogICAgICAgICAgICB9CiAgICAgICAgICAgIGVsZW1lbnQgIkRlcGxveW1lbnQgTm9kZSIgewogICAgICAgICAgICAgICAgYmFja2dyb3VuZCAjZjVmN2ZhCiAgICAgICAgICAgICAgICBjb2xvciAjMTgyYzNlCiAgICAgICAgICAgICAgICBzdHJva2UgIzUzNmI3ZQogICAgICAgICAgICB9CiAgICAgICAgICAgIGVsZW1lbnQgIkdyb3VwIiB7CiAgICAgICAgICAgICAgICBjb2xvciAjMTgyYzNlCiAgICAgICAgICAgICAgICBzdHJva2UgIzUzNmI3ZQogICAgICAgICAgICB9CiAgICAgICAgICAgIHJlbGF0aW9uc2hpcCAiVW5kZWNpZGVkIiB7CiAgICAgICAgICAgICAgICBjb2xvciAjOGE1YTAwCiAgICAgICAgICAgICAgICBzdHlsZSBkYXNoZWQKICAgICAgICAgICAgfQogICAgICAgIH0KICAgIH0KCiAgICBjb25maWd1cmF0aW9uIHsKICAgICAgICBzY29wZSBzb2Z0d2FyZXN5c3RlbQogICAgfQp9",
     "structurizr.inspection.model.softwaresystem.decisions": "ignore",
     "structurizr.inspection.info": "0",
     "structurizr.inspection.ignore": "2",
@@ -548,52 +2700,16 @@
         "order": 3,
         "relationships": [
           {
-            "id": "16"
-          },
-          {
-            "id": "19"
-          },
-          {
-            "id": "20"
-          },
-          {
-            "id": "21"
-          },
-          {
-            "id": "24"
-          },
-          {
-            "id": "25"
-          },
-          {
-            "id": "26"
-          },
-          {
-            "id": "29"
-          },
-          {
-            "id": "30"
-          },
-          {
-            "id": "31"
-          },
-          {
             "id": "34"
           },
           {
-            "id": "35"
+            "id": "37"
           },
           {
-            "id": "36"
+            "id": "38"
           },
           {
             "id": "39"
-          },
-          {
-            "id": "40"
-          },
-          {
-            "id": "41"
           },
           {
             "id": "42"
@@ -606,6 +2722,42 @@
           },
           {
             "id": "47"
+          },
+          {
+            "id": "48"
+          },
+          {
+            "id": "49"
+          },
+          {
+            "id": "52"
+          },
+          {
+            "id": "53"
+          },
+          {
+            "id": "54"
+          },
+          {
+            "id": "57"
+          },
+          {
+            "id": "58"
+          },
+          {
+            "id": "59"
+          },
+          {
+            "id": "60"
+          },
+          {
+            "id": "61"
+          },
+          {
+            "id": "62"
+          },
+          {
+            "id": "65"
           }
         ]
       }
@@ -614,7 +2766,34 @@
       "properties": {
         "plantuml.skinparams": "nodesep=80,ranksep=160"
       },
-      "styles": {},
+      "styles": {
+        "elements": [
+          {
+            "background": "#f5f7fa",
+            "color": "#182c3e",
+            "stroke": "#536b7e",
+            "tag": "Deployment Node"
+          },
+          {
+            "color": "#182c3e",
+            "stroke": "#536b7e",
+            "tag": "Group"
+          },
+          {
+            "background": "#e8f1fa",
+            "color": "#122b44",
+            "stroke": "#315b7d",
+            "tag": "Topology"
+          }
+        ],
+        "relationships": [
+          {
+            "color": "#8a5a00",
+            "style": "Dashed",
+            "tag": "Undecided"
+          }
+        ]
+      },
       "terminology": {}
     },
     "containerViews": [
@@ -665,25 +2844,1013 @@
         "order": 2,
         "relationships": [
           {
-            "id": "17"
+            "id": "35"
           },
           {
-            "id": "22"
-          },
-          {
-            "id": "27"
-          },
-          {
-            "id": "32"
-          },
-          {
-            "id": "37"
+            "id": "40"
           },
           {
             "id": "45"
+          },
+          {
+            "id": "50"
+          },
+          {
+            "id": "55"
+          },
+          {
+            "id": "63"
           }
         ],
         "softwareSystemId": "6"
+      },
+      {
+        "automaticLayout": {
+          "edgeSeparation": 50,
+          "nodeSeparation": 50,
+          "rankDirection": "TopBottom",
+          "rankSeparation": 100,
+          "vertices": true
+        },
+        "description": "Service roles supporting the deployment topology; connections are control or transport dependencies.",
+        "elements": [
+          {
+            "id": "16",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "17",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "19",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "20",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "21",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "23",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "24",
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "externalSoftwareSystemBoundariesVisible": false,
+        "key": "network-service-boundaries",
+        "name": "Container View: afakt",
+        "order": 13,
+        "relationships": [
+          {
+            "id": "107"
+          },
+          {
+            "id": "109"
+          },
+          {
+            "id": "75"
+          },
+          {
+            "id": "87"
+          },
+          {
+            "id": "88"
+          }
+        ],
+        "softwareSystemId": "6"
+      }
+    ],
+    "deploymentViews": [
+      {
+        "automaticLayout": {
+          "edgeSeparation": 50,
+          "nodeSeparation": 50,
+          "rankDirection": "LeftRight",
+          "rankSeparation": 100,
+          "vertices": true
+        },
+        "description": "Operator devices, attached tailnets, cluster and internet trust boundaries.",
+        "elements": [
+          {
+            "id": "110",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "111",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "112",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "113",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "114",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "115",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "116",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "117",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "118",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "119",
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "environment": "Topology context",
+        "key": "network-context",
+        "name": "Deployment View: Topology context",
+        "order": 4,
+        "relationships": [
+          {
+            "id": "120"
+          },
+          {
+            "id": "121"
+          },
+          {
+            "id": "122"
+          },
+          {
+            "id": "123"
+          },
+          {
+            "id": "124"
+          }
+        ]
+      },
+      {
+        "automaticLayout": {
+          "edgeSeparation": 50,
+          "nodeSeparation": 50,
+          "rankDirection": "LeftRight",
+          "rankSeparation": 100,
+          "vertices": true
+        },
+        "description": "Service nodes and independent launch nodes on the private overlay.",
+        "elements": [
+          {
+            "id": "125",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "126",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "127",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "128",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "130",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "131",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "132",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "133",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "134",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "135",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "136",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "139",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "140",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "143",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "144",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "146",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "147",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "149",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "150",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "152",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "153",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "154",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "160",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "161",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "168",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "169",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "170",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "176",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "177",
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "environment": "Topology cluster",
+        "key": "network-cluster",
+        "name": "Deployment View: Topology cluster",
+        "order": 5,
+        "relationships": [
+          {
+            "id": "129"
+          },
+          {
+            "id": "155"
+          },
+          {
+            "id": "171"
+          },
+          {
+            "id": "180"
+          },
+          {
+            "id": "181"
+          },
+          {
+            "id": "182"
+          },
+          {
+            "id": "183"
+          },
+          {
+            "id": "184"
+          },
+          {
+            "id": "185"
+          },
+          {
+            "id": "186"
+          },
+          {
+            "id": "187"
+          },
+          {
+            "id": "188"
+          },
+          {
+            "id": "189"
+          },
+          {
+            "id": "190"
+          }
+        ]
+      },
+      {
+        "automaticLayout": {
+          "edgeSeparation": 50,
+          "nodeSeparation": 50,
+          "rankDirection": "TopBottom",
+          "rankSeparation": 100,
+          "vertices": true
+        },
+        "description": "Host management, operator access and independent launch trust boundaries.",
+        "elements": [
+          {
+            "id": "191",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "192",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "193",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "194",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "195",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "197",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "199",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "200",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "201",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "204",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "205",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "206",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "207",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "208",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "212",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "213",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "216",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "217",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "218",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "219",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "220",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "224",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "225",
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "environment": "Topology host",
+        "key": "network-host",
+        "name": "Deployment View: Topology host",
+        "order": 6,
+        "relationships": [
+          {
+            "id": "196"
+          },
+          {
+            "id": "198"
+          },
+          {
+            "id": "202"
+          },
+          {
+            "id": "203"
+          },
+          {
+            "id": "211"
+          },
+          {
+            "id": "215"
+          },
+          {
+            "id": "223"
+          },
+          {
+            "id": "228"
+          }
+        ]
+      },
+      {
+        "automaticLayout": {
+          "edgeSeparation": 50,
+          "nodeSeparation": 50,
+          "rankDirection": "LeftRight",
+          "rankSeparation": 100,
+          "vertices": true
+        },
+        "description": "One launch crosses guest, mediation, network and service boundaries.",
+        "elements": [
+          {
+            "id": "229",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "230",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "231",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "232",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "233",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "234",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "237",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "238",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "241",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "242",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "243",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "246",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "247",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "250",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "251",
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "environment": "Topology launch",
+        "key": "network-launch",
+        "name": "Deployment View: Topology launch",
+        "order": 7,
+        "relationships": [
+          {
+            "id": "236"
+          },
+          {
+            "id": "240"
+          },
+          {
+            "id": "245"
+          },
+          {
+            "id": "248"
+          },
+          {
+            "id": "252"
+          }
+        ]
+      }
+    ],
+    "dynamicViews": [
+      {
+        "automaticLayout": {
+          "edgeSeparation": 50,
+          "nodeSeparation": 50,
+          "rankDirection": "LeftRight",
+          "rankSeparation": 100,
+          "vertices": true
+        },
+        "description": "Guest egress through its mediator and agent proxy.",
+        "elementId": "6",
+        "elements": [
+          {
+            "id": "28",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "29",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "30",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "69",
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "externalBoundariesVisible": false,
+        "key": "network-flow-internet",
+        "name": "Dynamic View: afakt",
+        "order": 8,
+        "relationships": [
+          {
+            "description": "Launch-bound request; no guest workload key",
+            "id": "89",
+            "order": "1",
+            "response": false
+          },
+          {
+            "description": "Policy-permitted destination; inspection required for credentialed traffic",
+            "id": "90",
+            "order": "2",
+            "response": false
+          },
+          {
+            "description": "Permitted request; destination credentials when authorized",
+            "id": "94",
+            "order": "3",
+            "response": false
+          }
+        ]
+      },
+      {
+        "automaticLayout": {
+          "edgeSeparation": 50,
+          "nodeSeparation": 50,
+          "rankDirection": "LeftRight",
+          "rankSeparation": 100,
+          "vertices": true
+        },
+        "description": "Guest request to the control plane API service.",
+        "elementId": "6",
+        "elements": [
+          {
+            "id": "17",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "28",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "29",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "30",
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "externalBoundariesVisible": false,
+        "key": "network-flow-control",
+        "name": "Dynamic View: afakt",
+        "order": 9,
+        "relationships": [
+          {
+            "description": "Request bound to current launch",
+            "id": "89",
+            "order": "1",
+            "response": false
+          },
+          {
+            "description": "Policy permit and stamped launch identity",
+            "id": "90",
+            "order": "2",
+            "response": false
+          },
+          {
+            "description": "Launch X.509-SVID; service checks capabilities and scopes",
+            "id": "92",
+            "order": "3",
+            "response": false
+          }
+        ]
+      },
+      {
+        "automaticLayout": {
+          "edgeSeparation": 50,
+          "nodeSeparation": 50,
+          "rankDirection": "TopBottom",
+          "rankSeparation": 100,
+          "vertices": true
+        },
+        "description": "Operator browser reaches a preview through the host node.",
+        "elementId": "6",
+        "elements": [
+          {
+            "id": "16",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "18",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "25",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "26",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "27",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "28",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "29",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "30",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "66",
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "externalBoundariesVisible": false,
+        "key": "network-flow-preview",
+        "name": "Dynamic View: afakt",
+        "order": 10,
+        "relationships": [
+          {
+            "description": "Resolve internal preview name",
+            "id": "70",
+            "order": "1",
+            "response": false
+          },
+          {
+            "description": "Host access request; mechanism undecided",
+            "id": "71",
+            "order": "2",
+            "response": false
+          },
+          {
+            "description": "Request under host-level authorization",
+            "id": "72",
+            "order": "3",
+            "response": false
+          },
+          {
+            "description": "Host workload identity; served app may require its own sign-in",
+            "id": "73",
+            "order": "4",
+            "response": false
+          },
+          {
+            "description": "Preview service identity; authorized published port",
+            "id": "95",
+            "order": "5",
+            "response": false
+          },
+          {
+            "description": "Target launch X.509-SVID on existing outbound connection",
+            "id": "96",
+            "order": "6",
+            "response": false
+          },
+          {
+            "description": "Authenticated caller and current publication",
+            "id": "97",
+            "order": "7",
+            "response": false
+          },
+          {
+            "description": "Permitted stream to bound guest listener",
+            "id": "98",
+            "order": "8",
+            "response": false
+          }
+        ]
+      },
+      {
+        "automaticLayout": {
+          "edgeSeparation": 50,
+          "nodeSeparation": 50,
+          "rankDirection": "LeftRight",
+          "rankSeparation": 100,
+          "vertices": true
+        },
+        "description": "Phone reaches the dashboard through an attached user tailnet.",
+        "elementId": "6",
+        "elements": [
+          {
+            "id": "17",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "22",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "67",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "68",
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "externalBoundariesVisible": false,
+        "key": "network-flow-phone",
+        "name": "Dynamic View: afakt",
+        "order": 11,
+        "relationships": [
+          {
+            "description": "Device identity in user-owned network",
+            "id": "81",
+            "order": "1",
+            "response": false
+          },
+          {
+            "description": "Private application request; afakt sign-in",
+            "id": "82",
+            "order": "2",
+            "response": false
+          },
+          {
+            "description": "Authenticated user context to web dashboard; no packet routing",
+            "id": "85",
+            "order": "3",
+            "response": false
+          }
+        ]
+      },
+      {
+        "automaticLayout": {
+          "edgeSeparation": 50,
+          "nodeSeparation": 50,
+          "rankDirection": "TopBottom",
+          "rankSeparation": 100,
+          "vertices": true
+        },
+        "description": "Logical grant flow; direct overlay versus agent hub transport is undecided.",
+        "elementId": "6",
+        "elements": [
+          {
+            "id": "28",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "29",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "30",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "31",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "32",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "33",
+            "x": 0,
+            "y": 0
+          }
+        ],
+        "externalBoundariesVisible": false,
+        "key": "network-flow-grant",
+        "name": "Dynamic View: afakt",
+        "order": 12,
+        "relationships": [
+          {
+            "description": "Source launch requests published destination",
+            "id": "89",
+            "order": "1",
+            "response": false
+          },
+          {
+            "description": "Source policy permits destination name and port",
+            "id": "90",
+            "order": "2",
+            "response": false
+          },
+          {
+            "description": "Source and destination workload identities; route undecided",
+            "id": "104",
+            "order": "3",
+            "response": false
+          },
+          {
+            "description": "Authenticated source launch and destination grant",
+            "id": "102",
+            "order": "4",
+            "response": false
+          },
+          {
+            "description": "Check current publication and grant before listener access",
+            "id": "103",
+            "order": "5",
+            "response": false
+          }
+        ]
       }
     ],
     "systemContextViews": [
@@ -734,22 +3901,22 @@
         "order": 1,
         "relationships": [
           {
-            "id": "18"
+            "id": "36"
           },
           {
-            "id": "23"
-          },
-          {
-            "id": "28"
-          },
-          {
-            "id": "33"
-          },
-          {
-            "id": "38"
+            "id": "41"
           },
           {
             "id": "46"
+          },
+          {
+            "id": "51"
+          },
+          {
+            "id": "56"
+          },
+          {
+            "id": "64"
           }
         ],
         "softwareSystemId": "6"

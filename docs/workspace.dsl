@@ -140,19 +140,19 @@ workspace "afakt" "Architecture of the afakt modular monolith." {
         hub -> overlayRelay "Uses encrypted relay transport when needed" "Overlay transport" "TopologyConnection"
 
         deploymentEnvironment "Topology context" {
-            deploymentNode "Operator device boundary" "Operator-controlled clients." "Client devices" {
+            context_operatorDeviceBoundaryNode = deploymentNode "Operator device boundary" "Operator-controlled clients." "Client devices" {
                 contextClients = infrastructureNode "Browser, phone, tablet and native apps" "Operator and device identities." "Application clients"
             }
-            deploymentNode "User tailnet boundary" "User-owned network; no cluster routing." "User network" {
+            context_userTailnetBoundaryNode = deploymentNode "User tailnet boundary" "User-owned network; no cluster routing." "User network" {
                 contextTailnet = infrastructureNode "Attached user tailnets" "Private application access to attached gateways." "Tailscale"
             }
-            deploymentNode "Cluster trust domain" "Control plane and agent hosts share authenticated overlay reachability." "Private cluster" {
-                deploymentNode "External ingress boundary" "Application entry only." "Gateway node" {
+            context_clusterTrustDomainNode = deploymentNode "Cluster trust domain" "Control plane and agent hosts share authenticated overlay reachability." "Private cluster" {
+                context_externalIngressBoundaryNode = deploymentNode "External ingress boundary" "Application entry only." "Gateway node" {
                     contextIngress = infrastructureNode "External ingress gateway" "Public and user-tailnet application traffic; no packet routing." "Application proxy"
                 }
                 contextCluster = infrastructureNode "Control plane and agent hosts" "Per-service, per-host and per-launch nodes; guests have no overlay membership." "Isolated Headscale overlay"
             }
-            deploymentNode "Internet boundary" "Upstream destinations outside cluster trust." "External network" {
+            context_internetBoundaryNode = deploymentNode "Internet boundary" "Upstream destinations outside cluster trust." "External network" {
                 contextInternet = infrastructureNode "Internet services" "Only permitted egress leaves an agent host." "Destination services"
             }
             contextClients -> contextTailnet "Device identity" "User tailnet"
@@ -162,47 +162,47 @@ workspace "afakt" "Architecture of the afakt modular monolith." {
             contextCluster -> contextInternet "Permitted destination request" "Agent proxy egress"
         }
         deploymentEnvironment "Topology cluster" {
-            deploymentNode "User tailnet boundary" "Separate user network." "User tailnet" {
+            cluster_userTailnetBoundaryNode = deploymentNode "User tailnet boundary" "Separate user network." "User tailnet" {
                 clusterTailnet = softwareSystemInstance userTailnet
             }
-            deploymentNode "External ingress boundary" "User-tailnet attachments do not route cluster packets." "Gateway node" {
+            cluster_externalIngressBoundaryNode = deploymentNode "External ingress boundary" "User-tailnet attachments do not route cluster packets." "Gateway node" {
                 clusterEdge = containerInstance edge
             }
-            deploymentNode "Cluster overlay boundary" "Tailscale tsnet nodes use isolated Headscale; every node retains a static stable-node map." "Private overlay" {
+            cluster_clusterOverlayBoundaryNode = deploymentNode "Cluster overlay boundary" "Tailscale tsnet nodes use isolated Headscale; every node retains a static stable-node map." "Private overlay" {
                 clusterOverlay = infrastructureNode "Private overlay reachability" "Each cluster node retains a static map of stable nodes. Launch access is limited to the hub and permitted service groups." "Tailscale tsnet"
-                deploymentNode "Control plane boundary" "One overlay node for each service." "Control plane" {
-                    deploymentNode "Agent hub node" "Independent service identity." "tsnet node" {
+                cluster_controlPlaneBoundaryNode = deploymentNode "Control plane boundary" "One overlay node for each service." "Control plane" {
+                    cluster_agentHubNodeNode = deploymentNode "Agent hub node" "Independent service identity." "tsnet node" {
                         cluster_hub = containerInstance hub
                     }
-                    deploymentNode "API service node" "Independent service identity; dashboard shares its origin." "tsnet node" {
+                    cluster_apiServiceNodeNode = deploymentNode "API service node" "Independent service identity; dashboard shares its origin." "tsnet node" {
                         cluster_controlApi = containerInstance controlApi
                     }
-                    deploymentNode "Preview service node" "Independent service identity." "tsnet node" {
+                    cluster_previewServiceNodeNode = deploymentNode "Preview service node" "Independent service identity." "tsnet node" {
                         cluster_previewServer = containerInstance previewServer
                     }
-                    deploymentNode "MCP service node" "Independent service identity." "tsnet node" {
+                    cluster_mcpServiceNodeNode = deploymentNode "MCP service node" "Independent service identity." "tsnet node" {
                         cluster_mcpGateway = containerInstance mcpGateway
                     }
-                    deploymentNode "Coordination node" "Isolated Headscale behind an afakt interface; instance count undecided." "Coordination service" {
+                    cluster_coordinationNodeNode = deploymentNode "Coordination node" "Isolated Headscale behind an afakt interface; instance count undecided." "Coordination service" {
                         cluster_coordination = containerInstance coordination
                     }
-                    deploymentNode "Relay node" "Encrypted overlay transport." "Relay service" {
+                    cluster_relayNodeNode = deploymentNode "Relay node" "Encrypted overlay transport." "Relay service" {
                         cluster_overlayRelay = containerInstance overlayRelay
                     }
                 }
-                deploymentNode "Agent host boundary" "Host management is separate from launch traffic." "Agent host" {
-                    deploymentNode "Host node" "Host identity; optional user-tailnet attachment." "tsnet node" {
+                cluster_agentHostBoundaryNode = deploymentNode "Agent host boundary" "Host management is separate from launch traffic." "Agent host" {
+                    cluster_hostNodeNode = deploymentNode "Host node" "Host identity; optional user-tailnet attachment." "tsnet node" {
                         cluster_hostNetwork = containerInstance hostNetwork
                     }
-                    deploymentNode "Agent launch boundary" "Independent mediator, agent proxy and guest; no shared launch data path." "Launch isolation" {
+                    cluster_agentLaunchBoundaryNode = deploymentNode "Agent launch boundary" "Independent mediator, agent proxy and guest; no shared launch data path." "Launch isolation" {
                         cluster_agent-proxy = containerInstance agent-proxy
                     }
                 }
-                deploymentNode "Another agent host boundary" "Independent host and launch identities." "Agent host" {
-                    deploymentNode "Another host node" "Independent host identity; optional attached user tailnet." "tsnet node" {
+                cluster_anotherAgentHostBoundaryNode = deploymentNode "Another agent host boundary" "Independent host and launch identities." "Agent host" {
+                    cluster_anotherHostNodeNode = deploymentNode "Another host node" "Independent host identity; optional attached user tailnet." "tsnet node" {
                         cluster_otherHost = containerInstance hostNetwork
                     }
-                    deploymentNode "Another launch boundary" "Independent launch connection." "Launch isolation" {
+                    cluster_anotherLaunchBoundaryNode = deploymentNode "Another launch boundary" "Independent launch connection." "Launch isolation" {
                         cluster_destination-agent-proxy = containerInstance destination-agent-proxy
                     }
                 }
@@ -220,66 +220,66 @@ workspace "afakt" "Architecture of the afakt modular monolith." {
             cluster_destination-agent-proxy -> clusterOverlay "Destination launch identity" "Coarse service access"
         }
         deploymentEnvironment "Topology host" {
-            deploymentNode "Agent host trust boundary" "Privileged host control remains outside every guest." "Agent host" {
-                deploymentNode "Dedicated worker user" "Separate from the host-mode agent user." "User boundary" {
-                    containerInstance hostWorker
+            host_agentHostTrustBoundaryNode = deploymentNode "Agent host trust boundary" "Privileged host control remains outside every guest." "Agent host" {
+                host_dedicatedWorkerUserNode = deploymentNode "Dedicated worker user" "Separate from the host-mode agent user." "User boundary" {
+                    host_hostWorker = containerInstance hostWorker
                 }
-                deploymentNode "Privileged setup boundary" "Helper authority and caller binding remain undecided." "Privilege boundary" {
-                    containerInstance helper
+                host_privilegedSetupBoundaryNode = deploymentNode "Privileged setup boundary" "Helper authority and caller binding remain undecided." "Privilege boundary" {
+                    host_helper = containerInstance helper
                 }
-                containerInstance hostResolver
-                deploymentNode "Operator access boundary" "Host access requires authorization; name resolution grants none." "Host service" {
-                    containerInstance loopbackProxy
-                    containerInstance hostNetwork
+                host_hostResolver = containerInstance hostResolver
+                host_operatorAccessBoundaryNode = deploymentNode "Operator access boundary" "Host access requires authorization; name resolution grants none." "Host service" {
+                    host_loopbackProxy = containerInstance loopbackProxy
+                    host_hostNetwork = containerInstance hostNetwork
                 }
-                deploymentNode "Agent launch A" "Independent data path; mediation and network users undecided." "Launch boundary" {
-                    deploymentNode "Guest A" "Host mode uses the dedicated agent user, separate from the worker." "Dedicated agent user in host mode" {
-                        containerInstance guest
+                host_agentLaunchANode = deploymentNode "Agent launch A" "Independent data path; mediation and network users undecided." "Launch boundary" {
+                    host_guestANode = deploymentNode "Guest A" "Host mode uses the dedicated agent user, separate from the worker." "Dedicated agent user in host mode" {
+                        host_guest = containerInstance guest
                     }
-                    deploymentNode "Mediator A" "Policy boundary; no independent network." "Local confinement; user undecided" {
-                        containerInstance mediator
+                    host_mediatorANode = deploymentNode "Mediator A" "Policy boundary; no independent network." "Local confinement; user undecided" {
+                        host_mediator = containerInstance mediator
                     }
-                    deploymentNode "Agent proxy A" "Own node, hub connection and launch X.509-SVID." "tsnet node; user undecided" {
-                        containerInstance agent-proxy
+                    host_agentProxyANode = deploymentNode "Agent proxy A" "Own node, hub connection and launch X.509-SVID." "tsnet node; user undecided" {
+                        host_agent-proxy = containerInstance agent-proxy
                     }
                 }
-                deploymentNode "Agent launch B" "Independent data path; same-host traffic uses the overlay." "Launch boundary" {
-                    deploymentNode "Guest B" "Host mode uses the dedicated agent user, separate from the worker." "Dedicated agent user in host mode" {
-                        containerInstance destinationGuest
+                host_agentLaunchBNode = deploymentNode "Agent launch B" "Independent data path; same-host traffic uses the overlay." "Launch boundary" {
+                    host_guestBNode = deploymentNode "Guest B" "Host mode uses the dedicated agent user, separate from the worker." "Dedicated agent user in host mode" {
+                        host_destinationGuest = containerInstance destinationGuest
                     }
-                    deploymentNode "Mediator B" "Policy boundary; no independent network." "Local confinement; user undecided" {
-                        containerInstance destinationMediator
+                    host_mediatorBNode = deploymentNode "Mediator B" "Policy boundary; no independent network." "Local confinement; user undecided" {
+                        host_destinationMediator = containerInstance destinationMediator
                     }
-                    deploymentNode "Agent proxy B" "Own node, hub connection and launch X.509-SVID." "tsnet node; user undecided" {
-                        containerInstance destination-agent-proxy
+                    host_agentProxyBNode = deploymentNode "Agent proxy B" "Own node, hub connection and launch X.509-SVID." "tsnet node; user undecided" {
+                        host_destination-agent-proxy = containerInstance destination-agent-proxy
                     }
                 }
             }
         }
         deploymentEnvironment "Topology launch" {
-            deploymentNode "Agent host trust boundary" "Worker stays outside this data path; service users undecided." "Agent host" {
-                deploymentNode "Agent launch boundary" "Launch-bound local carriers; private keys stay outside the guest." "Launch isolation" {
-                    deploymentNode "Guest trust boundary" "Guest has no overlay node or workload key." "Provider confinement" {
-                        containerInstance guest
+            launch_agentHostTrustBoundaryNode = deploymentNode "Agent host trust boundary" "Worker stays outside this data path; service users undecided." "Agent host" {
+                launch_agentLaunchBoundaryNode = deploymentNode "Agent launch boundary" "Launch-bound local carriers; private keys stay outside the guest." "Launch isolation" {
+                    launch_guestTrustBoundaryNode = deploymentNode "Guest trust boundary" "Guest has no overlay node or workload key." "Provider confinement" {
+                        launch_guest = containerInstance guest
                     }
-                    deploymentNode "Mediation trust boundary" "Enforces connection and message policy; no independent network." "Local confinement; user undecided" {
-                        containerInstance mediator
+                    launch_mediationTrustBoundaryNode = deploymentNode "Mediation trust boundary" "Enforces connection and message policy; no independent network." "Local confinement; user undecided" {
+                        launch_mediator = containerInstance mediator
                     }
-                    deploymentNode "Agent proxy trust boundary" "Only launch component opening off-host connections." "tsnet node; user undecided" {
-                        containerInstance agent-proxy
+                    launch_agentProxyTrustBoundaryNode = deploymentNode "Agent proxy trust boundary" "Only launch component opening off-host connections." "tsnet node; user undecided" {
+                        launch_agent-proxy = containerInstance agent-proxy
                     }
                 }
             }
-            deploymentNode "Control plane trust boundary" "Service identities authenticate workload connections." "Cluster overlay" {
-                deploymentNode "Agent hub node" "One multiplexed connection per launch." "tsnet node" {
-                    containerInstance hub
+            launch_controlPlaneTrustBoundaryNode = deploymentNode "Control plane trust boundary" "Service identities authenticate workload connections." "Cluster overlay" {
+                launch_agentHubNodeNode = deploymentNode "Agent hub node" "One multiplexed connection per launch." "tsnet node" {
+                    launch_hub = containerInstance hub
                 }
-                deploymentNode "API service node" "Checks live launch capabilities and scopes." "tsnet node" {
-                    containerInstance controlApi
+                launch_apiServiceNodeNode = deploymentNode "API service node" "Checks live launch capabilities and scopes." "tsnet node" {
+                    launch_controlApi = containerInstance controlApi
                 }
             }
-            deploymentNode "Internet boundary" "Destination authentication differs from workload identity." "External services" {
-                softwareSystemInstance internet
+            launch_internetBoundaryNode = deploymentNode "Internet boundary" "Destination authentication differs from workload identity." "External services" {
+                launch_internet = softwareSystemInstance internet
             }
         }
     }
