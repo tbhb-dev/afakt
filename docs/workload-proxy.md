@@ -29,7 +29,7 @@ Cutting off an agent's traffic requires action at more than one point. Overlay n
 
 ## Overlay node
 
-Each workload's workload proxy has its own overlay node using Tailscale's userspace client library, `tsnet`, against an isolated Headscale. Launch nodes never join user tailnets. The [overlay transport](workload-overlay.md#Overlay%20transport) supplies service reachability, while the launch identity and receiving service policy govern authorization.
+Each workload's proxy has its own overlay node using Tailscale's userspace client library, `tsnet`, against an isolated Headscale. Launch nodes never join user tailnets. The [overlay transport](workload-overlay.md#Overlay%20transport) supplies service reachability, while the launch identity and receiving service policy govern authorization.
 
 ## Agent launch authentication
 
@@ -54,7 +54,9 @@ Operations on external services, such as pull request comments and reviews, go t
 
 For internet traffic from the guest, the proxy requests the mediator's connection decision before opening a permitted external connection. Internet services receive their destination protocol and any authorized upstream credential, not the launch SVID merely because the request came from a launch.
 
-When an outbound server name matches a domain with an HTTP-level rule or credential injection, the mediator can instruct the proxy to end TLS. Connection policy also applies to passthrough traffic. Brokered secrets never go directly to the guest. Response reflection remains [`OQ-SBX-26`](agent-open-questions.md#%60OQ-SBX-26%60). Whether proxy TLS termination takes over [agent egress gateway decryption](agent-open-questions.md#%60OQ-SBX-72%60) remains open.
+When an outbound server name matches a domain with a Hypertext Transfer Protocol (HTTP) rule or credential injection, the proxy ends TLS when the mediator instructs it to do so. The guest's trust store includes a per-workload certificate authority. Its signing material stays outside the guest. A destination requiring HTTP policy or credentials can't use passthrough. The credential broker injects credentials at the workload proxy into permitted requests outside the guest. [Credential types](workload-sandbox.md#Credential%20types%20and%20custody) define the material the broker receives from the control plane, including static secrets the control plane can't exchange. Permitted passthrough traffic leaves without decryption under connection policy. Brokered secrets never go directly to the guest. Response reflection remains [`OQ-SBX-26`](agent-open-questions.md#%60OQ-SBX-26%60).
+
+HTTP-level decisions enter the [one decision log for the workload](workload-proxy-mediator.md#Network%20policy), alongside network, Agent Client Protocol (ACP), and control decisions. The log excludes secrets and request and response content.
 
 ## Open questions
 

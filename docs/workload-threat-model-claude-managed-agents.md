@@ -48,7 +48,7 @@ STRIDE covers spoofing, tampering, repudiation, information disclosure, denial o
 | `P-CMA-3` | Sandbox execution | Vendor sandbox. Managed tools, not the managed loop |
 | `P-CMA-4` | Workload proxy mediator | Required per launch. Remote placement unresolved |
 | `P-CMA-5` | Workload proxy | Required outside sandbox. Remote placement unresolved |
-| `P-CMA-6` | Overlay peers and global egress gateway | Workload peers and control plane gateway. Shared models apply |
+| `P-CMA-6` | Overlay peers | Workload peers and control plane services. Shared models apply |
 | `P-CMA-7` | Successor launch | New launch authority |
 | `P-CMA-8` | Workspace command | afakt-sandbox placement unresolved |
 | `DS-CMA-1` | Workspace and scratch | Launch data. Remote backing and separation unresolved |
@@ -79,7 +79,7 @@ flowchart LR
         P-CMA-5["P-CMA-5: Workload proxy"]
     end
     subgraph services["TB-CMA-3 / overlay peers and afakt services"]
-        P-CMA-6["P-CMA-6: Overlay peers and global egress gateway"]
+        P-CMA-6["P-CMA-6: Overlay peers"]
     end
     subgraph files["TB-CMA-4 / launch-controlled storage"]
         DS-CMA-1["DS-CMA-1: Workspace and scratch"]
@@ -112,6 +112,7 @@ flowchart LR
     P-CMA-3 -.->|"F-CMA-4"| P-CMA-4
     P-CMA-4 -.->|"F-CMA-5"| P-CMA-5
     P-CMA-5 -.->|"F-CMA-6"| P-CMA-6
+    P-CMA-5 -.->|"F-CMA-6"| E-CMA-4
     P-CMA-3 -->|"F-CMA-7"| E-CMA-4
     P-CMA-3 -->|"F-CMA-8"| DS-CMA-1
     P-CMA-1 -.->|"F-CMA-9"| DS-CMA-1
@@ -134,7 +135,7 @@ flowchart LR
 - **`F-CMA-3`.** untrusted runtime input, system calls, and execution output presented to vendor services. Crosses `TB-CMA-2`.
 - **`F-CMA-4`.** Required launch-bound network, name queries, control, ACP, MCP, and preview traffic. Crosses `TB-CMA-1`, `TB-CMA-3`.
 - **`F-CMA-5`.** Permitted requests passed from the no-network mediator to its workload proxy. Crosses `TB-CMA-3`.
-- **`F-CMA-6`.** Direct authenticated overlay connections and inspected traffic to the global egress gateway. Session routing depends on [`OQ-SES-17`](agent-open-questions.md#%60OQ-SES-17%60). Published-port routing depends on [`OQ-PORT-14`](agent-open-questions.md#%60OQ-PORT-14%60). Common service controls apply. Crosses `TB-CMA-3`.
+- **`F-CMA-6`.** Direct authenticated overlay connections and permitted internet traffic through the workload proxy. Its placement and carrier remain under [`OQ-SBX-36`](agent-open-questions.md#%60OQ-SBX-36%60). Session routing depends on [`OQ-SES-17`](agent-open-questions.md#%60OQ-SES-17%60). Published-port routing depends on [`OQ-PORT-14`](agent-open-questions.md#%60OQ-PORT-14%60). Common service controls apply. Crosses `TB-CMA-3`.
 - **`F-CMA-7`.** Vendor-permitted external traffic, including potential direct paths outside afakt mediation. Crosses `TB-CMA-1`, `TB-CMA-3`.
 - **`F-CMA-8`.** Workspace and scratch reads and writes. Crosses `TB-CMA-4`.
 - **`F-CMA-9`.** Remote workspace transfer, capture, materialization, and cleanup of hostile content. Crosses `TB-CMA-1`, `TB-CMA-4`.

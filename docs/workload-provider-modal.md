@@ -33,7 +33,7 @@ Modal can place sidecar containers beside the main sandbox, with the isolation b
 
 Each launch requires [agent mediation](workload-proxy-mediator.md#Launch%20boundary) for control, session, preview, and network traffic.
 
-Remote launches require the [workload proxy](workload-proxy.md#Launch%20boundary) and [global egress path](components.md#Agent%20egress%20gateway), with their placement and carrier subject to the workload provider mapping below.
+Remote launches require the [workload proxy](workload-proxy.md#Launch%20boundary) for egress, with its placement and carrier open under [`OQ-SBX-36`](agent-open-questions.md#%60OQ-SBX-36%60) and the workload provider mapping below.
 
 Remote placement, mandatory transport, Domain Name System (DNS) mediation, and prevention of direct connections remain under [`OQ-SBX-36`](agent-open-questions.md#%60OQ-SBX-36%60). Provider assertions for launch identity remain under [`OQ-SBX-52`](agent-open-questions.md#%60OQ-SBX-52%60).
 

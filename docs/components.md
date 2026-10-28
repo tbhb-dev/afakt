@@ -23,27 +23,13 @@ The ACP relay is the [guest relay](#Guest%20relay) inside the workload guest. It
 
 Through the built-in afakt Model Context Protocol (MCP) server, an agent can start a child agent launch or session and message another session. It can also read agent launch status and results or declare a forwarded port. Each call uses the calling agent launch's capabilities and scopes, and profiles allowlist these tools like any upstream server. See [Built-in afakt MCP server](agent-mcp-gateway.md#Built-in%20afakt%20MCP%20server).
 
-## Agent egress gateway
-
-Traffic from agent launches to inspected destinations passes through the agent egress gateway, which decrypts it and applies HTTP-level policy. It runs on each agent host by default. An agent host worker setting can direct a host's mediators to a site gateway on another machine instead, and remote sandboxes use a global egress gateway with the control plane through their workload proxies.
-
-Inspected destinations need credentials or Hypertext Transfer Protocol (HTTP) policy. Transport Layer Security (TLS) connections end at the gateway with a per-agent certificate authority trusted by the guest. The [credential broker](#Credential%20broker) injects credentials into permitted requests and keeps their values outside the guest. Traffic to passthrough destinations remains subject to the workload proxy mediator's connection policy and leaves the agent host without decryption.
-
-A site gateway is an agent egress gateway running on its own, on any machine the deployment chooses. It needn't run on an agent host. An agent host worker setting names the site gateway for that host's mediators. Over mutual TLS, each workload proxy connects to it with its agent launch's identity. The standalone site gateway has its own workload identity. The credential broker receives credentials from the control plane for the agent launches it serves. Each [credential type](workload-sandbox.md#Credential%20types%20and%20custody) defines custody, including static secrets that the control plane can't exchange.
-
-Like an [agent host](workload-host.md#Trust%20boundary), a site gateway is a trust boundary for policy enforcement. Its configuration defines certificate authority custody. Brokered secrets and signing material stay outside the agent sandbox.
-
-The global egress gateway serves remote sandboxes. Each remote sandbox launch has its own mediator and workload proxy. Their integration remains [undecided](agent-open-questions.md#%60OQ-SBX-36%60).
-
-Whether proxy TLS termination takes over the agent egress gateway's decryption role remains [open](agent-open-questions.md#%60OQ-SBX-72%60). The mediator never transmits traffic.
-
 ## Workload host worker
 
-The workload host worker is the daemon that runs the agent launcher workflow on a workload host and connects that host to the control plane. It registers capacity and polls its host task queue. The worker also reconciles agent launch records. Its settings can select a site egress gateway. It stays outside launch data paths, including traffic between launches on its host. Each host also supplies [host-level name resolution and connectivity](workload-overlay.md#Workload%20host%20access). See [Workload host](workload-host.md). [Workload host caches and startup](agent-workspace-lifecycle.md#Workload%20host%20caches%20and%20startup).
+The workload host worker is the daemon that runs the agent launcher workflow on a workload host and connects that host to the control plane. It registers capacity and polls its host task queue. The worker also reconciles agent launch records. It stays outside launch data paths, including traffic between launches on its host. Each host also supplies [host-level name resolution and connectivity](workload-overlay.md#Workload%20host%20access). See [Workload host](workload-host.md). [Workload host caches and startup](agent-workspace-lifecycle.md#Workload%20host%20caches%20and%20startup).
 
 ## Workload proxy mediator
 
-Each workload's workload proxy mediator decides every inbound and outbound connection without transmitting traffic. It controls guest Domain Name System (DNS) resolution through the proxy with no host fallback and stamps launch identity on control requests. Its control plane connections pass through its proxy under a fixed rule set that neither the launch's policy nor the guest can change. See [Workload proxy mediator](workload-proxy-mediator.md) and [ACP message policy](agent-acp.md#ACP%20message%20policy).
+Each workload's proxy mediator decides every inbound and outbound connection without transmitting traffic. It controls guest Domain Name System (DNS) resolution through the proxy with no host fallback and stamps launch identity on control requests. Its control plane connections pass through its proxy under a fixed rule set that neither the launch's policy nor the guest can change. See [Workload proxy mediator](workload-proxy-mediator.md) and [ACP message policy](agent-acp.md#ACP%20message%20policy).
 
 ## Agentmail
 
@@ -51,7 +37,7 @@ Agentmail manages messages addressed to durable agents. These include incoming a
 
 ## API server
 
-The Application Programming Interface (API) server serves afakt's Representational State Transfer (REST) API to its coordination workflows and, through the [ingress gateway](#Ingress%20gateway), to the dashboard, command-line interface (CLI), and apps. Workload proxies connect over the overlay. At TLS termination, the API server identifies the launch from its peer certificate. From the immutable spec, it reads capabilities and scopes and refuses requests after the launch enters a terminal state. For remote control and sessions, it exposes [endpoints whose connection owner remains open](agent-acp.md#Remote%20control%20and%20sessions). It keeps the [workload host registry](workload-placement.md#Workload%20host%20registry), and its reservation API places launches on hosts.
+The Application Programming Interface (API) server serves afakt's Representational State Transfer (REST) API to its coordination workflows and, through the [ingress gateway](#Ingress%20gateway), to the dashboard, command-line interface (CLI), and apps. Workload proxies connect over the overlay. At Transport Layer Security (TLS) termination, the API server identifies the launch from its peer certificate. From the immutable spec, it reads capabilities and scopes and refuses requests after the launch enters a terminal state. For remote control and sessions, it exposes [endpoints whose connection owner remains open](agent-acp.md#Remote%20control%20and%20sessions). It keeps the [workload host registry](workload-placement.md#Workload%20host%20registry), and its reservation API places launches on hosts.
 
 ### Health endpoints
 
@@ -75,7 +61,7 @@ The `afakt` command provides one command-line entrypoint for both running afakt'
 
 ## Credential broker
 
-The credential broker is a host-side component outside the guest. It injects credentials into permitted requests outside the guest. Reflected response content remains [`OQ-SBX-26`](agent-open-questions.md#%60OQ-SBX-26%60). Its placement relative to the agent egress gateway and workload proxy mediator remains [open](agent-open-questions.md#%60OQ-SBX-23%60). See [Credential brokering](workload-sandbox.md#Credential%20brokering).
+The credential broker is a host-side component outside the guest. It injects credentials at the workload proxy into permitted requests outside the guest. Reflected response content remains [`OQ-SBX-26`](agent-open-questions.md#%60OQ-SBX-26%60). Its placement relative to the workload proxy and workload proxy mediator remains [open](agent-open-questions.md#%60OQ-SBX-23%60). See [Credential brokering](workload-sandbox.md#Credential%20brokering).
 
 ## GitHub webhook receiver
 
@@ -107,7 +93,7 @@ An overlay node represents one workload proxy, workload host, or control plane s
 
 ## Workload proxy
 
-Each workload's workload proxy transmits guest traffic in both directions and requests a mediator decision for each connection. It has its own overlay node and holds the launch's X.509 SPIFFE Verifiable Identity Document (SVID) and private key outside the guest. The ingress gateway and permitted peers dial it directly with SPIFFE mutual TLS. See [Workload proxy](workload-proxy.md).
+Each workload's proxy transmits guest traffic in both directions and requests a mediator decision for each connection. It has its own overlay node and holds the launch's X.509 SPIFFE Verifiable Identity Document (SVID) and private key outside the guest. The ingress gateway and permitted peers dial it directly with SPIFFE mutual TLS. For inspected outbound destinations, it ends TLS under mediator decisions using a per-workload certificate authority trusted by the guest. The credential broker injects credentials there, outside the guest. See [Workload proxy](workload-proxy.md).
 
 ## Port forwarder
 

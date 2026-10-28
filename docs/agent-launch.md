@@ -40,8 +40,7 @@ An agent launch has these contracts and supporting resources:
 - **Workload provider.** The adapter that manages an agent sandbox's lifecycle on a workload host. Its contract verbs are provision, restore, and release. Status, cancel, and result observe or control the associated agent launch.
 - **Agent harness.** The agent program inside the agent sandbox. Claude Code and Codex are examples.
 - **Model provider.** The service that serves model requests. Agent harness and model provider vary independently, and the spec lists both.
-- **Agent egress gateway.** The component that decrypts inspected destinations for Hypertext Transfer Protocol (HTTP) policy. See [Agent egress gateway](components.md#Agent%20egress%20gateway).
-- **Workload proxy mediator.** The host-side component for one agent launch that ends the guest link and resolves guest names. It enforces connection policy. It sends inspected destinations to the agent egress gateway and mediates passthrough destinations without decryption. See [Workload sandbox](workload-sandbox.md).
+- **Workload proxy mediator.** The host-side component for one agent launch that ends the guest link and resolves guest names. It enforces connection policy. It directs the workload proxy to inspect destinations that require Hypertext Transfer Protocol (HTTP) policy or credential injection and to send permitted passthrough traffic without decryption. See [Workload sandbox](workload-sandbox.md).
 
 ## Harness transport
 
