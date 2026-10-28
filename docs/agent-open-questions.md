@@ -739,6 +739,18 @@ Which component accepts client Agent Client Protocol (ACP) and remote-control co
 
 Which component retains the session message log and enforces writer and reader roles, and how does replay work across reconnects and service failures? See [Writer and readers](agent-acp.md#Writer%20and%20readers) and [Session message log](agent-acp.md#Session%20message%20log).
 
+### `OQ-SES-19`
+
+Does a remote-control or Agent Client Protocol (ACP) request to an agent without an active launch fail or request a separately authorized start, and how does the caller observe the outcome? See [Remote control and sessions](agent-acp.md#Remote%20control%20and%20sessions).
+
+### `OQ-SES-20`
+
+How do concurrent client connections map to one launch's ACP stream while preserving the session writer, reader, and request-correlation rules? See [Writer and readers](agent-acp.md#Writer%20and%20readers).
+
+### `OQ-SES-21`
+
+How do the public endpoints, the component in [`OQ-SES-17`](#%60OQ-SES-17%60), and the guest negotiate protocol compatibility and reject unsupported transport features? See [Remote control and sessions](agent-acp.md#Remote%20control%20and%20sessions).
+
 ## Agent session attachment
 
 ### `OQ-ATT-2`
