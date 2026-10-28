@@ -67,6 +67,8 @@ The API server exposes per-agent remote-control and ACP routes through the ingre
 
 The enforcement owner remains [open](agent-open-questions.md#%60OQ-SES-18%60). The role requirements apply independently of that owner.
 
+How concurrent clients map to one launch's ACP stream while preserving these roles and request correlation remains [open](agent-open-questions.md#%60OQ-SES-20%60).
+
 - Every client attached to the agent session receives every permitted `session/update` notification of the session, within the agent mediator's size and rate bounds for ACP updates.
 - Only the writer sends prompts and cancels turns. Answering permission and elicitation requests and changing session modes and configuration options also require that role. afakt rejects these messages from a reader.
 - A client becomes the writer by taking the role. Taking it from another client requires the `sessions.write` capability and moves the role at once.
@@ -88,6 +90,8 @@ For workflow-controlled agent launches, the relay answers `session/request_permi
 ## Remote control and sessions
 
 The API server exposes ACP at `/api/v1/agents/{agent_id}/acp` and remote control at `/api/v1/agents/{agent_id}/remote`. Which component accepts connections from clients and reaches the workload remains [open](agent-open-questions.md#%60OQ-SES-17%60). [Endpoint relationships](agent-open-questions.md#%60OQ-SES-11%60) leave compatibility with the shared `/acp` endpoint undecided.
+
+The outcome of [requests without an active launch](agent-open-questions.md#%60OQ-SES-19%60) and [protocol compatibility negotiation](agent-open-questions.md#%60OQ-SES-21%60) remain undecided.
 
 For each ACP message, the agent mediator applies its policy. Both directions use default deny. A workflow-controlled ACP launch keeps the agent launcher workflow as its only writer. [Session-end wait and SVID lifetime](agent-open-questions.md#%60OQ-HOOK-18%60) remain on hold.
 
