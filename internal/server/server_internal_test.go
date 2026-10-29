@@ -227,16 +227,12 @@ func wantAPIRoot(t *testing.T, address string) {
 	}
 }
 
-// wantClosed checks that the server released address, by binding it again.
-func wantClosed(t *testing.T, address string) {
+// wantClosed checks the owned listener, since another test or process can bind its
+// address as soon as shutdown releases it.
+func wantClosed(t *testing.T, ln net.Listener) {
 	t.Helper()
-	var config net.ListenConfig
-	ln, err := config.Listen(t.Context(), "tcp", address)
-	if err != nil {
-		t.Fatalf("address %s is still in use: %v", address, err)
-	}
-	if err = ln.Close(); err != nil {
-		t.Fatalf("Close() error = %v", err)
+	if err := ln.Close(); !errors.Is(err, net.ErrClosed) {
+		t.Fatalf("listener %s Close() = %v, want already closed", ln.Addr(), err)
 	}
 }
 
@@ -301,7 +297,7 @@ func TestAPIServesWhileStopping(t *testing.T) {
 	if err := s.wait(t); err != nil {
 		t.Fatalf("run() error = %v", err)
 	}
-	wantClosed(t, s.addr(t))
+	wantClosed(t, s.listener)
 }
 
 func TestRequiredFailureAfterStartup(t *testing.T) {
@@ -319,7 +315,7 @@ func TestRequiredFailureAfterStartup(t *testing.T) {
 	if !errors.Is(err, errBoom) || err.Error() != `run "probe": boom` {
 		t.Errorf("run() error = %v, want run \"probe\": boom", err)
 	}
-	wantClosed(t, s.addr(t))
+	wantClosed(t, s.listener)
 }
 
 func TestStartupFailureReleasesListener(t *testing.T) {
@@ -332,7 +328,7 @@ func TestStartupFailureReleasesListener(t *testing.T) {
 		t.Errorf("run() error = %v, want start \"probe\": boom", err)
 	}
 	// The listener was bound before the probe failed, and the stop sequence closed it.
-	wantClosed(t, s.addr(t))
+	wantClosed(t, s.listener)
 }
 
 func TestListenFailure(t *testing.T) {

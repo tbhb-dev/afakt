@@ -136,7 +136,7 @@ func TestTemporalUIHealthStates(t *testing.T) {
 		if err := s.wait(t); err != nil {
 			t.Fatal(err)
 		}
-		wantClosed(t, s.addr(t))
+		wantClosed(t, s.listener)
 	}
 }
 

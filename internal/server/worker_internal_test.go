@@ -47,14 +47,14 @@ func startFrontend(t *testing.T, namespaces ...string) *temporaltest.Frontend {
 	return temporaltest.Serve(t, ln, namespaces...)
 }
 
-// stopCleanly cancels the server and checks that run returns nil and releases its address.
+// stopCleanly cancels the server and checks that run returns nil and closes its listener.
 func stopCleanly(t *testing.T, s *harness) {
 	t.Helper()
 	s.cancel()
 	if err := s.wait(t); err != nil {
 		t.Fatalf("run() error = %v", err)
 	}
-	wantClosed(t, s.addr(t))
+	wantClosed(t, s.listener)
 }
 
 func TestWorkerEmbedded(t *testing.T) {
@@ -209,11 +209,11 @@ func TestWorkerStartFailures(t *testing.T) {
 			if got := s.events.matching("starting"); !slices.Equal(got, tc.started) {
 				t.Errorf("started %q, want %q", got, tc.started)
 			}
-			// The HTTP server and the listener stopped, and the address is free again.
+			// The HTTP server and its owned listener stopped.
 			if got, want := s.events.matching("stopping"), []string{"http", "http-listener"}; !slices.Equal(got, want) {
 				t.Errorf("stopped %q, want %q", got, want)
 			}
-			wantClosed(t, s.addr(t))
+			wantClosed(t, s.listener)
 		})
 	}
 }
