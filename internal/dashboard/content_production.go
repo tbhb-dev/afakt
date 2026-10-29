@@ -12,7 +12,7 @@ import "embed"
 //go:embed all:assets
 var content embed.FS
 
-// entry is the production entry page; a missing build fails compilation.
+// entry is the production entry page. A missing build fails compilation.
 //
 //go:embed assets/index.html
 var entry []byte

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Prove prose lint rejects findings in owned Markdown without changing the checkout.
+# Prove prose lint rejects findings in Markdown and Go comments without changing the checkout.
 set -euo pipefail
 
 root=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
@@ -17,9 +17,18 @@ mise trust
 # A clean baseline prevents an unrelated finding from proving the gate works.
 mise run lint-prose
 for file in prose-gate.md docs/prose-gate/nested.md .claude/prose-gate/nested.md \
-  .agents/prose-gate/nested.md apps/prose-gate/nested.md .github/prose-gate/nested.md; do
+  .agents/prose-gate/nested.md apps/prose-gate/nested.md .github/prose-gate/nested.md \
+  prose-gate.go cmd/prose-gate/nested.go internal/prose-gate/nested.go; do
   mkdir -p "$(dirname "$file")"
-  printf 'Send e-mail.\n' >"$file"
+  case "$file" in
+  *.go)
+    printf 'package prose\n\nvar message = "Send e-mail."\n' >"$file"
+    # A string literal passes before the same wording in a comment fails.
+    mise run lint-prose
+    printf '\n// Send e-mail.\n' >>"$file"
+    ;;
+  *) printf 'Send e-mail.\n' >"$file" ;;
+  esac
   if mise run lint-prose >"$work/failure.log" 2>&1; then
     echo "prose gate accepted a planted finding in $file" >&2
     exit 1

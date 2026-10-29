@@ -77,7 +77,7 @@ func wantTemporalUIAbsent(t *testing.T, cfg Config) {
 			t.Errorf("GET %s = %d, want 404", target, code)
 		}
 	}
-	// Neither configuration registers a UI service.
+	// Both configurations leave the UI service out of the composition.
 	if slices.Contains(s.events.matching("starting"), "temporal-ui") {
 		t.Fatal("inactive UI started a service")
 	}
@@ -92,7 +92,7 @@ func wantBoundAddresses(t *testing.T, s *harness, count int) {
 	bound := s.events.matching("bound")
 	wantCount := len(bound) == count
 	if count == 6 {
-		// Each construction attempt owns five Temporal ports; only HTTP is shared.
+		// Each construction attempt binds five Temporal ports and reuses the shared HTTP port.
 		wantCount = len(bound) >= 6 && len(bound) <= 16 && (len(bound)-1)%5 == 0
 	}
 	if !wantCount || bound[0] != s.addr(t) {

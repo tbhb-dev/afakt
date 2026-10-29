@@ -77,7 +77,7 @@ jobs:
       - name: Lint
         run: mise run lint
 
-      - name: Prove prose lint rejects nested Markdown findings
+      - name: Prove prose lint rejects Markdown and Go comment findings
         run: mise run check-prose-gate
 
       # The tree scan in `lint` sees only the checkout. This reads every
