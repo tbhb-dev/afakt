@@ -9,11 +9,11 @@ generated: { by: "codex:gpt-6", at: "2026-10-28T22:38:36Z" }
 
 # Workload resource
 
-The `Workload` resource represents the execution context and its [workload](workload.md) boundary. That boundary includes `afakt-agent` together with the workload proxy and its mediator. Its `type` is `agent`, `app`, or `worker`. The control plane's own deployments, including its platform Temporal worker, aren't workloads. Workers that run user code are workloads. This boundary prevents workload creation from depending on a platform worker that itself needs a workload. See [worker placement](https://github.com/tbhb-dev/afakt-drafts/blob/2c4a19dc30ae73d3597fbc6c7be1d8a93e391023/workflows/wf-design/DESIGN.md#D.10%20Where%20workers%20run).
+The `Workload` resource represents the execution context and its [workload](workload.md) boundary. That boundary includes `afakt-agent` together with the workload proxy and its mediator. Its `type` is `agent`, `app`, or `worker`. The control plane's own deployments, including its platform Temporal worker, aren't workloads. Workers that run user code are workloads. This boundary prevents workload creation from depending on a platform worker that itself needs a workload.
 
 afakt destroys an agent workload after its single agent launch, while apps and workers never bind an agent. App replacement and worker deployment lifetimes remain [`OQ-WLD-2`](agent-open-questions.md#%60OQ-WLD-2%60).
 
-The contract applies to every Tier 1 cell: `linux-host`, `linux-vm`, and `docker-engine` on `linux/amd64` and `linux/arm64`, `macos-host` and `macos-vm` on `darwin/arm64`, and `windows-host` and `windows-vm` on `windows/amd64`. Provider capabilities determine the available operations, without changing creation-time immutability. See the [platform support matrix](https://github.com/tbhb-dev/afakt-drafts/blob/2c4a19dc30ae73d3597fbc6c7be1d8a93e391023/workloads/workload-platform-support.md).
+The contract applies to every Tier 1 cell: `linux-host`, `linux-vm`, and `docker-engine` on `linux/amd64` and `linux/arm64`, `macos-host` and `macos-vm` on `darwin/arm64`, and `windows-host` and `windows-vm` on `windows/amd64`. Provider capabilities determine the available operations, without changing creation-time immutability.
 
 ## Envelope
 
@@ -87,5 +87,3 @@ status:
   agent_id: example-agent
   agent_launch_id: example-launch
 ```
-
-Creation fields and revision pinning follow [workload design](https://github.com/tbhb-dev/afakt-drafts/blob/2c4a19dc30ae73d3597fbc6c7be1d8a93e391023/workloads/workload-design.md#Roles%20and%20policy) and [workload terminology](https://github.com/tbhb-dev/afakt-drafts/blob/2c4a19dc30ae73d3597fbc6c7be1d8a93e391023/workloads/workload-terminology.md). A sequential launch list in the reference schema conflicts with the single-launch lifetime, leaving its representation under [`OQ-RES-4`](agent-open-questions.md#%60OQ-RES-4%60).

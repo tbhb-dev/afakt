@@ -45,7 +45,7 @@ Each workload's proxy accepts direct authenticated [overlay connections](workloa
 
 Separate dedicated users run the workload host worker and host-mode agents under [Workload host access](workload-overlay.md#Workload%20host%20access). Workload provider privileges and platform-specific capture services follow [Enforcement](workload-sandbox.md#Enforcement), without settling the held [host isolation baseline](agent-open-questions.md#%60OQ-SBX-18%60).
 
-The Tier 1 targets follow the [platform matrix](https://github.com/tbhb-dev/afakt-drafts/blob/744ed448da1a77085e3a83cfb81550466718e5c8/workloads/workload-platform-support.md). Each target specifies a workload provider kind on a host platform. Worker authority follows [Runtime authority and targets](workload-host-worker.md#Runtime%20authority%20and%20targets).
+Each Tier 1 target specifies a workload provider kind on a host platform. Worker authority follows [Runtime authority and targets](workload-host-worker.md#Runtime%20authority%20and%20targets).
 
 | Mode | Provider kind | Platform |
 | --- | --- | --- |

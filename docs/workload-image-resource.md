@@ -11,7 +11,7 @@ generated: { by: "codex:gpt-6", at: "2026-10-28T23:14:00Z" }
 
 `WorkloadImage` identifies a [workload execution image](workload-image.md). A workload template selects it, and a workload fixes its image reference at creation. Payload fields and their wire names remain [`OQ-WLD-6`](agent-open-questions.md#%60OQ-WLD-6%60).
 
-This boundary applies to `linux-host`, `linux-vm`, and `docker-engine` on `linux/amd64` and `linux/arm64`, `macos-host` and `macos-vm` on `darwin/arm64`, and `windows-host` and `windows-vm` on `windows/amd64`. See the [Tier 1 matrix](https://github.com/tbhb-dev/afakt-drafts/blob/a4e663c7217fecfe7e4b2582e0b78e6291b42416/workloads/workload-platform-support.md).
+This boundary applies to `linux-host`, `linux-vm`, and `docker-engine` on `linux/amd64` and `linux/arm64`, `macos-host` and `macos-vm` on `darwin/arm64`, and `windows-host` and `windows-vm` on `windows/amd64`.
 
 ## Envelope
 
@@ -37,7 +37,7 @@ Each image form needs content whose field keys remain open.
 
 ## Status keys
 
-Image admission, availability, verification, and retention observations remain [`OQ-WLD-6`](agent-open-questions.md#%60OQ-WLD-6%60). Building or booting an image doesn't establish those separate facts. The [resource schema report](https://github.com/tbhb-dev/afakt-drafts/blob/a4e663c7217fecfe7e4b2582e0b78e6291b42416/REPORT-resource-schemas.md) leaves the status keys unspecified.
+Image admission, availability, verification, and retention observations remain [`OQ-WLD-6`](agent-open-questions.md#%60OQ-WLD-6%60). Building or booting an image doesn't establish those separate facts. Status keys remain open under that question.
 
 ## Example
 
