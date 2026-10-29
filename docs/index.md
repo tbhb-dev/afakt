@@ -91,8 +91,8 @@ okf_version: "0.2"
 * [Workload resource](workload-resource.md) - Immutable creation fields and lifecycle observations.
 * [Workload template](workload-template.md) - Creation settings, versions, and claim selection.
 * [Workload template resource](workload-template-resource.md) - Template envelope, specification, and preparation questions.
-* [Workload image](workload-image.md) - Execution images for each workload provider kind.
-* [Workload image resource](workload-image-resource.md) - Image identity and open payload contracts.
+* [Workload image](workload-image.md) - Container images selected for workload processes.
+* [Workload image resource](workload-image-resource.md) - Workload image identity and open payload contracts.
 * [Workload host worker](workload-host-worker.md) - Registration, capacity, observations, and reclaim.
 * [Workload host worker resource](workload-host-worker-resource.md) - Desired configuration and worker observations.
 * [Workload identity](workload-identity.md) - SPIFFE authority and overlay identity boundaries.

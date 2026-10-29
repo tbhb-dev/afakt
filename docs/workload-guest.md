@@ -9,7 +9,7 @@ generated: { by: "codex:gpt-6", at: "2026-10-28T17:30:00Z" }
 
 # Workload guest
 
-A workload guest is the virtual machine (VM) of a [workload](workload.md) on a VM provider. Guest components only route traffic. They don't make policy decisions. The [workload proxy](workload-proxy.md) transmits traffic, and the [workload proxy mediator](workload-proxy-mediator.md) allows or denies each connection.
+A workload guest is the Linux virtual machine (VM) of a [workload](workload.md) on a VM provider. Every workload guest runs Linux, including `macos-vm` and `windows-vm`. It boots a [guest image](workload-image.md#Guest%20images) built and published by afakt. The workload records each guest component's digest. Users don't choose the guest image. Its format and boot and restoration compatibility remain [`OQ-WLD-6`](agent-open-questions.md#%60OQ-WLD-6%60). Guest components only route traffic. They don't make policy decisions. The [workload proxy](workload-proxy.md) transmits traffic, and the [workload proxy mediator](workload-proxy-mediator.md) allows or denies each connection.
 
 ## Containment
 

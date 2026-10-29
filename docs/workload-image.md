@@ -1,7 +1,7 @@
 ---
 type: Design
 title: Workload image
-description: Execution images across virtual machines, container managers, and host providers, separate from workspace content.
+description: Container images selected for workload processes, separate from Linux guest boot content and workspace trees.
 tags: [afakt, workload, images]
 status: draft
 generated: { by: "codex:gpt-6", at: "2026-10-28T23:14:00Z" }
@@ -9,28 +9,26 @@ generated: { by: "codex:gpt-6", at: "2026-10-28T23:14:00Z" }
 
 # Workload image
 
-A workload image supplies the execution environment selected at workload creation. On a virtual machine (VM) provider, it supplies the disk and kernel the [workload guest](workload-guest.md) boots. Container managers use container images, while host providers use sandbox roots without guest kernels. The workload fixes its image reference at creation. Its [workload template](workload-template.md) supplies that setting.
+A workload image is the container image a [workload](workload.md) selects at creation for its workload process. An `empty` workload doesn't run a workload process or select a workload image. A [workload template](workload-template.md) supplies the selection when the workload needs one. The workload fixes that reference at creation.
 
-An [agent workspace image](agent-workspace-image.md) supplies the prepared workspace directory tree. Workspace sources and harness state occupy different layers from the execution environment. A workload can exist without a workspace. Workload snapshots capture VM memory plus disk. See [Suspend and resume](workload-lifecycle.md#Suspend%20and%20resume).
+## Container images
 
-## Provider forms
+A container image contains a root filesystem and a default command in Open Container Initiative (OCI) format. Jobs, app releases, and agents select container images for their processes, so their selected workload images can also take those type names. OCI is a format. Workspace images and agent snapshots use it too.
 
-| Tier 1 cell | Image form and boundary |
-| --- | --- |
-| `linux-vm` on `linux/amd64` and `linux/arm64`, `macos-vm` on `darwin/arm64`, and `windows-vm` on `windows/amd64` | Guest disk and kernel with compatibility for the guest operating system as well as the workload provider's VM format. |
-| `docker-engine` on `linux/amd64` and `linux/arm64` | Container image for the workload sandbox container, distinct from the workload proxy container. |
-| `linux-host` on `linux/amd64` and `linux/arm64` | Sandbox root compatible with the host's process environment. |
-| `macos-host` on `darwin/arm64` | Sandbox root compatible with the host's process environment. |
-| `windows-host` on `windows/amd64` | Sandbox root compatible with the host's process environment. |
+The first build's tests run a container image as a job to probe network rules from inside the workload. This is the test image.
 
-A workload image doesn't supply the proxy's identity or select its process placement. Workload provider isolation and image compatibility are separate contracts.
+## Guest images
 
-## Compatibility and content
+A guest image supplies the Linux kernel, init, and root disk that a [workload guest](workload-guest.md) boots. Every workload guest runs Linux, regardless of the workload host's operating system. Both `macos-vm` and `windows-vm` run Linux guests.
 
-The guest root, writable workspace, and harness configuration have distinct contents. Payload keys remain open. [`OQ-WLD-6`](agent-open-questions.md#%60OQ-WLD-6%60) covers image format, kernel and disk binding, compatibility declarations, digest resolution, admission, and retention for the [WorkloadImage resource](workload-image-resource.md).
+afakt builds and publishes guest images. Users don't choose them. Each workload records the digests of the guest components it uses. A workload proxy VM boots its own guest image.
 
-An app release image is distinct from the standard guest that runs it. Whether a container or host workload uses the release image directly remains [`OQ-WLD-6`](agent-open-questions.md#%60OQ-WLD-6%60). Apps don't bind an agent workspace.
+A guest image and a workload image have separate purposes. The guest boots afakt's Linux environment, while the workload image supplies the process's filesystem and default command. Whether that process runs directly in the guest or in a workload container remains [`OQ-WLD-6`](agent-open-questions.md#%60OQ-WLD-6%60). The guest format, component binding, and boot and restoration compatibility also remain under that question. An outside VM image, such as a Linux distribution's cloud image, can supply inputs for building a guest image.
 
-## Boot and restoration
+## Workspace images
 
-Running a harness in a confined root filesystem doesn't establish VM boot or restoration compatibility. The guest image format and boot and restoration compatibility across Tier 1 cells remain [`OQ-WLD-6`](agent-open-questions.md#%60OQ-WLD-6%60).
+A [workspace image](agent-workspace-image.md) contains a prepared workspace directory tree in OCI layers. It never runs and isn't a container image. Workspace content and harness state occupy different layers from the workload process's filesystem. A workload can exist without a workspace.
+
+## Compatibility and admission
+
+The [WorkloadImage resource](workload-image-resource.md) identifies the container image selected for the process. It doesn't select proxy placement or identity. Its payload keys, reference resolution, admission, retention, and compatibility with each workload provider remain [`OQ-WLD-6`](agent-open-questions.md#%60OQ-WLD-6%60). That question includes how host providers materialize the selected content for their native process environment.

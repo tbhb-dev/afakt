@@ -31,7 +31,7 @@ Agentmail manages messages addressed to durable agents. These include incoming a
 
 The Application Programming Interface (API) server serves afakt's Representational State Transfer (REST) API to its coordination workflows and, through the [ingress gateway](#Ingress%20gateway), to the dashboard, command-line interface (CLI), and apps. Workload proxies connect over the overlay. For an agent launch call, the API server identifies the launch from its peer certificate at Transport Layer Security (TLS) termination. From the immutable spec, it reads capabilities and scopes and refuses requests after the launch enters a terminal state. For remote control and sessions, it exposes [endpoints whose connection owner remains open](agent-acp.md#Remote%20control%20and%20sessions). It keeps the [workload host registry](workload-placement.md#Workload%20host%20registry), and its reservation API places launches on hosts.
 
-Workload creation uses [workload templates](workload-template.md) and [workload images](workload-image.md). The control plane records the selected template version and immutable creation fields on the [Workload resource](workload-resource.md). The [workload API](workload-api.md) also covers host workers. Image and worker operations remain open. [Workload identity](workload-identity.md) separates caller authentication from permission to use those resources.
+Workload creation uses [workload templates](workload-template.md) and [workload images](workload-image.md). The control plane records the selected template version and immutable creation fields on the [Workload resource](workload-resource.md). The [workload API](workload-api.md) also covers host workers. A workload image supplies the container image for its process. An `empty` workload doesn't select one. afakt supplies Linux guest images separately on VM providers. Workload image and worker operations remain open. [Workload identity](workload-identity.md) separates caller authentication from permission to use those resources.
 
 ### Health endpoints
 
@@ -141,7 +141,7 @@ The agent session workflow holds an interactive session's control state, includi
 
 The [workload guest](workload-guest.md) is the VM that runs the workload on a VM provider. Guest routing components don't decide policy. External traffic, including DNS, uses only the workload proxy.
 
-A workload guest is the isolation boundary, with a guest kernel, read-only operating system disk, and writable workspace disk. The workload host supervisor controls its virtual machine monitors (VMMs) independently of ACP and guest policy. See [Enforcement](workload-sandbox.md#Enforcement).
+A workload guest is the isolation boundary, with a Linux guest kernel, read-only operating system disk, and writable workspace disk. The workload host supervisor controls its virtual machine monitors (VMMs) independently of ACP and guest policy. See [Enforcement](workload-sandbox.md#Enforcement).
 
 ## Workload host worker
 

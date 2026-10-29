@@ -35,7 +35,7 @@ Hosted agent providers include [Claude Managed Agents](workload-provider-claude-
 
 The host modes are the weaker isolation tier.
 
-Each workload guest has its own guest kernel and disks. Linux uses a Kernel-based Virtual Machine (KVM) microVM driven by `Cloud Hypervisor`. Windows uses the same Linux microVM inside Windows Subsystem for Linux (WSL2) by default. A Windows-native utility VM serves an agent that needs a Windows guest. macOS uses Virtualization.framework. Whether macOS uses Apple's Containerization framework and its `vminitd` guest init or afakt drives Virtualization.framework directly remains [open](agent-open-questions.md#Agent%20sandbox).
+Every workload guest runs Linux with its own kernel and disks, regardless of the workload host OS. Linux uses a Kernel-based Virtual Machine (KVM) microVM driven by `Cloud Hypervisor`. Windows uses the same Linux microVM inside Windows Subsystem for Linux (WSL2). macOS uses Virtualization.framework. Whether macOS uses Apple's Containerization framework and its `vminitd` guest init or afakt drives Virtualization.framework directly remains [open](agent-open-questions.md#Agent%20sandbox).
 
 ### Runtime privileges
 
@@ -43,7 +43,7 @@ The workload host worker uses a dedicated user. It never runs as root. Host-mode
 
 ### Host process sandbox
 
-afakt-agent is afakt's cross-harness runner. For locally controlled harness execution, it starts afakt-sandbox, afakt's cross-platform process sandbox, and runs the agent harness inside it. In host modes, afakt-agent runs directly on the workload host. afakt-sandbox also runs on its own, without afakt-agent, to confine a command that `afakt agent exec` runs in an agent's workspace. Enforcement follows the [Anthropic sandbox runtime](https://github.com/anthropics/sandbox-runtime), using Seatbelt profiles through `sandbox-exec` on macOS, and bubblewrap namespaces plus seccomp on Linux. The [Linux host boundary](workload-provider-linux-host.md#Isolation%20boundary) uses bubblewrap, Landlock, seccomp, and the workload provider's network isolation together. The provider never drops a setting when selecting an enforcement mechanism. If it can't enforce the configuration, it rejects the launch with `sandbox-unsupported`.
+afakt-agent is afakt's cross-harness runner. For locally controlled harness execution, it starts afakt-sandbox, afakt's cross-platform process sandbox, and runs the agent harness inside it. In host modes, afakt-agent runs directly on the workload host. afakt-sandbox also runs on its own, without afakt-agent, to confine a command that `afakt workload exec` runs in an agent's workspace. Enforcement follows the [Anthropic sandbox runtime](https://github.com/anthropics/sandbox-runtime), using Seatbelt profiles through `sandbox-exec` on macOS, and bubblewrap namespaces plus seccomp on Linux. The [Linux host boundary](workload-provider-linux-host.md#Isolation%20boundary) uses bubblewrap, Landlock, seccomp, and the workload provider's network isolation together. The provider never drops a setting when selecting an enforcement mechanism. If it can't enforce the configuration, it rejects the launch with `sandbox-unsupported`.
 
 ### Guest layout and lifecycle control
 
