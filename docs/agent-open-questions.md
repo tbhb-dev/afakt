@@ -1249,11 +1249,11 @@ How are inbound and outbound webhook signing secrets provisioned, stored, rotate
 
 ### `OQ-RES-4`
 
-What wire keys, required fields, revision identifiers, and concurrency rules represent Workload and its lifecycle conditions? The reference schema uses `guest_image` and `agent_host`. It lists sequential launches but lacks `type` and a workload template version. Creation-time terminology and the single-launch rule require a different representation. See [Workload resource](workload-resource.md).
+What wire keys, required fields, revision identifiers, and concurrency rules represent Workload and its lifecycle conditions? The representation must include workload type and template version and preserve the immutable creation fields and single-launch lifetime. See [Workload resource](workload-resource.md).
 
 ### `OQ-WLD-1`
 
-How do workload creation, claims, and warm preparation relate? What selects the pool key, and when are namespace, type, role, and identities assigned? The proposal to key pools by workload template and the warm-guest model need one contract. See [Workload resource](workload-resource.md#Specification%20keys).
+How do workload creation, claims, and warm preparation relate? What selects the pool key, and when are namespace, type, role, and identities assigned? The pool key could use either the workload template or image, shape, execution mode, and workload host together. See [Workload resource](workload-resource.md#Specification%20keys).
 
 ### `OQ-WLD-2`
 
@@ -1265,11 +1265,11 @@ Which capture can restore a follow-up onto a new workload? How do agent snapshot
 
 ### `OQ-WLD-4`
 
-Does a workload own capacity independently of an agent launch, and how are app and user code worker allocations reserved and reclaimed? How does the capacity and budget proposal extend the launch slot contract without counting one allocation twice? See [Failure and reclaim](workload-lifecycle.md#Failure%20and%20reclaim).
+Does a workload own capacity independently of an agent launch, and how are app and user code worker allocations reserved and reclaimed? How does accounting for workloads and retained resources relate to launch slots without counting one allocation twice? See [Failure and reclaim](workload-lifecycle.md#Failure%20and%20reclaim).
 
 ### `OQ-RES-5`
 
-What wire keys, required fields, and version metadata represent WorkloadTemplate? The reference schema uses `guest_image` and `agent_host`. Its fields omit `type` and version metadata. Status is empty despite the preparation proposal. How do the canonical creation fields and preparation observations map to the resource? See [Workload template resource](workload-template-resource.md).
+What wire keys, required fields, and version metadata represent WorkloadTemplate? How do immutable creation fields, including workload type, and preparation observations map to the resource? See [Workload template resource](workload-template-resource.md).
 
 ### `OQ-WLD-5`
 
@@ -1277,24 +1277,24 @@ How do workload template versions, edits, parameters, defaults, host constraints
 
 ### `OQ-WLD-6`
 
-What are the workload image formats, payload keys, artifact digests, admission checks, compatibility declarations, and retention rules for each workload provider kind? The first build needs a guest image and a binding between its kernel and disk. Does an app release image serve directly as the workload image on some targets? The reference schemas omit WorkloadImage, and S-142 doesn't qualify boot and restoration across Tier 1 cells. See [Workload image](workload-image.md) and [Workload image resource](workload-image-resource.md).
+What are the workload image formats, payload keys, artifact digests, admission checks, compatibility declarations, and retention rules for each workload provider kind? Guest images need a binding between kernel and disk, with boot and restoration compatibility across Tier 1 cells still open. Does an app release image serve directly as the workload image on some targets? See [Workload image](workload-image.md) and [Workload image resource](workload-image-resource.md).
 
 ### `OQ-RES-6`
 
-How do WorkloadHostWorker and the workload host divide identity, desired configuration, registration, and observed state? The reference schema for AgentHost combines metadata about the machine with fields for worker queues and capacity. What identifies a replacement worker instance, and which fields keep their meaning across re-enrollment? See [Workload host worker resource](workload-host-worker-resource.md).
+How do WorkloadHostWorker and the workload host divide identity, desired configuration, registration, and observed state? How are machine metadata, worker queues, and capacity divided between their records? What identifies a replacement worker instance, and which fields keep their meaning across re-enrollment? See [Workload host worker resource](workload-host-worker-resource.md).
 
 ### `OQ-WLD-7`
 
-What protocol carries worker registration, desired state, observations, acknowledgements, and recovery after either endpoint restarts? All control connections originate at the workload host. Reclaim needs persistent execution identity and authority, including for a different workload account. For each Tier 1 cell, how do control endpoints authenticate callers, and how does recovery handle missing inventory or a failed supervisor? S-188 leaves those guarantees incomplete, and its macOS support findings conflict with custom Seatbelt assumptions. The host isolation baseline remains held under `OQ-SBX-18`. See [Workload host worker](workload-host-worker.md).
+What protocol carries worker registration, desired state, observations, acknowledgements, and recovery after either endpoint restarts? All control connections originate at the workload host. Reclaim needs persistent execution identity and authority, including for a different workload account. For each Tier 1 cell, how do control endpoints authenticate callers, and how does recovery handle missing inventory or a failed supervisor? Custom Seatbelt profiles aren't a supported isolation mechanism. The host isolation baseline and replacement mechanism remain held under `OQ-SBX-18`. See [Workload host worker](workload-host-worker.md).
 
 ### `OQ-WLD-8`
 
-Which operations may a workload's own SVID permit for each workload type? The registration, health, and claim proposal leaves apps and user code workers without egress because neither binds an agent. Attaching `afakt/api` gives an app an API identity through the attachment and workload role, but does it use a separate SVID or a scope on the workload SVID? Does an app without that add-on have any API access? Which component receives the agent SVID at bind, and how does it bind to the workload and overlay node? The identity proposal's hub routes also need reconciliation with direct connections to workload proxies. See [Workload identity](workload-identity.md).
+Which operations may a workload's own SVID permit for each workload type? Authority limited to registration, health, and claims leaves apps and user code workers without egress because neither binds an agent. Attaching `afakt/api` gives an app an API identity through the attachment and workload role, but does it use a separate SVID or a scope on the workload SVID? Does an app without that add-on have any API access? Which component receives the agent SVID at bind, and how does it bind to the workload and overlay node? Permitted peers and the ingress gateway connect directly to workload proxies. See [Workload identity](workload-identity.md).
 
 ### `OQ-WLD-9`
 
-What are the methods, paths, permissions, request projections, and completion responses for Workload, WorkloadTemplate, WorkloadImage, and WorkloadHostWorker operations? The API proposal defines workload and template mappings, but lacks workload listing, image routes, and a separate worker surface. Host routes combine machine and worker records. How do version selection, concurrent changes, idempotent retries, and observations of teardown fit the resource contracts? User authentication and authorization of role selection also need a contract. Preparation and creation stay under `OQ-WLD-1`. See [Workload API](workload-api.md).
+What are the methods, paths, permissions, request projections, and completion responses for Workload, WorkloadTemplate, WorkloadImage, and WorkloadHostWorker operations? How do workload listing, image routes, and worker operations map to those resource boundaries? How do version selection, concurrent changes, idempotent retries, and observations of teardown fit the resource contracts? User authentication and authorization of role selection also need a contract. Preparation and creation stay under `OQ-WLD-1`. See [Workload API](workload-api.md).
 
 ### `OQ-WLD-10`
 
-Which problem types, extensions, HTTP status mappings, and retry rules describe workload API failures under RFC 9457? For lists paginated by key, what ordering, encoding, expiry, invalidation, page limits, and behavior under concurrent changes apply? The proposal leaves those details open and proposes `items`, `next_cursor`, and a problem `code` field without settling them. How do cursor validity and authorization changes interact? See [Errors](workload-api.md#Errors) and [Pagination by key](workload-api.md#Pagination%20by%20key).
+Which problem types, extensions, HTTP status mappings, and retry rules describe workload API failures under RFC 9457? For lists paginated by key, what ordering, encoding, expiry, invalidation, page limits, and behavior under concurrent changes apply? Should list responses use `items` and `next_cursor`, and should problems have a `code` extension? How do cursor validity and authorization changes interact? See [Errors](workload-api.md#Errors) and [Pagination by key](workload-api.md#Pagination%20by%20key).

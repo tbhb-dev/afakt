@@ -11,7 +11,7 @@ generated: { by: "codex:gpt-6", at: "2026-10-28T22:38:36Z" }
 
 For an agent [workload](workload-resource.md), afakt destroys the execution context after its single launch. Workload state describes that context independently of the launch result. Apps and workers that run user code don't bind an agent. Their replacement and drain rules remain [`OQ-WLD-2`](agent-open-questions.md#%60OQ-WLD-2%60).
 
-The contract applies to every Tier 1 cell: `linux-host`, `linux-vm`, and `docker-engine` on `linux/amd64` and `linux/arm64`, `macos-host` and `macos-vm` on `darwin/arm64`, and `windows-host` and `windows-vm` on `windows/amd64`. Provider capabilities determine the available operations, without changing creation-time immutability. See the [platform support matrix](https://github.com/tbhb-dev/afakt-drafts/blob/2c4a19dc30ae73d3597fbc6c7be1d8a93e391023/workloads/workload-platform-support.md).
+The contract applies to every Tier 1 cell: `linux-host`, `linux-vm`, and `docker-engine` on `linux/amd64` and `linux/arm64`, `macos-host` and `macos-vm` on `darwin/arm64`, and `windows-host` and `windows-vm` on `windows/amd64`. Provider capabilities determine the available operations, without changing creation-time immutability.
 
 ## States and transition authority
 
@@ -34,8 +34,6 @@ Failure conditions record the cause while teardown proceeds. Whether failure has
 Losing contact proves nothing about termination. On reconnect, the workload host worker reconciles surviving execution before reporting state, preserving the last observation and its freshness until it can observe again. Neither a timeout nor a lease expiry proves that execution ended, even after an acknowledged stop request. Whole-machine restart and a workload host that never returns remain [`OQ-HST-1`](agent-open-questions.md#%60OQ-HST-1%60) and [`OQ-SBX-71`](agent-open-questions.md#%60OQ-SBX-71%60).
 
 Retries can't adopt a workload that already ran a different launch because each new agent launch needs a new workload. Releasing capacity requires observed release. The ownership of workload capacity versus launch slots remains [`OQ-WLD-4`](agent-open-questions.md#%60OQ-WLD-4%60). For host modes, termination authority remains [`OQ-SBX-57`](agent-open-questions.md#%60OQ-SBX-57%60), without settling the held baseline for host isolation [`OQ-SBX-18`](agent-open-questions.md#%60OQ-SBX-18%60).
-
-The proposal follows [workload design question 8](https://github.com/tbhb-dev/afakt-drafts/blob/2c4a19dc30ae73d3597fbc6c7be1d8a93e391023/workloads/workload-design.md#Open%20questions). [S-073](https://github.com/tbhb-dev/afakt-spikes/blob/23716546c0a7ff73d2f630a53cdd1c8bf55fb785/s-073-what-is-the-execution-backend-contract-that-covers-vm/REPORT.md) tests backend capabilities in a synthetic fixture. Workload lifecycle ownership remains open.
 
 ## Agent launch lifecycle
 

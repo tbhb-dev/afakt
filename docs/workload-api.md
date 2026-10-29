@@ -11,7 +11,7 @@ generated: { by: "codex:gpt-6", at: "2026-10-28T23:55:04Z" }
 
 The [API server](components.md#API%20server) exposes workload management through Representational State Transfer (REST) resources. Clients authenticate through the ingress gateway. Workload and host callers use [SPIFFE identity](workload-identity.md). Authentication establishes the caller, while authorization determines its permitted operations. User authentication and workload scopes remain open under [`OQ-WLD-9`](agent-open-questions.md#%60OQ-WLD-9%60) and [`OQ-WLD-8`](agent-open-questions.md#%60OQ-WLD-8%60).
 
-The same resource boundaries apply to `linux-host`, `linux-vm`, and `docker-engine` on `linux/amd64` and `linux/arm64`, `macos-host` and `macos-vm` on `darwin/arm64`, and `windows-host` and `windows-vm` on `windows/amd64`. See the [Tier 1 matrix](https://github.com/tbhb-dev/afakt-drafts/blob/18226efca53614bf2e8ac7151f606ff514997c95/workloads/workload-platform-support.md).
+The same resource boundaries apply to `linux-host`, `linux-vm`, and `docker-engine` on `linux/amd64` and `linux/arm64`, `macos-host` and `macos-vm` on `darwin/arm64`, and `windows-host` and `windows-vm` on `windows/amd64`.
 
 ## Resources and authority
 
@@ -21,14 +21,14 @@ Resource representations have `apiVersion`, `kind`, `metadata`, `spec`, and `sta
 | --- | --- |
 | [Workload](workload-resource.md) | Inspect identity, immutable creation fields, lifecycle state, and conditions. The proposed deletion operation requests teardown. Reclaim depends on execution observations. Lifecycle ownership remains `OQ-SBX-71`. |
 | [WorkloadTemplate](workload-template-resource.md) | Create and inspect creation settings, list templates, and request instantiation. Version publication, updates, retirement, and selection remain `OQ-WLD-5`. Each workload records the version it uses. |
-| [WorkloadImage](workload-image-resource.md) | Select an execution image by its resource reference. Registration, listing, lookup, admission, and retirement operations remain `OQ-WLD-6` and `OQ-WLD-9`. The reference API supplies no WorkloadImage routes or payload contract. |
-| [WorkloadHostWorker](workload-host-worker-resource.md) | Register, renew, report observations, and read desired state over worker-initiated connections. The proposed host routes combine machine and worker records. A separate worker resource contract remains `OQ-RES-6` and `OQ-WLD-7`. |
+| [WorkloadImage](workload-image-resource.md) | Select an execution image by its resource reference. Registration, listing, lookup, admission, and retirement operations remain `OQ-WLD-6` and `OQ-WLD-9`. |
+| [WorkloadHostWorker](workload-host-worker-resource.md) | Register, renew, report observations, and read desired state over worker-initiated connections. A separate worker resource contract remains `OQ-RES-6` and `OQ-WLD-7`. |
 
 Workload creation fixes type, Identity and Access Management (IAM) role, workload image, execution mode, shape, host, namespace, and workload template version. Changing those fields requires another workload. Wire fields and request projections remain [`OQ-RES-4`](agent-open-questions.md#%60OQ-RES-4%60) and [`OQ-RES-5`](agent-open-questions.md#%60OQ-RES-5%60). A complete resource representation doesn't establish which fields a caller may write. Authorization of role selection remains part of [`OQ-WLD-9`](agent-open-questions.md#%60OQ-WLD-9%60), separately from the workload's own pinned authority.
 
 ## Proposed routes
 
-These HTTP mappings follow the [API proposal](https://github.com/tbhb-dev/afakt-drafts/blob/18226efca53614bf2e8ac7151f606ff514997c95/api/README.md). Their methods, paths, payloads, and response mapping remain [`OQ-WLD-9`](agent-open-questions.md#%60OQ-WLD-9%60).
+The proposed HTTP methods, paths, payloads, and response mapping remain [`OQ-WLD-9`](agent-open-questions.md#%60OQ-WLD-9%60).
 
 | Method | Proposed path | Operation |
 | --- | --- | --- |
@@ -58,10 +58,10 @@ When registering or renewing its lease, the worker reports availability and capa
 
 HTTP failures use [RFC 9457 problem details](https://www.rfc-editor.org/rfc/rfc9457.html) with media type `application/problem+json`. Its members distinguish the problem type (`type`), a short description (`title`), the HTTP status (`status`), an explanation of this occurrence (`detail`), and an occurrence reference (`instance`). When supplied, `status` matches the HTTP response. Details exclude secrets.
 
-Problem types, extension fields, mappings from domain failures to HTTP status, and retry behavior remain [`OQ-WLD-10`](agent-open-questions.md#%60OQ-WLD-10%60). The [problem schema proposal](https://github.com/tbhb-dev/afakt-drafts/blob/18226efca53614bf2e8ac7151f606ff514997c95/api/control-plane/openapi/components/schemas/Problem.yaml) includes a proposed `code` extension without settling that contract.
+Problem types, extension fields, mappings from domain failures to HTTP status, and retry behavior remain [`OQ-WLD-10`](agent-open-questions.md#%60OQ-WLD-10%60). A `code` extension remains open under that question.
 
 ## Pagination by key
 
-List operations use cursors based on keys. A continuation cursor identifies a position in the same authorized collection with the same filters. The [template list proposal](https://github.com/tbhb-dev/afakt-drafts/blob/18226efca53614bf2e8ac7151f606ff514997c95/api/control-plane/openapi/components/schemas/ListWorkloadTemplatesPage.yaml) uses `items` and `next_cursor`, with no continuation field when the list ends. Those field names remain proposed.
+List operations use cursors based on keys. A continuation cursor identifies a position in the same authorized collection with the same filters. The response fields remain open: [`OQ-WLD-10`](agent-open-questions.md#%60OQ-WLD-10%60) covers whether `items` holds the results and `next_cursor` supplies continuation, with the continuation field absent when the list ends.
 
 Ordering, cursor encoding, expiry, invalidation, page limits, and behavior under concurrent changes remain [`OQ-WLD-10`](agent-open-questions.md#%60OQ-WLD-10%60). Continuation state in a cursor doesn't grant access to the collection.

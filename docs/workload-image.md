@@ -23,14 +23,14 @@ An [agent workspace image](agent-workspace-image.md) supplies the prepared works
 | `macos-host` on `darwin/arm64` | Sandbox root compatible with the host's process environment. |
 | `windows-host` on `windows/amd64` | Sandbox root compatible with the host's process environment. |
 
-The [platform matrix](https://github.com/tbhb-dev/afakt-drafts/blob/a4e663c7217fecfe7e4b2582e0b78e6291b42416/workloads/workload-platform-support.md) supplies the cells. A workload image doesn't supply the proxy's identity or select its process placement. Workload provider isolation and image compatibility are separate contracts.
+A workload image doesn't supply the proxy's identity or select its process placement. Workload provider isolation and image compatibility are separate contracts.
 
 ## Compatibility and content
 
-The guest root, writable workspace, and harness configuration have distinct contents under [filesystem composition](https://github.com/tbhb-dev/afakt-drafts/blob/a4e663c7217fecfe7e4b2582e0b78e6291b42416/workloads/workload-design.md#Filesystem%20composition%20at%20launch). Payload keys remain open. [`OQ-WLD-6`](agent-open-questions.md#%60OQ-WLD-6%60) covers image format, kernel and disk binding, compatibility declarations, digest resolution, admission, and retention for the [WorkloadImage resource](workload-image-resource.md).
+The guest root, writable workspace, and harness configuration have distinct contents. Payload keys remain open. [`OQ-WLD-6`](agent-open-questions.md#%60OQ-WLD-6%60) covers image format, kernel and disk binding, compatibility declarations, digest resolution, admission, and retention for the [WorkloadImage resource](workload-image-resource.md).
 
-For apps, the [app workload proposal](https://github.com/tbhb-dev/afakt-drafts/blob/a4e663c7217fecfe7e4b2582e0b78e6291b42416/workloads/workloads-for-apps.md#What%20doesn%27t%20fit%20as%20it%20stands) distinguishes the release image from a standard guest that runs it. Whether a container or host workload uses the release image directly remains [`OQ-WLD-6`](agent-open-questions.md#%60OQ-WLD-6%60). Apps don't bind an agent workspace.
+An app release image is distinct from the standard guest that runs it. Whether a container or host workload uses the release image directly remains [`OQ-WLD-6`](agent-open-questions.md#%60OQ-WLD-6%60). Apps don't bind an agent workspace.
 
-## Image evidence
+## Boot and restoration
 
-[S-142](https://github.com/tbhb-dev/afakt-spikes/blob/23716546c0a7ff73d2f630a53cdd1c8bf55fb785/s-142-techniques-for-building-a-minimal-guest-os/REPORT.md) compares minimal guest assembly techniques and tests real harnesses in confined root filesystems. The run lacked hypervisor access for VM boot and restoration checks. Those limits leave afakt's image format and Tier 1 qualification open, alongside the first guest-image choice in [`OQ-WLD-6`](agent-open-questions.md#%60OQ-WLD-6%60).
+Running a harness in a confined root filesystem doesn't establish VM boot or restoration compatibility. The guest image format and boot and restoration compatibility across Tier 1 cells remain [`OQ-WLD-6`](agent-open-questions.md#%60OQ-WLD-6%60).
