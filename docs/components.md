@@ -29,9 +29,9 @@ Agentmail manages messages addressed to durable agents. These include incoming a
 
 ## API server
 
-The Application Programming Interface (API) server serves afakt's Representational State Transfer (REST) API to its coordination workflows and, through the [ingress gateway](#Ingress%20gateway), to the dashboard, command-line interface (CLI), and apps. Workload proxies connect over the overlay. At Transport Layer Security (TLS) termination, the API server identifies the launch from its peer certificate. From the immutable spec, it reads capabilities and scopes and refuses requests after the launch enters a terminal state. For remote control and sessions, it exposes [endpoints whose connection owner remains open](agent-acp.md#Remote%20control%20and%20sessions). It keeps the [workload host registry](workload-placement.md#Workload%20host%20registry), and its reservation API places launches on hosts.
+The Application Programming Interface (API) server serves afakt's Representational State Transfer (REST) API to its coordination workflows and, through the [ingress gateway](#Ingress%20gateway), to the dashboard, command-line interface (CLI), and apps. Workload proxies connect over the overlay. For an agent launch call, the API server identifies the launch from its peer certificate at Transport Layer Security (TLS) termination. From the immutable spec, it reads capabilities and scopes and refuses requests after the launch enters a terminal state. For remote control and sessions, it exposes [endpoints whose connection owner remains open](agent-acp.md#Remote%20control%20and%20sessions). It keeps the [workload host registry](workload-placement.md#Workload%20host%20registry), and its reservation API places launches on hosts.
 
-Workload creation uses [workload templates](workload-template.md) and [workload images](workload-image.md). The control plane records the selected template version and immutable creation fields on the [Workload resource](workload-resource.md).
+Workload creation uses [workload templates](workload-template.md) and [workload images](workload-image.md). The control plane records the selected template version and immutable creation fields on the [Workload resource](workload-resource.md). The [workload API](workload-api.md) also covers host workers. Image and worker operations remain open. [Workload identity](workload-identity.md) separates caller authentication from permission to use those resources.
 
 ### Health endpoints
 
@@ -83,7 +83,7 @@ The object store supplies the S3 API compatible endpoint used by the registry an
 
 ## Overlay node
 
-An overlay node represents one workload proxy, workload host, or control plane service instance in the isolated cluster overlay. Service instances share a service tag but keep separate node identities. Guests aren't nodes. See [Overlay transport](workload-overlay.md#Overlay%20transport).
+An overlay node represents one workload proxy, workload host, or control plane service instance in the isolated cluster overlay. Service instances share a service tag but keep separate node identities. Guests aren't nodes. A node identity doesn't grant service access. SPIFFE authentication and service authorization are separate checks. See [Overlay node identity](workload-identity.md#Overlay%20node%20identity) and [Overlay transport](workload-overlay.md#Overlay%20transport).
 
 ## Port forwarder
 

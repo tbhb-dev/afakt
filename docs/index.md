@@ -95,3 +95,5 @@ okf_version: "0.2"
 * [Workload image resource](workload-image-resource.md) - Image identity and open payload contracts.
 * [Workload host worker](workload-host-worker.md) - Registration, capacity, observations, and reclaim.
 * [Workload host worker resource](workload-host-worker-resource.md) - Desired configuration and worker observations.
+* [Workload identity](workload-identity.md) - SPIFFE authority and overlay identity boundaries.
+* [Workload API](workload-api.md) - Resource operations, errors, and pagination by key.

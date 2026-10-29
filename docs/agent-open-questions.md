@@ -277,7 +277,7 @@ What format do evidence reference IDs take? The specification gives none. Candid
 
 ### `OQ-MOD-9`
 
-What path scheme do SPIFFE IDs use for workload hosts, agents, agent launches, and control plane components? Workload identities take the form `spiffe://<trust-domain>/...`, with one trust domain for each control plane and no federation. Does an agent's ID identify the durable agent or the agent launch, or include both? For a component in the control plane, should its identity name the service or one replica or both? See [Provenance record](agent-launch-model.md#Provenance%20record).
+What path scheme do SPIFFE IDs use for Workload resources, workload hosts, agents, agent launches, and control plane components? Workload identities take the form `spiffe://<trust-domain>/...`, with one trust domain for each control plane and no federation. How does a workload's ID relate to its bound agent launch? Does an agent's ID identify the durable agent or the agent launch, or include both? For a component in the control plane, should its identity name the service or one replica or both? See [Provenance record](agent-launch-model.md#Provenance%20record).
 
 ### `OQ-MOD-10`
 
@@ -1286,3 +1286,15 @@ How do WorkloadHostWorker and the workload host divide identity, desired configu
 ### `OQ-WLD-7`
 
 What protocol carries worker registration, desired state, observations, acknowledgements, and recovery after either endpoint restarts? All control connections originate at the workload host. Reclaim needs persistent execution identity and authority, including for a different workload account. For each Tier 1 cell, how do control endpoints authenticate callers, and how does recovery handle missing inventory or a failed supervisor? S-188 leaves those guarantees incomplete, and its macOS support findings conflict with custom Seatbelt assumptions. The host isolation baseline remains held under `OQ-SBX-18`. See [Workload host worker](workload-host-worker.md).
+
+### `OQ-WLD-8`
+
+Which operations may a workload's own SVID permit for each workload type? The registration, health, and claim proposal leaves apps and user code workers without egress because neither binds an agent. Attaching `afakt/api` gives an app an API identity through the attachment and workload role, but does it use a separate SVID or a scope on the workload SVID? Does an app without that add-on have any API access? Which component receives the agent SVID at bind, and how does it bind to the workload and overlay node? The identity proposal's hub routes also need reconciliation with direct connections to workload proxies. See [Workload identity](workload-identity.md).
+
+### `OQ-WLD-9`
+
+What are the methods, paths, permissions, request projections, and completion responses for Workload, WorkloadTemplate, WorkloadImage, and WorkloadHostWorker operations? The API proposal defines workload and template mappings, but lacks workload listing, image routes, and a separate worker surface. Host routes combine machine and worker records. How do version selection, concurrent changes, idempotent retries, and observations of teardown fit the resource contracts? User authentication and authorization of role selection also need a contract. Preparation and creation stay under `OQ-WLD-1`. See [Workload API](workload-api.md).
+
+### `OQ-WLD-10`
+
+Which problem types, extensions, HTTP status mappings, and retry rules describe workload API failures under RFC 9457? For lists paginated by key, what ordering, encoding, expiry, invalidation, page limits, and behavior under concurrent changes apply? The proposal leaves those details open and proposes `items`, `next_cursor`, and a problem `code` field without settling them. How do cursor validity and authorization changes interact? See [Errors](workload-api.md#Errors) and [Pagination by key](workload-api.md#Pagination%20by%20key).

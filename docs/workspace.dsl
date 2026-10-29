@@ -25,7 +25,7 @@ workspace "afakt" "Architecture of the afakt modular monolith." {
             }
 
             group "Control plane services" {
-                controlApi = container "API server and web dashboard" "Authorizes workload creation using workload templates and workload images; serves the dashboard from its own origin." "Application service" "Topology"
+                controlApi = container "API server and web dashboard" "Serves workload resources and the dashboard; image and host-worker operations remain open." "Application service" "Topology"
                 previewServer = container "Preview server" "Dials workload proxies over the overlay; published-port listener binding remains open." "Application service" "Topology"
                 mcpGateway = container "MCP gateway" "Checks launch tool grants and keeps upstream credentials outside guests." "Application service" "Topology"
                 staticOrigin = container "Static origin" "Serves static site and single-page app deploys from local copies of their files; keeps no cache." "Caddy" "Topology"
@@ -131,7 +131,7 @@ workspace "afakt" "Architecture of the afakt modular monolith." {
         destination-workload-proxy -> destinationMediator "Requests decision with source identity and target grant" "Local channel" "TopologyConnection,ReturnDetail,OverviewHidden"
         destination-workload-proxy -> destinationGuest "Carries permitted ingress; published-port binding open" "Private workload link" "TopologyConnection,ReturnDetail,OverviewHidden"
         workload-proxy -> destination-workload-proxy "Dials directly; both mediators check the connection" "SPIFFE mutual TLS over overlay" "TopologyConnection,OverviewHidden"
-        workload-proxy -> coordination "Obtains overlay coordination through afakt interface" "Overlay control" "TopologyConnection,OverviewHidden"
+        workload-proxy -> coordination "Enrolls its own node with an SVID; membership grants no service access" "Overlay control" "TopologyConnection,OverviewHidden"
         hostNetwork -> coordination "Obtains overlay coordination through afakt interface" "Overlay control" "TopologyConnection,OverviewHidden"
         workload-proxy -> overlayRelay "Uses encrypted relay transport when needed" "Overlay transport" "TopologyConnection,OverviewHidden"
 

@@ -75,7 +75,7 @@ skinparam {
 
 rectangle "afakt\n<size:16>[Software System]</size>" <<Boundary-YWZha3Q=>> {
   rectangle "Control plane services" <<Group-Q29udHJvbCBwbGFuZSBzZXJ2aWNlcw==>> as group16 {
-    rectangle "==API server and web dashboard\n<size:16>[Container: Application service]</size>\n\nAuthorizes workload creation using workload templates and workload images; serves the dashboard from its own origin." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.APIserverandwebdashboard
+    rectangle "==API server and web dashboard\n<size:16>[Container: Application service]</size>\n\nServes workload resources and the dashboard; image and host-worker operations remain open." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.APIserverandwebdashboard
   }
 
   rectangle "External ingress boundary" <<Group-RXh0ZXJuYWwgaW5ncmVzcyBib3VuZGFyeQ==>> as group17 {

@@ -115,7 +115,7 @@ generated: { by: "codex:gpt-6", at: "2026-10-28T17:30:00Z" }
 - **Web dashboard**: the component that provides afakt's web UI. See [Web dashboard](components.md#Web%20dashboard).
 - **Workflow orchestrator**: the component, Temporal, that provides durable execution for afakt's workflows. See [Workflow orchestrator](components.md#Workflow%20orchestrator).
 - **Workload**: the execution context plus the workload proxy mediator and workload proxy together with `afakt-agent`. On a VM provider, the context is a workload guest. Other workload providers use a host or container context. A workload can exist without a launch or workspace. An agent workload runs exactly one launch before afakt destroys it. A follow-up or relaunch uses a new workload. SPIFFE uses workload for mediators and gateways as well as workers, a distinct meaning. See [Workload](workload.md).
-- **Workload identity**: the SPIFFE ID that afakt assigns to a workload and proves with a SPIFFE Verifiable Identity Document (SVID). See [Workload identity](workload-host.md#Workload%20identity).
+- **Workload identity**: a SPIFFE identity proved by an SVID. SPIFFE includes services and host workers as well as Workload resources, with different authority for each. See [Workload identity](workload-identity.md).
 - **Workspace image builder**: the component that coordinates image builds and publishes successful results. See [Workspace image builder](components.md#Workspace%20image%20builder).
 - **Workspace image definition**: the sources, optional base image, steps, agent profile, triggers, destination, and retention settings that describe how to produce a workspace image. See [Workspace image definitions](agent-workspace-image.md#Workspace%20image%20definitions).
 - **Workspace image**: an Open Container Initiative (OCI) image whose layers contain a prepared workspace directory tree with checkouts, dependencies, and build outputs. See [Agent workspace image](agent-workspace-image.md).
@@ -136,3 +136,6 @@ generated: { by: "codex:gpt-6", at: "2026-10-28T17:30:00Z" }
 - **Workload image**: the execution image selected at workload creation. Its form depends on the workload provider kind. See [Workload image](workload-image.md).
 - **Workload template**: the resource holding workload creation settings. A workload records the template version it uses. See [Workload template](workload-template.md).
 - **Workload type**: the agent, app, or worker classification in the workload's `type` field, distinct from its IAM role. See [Workload resource](workload-resource.md).
+- **Continuation cursor**: continuation state for a position in an authorized collection under the same filters. See [Pagination by key](workload-api.md#Pagination%20by%20key).
+- **SVID**: a SPIFFE Verifiable Identity Document that proves identity, with receiving services checking authorization separately. See [SVIDs and workload types](workload-identity.md#SVIDs%20and%20workload%20types).
+- **Workload API**: the REST API for workload resources, distinct from the SPIFFE Workload API that supplies identity material. See [Workload API](workload-api.md).

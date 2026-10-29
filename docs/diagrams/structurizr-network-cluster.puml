@@ -75,7 +75,7 @@ rectangle "Cluster overlay boundary\n<size:16>[Deployment Node: Private overlay]
   rectangle "==Private overlay reachability\n<size:16>[Infrastructure Node: Tailscale tsnet]</size>\n\nEach cluster node retains a static map of stable nodes. Ingress rules admit only the gateway and named peers." <<Element-RWxlbWVudA==>> as Topologycluster.Clusteroverlayboundary.Privateoverlayreachability
   rectangle "Control plane boundary\n<size:16>[Deployment Node: Control plane]</size>" <<DeploymentNode-RWxlbWVudCxEZXBsb3ltZW50IE5vZGU=>> as Topologycluster.Clusteroverlayboundary.Controlplaneboundary {
     rectangle "API service node\n<size:16>[Deployment Node: tsnet node]</size>" <<DeploymentNode-RWxlbWVudCxEZXBsb3ltZW50IE5vZGU=>> as Topologycluster.Clusteroverlayboundary.Controlplaneboundary.APIservicenode {
-      rectangle "==API server and web dashboard\n<size:16>[Container: Application service]</size>\n\nAuthorizes workload creation using workload templates and workload images; serves the dashboard from its own origin." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as Topologycluster.Clusteroverlayboundary.Controlplaneboundary.APIservicenode.APIserverandwebdashboard_1
+      rectangle "==API server and web dashboard\n<size:16>[Container: Application service]</size>\n\nServes workload resources and the dashboard; image and host-worker operations remain open." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as Topologycluster.Clusteroverlayboundary.Controlplaneboundary.APIservicenode.APIserverandwebdashboard_1
     }
 
     rectangle "Preview service node\n<size:16>[Deployment Node: tsnet node]</size>" <<DeploymentNode-RWxlbWVudCxEZXBsb3ltZW50IE5vZGU=>> as Topologycluster.Clusteroverlayboundary.Controlplaneboundary.Previewservicenode {
