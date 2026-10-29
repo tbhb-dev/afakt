@@ -73,7 +73,7 @@ afakt identifies its workloads with SPIFFE. Each control plane has one trust dom
 
 Connections from a workload host to the control plane, including workload proxy connections, use mutual Transport Layer Security (TLS) with X.509 SPIFFE Verifiable Identity Documents (SVIDs). SVIDs come from a Workload API endpoint on every workload host. On behalf of the agents they serve, host-side processes request SVIDs from that endpoint, which agents can't connect to. Neither an SVID nor its private key enters the guest.
 
-Inside a SPIFFE ID, the path scheme remains [open](agent-open-questions.md#%60OQ-MOD-9%60), as does the [SVID form for other connections](agent-open-questions.md#%60OQ-SBX-17%60).
+Inside a SPIFFE ID, the path scheme remains [open](agent-open-questions.md#%60OQ-MOD-9%60), as does the [SVID form for other connections](agent-open-questions.md#%60OQ-SBX-17%60). See [Workload identity](workload-identity.md) for authority by workload type and the separate overlay identity.
 
 ## Restart and recovery
 
