@@ -15,7 +15,7 @@ A workload image is the container image a [workload](workload.md) selects at cre
 
 A container image contains a root filesystem and a default command in Open Container Initiative (OCI) format. Jobs, app releases, and agents select container images for their processes, so their selected workload images can also take those type names. OCI is a format. Workspace images and agent snapshots use it too.
 
-The first build's tests run a container image as a job to probe network rules from inside the workload. This is the test image.
+A test image is a container image afakt's tests run as a job to probe a workload's network path.
 
 ## Guest images
 
