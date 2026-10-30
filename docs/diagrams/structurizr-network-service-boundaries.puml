@@ -74,14 +74,14 @@ skinparam {
 </style>
 
 rectangle "afakt\n<size:16>[Software System]</size>" <<Boundary-YWZha3Q=>> {
-  rectangle "Control plane services" <<Group-Q29udHJvbCBwbGFuZSBzZXJ2aWNlcw==>> as group1 {
-    rectangle "==API server and web dashboard\n<size:16>[Container: Application service]</size>\n\nServes workload resources and the dashboard; image and host-worker operations remain open." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.APIserverandwebdashboard
+  rectangle "Control plane services" <<Group-Q29udHJvbCBwbGFuZSBzZXJ2aWNlcw==>> as group2 {
+    rectangle "==API server\n<size:16>[Container: Application service]</size>\n\nServes workload resources; image and host-worker operations remain open." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.APIserver
     rectangle "==MCP gateway\n<size:16>[Container: Application service]</size>\n\nChecks launch tool grants and keeps upstream credentials outside guests." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.MCPgateway
     rectangle "==Overlay coordination\n<size:16>[Container: Headscale]</size>\n\nAn afakt interface fronts isolated Headscale coordination; cluster nodes retain a static map of stable nodes." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Overlaycoordination
     rectangle "==Overlay relay\n<size:16>[Container: Overlay transport]</size>\n\nCarries encrypted overlay traffic when a relay path is needed." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Overlayrelay
   }
 
-  rectangle "Host management boundary" <<Group-SG9zdCBtYW5hZ2VtZW50IGJvdW5kYXJ5>> as group2 {
+  rectangle "Host management boundary" <<Group-SG9zdCBtYW5hZ2VtZW50IGJvdW5kYXJ5>> as group3 {
     rectangle "==Workload host worker\n<size:16>[Container: Host service]</size>\n\nObserves workload execution as a dedicated non-root user; workload lifecycle ownership remains open." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Workloadhostworker
     rectangle "==Privileged helper\n<size:16>[Container: Host privilege boundary]</size>\n\nPerforms narrowly authorized setup and launch operations; caller binding is undecided." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Privilegedhelper
   }
@@ -89,6 +89,6 @@ rectangle "afakt\n<size:16>[Software System]</size>" <<Boundary-YWZha3Q=>> {
 }
 
 afakt.Workloadhostworker --> afakt.Privilegedhelper <<Relationship-UmVsYXRpb25zaGlw>> : "Requests authorized setup and launch operations\n<size:16>[Authenticated local control]</size>"
-afakt.MCPgateway --> afakt.APIserverandwebdashboard <<Relationship-UmVsYXRpb25zaGlw>> : "Calls permitted operations with launch context\n<size:16>[Authenticated service connection]</size>"
+afakt.MCPgateway --> afakt.APIserver <<Relationship-UmVsYXRpb25zaGlw>> : "Calls permitted operations with launch context\n<size:16>[Authenticated service connection]</size>"
 
 @enduml

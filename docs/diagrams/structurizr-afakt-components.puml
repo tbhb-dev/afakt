@@ -72,7 +72,6 @@ rectangle "==External Temporal\n<size:16>[Software System]</size>\n\nProvides du
 rectangle "afakt\n<size:16>[Software System]</size>" <<Boundary-YWZha3Q=>> {
   rectangle "afakt process\n<size:16>[Container: Go]</size>" <<Boundary-YWZha3QgcHJvY2Vzcw==>> {
     rectangle "==GitHub webhook receiver\n<size:16>[Component: Go]</size>\n\nAccepts webhook deliveries and starts coordination work." <<Element-RWxlbWVudA==>> as afakt.afaktprocess.GitHubwebhookreceiver
-    rectangle "==Web dashboard\n<size:16>[Component: React]</size>\n\nProvides the web UI from the API's origin." <<Element-RWxlbWVudA==>> as afakt.afaktprocess.Webdashboard
     rectangle "==Embedded workflow orchestrator\n<size:16>[Component: Temporal]</size>\n\nProvides durable execution inside the process for development and tests." <<Element-RWxlbWVudA==>> as afakt.afaktprocess.Embeddedworkfloworchestrator
     rectangle "==Coordination workflows\n<size:16>[Component: Temporal]</size>\n\nCoordinate work on workers inside the binary and start other workflows." <<Element-RWxlbWVudA==>> as afakt.afaktprocess.Coordinationworkflows
     rectangle "==Agent runner\n<size:16>[Component: Temporal]</size>\n\nRuns AI coding agents as a workflow." <<Element-RWxlbWVudA==>> as afakt.afaktprocess.Agentrunner
@@ -81,14 +80,15 @@ rectangle "afakt\n<size:16>[Software System]</size>" <<Boundary-YWZha3Q=>> {
     rectangle "==API server\n<size:16>[Component: Go]</size>\n\nServes the REST API and starts workflows." <<Element-RWxlbWVudA==>> as afakt.afaktprocess.APIserver
   }
 
+  rectangle "==Web dashboard\n<size:16>[Container: React]</size>\n\nA platform app: a static single-page app on the static origin and a backend-for-frontend app workload that holds the user's session. The API origin routes /dashboard to it." <<Element-RWxlbWVudA==>> as afakt.Webdashboard
 }
 
 Developerortester --> afakt.afaktprocess.Commandlineinterface <<Relationship-UmVsYXRpb25zaGlw>> : "Runs commands\n<size:16>[CLI]</size>"
-Developerortester --> afakt.afaktprocess.Webdashboard <<Relationship-UmVsYXRpb25zaGlw>> : "Uses the dashboard\n<size:16>[HTTP]</size>"
+Developerortester --> afakt.Webdashboard <<Relationship-UmVsYXRpb25zaGlw>> : "Uses the dashboard\n<size:16>[HTTP]</size>"
 Developerortester --> afakt.afaktprocess.TemporalWebUI <<Relationship-UmVsYXRpb25zaGlw>> : "Inspects workflows\n<size:16>[HTTP]</size>"
 Nativeapps --> afakt.afaktprocess.APIserver <<Relationship-UmVsYXRpb25zaGlw>> : "Calls the REST API\n<size:16>[HTTP]</size>"
 afakt.afaktprocess.Commandlineinterface --> afakt.afaktprocess.APIserver <<Relationship-UmVsYXRpb25zaGlw>> : "Calls the REST API\n<size:16>[HTTP]</size>"
-afakt.afaktprocess.Webdashboard --> afakt.afaktprocess.APIserver <<Relationship-UmVsYXRpb25zaGlw>> : "Calls the REST API\n<size:16>[HTTP]</size>"
+afakt.Webdashboard --> afakt.afaktprocess.APIserver <<Relationship-UmVsYXRpb25zaGlw>> : "Calls the REST API with the user's access token\n<size:16>[HTTP]</size>"
 GitHub --> afakt.afaktprocess.GitHubwebhookreceiver <<Relationship-UmVsYXRpb25zaGlw>> : "Delivers webhooks\n<size:16>[HTTP]</size>"
 afakt.afaktprocess.GitHubwebhookreceiver --> afakt.afaktprocess.APIserver <<Relationship-UmVsYXRpb25zaGlw>> : "Calls the REST API\n<size:16>[HTTP]</size>"
 afakt.afaktprocess.GitHubwebhookreceiver --> afakt.afaktprocess.Embeddedworkfloworchestrator <<Relationship-UmVsYXRpb25zaGlw>> : "Starts workflows in embedded mode\n<size:16>[Temporal]</size>"

@@ -10,12 +10,12 @@
       {
         "description": "Operator-controlled clients.",
         "environment": "Topology context",
-        "id": "106",
+        "id": "109",
         "infrastructureNodes": [
           {
             "description": "Operator and device identities.",
             "environment": "Topology context",
-            "id": "107",
+            "id": "110",
             "name": "Browser, phone, tablet and native apps",
             "properties": {
               "structurizr.dsl.identifier": "contextClients"
@@ -23,17 +23,17 @@
             "relationships": [
               {
                 "description": "Device identity",
-                "destinationId": "109",
-                "id": "116",
-                "sourceId": "107",
+                "destinationId": "112",
+                "id": "119",
+                "sourceId": "110",
                 "tags": "Relationship",
                 "technology": "User tailnet"
               },
               {
                 "description": "Signed-in user",
-                "destinationId": "112",
-                "id": "117",
-                "sourceId": "107",
+                "destinationId": "115",
+                "id": "120",
+                "sourceId": "110",
                 "tags": "Relationship",
                 "technology": "Public application request"
               }
@@ -53,12 +53,12 @@
       {
         "description": "User-owned network; no cluster routing.",
         "environment": "Topology context",
-        "id": "108",
+        "id": "111",
         "infrastructureNodes": [
           {
             "description": "Private application access to attached gateways.",
             "environment": "Topology context",
-            "id": "109",
+            "id": "112",
             "name": "Attached user tailnets",
             "properties": {
               "structurizr.dsl.identifier": "contextTailnet"
@@ -66,9 +66,9 @@
             "relationships": [
               {
                 "description": "User context; no packet routing",
-                "destinationId": "112",
-                "id": "118",
-                "sourceId": "109",
+                "destinationId": "115",
+                "id": "121",
+                "sourceId": "112",
                 "tags": "Relationship",
                 "technology": "Private application request"
               }
@@ -90,12 +90,12 @@
           {
             "description": "Application entry only.",
             "environment": "Topology context",
-            "id": "111",
+            "id": "114",
             "infrastructureNodes": [
               {
                 "description": "Public and user-tailnet application traffic; no packet routing.",
                 "environment": "Topology context",
-                "id": "112",
+                "id": "115",
                 "name": "External ingress gateway",
                 "properties": {
                   "structurizr.dsl.identifier": "contextIngress"
@@ -103,9 +103,9 @@
                 "relationships": [
                   {
                     "description": "Authenticated application request",
-                    "destinationId": "113",
-                    "id": "119",
-                    "sourceId": "112",
+                    "destinationId": "116",
+                    "id": "122",
+                    "sourceId": "115",
                     "tags": "Relationship",
                     "technology": "Cluster overlay"
                   }
@@ -125,12 +125,12 @@
         ],
         "description": "Control plane and workload hosts share authenticated overlay reachability.",
         "environment": "Topology context",
-        "id": "110",
+        "id": "113",
         "infrastructureNodes": [
           {
             "description": "Per-service, per-host and per-launch nodes; guests have no overlay membership.",
             "environment": "Topology context",
-            "id": "113",
+            "id": "116",
             "name": "Control plane and workload hosts",
             "properties": {
               "structurizr.dsl.identifier": "contextCluster"
@@ -138,9 +138,9 @@
             "relationships": [
               {
                 "description": "Permitted destination request",
-                "destinationId": "115",
-                "id": "120",
-                "sourceId": "113",
+                "destinationId": "118",
+                "id": "123",
+                "sourceId": "116",
                 "tags": "Relationship",
                 "technology": "Workload proxy egress"
               }
@@ -160,12 +160,12 @@
       {
         "description": "Upstream destinations outside cluster trust.",
         "environment": "Topology context",
-        "id": "114",
+        "id": "117",
         "infrastructureNodes": [
           {
             "description": "Only permitted egress leaves a workload host.",
             "environment": "Topology context",
-            "id": "115",
+            "id": "118",
             "name": "Internet services",
             "properties": {
               "structurizr.dsl.identifier": "contextInternet"
@@ -185,7 +185,7 @@
       {
         "description": "Separate user network.",
         "environment": "Topology cluster",
-        "id": "121",
+        "id": "124",
         "instances": "1",
         "name": "User tailnet boundary",
         "properties": {
@@ -194,7 +194,7 @@
         "softwareSystemInstances": [
           {
             "environment": "Topology cluster",
-            "id": "122",
+            "id": "125",
             "instanceId": 1,
             "properties": {
               "structurizr.dsl.identifier": "clusterTailnet"
@@ -202,30 +202,30 @@
             "relationships": [
               {
                 "description": "Delivers application requests",
-                "destinationId": "124",
-                "id": "125",
-                "linkedRelationshipId": "82",
-                "sourceId": "122",
+                "destinationId": "127",
+                "id": "128",
+                "linkedRelationshipId": "83",
+                "sourceId": "125",
                 "technology": "Transport Layer Security"
               },
               {
                 "description": "Optional host attachment; application access only",
-                "destinationId": "147",
-                "id": "148",
-                "linkedRelationshipId": "83",
-                "sourceId": "122",
+                "destinationId": "150",
+                "id": "151",
+                "linkedRelationshipId": "84",
+                "sourceId": "125",
                 "technology": "User tailnet"
               },
               {
                 "description": "Optional host attachment; application access only",
-                "destinationId": "162",
-                "id": "163",
-                "linkedRelationshipId": "83",
-                "sourceId": "122",
+                "destinationId": "165",
+                "id": "166",
+                "linkedRelationshipId": "84",
+                "sourceId": "125",
                 "technology": "User tailnet"
               }
             ],
-            "softwareSystemId": "68",
+            "softwareSystemId": "69",
             "tags": "Software System Instance"
           }
         ],
@@ -237,49 +237,49 @@
           {
             "containerId": "22",
             "environment": "Topology cluster",
-            "id": "124",
+            "id": "127",
             "instanceId": 1,
             "properties": {
               "structurizr.dsl.identifier": "clusterEdge"
             },
             "relationships": [
               {
-                "description": "Forwards authenticated dashboard and API requests",
-                "destinationId": "130",
-                "id": "131",
-                "linkedRelationshipId": "85",
-                "sourceId": "124",
+                "description": "Forwards authenticated API requests",
+                "destinationId": "133",
+                "id": "134",
+                "linkedRelationshipId": "86",
+                "sourceId": "127",
                 "technology": "Application protocol over overlay"
               },
               {
                 "description": "Forwards preview requests with user context",
-                "destinationId": "133",
-                "id": "134",
-                "linkedRelationshipId": "86",
-                "sourceId": "124",
+                "destinationId": "136",
+                "id": "137",
+                "linkedRelationshipId": "89",
+                "sourceId": "127",
                 "technology": "Application protocol over overlay"
               },
               {
                 "description": "Forwards static site requests by hostname",
-                "destinationId": "139",
-                "id": "140",
-                "linkedRelationshipId": "87",
-                "sourceId": "124",
+                "destinationId": "142",
+                "id": "143",
+                "linkedRelationshipId": "90",
+                "sourceId": "127",
                 "technology": "Application protocol over overlay"
               },
               {
                 "description": "Dials permitted workload ingress directly",
-                "destinationId": "153",
-                "id": "154",
-                "linkedRelationshipId": "88",
-                "sourceId": "124",
+                "destinationId": "156",
+                "id": "157",
+                "linkedRelationshipId": "91",
+                "sourceId": "127",
                 "technology": "SPIFFE mutual TLS over overlay"
               },
               {
                 "description": "Authenticated app requests",
-                "destinationId": "127",
-                "id": "170",
-                "sourceId": "124",
+                "destinationId": "130",
+                "id": "173",
+                "sourceId": "127",
                 "tags": "Relationship",
                 "technology": "Overlay access"
               }
@@ -289,7 +289,7 @@
         ],
         "description": "User-tailnet attachments do not route cluster packets.",
         "environment": "Topology cluster",
-        "id": "123",
+        "id": "126",
         "instances": "1",
         "name": "External ingress boundary",
         "properties": {
@@ -307,7 +307,7 @@
                   {
                     "containerId": "16",
                     "environment": "Topology cluster",
-                    "id": "130",
+                    "id": "133",
                     "instanceId": 1,
                     "properties": {
                       "structurizr.dsl.identifier": "cluster_controlApi"
@@ -315,9 +315,9 @@
                     "relationships": [
                       {
                         "description": "Service identity",
-                        "destinationId": "127",
-                        "id": "171",
-                        "sourceId": "130",
+                        "destinationId": "130",
+                        "id": "174",
+                        "sourceId": "133",
                         "tags": "Relationship",
                         "technology": "Overlay membership"
                       }
@@ -325,9 +325,9 @@
                     "tags": "Container Instance"
                   }
                 ],
-                "description": "Independent service identity; dashboard shares its origin.",
+                "description": "Independent service identity.",
                 "environment": "Topology cluster",
-                "id": "129",
+                "id": "132",
                 "instances": "1",
                 "name": "API service node",
                 "properties": {
@@ -341,7 +341,7 @@
                   {
                     "containerId": "17",
                     "environment": "Topology cluster",
-                    "id": "133",
+                    "id": "136",
                     "instanceId": 1,
                     "properties": {
                       "structurizr.dsl.identifier": "cluster_previewServer"
@@ -349,17 +349,17 @@
                     "relationships": [
                       {
                         "description": "Dials workload proxy; published-port binding open",
-                        "destinationId": "153",
-                        "id": "156",
-                        "linkedRelationshipId": "89",
-                        "sourceId": "133",
+                        "destinationId": "156",
+                        "id": "159",
+                        "linkedRelationshipId": "92",
+                        "sourceId": "136",
                         "technology": "SPIFFE mutual TLS over overlay"
                       },
                       {
                         "description": "Service identity",
-                        "destinationId": "127",
-                        "id": "172",
-                        "sourceId": "133",
+                        "destinationId": "130",
+                        "id": "175",
+                        "sourceId": "136",
                         "tags": "Relationship",
                         "technology": "Overlay membership"
                       }
@@ -369,7 +369,7 @@
                 ],
                 "description": "Independent service identity.",
                 "environment": "Topology cluster",
-                "id": "132",
+                "id": "135",
                 "instances": "1",
                 "name": "Preview service node",
                 "properties": {
@@ -383,7 +383,7 @@
                   {
                     "containerId": "18",
                     "environment": "Topology cluster",
-                    "id": "136",
+                    "id": "139",
                     "instanceId": 1,
                     "properties": {
                       "structurizr.dsl.identifier": "cluster_mcpGateway"
@@ -391,17 +391,17 @@
                     "relationships": [
                       {
                         "description": "Calls permitted operations with launch context",
-                        "destinationId": "130",
-                        "id": "137",
-                        "linkedRelationshipId": "90",
-                        "sourceId": "136",
+                        "destinationId": "133",
+                        "id": "140",
+                        "linkedRelationshipId": "93",
+                        "sourceId": "139",
                         "technology": "Authenticated service connection"
                       },
                       {
                         "description": "Service identity",
-                        "destinationId": "127",
-                        "id": "173",
-                        "sourceId": "136",
+                        "destinationId": "130",
+                        "id": "176",
+                        "sourceId": "139",
                         "tags": "Relationship",
                         "technology": "Overlay membership"
                       }
@@ -411,7 +411,7 @@
                 ],
                 "description": "Independent service identity.",
                 "environment": "Topology cluster",
-                "id": "135",
+                "id": "138",
                 "instances": "1",
                 "name": "MCP service node",
                 "properties": {
@@ -425,7 +425,7 @@
                   {
                     "containerId": "19",
                     "environment": "Topology cluster",
-                    "id": "139",
+                    "id": "142",
                     "instanceId": 1,
                     "properties": {
                       "structurizr.dsl.identifier": "cluster_staticOrigin"
@@ -433,9 +433,9 @@
                     "relationships": [
                       {
                         "description": "Service identity",
-                        "destinationId": "127",
-                        "id": "174",
-                        "sourceId": "139",
+                        "destinationId": "130",
+                        "id": "177",
+                        "sourceId": "142",
                         "tags": "Relationship",
                         "technology": "Overlay membership"
                       }
@@ -445,7 +445,7 @@
                 ],
                 "description": "Independent service identity.",
                 "environment": "Topology cluster",
-                "id": "138",
+                "id": "141",
                 "instances": "1",
                 "name": "Static origin node",
                 "properties": {
@@ -459,7 +459,7 @@
                   {
                     "containerId": "20",
                     "environment": "Topology cluster",
-                    "id": "142",
+                    "id": "145",
                     "instanceId": 1,
                     "properties": {
                       "structurizr.dsl.identifier": "cluster_coordination"
@@ -467,9 +467,9 @@
                     "relationships": [
                       {
                         "description": "Node coordination",
-                        "destinationId": "127",
-                        "id": "175",
-                        "sourceId": "142",
+                        "destinationId": "130",
+                        "id": "178",
+                        "sourceId": "145",
                         "tags": "Relationship",
                         "technology": "afakt interface"
                       }
@@ -479,7 +479,7 @@
                 ],
                 "description": "Isolated Headscale behind an afakt interface; instance count undecided.",
                 "environment": "Topology cluster",
-                "id": "141",
+                "id": "144",
                 "instances": "1",
                 "name": "Coordination node",
                 "properties": {
@@ -493,7 +493,7 @@
                   {
                     "containerId": "21",
                     "environment": "Topology cluster",
-                    "id": "144",
+                    "id": "147",
                     "instanceId": 1,
                     "properties": {
                       "structurizr.dsl.identifier": "cluster_overlayRelay"
@@ -501,9 +501,9 @@
                     "relationships": [
                       {
                         "description": "Encrypted transport",
-                        "destinationId": "127",
-                        "id": "176",
-                        "sourceId": "144",
+                        "destinationId": "130",
+                        "id": "179",
+                        "sourceId": "147",
                         "tags": "Relationship",
                         "technology": "Relay path"
                       }
@@ -513,7 +513,7 @@
                 ],
                 "description": "Encrypted overlay transport.",
                 "environment": "Topology cluster",
-                "id": "143",
+                "id": "146",
                 "instances": "1",
                 "name": "Relay node",
                 "properties": {
@@ -525,7 +525,7 @@
             ],
             "description": "One overlay node for each service.",
             "environment": "Topology cluster",
-            "id": "128",
+            "id": "131",
             "instances": "1",
             "name": "Control plane boundary",
             "properties": {
@@ -541,7 +541,7 @@
                   {
                     "containerId": "27",
                     "environment": "Topology cluster",
-                    "id": "147",
+                    "id": "150",
                     "instanceId": 1,
                     "properties": {
                       "structurizr.dsl.identifier": "cluster_hostNetwork"
@@ -549,33 +549,33 @@
                     "relationships": [
                       {
                         "description": "Registers host and reports capacity over host-initiated connections",
-                        "destinationId": "130",
-                        "id": "149",
-                        "linkedRelationshipId": "80",
-                        "sourceId": "147",
+                        "destinationId": "133",
+                        "id": "152",
+                        "linkedRelationshipId": "81",
+                        "sourceId": "150",
                         "technology": "Workload mutual TLS over overlay"
                       },
                       {
                         "description": "Requests preview as host identity",
-                        "destinationId": "133",
-                        "id": "150",
-                        "linkedRelationshipId": "73",
-                        "sourceId": "147",
+                        "destinationId": "136",
+                        "id": "153",
+                        "linkedRelationshipId": "74",
+                        "sourceId": "150",
                         "technology": "Workload mutual TLS over overlay"
                       },
                       {
                         "description": "Obtains overlay coordination through afakt interface",
-                        "destinationId": "142",
-                        "id": "151",
-                        "linkedRelationshipId": "104",
-                        "sourceId": "147",
+                        "destinationId": "145",
+                        "id": "154",
+                        "linkedRelationshipId": "107",
+                        "sourceId": "150",
                         "technology": "Overlay control"
                       },
                       {
                         "description": "Host identity",
-                        "destinationId": "127",
-                        "id": "177",
-                        "sourceId": "147",
+                        "destinationId": "130",
+                        "id": "180",
+                        "sourceId": "150",
                         "tags": "Relationship",
                         "technology": "Overlay membership"
                       }
@@ -585,7 +585,7 @@
                 ],
                 "description": "Host identity; optional user-tailnet attachment.",
                 "environment": "Topology cluster",
-                "id": "146",
+                "id": "149",
                 "instances": "1",
                 "name": "Host node",
                 "properties": {
@@ -599,7 +599,7 @@
                   {
                     "containerId": "30",
                     "environment": "Topology cluster",
-                    "id": "153",
+                    "id": "156",
                     "instanceId": 1,
                     "properties": {
                       "structurizr.dsl.identifier": "cluster_workload-proxy"
@@ -607,49 +607,49 @@
                     "relationships": [
                       {
                         "description": "Calls authorized operations with launch X.509-SVID",
-                        "destinationId": "130",
-                        "id": "155",
-                        "linkedRelationshipId": "93",
-                        "sourceId": "153",
+                        "destinationId": "133",
+                        "id": "158",
+                        "linkedRelationshipId": "96",
+                        "sourceId": "156",
                         "technology": "Workload mutual TLS over overlay"
                       },
                       {
                         "description": "Calls allowed tools with launch X.509-SVID",
-                        "destinationId": "136",
-                        "id": "157",
-                        "linkedRelationshipId": "94",
-                        "sourceId": "153",
+                        "destinationId": "139",
+                        "id": "160",
+                        "linkedRelationshipId": "97",
+                        "sourceId": "156",
                         "technology": "Workload mutual TLS over overlay"
                       },
                       {
                         "description": "Enrolls its own node with an SVID; membership grants no service access",
-                        "destinationId": "142",
-                        "id": "158",
-                        "linkedRelationshipId": "103",
-                        "sourceId": "153",
+                        "destinationId": "145",
+                        "id": "161",
+                        "linkedRelationshipId": "106",
+                        "sourceId": "156",
                         "technology": "Overlay control"
                       },
                       {
                         "description": "Uses encrypted relay transport when needed",
-                        "destinationId": "144",
-                        "id": "159",
-                        "linkedRelationshipId": "105",
-                        "sourceId": "153",
+                        "destinationId": "147",
+                        "id": "162",
+                        "linkedRelationshipId": "108",
+                        "sourceId": "156",
                         "technology": "Overlay transport"
                       },
                       {
                         "description": "Dials directly; both mediators check the connection",
-                        "destinationId": "168",
-                        "id": "169",
-                        "linkedRelationshipId": "102",
-                        "sourceId": "153",
+                        "destinationId": "171",
+                        "id": "172",
+                        "linkedRelationshipId": "105",
+                        "sourceId": "156",
                         "technology": "SPIFFE mutual TLS over overlay"
                       },
                       {
                         "description": "Launch identity",
-                        "destinationId": "127",
-                        "id": "179",
-                        "sourceId": "153",
+                        "destinationId": "130",
+                        "id": "182",
+                        "sourceId": "156",
                         "tags": "Relationship",
                         "technology": "Coarse service access"
                       }
@@ -659,7 +659,7 @@
                 ],
                 "description": "Independent mediator, workload proxy and guest; no shared launch data path.",
                 "environment": "Topology cluster",
-                "id": "152",
+                "id": "155",
                 "instances": "1",
                 "name": "Agent launch boundary",
                 "properties": {
@@ -671,7 +671,7 @@
             ],
             "description": "Host management is separate from launch traffic.",
             "environment": "Topology cluster",
-            "id": "145",
+            "id": "148",
             "instances": "1",
             "name": "Workload host boundary",
             "properties": {
@@ -687,7 +687,7 @@
                   {
                     "containerId": "27",
                     "environment": "Topology cluster",
-                    "id": "162",
+                    "id": "165",
                     "instanceId": 1,
                     "properties": {
                       "structurizr.dsl.identifier": "cluster_otherHost"
@@ -695,33 +695,33 @@
                     "relationships": [
                       {
                         "description": "Registers host and reports capacity over host-initiated connections",
-                        "destinationId": "130",
-                        "id": "164",
-                        "linkedRelationshipId": "80",
-                        "sourceId": "162",
+                        "destinationId": "133",
+                        "id": "167",
+                        "linkedRelationshipId": "81",
+                        "sourceId": "165",
                         "technology": "Workload mutual TLS over overlay"
                       },
                       {
                         "description": "Requests preview as host identity",
-                        "destinationId": "133",
-                        "id": "165",
-                        "linkedRelationshipId": "73",
-                        "sourceId": "162",
+                        "destinationId": "136",
+                        "id": "168",
+                        "linkedRelationshipId": "74",
+                        "sourceId": "165",
                         "technology": "Workload mutual TLS over overlay"
                       },
                       {
                         "description": "Obtains overlay coordination through afakt interface",
-                        "destinationId": "142",
-                        "id": "166",
-                        "linkedRelationshipId": "104",
-                        "sourceId": "162",
+                        "destinationId": "145",
+                        "id": "169",
+                        "linkedRelationshipId": "107",
+                        "sourceId": "165",
                         "technology": "Overlay control"
                       },
                       {
                         "description": "Host identity",
-                        "destinationId": "127",
-                        "id": "178",
-                        "sourceId": "162",
+                        "destinationId": "130",
+                        "id": "181",
+                        "sourceId": "165",
                         "tags": "Relationship",
                         "technology": "Overlay membership"
                       }
@@ -731,7 +731,7 @@
                 ],
                 "description": "Independent host identity; optional attached user tailnet.",
                 "environment": "Topology cluster",
-                "id": "161",
+                "id": "164",
                 "instances": "1",
                 "name": "Another host node",
                 "properties": {
@@ -745,7 +745,7 @@
                   {
                     "containerId": "33",
                     "environment": "Topology cluster",
-                    "id": "168",
+                    "id": "171",
                     "instanceId": 1,
                     "properties": {
                       "structurizr.dsl.identifier": "cluster_destination-workload-proxy"
@@ -753,9 +753,9 @@
                     "relationships": [
                       {
                         "description": "Destination launch identity",
-                        "destinationId": "127",
-                        "id": "180",
-                        "sourceId": "168",
+                        "destinationId": "130",
+                        "id": "183",
+                        "sourceId": "171",
                         "tags": "Relationship",
                         "technology": "Coarse service access"
                       }
@@ -765,7 +765,7 @@
                 ],
                 "description": "Independent launch connection.",
                 "environment": "Topology cluster",
-                "id": "167",
+                "id": "170",
                 "instances": "1",
                 "name": "Another launch boundary",
                 "properties": {
@@ -777,7 +777,7 @@
             ],
             "description": "Independent host and launch identities.",
             "environment": "Topology cluster",
-            "id": "160",
+            "id": "163",
             "instances": "1",
             "name": "Another workload host boundary",
             "properties": {
@@ -789,12 +789,12 @@
         ],
         "description": "Tailscale tsnet nodes use isolated Headscale; every node retains a static stable-node map.",
         "environment": "Topology cluster",
-        "id": "126",
+        "id": "129",
         "infrastructureNodes": [
           {
             "description": "Each cluster node retains a static map of stable nodes. Ingress rules admit only the gateway and named peers.",
             "environment": "Topology cluster",
-            "id": "127",
+            "id": "130",
             "name": "Private overlay reachability",
             "properties": {
               "structurizr.dsl.identifier": "clusterOverlay"
@@ -818,7 +818,7 @@
               {
                 "containerId": "23",
                 "environment": "Topology host",
-                "id": "183",
+                "id": "186",
                 "instanceId": 1,
                 "properties": {
                   "structurizr.dsl.identifier": "host_hostWorker"
@@ -826,50 +826,50 @@
                 "relationships": [
                   {
                     "description": "Requests authorized setup and launch operations",
-                    "destinationId": "185",
-                    "id": "186",
-                    "linkedRelationshipId": "75",
-                    "sourceId": "183",
+                    "destinationId": "188",
+                    "id": "189",
+                    "linkedRelationshipId": "76",
+                    "sourceId": "186",
                     "technology": "Authenticated local control"
                   },
                   {
                     "description": "Requires host name resolution",
-                    "destinationId": "187",
-                    "id": "188",
-                    "linkedRelationshipId": "76",
-                    "sourceId": "183",
+                    "destinationId": "190",
+                    "id": "191",
+                    "linkedRelationshipId": "77",
+                    "sourceId": "186",
                     "technology": "Local control"
                   },
                   {
                     "description": "Initiates control connections; requests desired state and reports observations",
-                    "destinationId": "191",
-                    "id": "192",
-                    "linkedRelationshipId": "79",
-                    "sourceId": "183",
+                    "destinationId": "194",
+                    "id": "195",
+                    "linkedRelationshipId": "80",
+                    "sourceId": "186",
                     "technology": "Local channel"
                   },
                   {
                     "description": "Observes workload execution and reclaim; lifecycle owner undecided",
-                    "destinationId": "196",
-                    "id": "197",
-                    "linkedRelationshipId": "74",
-                    "sourceId": "183",
+                    "destinationId": "199",
+                    "id": "200",
+                    "linkedRelationshipId": "75",
+                    "sourceId": "186",
                     "technology": "Local observation"
                   },
                   {
                     "description": "Starts and manages launch; no data forwarding",
-                    "destinationId": "199",
-                    "id": "200",
-                    "linkedRelationshipId": "77",
-                    "sourceId": "183",
+                    "destinationId": "202",
+                    "id": "203",
+                    "linkedRelationshipId": "78",
+                    "sourceId": "186",
                     "technology": "Local lifecycle control"
                   },
                   {
                     "description": "Starts and manages destination launch; no data forwarding",
-                    "destinationId": "211",
-                    "id": "212",
-                    "linkedRelationshipId": "78",
-                    "sourceId": "183",
+                    "destinationId": "214",
+                    "id": "215",
+                    "linkedRelationshipId": "79",
+                    "sourceId": "186",
                     "technology": "Local lifecycle control"
                   }
                 ],
@@ -878,7 +878,7 @@
             ],
             "description": "Separate from the host-mode agent user.",
             "environment": "Topology host",
-            "id": "182",
+            "id": "185",
             "instances": "1",
             "name": "Dedicated worker user",
             "properties": {
@@ -892,7 +892,7 @@
               {
                 "containerId": "24",
                 "environment": "Topology host",
-                "id": "185",
+                "id": "188",
                 "instanceId": 1,
                 "properties": {
                   "structurizr.dsl.identifier": "host_helper"
@@ -902,7 +902,7 @@
             ],
             "description": "Helper authority and caller binding remain undecided.",
             "environment": "Topology host",
-            "id": "184",
+            "id": "187",
             "instances": "1",
             "name": "Privileged setup boundary",
             "properties": {
@@ -916,7 +916,7 @@
               {
                 "containerId": "26",
                 "environment": "Topology host",
-                "id": "190",
+                "id": "193",
                 "instanceId": 1,
                 "properties": {
                   "structurizr.dsl.identifier": "host_loopbackProxy"
@@ -924,10 +924,10 @@
                 "relationships": [
                   {
                     "description": "Uses host-level authorization",
-                    "destinationId": "191",
-                    "id": "193",
-                    "linkedRelationshipId": "72",
-                    "sourceId": "190",
+                    "destinationId": "194",
+                    "id": "196",
+                    "linkedRelationshipId": "73",
+                    "sourceId": "193",
                     "technology": "Connection mechanism undecided"
                   }
                 ],
@@ -936,7 +936,7 @@
               {
                 "containerId": "27",
                 "environment": "Topology host",
-                "id": "191",
+                "id": "194",
                 "instanceId": 1,
                 "properties": {
                   "structurizr.dsl.identifier": "host_hostNetwork"
@@ -946,7 +946,7 @@
             ],
             "description": "Host access requires authorization; name resolution grants none.",
             "environment": "Topology host",
-            "id": "189",
+            "id": "192",
             "instances": "1",
             "name": "Operator access boundary",
             "properties": {
@@ -962,7 +962,7 @@
                   {
                     "containerId": "28",
                     "environment": "Topology host",
-                    "id": "196",
+                    "id": "199",
                     "instanceId": 1,
                     "properties": {
                       "structurizr.dsl.identifier": "host_guest"
@@ -970,10 +970,10 @@
                     "relationships": [
                       {
                         "description": "Sends workload traffic including DNS, TCP, UDP and QUIC",
-                        "destinationId": "202",
-                        "id": "204",
-                        "linkedRelationshipId": "91",
-                        "sourceId": "196",
+                        "destinationId": "205",
+                        "id": "207",
+                        "linkedRelationshipId": "94",
+                        "sourceId": "199",
                         "technology": "Private workload link"
                       }
                     ],
@@ -982,7 +982,7 @@
                 ],
                 "description": "Host mode uses the dedicated agent user, separate from the worker.",
                 "environment": "Topology host",
-                "id": "195",
+                "id": "198",
                 "instances": "1",
                 "name": "Guest A",
                 "properties": {
@@ -996,7 +996,7 @@
                   {
                     "containerId": "29",
                     "environment": "Topology host",
-                    "id": "199",
+                    "id": "202",
                     "instanceId": 1,
                     "properties": {
                       "structurizr.dsl.identifier": "host_mediator"
@@ -1004,10 +1004,10 @@
                     "relationships": [
                       {
                         "description": "Returns connection decision and stamped launch identity",
-                        "destinationId": "202",
-                        "id": "206",
-                        "linkedRelationshipId": "92",
-                        "sourceId": "199",
+                        "destinationId": "205",
+                        "id": "209",
+                        "linkedRelationshipId": "95",
+                        "sourceId": "202",
                         "technology": "Local channel"
                       }
                     ],
@@ -1016,7 +1016,7 @@
                 ],
                 "description": "Policy boundary; no independent network.",
                 "environment": "Topology host",
-                "id": "198",
+                "id": "201",
                 "instances": "1",
                 "name": "Mediator A",
                 "properties": {
@@ -1030,7 +1030,7 @@
                   {
                     "containerId": "30",
                     "environment": "Topology host",
-                    "id": "202",
+                    "id": "205",
                     "instanceId": 1,
                     "properties": {
                       "structurizr.dsl.identifier": "host_workload-proxy"
@@ -1038,26 +1038,26 @@
                     "relationships": [
                       {
                         "description": "Carries permitted ingress; published-port binding open",
-                        "destinationId": "196",
-                        "id": "203",
-                        "linkedRelationshipId": "97",
-                        "sourceId": "202",
+                        "destinationId": "199",
+                        "id": "206",
+                        "linkedRelationshipId": "100",
+                        "sourceId": "205",
                         "technology": "Private workload link"
                       },
                       {
                         "description": "Asks for inbound and outbound connection decisions",
-                        "destinationId": "199",
-                        "id": "205",
-                        "linkedRelationshipId": "96",
-                        "sourceId": "202",
+                        "destinationId": "202",
+                        "id": "208",
+                        "linkedRelationshipId": "99",
+                        "sourceId": "205",
                         "technology": "Local channel"
                       },
                       {
                         "description": "Dials directly; both mediators check the connection",
-                        "destinationId": "214",
-                        "id": "215",
-                        "linkedRelationshipId": "102",
-                        "sourceId": "202",
+                        "destinationId": "217",
+                        "id": "218",
+                        "linkedRelationshipId": "105",
+                        "sourceId": "205",
                         "technology": "SPIFFE mutual TLS over overlay"
                       }
                     ],
@@ -1066,7 +1066,7 @@
                 ],
                 "description": "Own overlay node and launch X.509-SVID; carries workload traffic.",
                 "environment": "Topology host",
-                "id": "201",
+                "id": "204",
                 "instances": "1",
                 "name": "Workload proxy A",
                 "properties": {
@@ -1078,7 +1078,7 @@
             ],
             "description": "Independent data path; mediation and network users undecided.",
             "environment": "Topology host",
-            "id": "194",
+            "id": "197",
             "instances": "1",
             "name": "Agent launch A",
             "properties": {
@@ -1094,7 +1094,7 @@
                   {
                     "containerId": "31",
                     "environment": "Topology host",
-                    "id": "209",
+                    "id": "212",
                     "instanceId": 1,
                     "properties": {
                       "structurizr.dsl.identifier": "host_destinationGuest"
@@ -1102,10 +1102,10 @@
                     "relationships": [
                       {
                         "description": "Sends destination workload traffic",
-                        "destinationId": "214",
-                        "id": "217",
-                        "linkedRelationshipId": "98",
-                        "sourceId": "209",
+                        "destinationId": "217",
+                        "id": "220",
+                        "linkedRelationshipId": "101",
+                        "sourceId": "212",
                         "technology": "Private workload link"
                       }
                     ],
@@ -1114,7 +1114,7 @@
                 ],
                 "description": "Host mode uses the dedicated agent user, separate from the worker.",
                 "environment": "Topology host",
-                "id": "208",
+                "id": "211",
                 "instances": "1",
                 "name": "Guest B",
                 "properties": {
@@ -1128,7 +1128,7 @@
                   {
                     "containerId": "32",
                     "environment": "Topology host",
-                    "id": "211",
+                    "id": "214",
                     "instanceId": 1,
                     "properties": {
                       "structurizr.dsl.identifier": "host_destinationMediator"
@@ -1136,10 +1136,10 @@
                     "relationships": [
                       {
                         "description": "Returns destination connection decision",
-                        "destinationId": "214",
-                        "id": "219",
-                        "linkedRelationshipId": "99",
-                        "sourceId": "211",
+                        "destinationId": "217",
+                        "id": "222",
+                        "linkedRelationshipId": "102",
+                        "sourceId": "214",
                         "technology": "Local channel"
                       }
                     ],
@@ -1148,7 +1148,7 @@
                 ],
                 "description": "Policy boundary; no independent network.",
                 "environment": "Topology host",
-                "id": "210",
+                "id": "213",
                 "instances": "1",
                 "name": "Mediator B",
                 "properties": {
@@ -1162,7 +1162,7 @@
                   {
                     "containerId": "33",
                     "environment": "Topology host",
-                    "id": "214",
+                    "id": "217",
                     "instanceId": 1,
                     "properties": {
                       "structurizr.dsl.identifier": "host_destination-workload-proxy"
@@ -1170,18 +1170,18 @@
                     "relationships": [
                       {
                         "description": "Carries permitted ingress; published-port binding open",
-                        "destinationId": "209",
-                        "id": "216",
-                        "linkedRelationshipId": "101",
-                        "sourceId": "214",
+                        "destinationId": "212",
+                        "id": "219",
+                        "linkedRelationshipId": "104",
+                        "sourceId": "217",
                         "technology": "Private workload link"
                       },
                       {
                         "description": "Requests decision with source identity and target grant",
-                        "destinationId": "211",
-                        "id": "218",
-                        "linkedRelationshipId": "100",
-                        "sourceId": "214",
+                        "destinationId": "214",
+                        "id": "221",
+                        "linkedRelationshipId": "103",
+                        "sourceId": "217",
                         "technology": "Local channel"
                       }
                     ],
@@ -1190,7 +1190,7 @@
                 ],
                 "description": "Own overlay node and launch X.509-SVID; carries workload traffic.",
                 "environment": "Topology host",
-                "id": "213",
+                "id": "216",
                 "instances": "1",
                 "name": "Workload proxy B",
                 "properties": {
@@ -1202,7 +1202,7 @@
             ],
             "description": "Independent data path; same-host traffic uses the overlay.",
             "environment": "Topology host",
-            "id": "207",
+            "id": "210",
             "instances": "1",
             "name": "Agent launch B",
             "properties": {
@@ -1216,7 +1216,7 @@
           {
             "containerId": "25",
             "environment": "Topology host",
-            "id": "187",
+            "id": "190",
             "instanceId": 1,
             "properties": {
               "structurizr.dsl.identifier": "host_hostResolver"
@@ -1226,7 +1226,7 @@
         ],
         "description": "Privileged host control remains outside every guest.",
         "environment": "Topology host",
-        "id": "181",
+        "id": "184",
         "instances": "1",
         "name": "Workload host trust boundary",
         "properties": {
@@ -1244,7 +1244,7 @@
                   {
                     "containerId": "28",
                     "environment": "Topology launch",
-                    "id": "223",
+                    "id": "226",
                     "instanceId": 1,
                     "properties": {
                       "structurizr.dsl.identifier": "launch_guest"
@@ -1252,10 +1252,10 @@
                     "relationships": [
                       {
                         "description": "Sends workload traffic including DNS, TCP, UDP and QUIC",
-                        "destinationId": "227",
-                        "id": "229",
-                        "linkedRelationshipId": "91",
-                        "sourceId": "223",
+                        "destinationId": "230",
+                        "id": "232",
+                        "linkedRelationshipId": "94",
+                        "sourceId": "226",
                         "technology": "Private workload link"
                       }
                     ],
@@ -1264,7 +1264,7 @@
                 ],
                 "description": "Guest has no overlay node or workload key.",
                 "environment": "Topology launch",
-                "id": "222",
+                "id": "225",
                 "instances": "1",
                 "name": "Guest trust boundary",
                 "properties": {
@@ -1278,7 +1278,7 @@
                   {
                     "containerId": "29",
                     "environment": "Topology launch",
-                    "id": "225",
+                    "id": "228",
                     "instanceId": 1,
                     "properties": {
                       "structurizr.dsl.identifier": "launch_mediator"
@@ -1286,10 +1286,10 @@
                     "relationships": [
                       {
                         "description": "Returns connection decision and stamped launch identity",
-                        "destinationId": "227",
-                        "id": "231",
-                        "linkedRelationshipId": "92",
-                        "sourceId": "225",
+                        "destinationId": "230",
+                        "id": "234",
+                        "linkedRelationshipId": "95",
+                        "sourceId": "228",
                         "technology": "Local channel"
                       }
                     ],
@@ -1298,7 +1298,7 @@
                 ],
                 "description": "Enforces connection and message policy; no independent network.",
                 "environment": "Topology launch",
-                "id": "224",
+                "id": "227",
                 "instances": "1",
                 "name": "Mediation trust boundary",
                 "properties": {
@@ -1312,7 +1312,7 @@
                   {
                     "containerId": "30",
                     "environment": "Topology launch",
-                    "id": "227",
+                    "id": "230",
                     "instanceId": 1,
                     "properties": {
                       "structurizr.dsl.identifier": "launch_workload-proxy"
@@ -1320,34 +1320,34 @@
                     "relationships": [
                       {
                         "description": "Carries permitted ingress; published-port binding open",
-                        "destinationId": "223",
-                        "id": "228",
-                        "linkedRelationshipId": "97",
-                        "sourceId": "227",
+                        "destinationId": "226",
+                        "id": "231",
+                        "linkedRelationshipId": "100",
+                        "sourceId": "230",
                         "technology": "Private workload link"
                       },
                       {
                         "description": "Asks for inbound and outbound connection decisions",
-                        "destinationId": "225",
-                        "id": "230",
-                        "linkedRelationshipId": "96",
-                        "sourceId": "227",
+                        "destinationId": "228",
+                        "id": "233",
+                        "linkedRelationshipId": "99",
+                        "sourceId": "230",
                         "technology": "Local channel"
                       },
                       {
                         "description": "Calls authorized operations with launch X.509-SVID",
-                        "destinationId": "234",
-                        "id": "235",
-                        "linkedRelationshipId": "93",
-                        "sourceId": "227",
+                        "destinationId": "237",
+                        "id": "238",
+                        "linkedRelationshipId": "96",
+                        "sourceId": "230",
                         "technology": "Workload mutual TLS over overlay"
                       },
                       {
                         "description": "Opens permitted egress; inspection where required",
-                        "destinationId": "237",
-                        "id": "238",
-                        "linkedRelationshipId": "95",
-                        "sourceId": "227",
+                        "destinationId": "240",
+                        "id": "241",
+                        "linkedRelationshipId": "98",
+                        "sourceId": "230",
                         "technology": "Destination protocol"
                       }
                     ],
@@ -1356,7 +1356,7 @@
                 ],
                 "description": "Only launch component opening off-host connections.",
                 "environment": "Topology launch",
-                "id": "226",
+                "id": "229",
                 "instances": "1",
                 "name": "Workload proxy trust boundary",
                 "properties": {
@@ -1368,7 +1368,7 @@
             ],
             "description": "Launch-bound local carriers; private keys stay outside the guest.",
             "environment": "Topology launch",
-            "id": "221",
+            "id": "224",
             "instances": "1",
             "name": "Agent launch boundary",
             "properties": {
@@ -1380,7 +1380,7 @@
         ],
         "description": "Worker stays outside this data path; service users undecided.",
         "environment": "Topology launch",
-        "id": "220",
+        "id": "223",
         "instances": "1",
         "name": "Workload host trust boundary",
         "properties": {
@@ -1396,7 +1396,7 @@
               {
                 "containerId": "16",
                 "environment": "Topology launch",
-                "id": "234",
+                "id": "237",
                 "instanceId": 1,
                 "properties": {
                   "structurizr.dsl.identifier": "launch_controlApi"
@@ -1406,7 +1406,7 @@
             ],
             "description": "Checks live launch capabilities and scopes.",
             "environment": "Topology launch",
-            "id": "233",
+            "id": "236",
             "instances": "1",
             "name": "API service node",
             "properties": {
@@ -1418,7 +1418,7 @@
         ],
         "description": "Service identities authenticate workload connections.",
         "environment": "Topology launch",
-        "id": "232",
+        "id": "235",
         "instances": "1",
         "name": "Control plane trust boundary",
         "properties": {
@@ -1430,7 +1430,7 @@
       {
         "description": "Destination authentication differs from workload identity.",
         "environment": "Topology launch",
-        "id": "236",
+        "id": "239",
         "instances": "1",
         "name": "Internet boundary",
         "properties": {
@@ -1439,12 +1439,12 @@
         "softwareSystemInstances": [
           {
             "environment": "Topology launch",
-            "id": "237",
+            "id": "240",
             "instanceId": 1,
             "properties": {
               "structurizr.dsl.identifier": "launch_internet"
             },
-            "softwareSystemId": "69",
+            "softwareSystemId": "70",
             "tags": "Software System Instance"
           }
         ],
@@ -1487,7 +1487,7 @@
           },
           {
             "description": "Uses the dashboard",
-            "destinationId": "11",
+            "destinationId": "15",
             "id": "37",
             "sourceId": "1",
             "tags": "Relationship",
@@ -1495,7 +1495,7 @@
           },
           {
             "description": "Inspects workflows",
-            "destinationId": "15",
+            "destinationId": "14",
             "id": "38",
             "sourceId": "1",
             "tags": "Relationship",
@@ -1518,7 +1518,7 @@
           {
             "description": "Delivers webhooks",
             "destinationId": "10",
-            "id": "44",
+            "id": "45",
             "sourceId": "2",
             "tags": "Relationship",
             "technology": "HTTP"
@@ -1526,16 +1526,16 @@
           {
             "description": "Delivers webhooks",
             "destinationId": "7",
-            "id": "45",
-            "linkedRelationshipId": "44",
+            "id": "46",
+            "linkedRelationshipId": "45",
             "sourceId": "2",
             "technology": "HTTP"
           },
           {
             "description": "Delivers webhooks",
             "destinationId": "6",
-            "id": "46",
-            "linkedRelationshipId": "44",
+            "id": "47",
+            "linkedRelationshipId": "45",
             "sourceId": "2",
             "technology": "HTTP"
           }
@@ -1634,8 +1634,8 @@
                 "relationships": [
                   {
                     "description": "Starts workflows in embedded mode",
-                    "destinationId": "12",
-                    "id": "52",
+                    "destinationId": "11",
+                    "id": "53",
                     "sourceId": "9",
                     "tags": "Relationship",
                     "technology": "Temporal"
@@ -1643,7 +1643,7 @@
                   {
                     "description": "Starts workflows in external mode",
                     "destinationId": "5",
-                    "id": "53",
+                    "id": "54",
                     "sourceId": "9",
                     "tags": "Relationship",
                     "technology": "Temporal"
@@ -1651,7 +1651,7 @@
                   {
                     "description": "Calls the GitHub API",
                     "destinationId": "2",
-                    "id": "54",
+                    "id": "55",
                     "sourceId": "9",
                     "tags": "Relationship",
                     "technology": "HTTP"
@@ -1672,15 +1672,15 @@
                   {
                     "description": "Calls the REST API",
                     "destinationId": "9",
-                    "id": "47",
+                    "id": "48",
                     "sourceId": "10",
                     "tags": "Relationship",
                     "technology": "HTTP"
                   },
                   {
                     "description": "Starts workflows in embedded mode",
-                    "destinationId": "12",
-                    "id": "48",
+                    "destinationId": "11",
+                    "id": "49",
                     "sourceId": "10",
                     "tags": "Relationship",
                     "technology": "Temporal"
@@ -1688,7 +1688,7 @@
                   {
                     "description": "Starts workflows in external mode",
                     "destinationId": "5",
-                    "id": "49",
+                    "id": "50",
                     "sourceId": "10",
                     "tags": "Relationship",
                     "technology": "Temporal"
@@ -1698,30 +1698,9 @@
                 "technology": "Go"
               },
               {
-                "description": "Provides the web UI from the API's origin.",
-                "documentation": {},
-                "id": "11",
-                "name": "Web dashboard",
-                "properties": {
-                  "structurizr.dsl.identifier": "dashboard"
-                },
-                "relationships": [
-                  {
-                    "description": "Calls the REST API",
-                    "destinationId": "9",
-                    "id": "43",
-                    "sourceId": "11",
-                    "tags": "Relationship",
-                    "technology": "HTTP"
-                  }
-                ],
-                "tags": "Element,Component",
-                "technology": "React"
-              },
-              {
                 "description": "Provides durable execution inside the process for development and tests.",
                 "documentation": {},
-                "id": "12",
+                "id": "11",
                 "name": "Embedded workflow orchestrator",
                 "properties": {
                   "structurizr.dsl.identifier": "orchestrator"
@@ -1732,7 +1711,7 @@
               {
                 "description": "Coordinate work on workers inside the binary and start other workflows.",
                 "documentation": {},
-                "id": "13",
+                "id": "12",
                 "name": "Coordination workflows",
                 "properties": {
                   "structurizr.dsl.identifier": "workflows"
@@ -1741,40 +1720,40 @@
                   {
                     "description": "Calls the REST API",
                     "destinationId": "9",
-                    "id": "57",
-                    "sourceId": "13",
+                    "id": "58",
+                    "sourceId": "12",
                     "tags": "Relationship",
                     "technology": "HTTP"
                   },
                   {
                     "description": "Calls the GitHub API",
                     "destinationId": "2",
-                    "id": "58",
-                    "sourceId": "13",
+                    "id": "59",
+                    "sourceId": "12",
                     "tags": "Relationship",
                     "technology": "HTTP"
                   },
                   {
                     "description": "Uses durable execution in embedded mode",
-                    "destinationId": "12",
-                    "id": "59",
-                    "sourceId": "13",
+                    "destinationId": "11",
+                    "id": "60",
+                    "sourceId": "12",
                     "tags": "Relationship",
                     "technology": "Temporal"
                   },
                   {
                     "description": "Uses durable execution in external mode",
                     "destinationId": "5",
-                    "id": "60",
-                    "sourceId": "13",
+                    "id": "61",
+                    "sourceId": "12",
                     "tags": "Relationship",
                     "technology": "Temporal"
                   },
                   {
                     "description": "Starts agent work",
-                    "destinationId": "14",
-                    "id": "61",
-                    "sourceId": "13",
+                    "destinationId": "13",
+                    "id": "62",
+                    "sourceId": "12",
                     "tags": "Relationship",
                     "technology": "Temporal"
                   }
@@ -1785,7 +1764,7 @@
               {
                 "description": "Runs AI coding agents as a workflow.",
                 "documentation": {},
-                "id": "14",
+                "id": "13",
                 "name": "Agent runner",
                 "properties": {
                   "structurizr.dsl.identifier": "runner"
@@ -1794,8 +1773,8 @@
                   {
                     "description": "Runs coding agents",
                     "destinationId": "4",
-                    "id": "62",
-                    "sourceId": "14",
+                    "id": "63",
+                    "sourceId": "13",
                     "tags": "Relationship",
                     "technology": "Process"
                   }
@@ -1806,7 +1785,7 @@
               {
                 "description": "Shows the embedded server's namespaces, workflows, and histories.",
                 "documentation": {},
-                "id": "15",
+                "id": "14",
                 "name": "Temporal Web UI",
                 "properties": {
                   "structurizr.dsl.identifier": "temporalUI"
@@ -1814,9 +1793,9 @@
                 "relationships": [
                   {
                     "description": "Reads namespaces and workflow histories",
-                    "destinationId": "12",
-                    "id": "65",
-                    "sourceId": "15",
+                    "destinationId": "11",
+                    "id": "66",
+                    "sourceId": "14",
                     "tags": "Relationship",
                     "technology": "Temporal"
                   }
@@ -1836,24 +1815,24 @@
               {
                 "description": "Starts workflows in external mode",
                 "destinationId": "5",
-                "id": "50",
-                "linkedRelationshipId": "49",
+                "id": "51",
+                "linkedRelationshipId": "50",
                 "sourceId": "7",
                 "technology": "Temporal"
               },
               {
                 "description": "Calls the GitHub API",
                 "destinationId": "2",
-                "id": "55",
-                "linkedRelationshipId": "54",
+                "id": "56",
+                "linkedRelationshipId": "55",
                 "sourceId": "7",
                 "technology": "HTTP"
               },
               {
                 "description": "Runs coding agents",
                 "destinationId": "4",
-                "id": "63",
-                "linkedRelationshipId": "62",
+                "id": "64",
+                "linkedRelationshipId": "63",
                 "sourceId": "7",
                 "technology": "Process"
               }
@@ -1862,11 +1841,49 @@
             "technology": "Go"
           },
           {
-            "description": "Serves workload resources and the dashboard; image and host-worker operations remain open.",
+            "description": "A platform app: a static single-page app on the static origin and a backend-for-frontend app workload that holds the user's session. The API origin routes /dashboard to it.",
+            "documentation": {},
+            "group": "Platform as a Service",
+            "id": "15",
+            "name": "Web dashboard",
+            "properties": {
+              "structurizr.dsl.identifier": "dashboard"
+            },
+            "relationships": [
+              {
+                "description": "Calls the REST API with the user's access token",
+                "destinationId": "9",
+                "id": "43",
+                "sourceId": "15",
+                "tags": "Relationship",
+                "technology": "HTTP"
+              },
+              {
+                "description": "Calls the REST API with the user's access token",
+                "destinationId": "7",
+                "id": "44",
+                "linkedRelationshipId": "43",
+                "sourceId": "15",
+                "technology": "HTTP"
+              },
+              {
+                "description": "Forwards API calls with the user's access token",
+                "destinationId": "16",
+                "id": "88",
+                "sourceId": "15",
+                "tags": "Relationship,TopologyConnection,OverviewHidden",
+                "technology": "Application protocol over overlay"
+              }
+            ],
+            "tags": "Element,Container",
+            "technology": "React"
+          },
+          {
+            "description": "Serves workload resources; image and host-worker operations remain open.",
             "documentation": {},
             "group": "Control plane services",
             "id": "16",
-            "name": "API server and web dashboard",
+            "name": "API server",
             "properties": {
               "structurizr.dsl.identifier": "controlApi"
             },
@@ -1886,7 +1903,7 @@
               {
                 "description": "Dials workload proxy; published-port binding open",
                 "destinationId": "30",
-                "id": "89",
+                "id": "92",
                 "sourceId": "17",
                 "tags": "Relationship,TopologyConnection,OverviewHidden",
                 "technology": "SPIFFE mutual TLS over overlay"
@@ -1908,7 +1925,7 @@
               {
                 "description": "Calls permitted operations with launch context",
                 "destinationId": "16",
-                "id": "90",
+                "id": "93",
                 "sourceId": "18",
                 "tags": "Relationship,TopologyConnection",
                 "technology": "Authenticated service connection"
@@ -1964,9 +1981,17 @@
             },
             "relationships": [
               {
-                "description": "Forwards authenticated dashboard and API requests",
+                "description": "Forwards authenticated API requests",
                 "destinationId": "16",
-                "id": "85",
+                "id": "86",
+                "sourceId": "22",
+                "tags": "Relationship,TopologyConnection,OverviewHidden",
+                "technology": "Application protocol over overlay"
+              },
+              {
+                "description": "Routes /dashboard on the API origin; assets to the static origin, session and API routes to the backend-for-frontend",
+                "destinationId": "15",
+                "id": "87",
                 "sourceId": "22",
                 "tags": "Relationship,TopologyConnection,OverviewHidden",
                 "technology": "Application protocol over overlay"
@@ -1974,7 +1999,7 @@
               {
                 "description": "Forwards preview requests with user context",
                 "destinationId": "17",
-                "id": "86",
+                "id": "89",
                 "sourceId": "22",
                 "tags": "Relationship,TopologyConnection,OverviewHidden",
                 "technology": "Application protocol over overlay"
@@ -1982,7 +2007,7 @@
               {
                 "description": "Forwards static site requests by hostname",
                 "destinationId": "19",
-                "id": "87",
+                "id": "90",
                 "sourceId": "22",
                 "tags": "Relationship,TopologyConnection,OverviewHidden",
                 "technology": "Application protocol over overlay"
@@ -1990,7 +2015,7 @@
               {
                 "description": "Dials permitted workload ingress directly",
                 "destinationId": "30",
-                "id": "88",
+                "id": "91",
                 "sourceId": "22",
                 "tags": "Relationship,TopologyConnection,OverviewHidden",
                 "technology": "SPIFFE mutual TLS over overlay"
@@ -2012,7 +2037,7 @@
               {
                 "description": "Observes workload execution and reclaim; lifecycle owner undecided",
                 "destinationId": "28",
-                "id": "74",
+                "id": "75",
                 "sourceId": "23",
                 "tags": "Relationship,LifecycleDetail,TopologyConnection,OverviewHidden",
                 "technology": "Local observation"
@@ -2020,7 +2045,7 @@
               {
                 "description": "Requests authorized setup and launch operations",
                 "destinationId": "24",
-                "id": "75",
+                "id": "76",
                 "sourceId": "23",
                 "tags": "Relationship,TopologyConnection",
                 "technology": "Authenticated local control"
@@ -2028,7 +2053,7 @@
               {
                 "description": "Requires host name resolution",
                 "destinationId": "25",
-                "id": "76",
+                "id": "77",
                 "sourceId": "23",
                 "tags": "Relationship,TopologyConnection,OverviewHidden",
                 "technology": "Local control"
@@ -2036,7 +2061,7 @@
               {
                 "description": "Starts and manages launch; no data forwarding",
                 "destinationId": "29",
-                "id": "77",
+                "id": "78",
                 "sourceId": "23",
                 "tags": "Relationship,LifecycleDetail,TopologyConnection,OverviewHidden",
                 "technology": "Local lifecycle control"
@@ -2044,7 +2069,7 @@
               {
                 "description": "Starts and manages destination launch; no data forwarding",
                 "destinationId": "32",
-                "id": "78",
+                "id": "79",
                 "sourceId": "23",
                 "tags": "Relationship,LifecycleDetail,TopologyConnection,OverviewHidden",
                 "technology": "Local lifecycle control"
@@ -2052,7 +2077,7 @@
               {
                 "description": "Initiates control connections; requests desired state and reports observations",
                 "destinationId": "27",
-                "id": "79",
+                "id": "80",
                 "sourceId": "23",
                 "tags": "Relationship,TopologyConnection",
                 "technology": "Local channel"
@@ -2098,7 +2123,7 @@
               {
                 "description": "Uses host-level authorization",
                 "destinationId": "27",
-                "id": "72",
+                "id": "73",
                 "sourceId": "26",
                 "tags": "Relationship,TopologyConnection,OverviewHidden",
                 "technology": "Connection mechanism undecided"
@@ -2120,7 +2145,7 @@
               {
                 "description": "Requests preview as host identity",
                 "destinationId": "17",
-                "id": "73",
+                "id": "74",
                 "sourceId": "27",
                 "tags": "Relationship,TopologyConnection,OverviewHidden",
                 "technology": "Workload mutual TLS over overlay"
@@ -2128,7 +2153,7 @@
               {
                 "description": "Registers host and reports capacity over host-initiated connections",
                 "destinationId": "16",
-                "id": "80",
+                "id": "81",
                 "sourceId": "27",
                 "tags": "Relationship,TopologyConnection",
                 "technology": "Workload mutual TLS over overlay"
@@ -2136,7 +2161,7 @@
               {
                 "description": "Obtains overlay coordination through afakt interface",
                 "destinationId": "20",
-                "id": "104",
+                "id": "107",
                 "sourceId": "27",
                 "tags": "Relationship,TopologyConnection,OverviewHidden",
                 "technology": "Overlay control"
@@ -2158,7 +2183,7 @@
               {
                 "description": "Sends workload traffic including DNS, TCP, UDP and QUIC",
                 "destinationId": "30",
-                "id": "91",
+                "id": "94",
                 "sourceId": "28",
                 "tags": "Relationship,TopologyConnection,OverviewHidden",
                 "technology": "Private workload link"
@@ -2180,7 +2205,7 @@
               {
                 "description": "Returns connection decision and stamped launch identity",
                 "destinationId": "30",
-                "id": "92",
+                "id": "95",
                 "sourceId": "29",
                 "tags": "Relationship,TopologyConnection,OverviewHidden",
                 "technology": "Local channel"
@@ -2202,7 +2227,7 @@
               {
                 "description": "Calls authorized operations with launch X.509-SVID",
                 "destinationId": "16",
-                "id": "93",
+                "id": "96",
                 "sourceId": "30",
                 "tags": "Relationship,TopologyConnection,OverviewHidden",
                 "technology": "Workload mutual TLS over overlay"
@@ -2210,15 +2235,15 @@
               {
                 "description": "Calls allowed tools with launch X.509-SVID",
                 "destinationId": "18",
-                "id": "94",
+                "id": "97",
                 "sourceId": "30",
                 "tags": "Relationship,TopologyConnection,OverviewHidden",
                 "technology": "Workload mutual TLS over overlay"
               },
               {
                 "description": "Opens permitted egress; inspection where required",
-                "destinationId": "69",
-                "id": "95",
+                "destinationId": "70",
+                "id": "98",
                 "sourceId": "30",
                 "tags": "Relationship,TopologyConnection,OverviewHidden",
                 "technology": "Destination protocol"
@@ -2226,7 +2251,7 @@
               {
                 "description": "Asks for inbound and outbound connection decisions",
                 "destinationId": "29",
-                "id": "96",
+                "id": "99",
                 "sourceId": "30",
                 "tags": "Relationship,TopologyConnection,ReturnDetail,OverviewHidden",
                 "technology": "Local channel"
@@ -2234,7 +2259,7 @@
               {
                 "description": "Carries permitted ingress; published-port binding open",
                 "destinationId": "28",
-                "id": "97",
+                "id": "100",
                 "sourceId": "30",
                 "tags": "Relationship,TopologyConnection,ReturnDetail,OverviewHidden",
                 "technology": "Private workload link"
@@ -2242,7 +2267,7 @@
               {
                 "description": "Dials directly; both mediators check the connection",
                 "destinationId": "33",
-                "id": "102",
+                "id": "105",
                 "sourceId": "30",
                 "tags": "Relationship,TopologyConnection,OverviewHidden",
                 "technology": "SPIFFE mutual TLS over overlay"
@@ -2250,7 +2275,7 @@
               {
                 "description": "Enrolls its own node with an SVID; membership grants no service access",
                 "destinationId": "20",
-                "id": "103",
+                "id": "106",
                 "sourceId": "30",
                 "tags": "Relationship,TopologyConnection,OverviewHidden",
                 "technology": "Overlay control"
@@ -2258,7 +2283,7 @@
               {
                 "description": "Uses encrypted relay transport when needed",
                 "destinationId": "21",
-                "id": "105",
+                "id": "108",
                 "sourceId": "30",
                 "tags": "Relationship,TopologyConnection,OverviewHidden",
                 "technology": "Overlay transport"
@@ -2280,7 +2305,7 @@
               {
                 "description": "Sends destination workload traffic",
                 "destinationId": "33",
-                "id": "98",
+                "id": "101",
                 "sourceId": "31",
                 "tags": "Relationship,TopologyConnection,OverviewHidden",
                 "technology": "Private workload link"
@@ -2302,7 +2327,7 @@
               {
                 "description": "Returns destination connection decision",
                 "destinationId": "33",
-                "id": "99",
+                "id": "102",
                 "sourceId": "32",
                 "tags": "Relationship,TopologyConnection,OverviewHidden",
                 "technology": "Local channel"
@@ -2324,7 +2349,7 @@
               {
                 "description": "Requests decision with source identity and target grant",
                 "destinationId": "32",
-                "id": "100",
+                "id": "103",
                 "sourceId": "33",
                 "tags": "Relationship,TopologyConnection,ReturnDetail,OverviewHidden",
                 "technology": "Local channel"
@@ -2332,7 +2357,7 @@
               {
                 "description": "Carries permitted ingress; published-port binding open",
                 "destinationId": "31",
-                "id": "101",
+                "id": "104",
                 "sourceId": "33",
                 "tags": "Relationship,TopologyConnection,ReturnDetail,OverviewHidden",
                 "technology": "Private workload link"
@@ -2353,24 +2378,24 @@
           {
             "description": "Starts workflows in external mode",
             "destinationId": "5",
-            "id": "51",
-            "linkedRelationshipId": "49",
+            "id": "52",
+            "linkedRelationshipId": "50",
             "sourceId": "6",
             "technology": "Temporal"
           },
           {
             "description": "Calls the GitHub API",
             "destinationId": "2",
-            "id": "56",
-            "linkedRelationshipId": "54",
+            "id": "57",
+            "linkedRelationshipId": "55",
             "sourceId": "6",
             "technology": "HTTP"
           },
           {
             "description": "Runs coding agents",
             "destinationId": "4",
-            "id": "64",
-            "linkedRelationshipId": "62",
+            "id": "65",
+            "linkedRelationshipId": "63",
             "sourceId": "6",
             "technology": "Process"
           }
@@ -2381,7 +2406,7 @@
         "description": "A browser under the operator's local user identity.",
         "documentation": {},
         "group": "Operator devices",
-        "id": "66",
+        "id": "67",
         "name": "Operator browser",
         "properties": {
           "structurizr.dsl.identifier": "browser"
@@ -2390,24 +2415,24 @@
           {
             "description": "Resolves *.afakt.internal",
             "destinationId": "25",
-            "id": "70",
-            "sourceId": "66",
+            "id": "71",
+            "sourceId": "67",
             "tags": "Relationship,TopologyConnection,OverviewHidden",
             "technology": "Local name query"
           },
           {
             "description": "Requests service, preview or port",
             "destinationId": "26",
-            "id": "71",
-            "sourceId": "66",
+            "id": "72",
+            "sourceId": "67",
             "tags": "Relationship,TopologyConnection,OverviewHidden",
             "technology": "Host access mechanism undecided"
           },
           {
             "description": "Sends public application requests as signed-in user",
             "destinationId": "22",
-            "id": "84",
-            "sourceId": "66",
+            "id": "85",
+            "sourceId": "67",
             "tags": "Relationship,TopologyConnection,OverviewHidden",
             "technology": "Transport Layer Security"
           }
@@ -2418,7 +2443,7 @@
         "description": "Operator devices using their attached user tailnet and afakt sign-in.",
         "documentation": {},
         "group": "Operator devices",
-        "id": "67",
+        "id": "68",
         "name": "Phone and native clients",
         "properties": {
           "structurizr.dsl.identifier": "phone"
@@ -2426,9 +2451,9 @@
         "relationships": [
           {
             "description": "Connects with device identity",
-            "destinationId": "68",
-            "id": "81",
-            "sourceId": "67",
+            "destinationId": "69",
+            "id": "82",
+            "sourceId": "68",
             "tags": "Relationship,TopologyConnection,OverviewHidden",
             "technology": "User tailnet"
           }
@@ -2439,7 +2464,7 @@
         "description": "User-controlled private connectivity; separate from the cluster overlay.",
         "documentation": {},
         "group": "User network boundary",
-        "id": "68",
+        "id": "69",
         "name": "Attached user tailnet",
         "properties": {
           "structurizr.dsl.identifier": "userTailnet"
@@ -2448,16 +2473,16 @@
           {
             "description": "Delivers application requests",
             "destinationId": "22",
-            "id": "82",
-            "sourceId": "68",
+            "id": "83",
+            "sourceId": "69",
             "tags": "Relationship,ClusterAttachment,OverviewHidden",
             "technology": "Transport Layer Security"
           },
           {
             "description": "Optional host attachment; application access only",
             "destinationId": "27",
-            "id": "83",
-            "sourceId": "68",
+            "id": "84",
+            "sourceId": "69",
             "tags": "Relationship,ClusterAttachment,OverviewHidden",
             "technology": "User tailnet"
           }
@@ -2468,7 +2493,7 @@
         "description": "Permitted upstream destinations outside the cluster trust domain.",
         "documentation": {},
         "group": "External service boundary",
-        "id": "69",
+        "id": "70",
         "name": "Internet services",
         "properties": {
           "structurizr.dsl.identifier": "internet"
@@ -2481,7 +2506,7 @@
   "properties": {
     "structurizr.inspection.error": "0",
     "structurizr.inspection.model.softwaresystem.documentation": "ignore",
-    "structurizr.dsl": "d29ya3NwYWNlICJhZmFrdCIgIkFyY2hpdGVjdHVyZSBvZiB0aGUgYWZha3QgbW9kdWxhciBtb25vbGl0aC4iIHsKICAgIHByb3BlcnRpZXMgewogICAgICAgIC8vIERvY3VtZW50YXRpb24gYW5kIGRlY2lzaW9ucyBzdGF5IGluIHRoZSByZXBvc2l0b3J5J3MgZG9jcyBidW5kbGUuCiAgICAgICAgc3RydWN0dXJpenIuaW5zcGVjdGlvbi5tb2RlbC5zb2Z0d2FyZXN5c3RlbS5kb2N1bWVudGF0aW9uIGlnbm9yZQogICAgICAgIHN0cnVjdHVyaXpyLmluc3BlY3Rpb24ubW9kZWwuc29mdHdhcmVzeXN0ZW0uZGVjaXNpb25zIGlnbm9yZQogICAgfQoKICAgIG1vZGVsIHsKICAgICAgICBkZXZlbG9wZXIgPSBwZXJzb24gIkRldmVsb3BlciBvciB0ZXN0ZXIiICJSdW5zIGFmYWt0IGFuZCBpbnNwZWN0cyBpdHMgd29ya2Zsb3dzLiIKICAgICAgICBnaXRodWIgPSBzb2Z0d2FyZVN5c3RlbSAiR2l0SHViIiAiRGVsaXZlcnMgd2ViaG9va3MgYW5kIGV4cG9zZXMgdGhlIEdpdEh1YiBBUEkuIgogICAgICAgIG5hdGl2ZSA9IHNvZnR3YXJlU3lzdGVtICJOYXRpdmUgYXBwcyIgIkNsaWVudHMgb2YgYWZha3QncyBSRVNUIEFQSS4iCiAgICAgICAgYWdlbnRzID0gc29mdHdhcmVTeXN0ZW0gIkFJIGNvZGluZyBhZ2VudHMiICJQZXJmb3JtIGNvZGluZyB3b3JrIHN0YXJ0ZWQgYnkgQWdlbnQgcnVubmVyLiIKICAgICAgICB0ZW1wb3JhbCA9IHNvZnR3YXJlU3lzdGVtICJFeHRlcm5hbCBUZW1wb3JhbCIgIlByb3ZpZGVzIGR1cmFibGUgZXhlY3V0aW9uIHdoZW4gd29ya2VycyB1c2UgYW4gZXh0ZXJuYWwgc2VydmVyLiIKCiAgICAgICAgYWZha3QgPSBzb2Z0d2FyZVN5c3RlbSAiYWZha3QiICJDb29yZGluYXRlcyBjb2Rpbmcgd29yayB0aHJvdWdoIGl0cyBBUEkgYW5kIHdvcmtmbG93cy4iIHsKICAgICAgICAgICAgcnVudGltZSA9IGNvbnRhaW5lciAiYWZha3QgcHJvY2VzcyIgIlJ1bnMgdGhlIHNlbGVjdGVkIHJ1bnRpbWUgc2VydmljZXMgdG9nZXRoZXIgb3Igc2VwYXJhdGVseSBmcm9tIHRoZSBzYW1lIGJpbmFyeS4iICJHbyIgewogICAgICAgICAgICAgICAgY2xpID0gY29tcG9uZW50ICJDb21tYW5kLWxpbmUgaW50ZXJmYWNlIiAiUnVucyBzZXJ2ZXIgc2VydmljZXMgYW5kIGNvbW11bmljYXRlcyB3aXRoIHRoZSBBUEkuIiAiR28iCiAgICAgICAgICAgICAgICBhcGkgPSBjb21wb25lbnQgIkFQSSBzZXJ2ZXIiICJTZXJ2ZXMgdGhlIFJFU1QgQVBJIGFuZCBzdGFydHMgd29ya2Zsb3dzLiIgIkdvIgogICAgICAgICAgICAgICAgd2ViaG9vayA9IGNvbXBvbmVudCAiR2l0SHViIHdlYmhvb2sgcmVjZWl2ZXIiICJBY2NlcHRzIHdlYmhvb2sgZGVsaXZlcmllcyBhbmQgc3RhcnRzIGNvb3JkaW5hdGlvbiB3b3JrLiIgIkdvIgogICAgICAgICAgICAgICAgZGFzaGJvYXJkID0gY29tcG9uZW50ICJXZWIgZGFzaGJvYXJkIiAiUHJvdmlkZXMgdGhlIHdlYiBVSSBmcm9tIHRoZSBBUEkncyBvcmlnaW4uIiAiUmVhY3QiCiAgICAgICAgICAgICAgICBvcmNoZXN0cmF0b3IgPSBjb21wb25lbnQgIkVtYmVkZGVkIHdvcmtmbG93IG9yY2hlc3RyYXRvciIgIlByb3ZpZGVzIGR1cmFibGUgZXhlY3V0aW9uIGluc2lkZSB0aGUgcHJvY2VzcyBmb3IgZGV2ZWxvcG1lbnQgYW5kIHRlc3RzLiIgIlRlbXBvcmFsIgogICAgICAgICAgICAgICAgd29ya2Zsb3dzID0gY29tcG9uZW50ICJDb29yZGluYXRpb24gd29ya2Zsb3dzIiAiQ29vcmRpbmF0ZSB3b3JrIG9uIHdvcmtlcnMgaW5zaWRlIHRoZSBiaW5hcnkgYW5kIHN0YXJ0IG90aGVyIHdvcmtmbG93cy4iICJUZW1wb3JhbCIKICAgICAgICAgICAgICAgIHJ1bm5lciA9IGNvbXBvbmVudCAiQWdlbnQgcnVubmVyIiAiUnVucyBBSSBjb2RpbmcgYWdlbnRzIGFzIGEgd29ya2Zsb3cuIiAiVGVtcG9yYWwiCiAgICAgICAgICAgICAgICB0ZW1wb3JhbFVJID0gY29tcG9uZW50ICJUZW1wb3JhbCBXZWIgVUkiICJTaG93cyB0aGUgZW1iZWRkZWQgc2VydmVyJ3MgbmFtZXNwYWNlcywgd29ya2Zsb3dzLCBhbmQgaGlzdG9yaWVzLiIgIlRlbXBvcmFsIgogICAgICAgICAgICB9CgogICAgICAgICAgICBncm91cCAiQ29udHJvbCBwbGFuZSBzZXJ2aWNlcyIgewogICAgICAgICAgICAgICAgY29udHJvbEFwaSA9IGNvbnRhaW5lciAiQVBJIHNlcnZlciBhbmQgd2ViIGRhc2hib2FyZCIgIlNlcnZlcyB3b3JrbG9hZCByZXNvdXJjZXMgYW5kIHRoZSBkYXNoYm9hcmQ7IGltYWdlIGFuZCBob3N0LXdvcmtlciBvcGVyYXRpb25zIHJlbWFpbiBvcGVuLiIgIkFwcGxpY2F0aW9uIHNlcnZpY2UiICJUb3BvbG9neSIKICAgICAgICAgICAgICAgIHByZXZpZXdTZXJ2ZXIgPSBjb250YWluZXIgIlByZXZpZXcgc2VydmVyIiAiRGlhbHMgd29ya2xvYWQgcHJveGllcyBvdmVyIHRoZSBvdmVybGF5OyBwdWJsaXNoZWQtcG9ydCBsaXN0ZW5lciBiaW5kaW5nIHJlbWFpbnMgb3Blbi4iICJBcHBsaWNhdGlvbiBzZXJ2aWNlIiAiVG9wb2xvZ3kiCiAgICAgICAgICAgICAgICBtY3BHYXRld2F5ID0gY29udGFpbmVyICJNQ1AgZ2F0ZXdheSIgIkNoZWNrcyBsYXVuY2ggdG9vbCBncmFudHMgYW5kIGtlZXBzIHVwc3RyZWFtIGNyZWRlbnRpYWxzIG91dHNpZGUgZ3Vlc3RzLiIgIkFwcGxpY2F0aW9uIHNlcnZpY2UiICJUb3BvbG9neSIKICAgICAgICAgICAgICAgIHN0YXRpY09yaWdpbiA9IGNvbnRhaW5lciAiU3RhdGljIG9yaWdpbiIgIlNlcnZlcyBzdGF0aWMgc2l0ZSBhbmQgc2luZ2xlLXBhZ2UgYXBwIGRlcGxveXMgZnJvbSBsb2NhbCBjb3BpZXMgb2YgdGhlaXIgZmlsZXM7IGtlZXBzIG5vIGNhY2hlLiIgIkNhZGR5IiAiVG9wb2xvZ3kiCiAgICAgICAgICAgICAgICBjb29yZGluYXRpb24gPSBjb250YWluZXIgIk92ZXJsYXkgY29vcmRpbmF0aW9uIiAiQW4gYWZha3QgaW50ZXJmYWNlIGZyb250cyBpc29sYXRlZCBIZWFkc2NhbGUgY29vcmRpbmF0aW9uOyBjbHVzdGVyIG5vZGVzIHJldGFpbiBhIHN0YXRpYyBtYXAgb2Ygc3RhYmxlIG5vZGVzLiIgIkhlYWRzY2FsZSIgIlRvcG9sb2d5IgogICAgICAgICAgICAgICAgb3ZlcmxheVJlbGF5ID0gY29udGFpbmVyICJPdmVybGF5IHJlbGF5IiAiQ2FycmllcyBlbmNyeXB0ZWQgb3ZlcmxheSB0cmFmZmljIHdoZW4gYSByZWxheSBwYXRoIGlzIG5lZWRlZC4iICJPdmVybGF5IHRyYW5zcG9ydCIgIlRvcG9sb2d5IgogICAgICAgICAgICB9CiAgICAgICAgICAgIGdyb3VwICJFeHRlcm5hbCBpbmdyZXNzIGJvdW5kYXJ5IiB7CiAgICAgICAgICAgICAgICBlZGdlID0gY29udGFpbmVyICJFeHRlcm5hbCBpbmdyZXNzIGdhdGV3YXkiICJBY2NlcHRzIHB1YmxpYyBhbmQgYXR0YWNoZWQtdGFpbG5ldCBhcHBsaWNhdGlvbiByZXF1ZXN0czsgbmV2ZXIgcm91dGVzIHBhY2tldHMgYmV0d2VlbiB0YWlsbmV0cyBhbmQgdGhlIGNsdXN0ZXIuIiAiQXBwbGljYXRpb24gcHJveHkiICJUb3BvbG9neSIKICAgICAgICAgICAgfQogICAgICAgICAgICBncm91cCAiSG9zdCBtYW5hZ2VtZW50IGJvdW5kYXJ5IiB7CiAgICAgICAgICAgICAgICBob3N0V29ya2VyID0gY29udGFpbmVyICJXb3JrbG9hZCBob3N0IHdvcmtlciIgIk9ic2VydmVzIHdvcmtsb2FkIGV4ZWN1dGlvbiBhcyBhIGRlZGljYXRlZCBub24tcm9vdCB1c2VyOyB3b3JrbG9hZCBsaWZlY3ljbGUgb3duZXJzaGlwIHJlbWFpbnMgb3Blbi4iICJIb3N0IHNlcnZpY2UiICJUb3BvbG9neSIKICAgICAgICAgICAgICAgIGhlbHBlciA9IGNvbnRhaW5lciAiUHJpdmlsZWdlZCBoZWxwZXIiICJQZXJmb3JtcyBuYXJyb3dseSBhdXRob3JpemVkIHNldHVwIGFuZCBsYXVuY2ggb3BlcmF0aW9uczsgY2FsbGVyIGJpbmRpbmcgaXMgdW5kZWNpZGVkLiIgIkhvc3QgcHJpdmlsZWdlIGJvdW5kYXJ5IiAiVG9wb2xvZ3kiCiAgICAgICAgICAgICAgICBob3N0UmVzb2x2ZXIgPSBjb250YWluZXIgIkhvc3QgbmFtZSByZXNvbHZlciIgIlJlc29sdmVzIG5hbWVzIHVuZGVyICouYWZha3QuaW50ZXJuYWwgZm9yIGhvc3QgY2xpZW50cy4iICJEb21haW4gTmFtZSBTeXN0ZW0iICJUb3BvbG9neSIKICAgICAgICAgICAgfQogICAgICAgICAgICBncm91cCAiT3BlcmF0b3IgYWNjZXNzIG9uIHRoZSB3b3JrbG9hZCBob3N0IiB7CiAgICAgICAgICAgICAgICBsb29wYmFja1Byb3h5ID0gY29udGFpbmVyICJIb3N0IGFjY2VzcyBib3VuZGFyeSIgIkhvc3QtbGV2ZWwgYXV0aG9yaXphdGlvbiBmb3Igc2VydmljZXMsIHByZXZpZXdzIGFuZCBwb3J0czsgbG9jYWwgY2FsbGVyIGFuZCBjb25uZWN0aW9uIG1lY2hhbmlzbXMgdW5kZWNpZGVkLiIgIkFjY2VzcyBtZWNoYW5pc20gdW5kZWNpZGVkIiAiVG9wb2xvZ3kiCiAgICAgICAgICAgICAgICBob3N0TmV0d29yayA9IGNvbnRhaW5lciAiSG9zdC1sZXZlbCBjb25uZWN0aXZpdHkiICJIb3N0IGF1dGhvcml6YXRpb24gZm9yIGFnZW50IGFuZCBjbHVzdGVyIHNlcnZpY2VzOyBjb25uZWN0aW9uIG1lY2hhbmlzbSB1bmRlY2lkZWQ7IG9wdGlvbmFsIHVzZXIgdGFpbG5ldCBhdHRhY2htZW50LiIgIkhvc3QgY29ubmVjdGl2aXR5IHNlcnZpY2UiICJUb3BvbG9neSIKICAgICAgICAgICAgfQogICAgICAgICAgICBncm91cCAiTGF1bmNoIGd1ZXN0IGJvdW5kYXJ5IiB7CiAgICAgICAgICAgICAgICBndWVzdCA9IGNvbnRhaW5lciAiR3Vlc3QgY29udGV4dCIgIlVudHJ1c3RlZCBoYXJuZXNzLCByZWxheSBhbmQgbG9vcGJhY2sgbGlzdGVuZXJzOyBubyBvdmVybGF5IG1lbWJlcnNoaXAgb3Igd29ya2xvYWQga2V5cy4iICJXb3JrbG9hZCBwcm92aWRlciBjb25maW5lbWVudCIgIlRvcG9sb2d5IgogICAgICAgICAgICB9CiAgICAgICAgICAgIGdyb3VwICJMYXVuY2ggbWVkaWF0aW9uIGJvdW5kYXJ5IiB7CiAgICAgICAgICAgICAgICBtZWRpYXRvciA9IGNvbnRhaW5lciAiV29ya2xvYWQgcHJveHkgbWVkaWF0b3IiICJEZWNpZGVzIGV2ZXJ5IGluYm91bmQgYW5kIG91dGJvdW5kIGNvbm5lY3Rpb24gYW5kIHN0YW1wcyBpZGVudGl0eTsgbmV2ZXIgY2FycmllcyB0cmFmZmljLiIgIkxvY2FsIHBvbGljeSBlbmZvcmNlbWVudCIgIlRvcG9sb2d5IgogICAgICAgICAgICB9CiAgICAgICAgICAgIGdyb3VwICJMYXVuY2ggd29ya2xvYWQgcHJveHkgYm91bmRhcnkiIHsKICAgICAgICAgICAgICAgIHdvcmtsb2FkLXByb3h5ID0gY29udGFpbmVyICJXb3JrbG9hZCBwcm94eSIgIkNhcnJpZXMgd29ya2xvYWQgdHJhZmZpYyBpbiBib3RoIGRpcmVjdGlvbnM7IG93biBvdmVybGF5IG5vZGUgYW5kIGxhdW5jaCBYLjUwOS1TVklEOyBhc2tzIHRoZSBtZWRpYXRvciB0byBkZWNpZGUgZWFjaCBjb25uZWN0aW9uLiIgIk5ldHdvcmsgcHJveHkiICJUb3BvbG9neSIKICAgICAgICAgICAgfQogICAgICAgICAgICBncm91cCAiRGVzdGluYXRpb24gbGF1bmNoIGd1ZXN0IGJvdW5kYXJ5IiB7CiAgICAgICAgICAgICAgICBkZXN0aW5hdGlvbkd1ZXN0ID0gY29udGFpbmVyICJEZXN0aW5hdGlvbiBndWVzdCIgIlVudHJ1c3RlZCBoYXJuZXNzIGFuZCBwdWJsaXNoZWQgbG9vcGJhY2sgbGlzdGVuZXI7IG5vIG92ZXJsYXkgbWVtYmVyc2hpcCBvciB3b3JrbG9hZCBrZXlzLiIgIldvcmtsb2FkIHByb3ZpZGVyIGNvbmZpbmVtZW50IiAiVG9wb2xvZ3kiCiAgICAgICAgICAgIH0KICAgICAgICAgICAgZ3JvdXAgIkRlc3RpbmF0aW9uIGxhdW5jaCBtZWRpYXRpb24gYm91bmRhcnkiIHsKICAgICAgICAgICAgICAgIGRlc3RpbmF0aW9uTWVkaWF0b3IgPSBjb250YWluZXIgIkRlc3RpbmF0aW9uIG1lZGlhdG9yIiAiQ2hlY2tzIHRoZSBzb3VyY2UgZ3JhbnQgYW5kIGN1cnJlbnQgZGVzdGluYXRpb24gbGF1bmNoIGJlZm9yZSBsaXN0ZW5lciBhY2Nlc3M7IG5vIGluZGVwZW5kZW50IG5ldHdvcmsuIiAiTG9jYWwgcG9saWN5IGVuZm9yY2VtZW50IiAiVG9wb2xvZ3kiCiAgICAgICAgICAgIH0KICAgICAgICAgICAgZ3JvdXAgIkRlc3RpbmF0aW9uIGxhdW5jaCBuZXR3b3JrIGJvdW5kYXJ5IiB7CiAgICAgICAgICAgICAgICBkZXN0aW5hdGlvbi13b3JrbG9hZC1wcm94eSA9IGNvbnRhaW5lciAiRGVzdGluYXRpb24gd29ya2xvYWQgcHJveHkiICJDYXJyaWVzIGRlc3RpbmF0aW9uIHdvcmtsb2FkIHRyYWZmaWMgdW5kZXIgbWVkaWF0b3IgZGVjaXNpb25zOyBvd24gb3ZlcmxheSBub2RlIGFuZCBsYXVuY2ggWC41MDktU1ZJRC4iICJOZXR3b3JrIHByb3h5IiAiVG9wb2xvZ3kiCiAgICAgICAgICAgIH0KICAgICAgICB9CgogICAgICAgIGRldmVsb3BlciAtPiBjbGkgIlJ1bnMgY29tbWFuZHMiICJDTEkiCiAgICAgICAgZGV2ZWxvcGVyIC0+IGRhc2hib2FyZCAiVXNlcyB0aGUgZGFzaGJvYXJkIiAiSFRUUCIKICAgICAgICBkZXZlbG9wZXIgLT4gdGVtcG9yYWxVSSAiSW5zcGVjdHMgd29ya2Zsb3dzIiAiSFRUUCIKICAgICAgICBuYXRpdmUgLT4gYXBpICJDYWxscyB0aGUgUkVTVCBBUEkiICJIVFRQIgogICAgICAgIGNsaSAtPiBhcGkgIkNhbGxzIHRoZSBSRVNUIEFQSSIgIkhUVFAiCiAgICAgICAgZGFzaGJvYXJkIC0+IGFwaSAiQ2FsbHMgdGhlIFJFU1QgQVBJIiAiSFRUUCIKICAgICAgICBnaXRodWIgLT4gd2ViaG9vayAiRGVsaXZlcnMgd2ViaG9va3MiICJIVFRQIgogICAgICAgIHdlYmhvb2sgLT4gYXBpICJDYWxscyB0aGUgUkVTVCBBUEkiICJIVFRQIgogICAgICAgIHdlYmhvb2sgLT4gb3JjaGVzdHJhdG9yICJTdGFydHMgd29ya2Zsb3dzIGluIGVtYmVkZGVkIG1vZGUiICJUZW1wb3JhbCIKICAgICAgICB3ZWJob29rIC0+IHRlbXBvcmFsICJTdGFydHMgd29ya2Zsb3dzIGluIGV4dGVybmFsIG1vZGUiICJUZW1wb3JhbCIKICAgICAgICBhcGkgLT4gb3JjaGVzdHJhdG9yICJTdGFydHMgd29ya2Zsb3dzIGluIGVtYmVkZGVkIG1vZGUiICJUZW1wb3JhbCIKICAgICAgICBhcGkgLT4gdGVtcG9yYWwgIlN0YXJ0cyB3b3JrZmxvd3MgaW4gZXh0ZXJuYWwgbW9kZSIgIlRlbXBvcmFsIgogICAgICAgIGFwaSAtPiBnaXRodWIgIkNhbGxzIHRoZSBHaXRIdWIgQVBJIiAiSFRUUCIKICAgICAgICB3b3JrZmxvd3MgLT4gYXBpICJDYWxscyB0aGUgUkVTVCBBUEkiICJIVFRQIgogICAgICAgIHdvcmtmbG93cyAtPiBnaXRodWIgIkNhbGxzIHRoZSBHaXRIdWIgQVBJIiAiSFRUUCIKICAgICAgICB3b3JrZmxvd3MgLT4gb3JjaGVzdHJhdG9yICJVc2VzIGR1cmFibGUgZXhlY3V0aW9uIGluIGVtYmVkZGVkIG1vZGUiICJUZW1wb3JhbCIKICAgICAgICB3b3JrZmxvd3MgLT4gdGVtcG9yYWwgIlVzZXMgZHVyYWJsZSBleGVjdXRpb24gaW4gZXh0ZXJuYWwgbW9kZSIgIlRlbXBvcmFsIgogICAgICAgIHdvcmtmbG93cyAtPiBydW5uZXIgIlN0YXJ0cyBhZ2VudCB3b3JrIiAiVGVtcG9yYWwiCiAgICAgICAgcnVubmVyIC0+IGFnZW50cyAiUnVucyBjb2RpbmcgYWdlbnRzIiAiUHJvY2VzcyIKICAgICAgICB0ZW1wb3JhbFVJIC0+IG9yY2hlc3RyYXRvciAiUmVhZHMgbmFtZXNwYWNlcyBhbmQgd29ya2Zsb3cgaGlzdG9yaWVzIiAiVGVtcG9yYWwiCgogICAgICAgIC8vIEV4aXN0aW5nIGltcGxpZWQgcmVsYXRpb25zaGlwcyBwcmVjZWRlIHRoaXMgcG9pbnQgYW5kIHJlbWFpbiB1bmNoYW5nZWQuCiAgICAgICAgIWltcGxpZWRSZWxhdGlvbnNoaXBzIGZhbHNlCiAgICAgICAgZ3JvdXAgIk9wZXJhdG9yIGRldmljZXMiIHsKICAgICAgICAgICAgYnJvd3NlciA9IHNvZnR3YXJlU3lzdGVtICJPcGVyYXRvciBicm93c2VyIiAiQSBicm93c2VyIHVuZGVyIHRoZSBvcGVyYXRvcidzIGxvY2FsIHVzZXIgaWRlbnRpdHkuIiAiVG9wb2xvZ3kiCiAgICAgICAgICAgIHBob25lID0gc29mdHdhcmVTeXN0ZW0gIlBob25lIGFuZCBuYXRpdmUgY2xpZW50cyIgIk9wZXJhdG9yIGRldmljZXMgdXNpbmcgdGhlaXIgYXR0YWNoZWQgdXNlciB0YWlsbmV0IGFuZCBhZmFrdCBzaWduLWluLiIgIlRvcG9sb2d5IgogICAgICAgIH0KICAgICAgICBncm91cCAiVXNlciBuZXR3b3JrIGJvdW5kYXJ5IiB7CiAgICAgICAgICAgIHVzZXJUYWlsbmV0ID0gc29mdHdhcmVTeXN0ZW0gIkF0dGFjaGVkIHVzZXIgdGFpbG5ldCIgIlVzZXItY29udHJvbGxlZCBwcml2YXRlIGNvbm5lY3Rpdml0eTsgc2VwYXJhdGUgZnJvbSB0aGUgY2x1c3RlciBvdmVybGF5LiIgIlRvcG9sb2d5IgogICAgICAgIH0KICAgICAgICBncm91cCAiRXh0ZXJuYWwgc2VydmljZSBib3VuZGFyeSIgewogICAgICAgICAgICBpbnRlcm5ldCA9IHNvZnR3YXJlU3lzdGVtICJJbnRlcm5ldCBzZXJ2aWNlcyIgIlBlcm1pdHRlZCB1cHN0cmVhbSBkZXN0aW5hdGlvbnMgb3V0c2lkZSB0aGUgY2x1c3RlciB0cnVzdCBkb21haW4uIiAiVG9wb2xvZ3kiCiAgICAgICAgfQoKICAgICAgICBicm93c2VyIC0+IGhvc3RSZXNvbHZlciAiUmVzb2x2ZXMgKi5hZmFrdC5pbnRlcm5hbCIgIkxvY2FsIG5hbWUgcXVlcnkiICJUb3BvbG9neUNvbm5lY3Rpb24sT3ZlcnZpZXdIaWRkZW4iCiAgICAgICAgYnJvd3NlciAtPiBsb29wYmFja1Byb3h5ICJSZXF1ZXN0cyBzZXJ2aWNlLCBwcmV2aWV3IG9yIHBvcnQiICJIb3N0IGFjY2VzcyBtZWNoYW5pc20gdW5kZWNpZGVkIiAiVG9wb2xvZ3lDb25uZWN0aW9uLE92ZXJ2aWV3SGlkZGVuIgogICAgICAgIGxvb3BiYWNrUHJveHkgLT4gaG9zdE5ldHdvcmsgIlVzZXMgaG9zdC1sZXZlbCBhdXRob3JpemF0aW9uIiAiQ29ubmVjdGlvbiBtZWNoYW5pc20gdW5kZWNpZGVkIiAiVG9wb2xvZ3lDb25uZWN0aW9uLE92ZXJ2aWV3SGlkZGVuIgogICAgICAgIGhvc3ROZXR3b3JrIC0+IHByZXZpZXdTZXJ2ZXIgIlJlcXVlc3RzIHByZXZpZXcgYXMgaG9zdCBpZGVudGl0eSIgIldvcmtsb2FkIG11dHVhbCBUTFMgb3ZlciBvdmVybGF5IiAiVG9wb2xvZ3lDb25uZWN0aW9uLE92ZXJ2aWV3SGlkZGVuIgogICAgICAgIGhvc3RXb3JrZXIgLT4gZ3Vlc3QgIk9ic2VydmVzIHdvcmtsb2FkIGV4ZWN1dGlvbiBhbmQgcmVjbGFpbTsgbGlmZWN5Y2xlIG93bmVyIHVuZGVjaWRlZCIgIkxvY2FsIG9ic2VydmF0aW9uIiAiTGlmZWN5Y2xlRGV0YWlsLFRvcG9sb2d5Q29ubmVjdGlvbixPdmVydmlld0hpZGRlbiIKICAgICAgICBob3N0V29ya2VyIC0+IGhlbHBlciAiUmVxdWVzdHMgYXV0aG9yaXplZCBzZXR1cCBhbmQgbGF1bmNoIG9wZXJhdGlvbnMiICJBdXRoZW50aWNhdGVkIGxvY2FsIGNvbnRyb2wiICJUb3BvbG9neUNvbm5lY3Rpb24iCiAgICAgICAgaG9zdFdvcmtlciAtPiBob3N0UmVzb2x2ZXIgIlJlcXVpcmVzIGhvc3QgbmFtZSByZXNvbHV0aW9uIiAiTG9jYWwgY29udHJvbCIgIlRvcG9sb2d5Q29ubmVjdGlvbixPdmVydmlld0hpZGRlbiIKICAgICAgICBob3N0V29ya2VyIC0+IG1lZGlhdG9yICJTdGFydHMgYW5kIG1hbmFnZXMgbGF1bmNoOyBubyBkYXRhIGZvcndhcmRpbmciICJMb2NhbCBsaWZlY3ljbGUgY29udHJvbCIgIkxpZmVjeWNsZURldGFpbCxUb3BvbG9neUNvbm5lY3Rpb24sT3ZlcnZpZXdIaWRkZW4iCiAgICAgICAgaG9zdFdvcmtlciAtPiBkZXN0aW5hdGlvbk1lZGlhdG9yICJTdGFydHMgYW5kIG1hbmFnZXMgZGVzdGluYXRpb24gbGF1bmNoOyBubyBkYXRhIGZvcndhcmRpbmciICJMb2NhbCBsaWZlY3ljbGUgY29udHJvbCIgIkxpZmVjeWNsZURldGFpbCxUb3BvbG9neUNvbm5lY3Rpb24sT3ZlcnZpZXdIaWRkZW4iCiAgICAgICAgaG9zdFdvcmtlciAtPiBob3N0TmV0d29yayAiSW5pdGlhdGVzIGNvbnRyb2wgY29ubmVjdGlvbnM7IHJlcXVlc3RzIGRlc2lyZWQgc3RhdGUgYW5kIHJlcG9ydHMgb2JzZXJ2YXRpb25zIiAiTG9jYWwgY2hhbm5lbCIgIlRvcG9sb2d5Q29ubmVjdGlvbiIKICAgICAgICBob3N0TmV0d29yayAtPiBjb250cm9sQXBpICJSZWdpc3RlcnMgaG9zdCBhbmQgcmVwb3J0cyBjYXBhY2l0eSBvdmVyIGhvc3QtaW5pdGlhdGVkIGNvbm5lY3Rpb25zIiAiV29ya2xvYWQgbXV0dWFsIFRMUyBvdmVyIG92ZXJsYXkiICJUb3BvbG9neUNvbm5lY3Rpb24iCiAgICAgICAgcGhvbmUgLT4gdXNlclRhaWxuZXQgIkNvbm5lY3RzIHdpdGggZGV2aWNlIGlkZW50aXR5IiAiVXNlciB0YWlsbmV0IiAiVG9wb2xvZ3lDb25uZWN0aW9uLE92ZXJ2aWV3SGlkZGVuIgogICAgICAgIHVzZXJUYWlsbmV0IC0+IGVkZ2UgIkRlbGl2ZXJzIGFwcGxpY2F0aW9uIHJlcXVlc3RzIiAiVHJhbnNwb3J0IExheWVyIFNlY3VyaXR5IiAiQ2x1c3RlckF0dGFjaG1lbnQsT3ZlcnZpZXdIaWRkZW4iCiAgICAgICAgdXNlclRhaWxuZXQgLT4gaG9zdE5ldHdvcmsgIk9wdGlvbmFsIGhvc3QgYXR0YWNobWVudDsgYXBwbGljYXRpb24gYWNjZXNzIG9ubHkiICJVc2VyIHRhaWxuZXQiICJDbHVzdGVyQXR0YWNobWVudCxPdmVydmlld0hpZGRlbiIKICAgICAgICBicm93c2VyIC0+IGVkZ2UgIlNlbmRzIHB1YmxpYyBhcHBsaWNhdGlvbiByZXF1ZXN0cyBhcyBzaWduZWQtaW4gdXNlciIgIlRyYW5zcG9ydCBMYXllciBTZWN1cml0eSIgIlRvcG9sb2d5Q29ubmVjdGlvbixPdmVydmlld0hpZGRlbiIKICAgICAgICBlZGdlIC0+IGNvbnRyb2xBcGkgIkZvcndhcmRzIGF1dGhlbnRpY2F0ZWQgZGFzaGJvYXJkIGFuZCBBUEkgcmVxdWVzdHMiICJBcHBsaWNhdGlvbiBwcm90b2NvbCBvdmVyIG92ZXJsYXkiICJUb3BvbG9neUNvbm5lY3Rpb24sT3ZlcnZpZXdIaWRkZW4iCiAgICAgICAgZWRnZSAtPiBwcmV2aWV3U2VydmVyICJGb3J3YXJkcyBwcmV2aWV3IHJlcXVlc3RzIHdpdGggdXNlciBjb250ZXh0IiAiQXBwbGljYXRpb24gcHJvdG9jb2wgb3ZlciBvdmVybGF5IiAiVG9wb2xvZ3lDb25uZWN0aW9uLE92ZXJ2aWV3SGlkZGVuIgogICAgICAgIGVkZ2UgLT4gc3RhdGljT3JpZ2luICJGb3J3YXJkcyBzdGF0aWMgc2l0ZSByZXF1ZXN0cyBieSBob3N0bmFtZSIgIkFwcGxpY2F0aW9uIHByb3RvY29sIG92ZXIgb3ZlcmxheSIgIlRvcG9sb2d5Q29ubmVjdGlvbixPdmVydmlld0hpZGRlbiIKICAgICAgICBlZGdlIC0+IHdvcmtsb2FkLXByb3h5ICJEaWFscyBwZXJtaXR0ZWQgd29ya2xvYWQgaW5ncmVzcyBkaXJlY3RseSIgIlNQSUZGRSBtdXR1YWwgVExTIG92ZXIgb3ZlcmxheSIgIlRvcG9sb2d5Q29ubmVjdGlvbixPdmVydmlld0hpZGRlbiIKICAgICAgICBwcmV2aWV3U2VydmVyIC0+IHdvcmtsb2FkLXByb3h5ICJEaWFscyB3b3JrbG9hZCBwcm94eTsgcHVibGlzaGVkLXBvcnQgYmluZGluZyBvcGVuIiAiU1BJRkZFIG11dHVhbCBUTFMgb3ZlciBvdmVybGF5IiAiVG9wb2xvZ3lDb25uZWN0aW9uLE92ZXJ2aWV3SGlkZGVuIgogICAgICAgIG1jcEdhdGV3YXkgLT4gY29udHJvbEFwaSAiQ2FsbHMgcGVybWl0dGVkIG9wZXJhdGlvbnMgd2l0aCBsYXVuY2ggY29udGV4dCIgIkF1dGhlbnRpY2F0ZWQgc2VydmljZSBjb25uZWN0aW9uIiAiVG9wb2xvZ3lDb25uZWN0aW9uIgogICAgICAgIGd1ZXN0IC0+IHdvcmtsb2FkLXByb3h5ICJTZW5kcyB3b3JrbG9hZCB0cmFmZmljIGluY2x1ZGluZyBETlMsIFRDUCwgVURQIGFuZCBRVUlDIiAiUHJpdmF0ZSB3b3JrbG9hZCBsaW5rIiAiVG9wb2xvZ3lDb25uZWN0aW9uLE92ZXJ2aWV3SGlkZGVuIgogICAgICAgIG1lZGlhdG9yIC0+IHdvcmtsb2FkLXByb3h5ICJSZXR1cm5zIGNvbm5lY3Rpb24gZGVjaXNpb24gYW5kIHN0YW1wZWQgbGF1bmNoIGlkZW50aXR5IiAiTG9jYWwgY2hhbm5lbCIgIlRvcG9sb2d5Q29ubmVjdGlvbixPdmVydmlld0hpZGRlbiIKICAgICAgICB3b3JrbG9hZC1wcm94eSAtPiBjb250cm9sQXBpICJDYWxscyBhdXRob3JpemVkIG9wZXJhdGlvbnMgd2l0aCBsYXVuY2ggWC41MDktU1ZJRCIgIldvcmtsb2FkIG11dHVhbCBUTFMgb3ZlciBvdmVybGF5IiAiVG9wb2xvZ3lDb25uZWN0aW9uLE92ZXJ2aWV3SGlkZGVuIgogICAgICAgIHdvcmtsb2FkLXByb3h5IC0+IG1jcEdhdGV3YXkgIkNhbGxzIGFsbG93ZWQgdG9vbHMgd2l0aCBsYXVuY2ggWC41MDktU1ZJRCIgIldvcmtsb2FkIG11dHVhbCBUTFMgb3ZlciBvdmVybGF5IiAiVG9wb2xvZ3lDb25uZWN0aW9uLE92ZXJ2aWV3SGlkZGVuIgogICAgICAgIHdvcmtsb2FkLXByb3h5IC0+IGludGVybmV0ICJPcGVucyBwZXJtaXR0ZWQgZWdyZXNzOyBpbnNwZWN0aW9uIHdoZXJlIHJlcXVpcmVkIiAiRGVzdGluYXRpb24gcHJvdG9jb2wiICJUb3BvbG9neUNvbm5lY3Rpb24sT3ZlcnZpZXdIaWRkZW4iCiAgICAgICAgd29ya2xvYWQtcHJveHkgLT4gbWVkaWF0b3IgIkFza3MgZm9yIGluYm91bmQgYW5kIG91dGJvdW5kIGNvbm5lY3Rpb24gZGVjaXNpb25zIiAiTG9jYWwgY2hhbm5lbCIgIlRvcG9sb2d5Q29ubmVjdGlvbixSZXR1cm5EZXRhaWwsT3ZlcnZpZXdIaWRkZW4iCiAgICAgICAgd29ya2xvYWQtcHJveHkgLT4gZ3Vlc3QgIkNhcnJpZXMgcGVybWl0dGVkIGluZ3Jlc3M7IHB1Ymxpc2hlZC1wb3J0IGJpbmRpbmcgb3BlbiIgIlByaXZhdGUgd29ya2xvYWQgbGluayIgIlRvcG9sb2d5Q29ubmVjdGlvbixSZXR1cm5EZXRhaWwsT3ZlcnZpZXdIaWRkZW4iCiAgICAgICAgZGVzdGluYXRpb25HdWVzdCAtPiBkZXN0aW5hdGlvbi13b3JrbG9hZC1wcm94eSAiU2VuZHMgZGVzdGluYXRpb24gd29ya2xvYWQgdHJhZmZpYyIgIlByaXZhdGUgd29ya2xvYWQgbGluayIgIlRvcG9sb2d5Q29ubmVjdGlvbixPdmVydmlld0hpZGRlbiIKICAgICAgICBkZXN0aW5hdGlvbk1lZGlhdG9yIC0+IGRlc3RpbmF0aW9uLXdvcmtsb2FkLXByb3h5ICJSZXR1cm5zIGRlc3RpbmF0aW9uIGNvbm5lY3Rpb24gZGVjaXNpb24iICJMb2NhbCBjaGFubmVsIiAiVG9wb2xvZ3lDb25uZWN0aW9uLE92ZXJ2aWV3SGlkZGVuIgogICAgICAgIGRlc3RpbmF0aW9uLXdvcmtsb2FkLXByb3h5IC0+IGRlc3RpbmF0aW9uTWVkaWF0b3IgIlJlcXVlc3RzIGRlY2lzaW9uIHdpdGggc291cmNlIGlkZW50aXR5IGFuZCB0YXJnZXQgZ3JhbnQiICJMb2NhbCBjaGFubmVsIiAiVG9wb2xvZ3lDb25uZWN0aW9uLFJldHVybkRldGFpbCxPdmVydmlld0hpZGRlbiIKICAgICAgICBkZXN0aW5hdGlvbi13b3JrbG9hZC1wcm94eSAtPiBkZXN0aW5hdGlvbkd1ZXN0ICJDYXJyaWVzIHBlcm1pdHRlZCBpbmdyZXNzOyBwdWJsaXNoZWQtcG9ydCBiaW5kaW5nIG9wZW4iICJQcml2YXRlIHdvcmtsb2FkIGxpbmsiICJUb3BvbG9neUNvbm5lY3Rpb24sUmV0dXJuRGV0YWlsLE92ZXJ2aWV3SGlkZGVuIgogICAgICAgIHdvcmtsb2FkLXByb3h5IC0+IGRlc3RpbmF0aW9uLXdvcmtsb2FkLXByb3h5ICJEaWFscyBkaXJlY3RseTsgYm90aCBtZWRpYXRvcnMgY2hlY2sgdGhlIGNvbm5lY3Rpb24iICJTUElGRkUgbXV0dWFsIFRMUyBvdmVyIG92ZXJsYXkiICJUb3BvbG9neUNvbm5lY3Rpb24sT3ZlcnZpZXdIaWRkZW4iCiAgICAgICAgd29ya2xvYWQtcHJveHkgLT4gY29vcmRpbmF0aW9uICJFbnJvbGxzIGl0cyBvd24gbm9kZSB3aXRoIGFuIFNWSUQ7IG1lbWJlcnNoaXAgZ3JhbnRzIG5vIHNlcnZpY2UgYWNjZXNzIiAiT3ZlcmxheSBjb250cm9sIiAiVG9wb2xvZ3lDb25uZWN0aW9uLE92ZXJ2aWV3SGlkZGVuIgogICAgICAgIGhvc3ROZXR3b3JrIC0+IGNvb3JkaW5hdGlvbiAiT2J0YWlucyBvdmVybGF5IGNvb3JkaW5hdGlvbiB0aHJvdWdoIGFmYWt0IGludGVyZmFjZSIgIk92ZXJsYXkgY29udHJvbCIgIlRvcG9sb2d5Q29ubmVjdGlvbixPdmVydmlld0hpZGRlbiIKICAgICAgICB3b3JrbG9hZC1wcm94eSAtPiBvdmVybGF5UmVsYXkgIlVzZXMgZW5jcnlwdGVkIHJlbGF5IHRyYW5zcG9ydCB3aGVuIG5lZWRlZCIgIk92ZXJsYXkgdHJhbnNwb3J0IiAiVG9wb2xvZ3lDb25uZWN0aW9uLE92ZXJ2aWV3SGlkZGVuIgoKICAgICAgICBkZXBsb3ltZW50RW52aXJvbm1lbnQgIlRvcG9sb2d5IGNvbnRleHQiIHsKICAgICAgICAgICAgY29udGV4dF9vcGVyYXRvckRldmljZUJvdW5kYXJ5Tm9kZSA9IGRlcGxveW1lbnROb2RlICJPcGVyYXRvciBkZXZpY2UgYm91bmRhcnkiICJPcGVyYXRvci1jb250cm9sbGVkIGNsaWVudHMuIiAiQ2xpZW50IGRldmljZXMiIHsKICAgICAgICAgICAgICAgIGNvbnRleHRDbGllbnRzID0gaW5mcmFzdHJ1Y3R1cmVOb2RlICJCcm93c2VyLCBwaG9uZSwgdGFibGV0IGFuZCBuYXRpdmUgYXBwcyIgIk9wZXJhdG9yIGFuZCBkZXZpY2UgaWRlbnRpdGllcy4iICJBcHBsaWNhdGlvbiBjbGllbnRzIgogICAgICAgICAgICB9CiAgICAgICAgICAgIGNvbnRleHRfdXNlclRhaWxuZXRCb3VuZGFyeU5vZGUgPSBkZXBsb3ltZW50Tm9kZSAiVXNlciB0YWlsbmV0IGJvdW5kYXJ5IiAiVXNlci1vd25lZCBuZXR3b3JrOyBubyBjbHVzdGVyIHJvdXRpbmcuIiAiVXNlciBuZXR3b3JrIiB7CiAgICAgICAgICAgICAgICBjb250ZXh0VGFpbG5ldCA9IGluZnJhc3RydWN0dXJlTm9kZSAiQXR0YWNoZWQgdXNlciB0YWlsbmV0cyIgIlByaXZhdGUgYXBwbGljYXRpb24gYWNjZXNzIHRvIGF0dGFjaGVkIGdhdGV3YXlzLiIgIlRhaWxzY2FsZSIKICAgICAgICAgICAgfQogICAgICAgICAgICBjb250ZXh0X2NsdXN0ZXJUcnVzdERvbWFpbk5vZGUgPSBkZXBsb3ltZW50Tm9kZSAiQ2x1c3RlciB0cnVzdCBkb21haW4iICJDb250cm9sIHBsYW5lIGFuZCB3b3JrbG9hZCBob3N0cyBzaGFyZSBhdXRoZW50aWNhdGVkIG92ZXJsYXkgcmVhY2hhYmlsaXR5LiIgIlByaXZhdGUgY2x1c3RlciIgewogICAgICAgICAgICAgICAgY29udGV4dF9leHRlcm5hbEluZ3Jlc3NCb3VuZGFyeU5vZGUgPSBkZXBsb3ltZW50Tm9kZSAiRXh0ZXJuYWwgaW5ncmVzcyBib3VuZGFyeSIgIkFwcGxpY2F0aW9uIGVudHJ5IG9ubHkuIiAiR2F0ZXdheSBub2RlIiB7CiAgICAgICAgICAgICAgICAgICAgY29udGV4dEluZ3Jlc3MgPSBpbmZyYXN0cnVjdHVyZU5vZGUgIkV4dGVybmFsIGluZ3Jlc3MgZ2F0ZXdheSIgIlB1YmxpYyBhbmQgdXNlci10YWlsbmV0IGFwcGxpY2F0aW9uIHRyYWZmaWM7IG5vIHBhY2tldCByb3V0aW5nLiIgIkFwcGxpY2F0aW9uIHByb3h5IgogICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgY29udGV4dENsdXN0ZXIgPSBpbmZyYXN0cnVjdHVyZU5vZGUgIkNvbnRyb2wgcGxhbmUgYW5kIHdvcmtsb2FkIGhvc3RzIiAiUGVyLXNlcnZpY2UsIHBlci1ob3N0IGFuZCBwZXItbGF1bmNoIG5vZGVzOyBndWVzdHMgaGF2ZSBubyBvdmVybGF5IG1lbWJlcnNoaXAuIiAiSXNvbGF0ZWQgSGVhZHNjYWxlIG92ZXJsYXkiCiAgICAgICAgICAgIH0KICAgICAgICAgICAgY29udGV4dF9pbnRlcm5ldEJvdW5kYXJ5Tm9kZSA9IGRlcGxveW1lbnROb2RlICJJbnRlcm5ldCBib3VuZGFyeSIgIlVwc3RyZWFtIGRlc3RpbmF0aW9ucyBvdXRzaWRlIGNsdXN0ZXIgdHJ1c3QuIiAiRXh0ZXJuYWwgbmV0d29yayIgewogICAgICAgICAgICAgICAgY29udGV4dEludGVybmV0ID0gaW5mcmFzdHJ1Y3R1cmVOb2RlICJJbnRlcm5ldCBzZXJ2aWNlcyIgIk9ubHkgcGVybWl0dGVkIGVncmVzcyBsZWF2ZXMgYSB3b3JrbG9hZCBob3N0LiIgIkRlc3RpbmF0aW9uIHNlcnZpY2VzIgogICAgICAgICAgICB9CiAgICAgICAgICAgIGNvbnRleHRDbGllbnRzIC0+IGNvbnRleHRUYWlsbmV0ICJEZXZpY2UgaWRlbnRpdHkiICJVc2VyIHRhaWxuZXQiCiAgICAgICAgICAgIGNvbnRleHRDbGllbnRzIC0+IGNvbnRleHRJbmdyZXNzICJTaWduZWQtaW4gdXNlciIgIlB1YmxpYyBhcHBsaWNhdGlvbiByZXF1ZXN0IgogICAgICAgICAgICBjb250ZXh0VGFpbG5ldCAtPiBjb250ZXh0SW5ncmVzcyAiVXNlciBjb250ZXh0OyBubyBwYWNrZXQgcm91dGluZyIgIlByaXZhdGUgYXBwbGljYXRpb24gcmVxdWVzdCIKICAgICAgICAgICAgY29udGV4dEluZ3Jlc3MgLT4gY29udGV4dENsdXN0ZXIgIkF1dGhlbnRpY2F0ZWQgYXBwbGljYXRpb24gcmVxdWVzdCIgIkNsdXN0ZXIgb3ZlcmxheSIKICAgICAgICAgICAgY29udGV4dENsdXN0ZXIgLT4gY29udGV4dEludGVybmV0ICJQZXJtaXR0ZWQgZGVzdGluYXRpb24gcmVxdWVzdCIgIldvcmtsb2FkIHByb3h5IGVncmVzcyIKICAgICAgICB9CiAgICAgICAgZGVwbG95bWVudEVudmlyb25tZW50ICJUb3BvbG9neSBjbHVzdGVyIiB7CiAgICAgICAgICAgIGNsdXN0ZXJfdXNlclRhaWxuZXRCb3VuZGFyeU5vZGUgPSBkZXBsb3ltZW50Tm9kZSAiVXNlciB0YWlsbmV0IGJvdW5kYXJ5IiAiU2VwYXJhdGUgdXNlciBuZXR3b3JrLiIgIlVzZXIgdGFpbG5ldCIgewogICAgICAgICAgICAgICAgY2x1c3RlclRhaWxuZXQgPSBzb2Z0d2FyZVN5c3RlbUluc3RhbmNlIHVzZXJUYWlsbmV0CiAgICAgICAgICAgIH0KICAgICAgICAgICAgY2x1c3Rlcl9leHRlcm5hbEluZ3Jlc3NCb3VuZGFyeU5vZGUgPSBkZXBsb3ltZW50Tm9kZSAiRXh0ZXJuYWwgaW5ncmVzcyBib3VuZGFyeSIgIlVzZXItdGFpbG5ldCBhdHRhY2htZW50cyBkbyBub3Qgcm91dGUgY2x1c3RlciBwYWNrZXRzLiIgIkdhdGV3YXkgbm9kZSIgewogICAgICAgICAgICAgICAgY2x1c3RlckVkZ2UgPSBjb250YWluZXJJbnN0YW5jZSBlZGdlCiAgICAgICAgICAgIH0KICAgICAgICAgICAgY2x1c3Rlcl9jbHVzdGVyT3ZlcmxheUJvdW5kYXJ5Tm9kZSA9IGRlcGxveW1lbnROb2RlICJDbHVzdGVyIG92ZXJsYXkgYm91bmRhcnkiICJUYWlsc2NhbGUgdHNuZXQgbm9kZXMgdXNlIGlzb2xhdGVkIEhlYWRzY2FsZTsgZXZlcnkgbm9kZSByZXRhaW5zIGEgc3RhdGljIHN0YWJsZS1ub2RlIG1hcC4iICJQcml2YXRlIG92ZXJsYXkiIHsKICAgICAgICAgICAgICAgIGNsdXN0ZXJPdmVybGF5ID0gaW5mcmFzdHJ1Y3R1cmVOb2RlICJQcml2YXRlIG92ZXJsYXkgcmVhY2hhYmlsaXR5IiAiRWFjaCBjbHVzdGVyIG5vZGUgcmV0YWlucyBhIHN0YXRpYyBtYXAgb2Ygc3RhYmxlIG5vZGVzLiBJbmdyZXNzIHJ1bGVzIGFkbWl0IG9ubHkgdGhlIGdhdGV3YXkgYW5kIG5hbWVkIHBlZXJzLiIgIlRhaWxzY2FsZSB0c25ldCIKICAgICAgICAgICAgICAgIGNsdXN0ZXJfY29udHJvbFBsYW5lQm91bmRhcnlOb2RlID0gZGVwbG95bWVudE5vZGUgIkNvbnRyb2wgcGxhbmUgYm91bmRhcnkiICJPbmUgb3ZlcmxheSBub2RlIGZvciBlYWNoIHNlcnZpY2UuIiAiQ29udHJvbCBwbGFuZSIgewoKICAgICAgICAgICAgICAgICAgICBjbHVzdGVyX2FwaVNlcnZpY2VOb2RlTm9kZSA9IGRlcGxveW1lbnROb2RlICJBUEkgc2VydmljZSBub2RlIiAiSW5kZXBlbmRlbnQgc2VydmljZSBpZGVudGl0eTsgZGFzaGJvYXJkIHNoYXJlcyBpdHMgb3JpZ2luLiIgInRzbmV0IG5vZGUiIHsKICAgICAgICAgICAgICAgICAgICAgICAgY2x1c3Rlcl9jb250cm9sQXBpID0gY29udGFpbmVySW5zdGFuY2UgY29udHJvbEFwaQogICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgICAgICBjbHVzdGVyX3ByZXZpZXdTZXJ2aWNlTm9kZU5vZGUgPSBkZXBsb3ltZW50Tm9kZSAiUHJldmlldyBzZXJ2aWNlIG5vZGUiICJJbmRlcGVuZGVudCBzZXJ2aWNlIGlkZW50aXR5LiIgInRzbmV0IG5vZGUiIHsKICAgICAgICAgICAgICAgICAgICAgICAgY2x1c3Rlcl9wcmV2aWV3U2VydmVyID0gY29udGFpbmVySW5zdGFuY2UgcHJldmlld1NlcnZlcgogICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgICAgICBjbHVzdGVyX21jcFNlcnZpY2VOb2RlTm9kZSA9IGRlcGxveW1lbnROb2RlICJNQ1Agc2VydmljZSBub2RlIiAiSW5kZXBlbmRlbnQgc2VydmljZSBpZGVudGl0eS4iICJ0c25ldCBub2RlIiB7CiAgICAgICAgICAgICAgICAgICAgICAgIGNsdXN0ZXJfbWNwR2F0ZXdheSA9IGNvbnRhaW5lckluc3RhbmNlIG1jcEdhdGV3YXkKICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgY2x1c3Rlcl9zdGF0aWNPcmlnaW5Ob2RlTm9kZSA9IGRlcGxveW1lbnROb2RlICJTdGF0aWMgb3JpZ2luIG5vZGUiICJJbmRlcGVuZGVudCBzZXJ2aWNlIGlkZW50aXR5LiIgInRzbmV0IG5vZGUiIHsKICAgICAgICAgICAgICAgICAgICAgICAgY2x1c3Rlcl9zdGF0aWNPcmlnaW4gPSBjb250YWluZXJJbnN0YW5jZSBzdGF0aWNPcmlnaW4KICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgY2x1c3Rlcl9jb29yZGluYXRpb25Ob2RlTm9kZSA9IGRlcGxveW1lbnROb2RlICJDb29yZGluYXRpb24gbm9kZSIgIklzb2xhdGVkIEhlYWRzY2FsZSBiZWhpbmQgYW4gYWZha3QgaW50ZXJmYWNlOyBpbnN0YW5jZSBjb3VudCB1bmRlY2lkZWQuIiAiQ29vcmRpbmF0aW9uIHNlcnZpY2UiIHsKICAgICAgICAgICAgICAgICAgICAgICAgY2x1c3Rlcl9jb29yZGluYXRpb24gPSBjb250YWluZXJJbnN0YW5jZSBjb29yZGluYXRpb24KICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgY2x1c3Rlcl9yZWxheU5vZGVOb2RlID0gZGVwbG95bWVudE5vZGUgIlJlbGF5IG5vZGUiICJFbmNyeXB0ZWQgb3ZlcmxheSB0cmFuc3BvcnQuIiAiUmVsYXkgc2VydmljZSIgewogICAgICAgICAgICAgICAgICAgICAgICBjbHVzdGVyX292ZXJsYXlSZWxheSA9IGNvbnRhaW5lckluc3RhbmNlIG92ZXJsYXlSZWxheQogICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgIGNsdXN0ZXJfYWdlbnRIb3N0Qm91bmRhcnlOb2RlID0gZGVwbG95bWVudE5vZGUgIldvcmtsb2FkIGhvc3QgYm91bmRhcnkiICJIb3N0IG1hbmFnZW1lbnQgaXMgc2VwYXJhdGUgZnJvbSBsYXVuY2ggdHJhZmZpYy4iICJXb3JrbG9hZCBob3N0IiB7CiAgICAgICAgICAgICAgICAgICAgY2x1c3Rlcl9ob3N0Tm9kZU5vZGUgPSBkZXBsb3ltZW50Tm9kZSAiSG9zdCBub2RlIiAiSG9zdCBpZGVudGl0eTsgb3B0aW9uYWwgdXNlci10YWlsbmV0IGF0dGFjaG1lbnQuIiAidHNuZXQgbm9kZSIgewogICAgICAgICAgICAgICAgICAgICAgICBjbHVzdGVyX2hvc3ROZXR3b3JrID0gY29udGFpbmVySW5zdGFuY2UgaG9zdE5ldHdvcmsKICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgY2x1c3Rlcl9hZ2VudExhdW5jaEJvdW5kYXJ5Tm9kZSA9IGRlcGxveW1lbnROb2RlICJBZ2VudCBsYXVuY2ggYm91bmRhcnkiICJJbmRlcGVuZGVudCBtZWRpYXRvciwgd29ya2xvYWQgcHJveHkgYW5kIGd1ZXN0OyBubyBzaGFyZWQgbGF1bmNoIGRhdGEgcGF0aC4iICJMYXVuY2ggaXNvbGF0aW9uIiB7CiAgICAgICAgICAgICAgICAgICAgICAgIGNsdXN0ZXJfd29ya2xvYWQtcHJveHkgPSBjb250YWluZXJJbnN0YW5jZSB3b3JrbG9hZC1wcm94eQogICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgIGNsdXN0ZXJfYW5vdGhlckFnZW50SG9zdEJvdW5kYXJ5Tm9kZSA9IGRlcGxveW1lbnROb2RlICJBbm90aGVyIHdvcmtsb2FkIGhvc3QgYm91bmRhcnkiICJJbmRlcGVuZGVudCBob3N0IGFuZCBsYXVuY2ggaWRlbnRpdGllcy4iICJXb3JrbG9hZCBob3N0IiB7CiAgICAgICAgICAgICAgICAgICAgY2x1c3Rlcl9hbm90aGVySG9zdE5vZGVOb2RlID0gZGVwbG95bWVudE5vZGUgIkFub3RoZXIgaG9zdCBub2RlIiAiSW5kZXBlbmRlbnQgaG9zdCBpZGVudGl0eTsgb3B0aW9uYWwgYXR0YWNoZWQgdXNlciB0YWlsbmV0LiIgInRzbmV0IG5vZGUiIHsKICAgICAgICAgICAgICAgICAgICAgICAgY2x1c3Rlcl9vdGhlckhvc3QgPSBjb250YWluZXJJbnN0YW5jZSBob3N0TmV0d29yawogICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgICAgICBjbHVzdGVyX2Fub3RoZXJMYXVuY2hCb3VuZGFyeU5vZGUgPSBkZXBsb3ltZW50Tm9kZSAiQW5vdGhlciBsYXVuY2ggYm91bmRhcnkiICJJbmRlcGVuZGVudCBsYXVuY2ggY29ubmVjdGlvbi4iICJMYXVuY2ggaXNvbGF0aW9uIiB7CiAgICAgICAgICAgICAgICAgICAgICAgIGNsdXN0ZXJfZGVzdGluYXRpb24td29ya2xvYWQtcHJveHkgPSBjb250YWluZXJJbnN0YW5jZSBkZXN0aW5hdGlvbi13b3JrbG9hZC1wcm94eQogICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgfQogICAgICAgICAgICBjbHVzdGVyRWRnZSAtPiBjbHVzdGVyT3ZlcmxheSAiQXV0aGVudGljYXRlZCBhcHAgcmVxdWVzdHMiICJPdmVybGF5IGFjY2VzcyIKICAgICAgICAgICAgY2x1c3Rlcl9jb250cm9sQXBpIC0+IGNsdXN0ZXJPdmVybGF5ICJTZXJ2aWNlIGlkZW50aXR5IiAiT3ZlcmxheSBtZW1iZXJzaGlwIgogICAgICAgICAgICBjbHVzdGVyX3ByZXZpZXdTZXJ2ZXIgLT4gY2x1c3Rlck92ZXJsYXkgIlNlcnZpY2UgaWRlbnRpdHkiICJPdmVybGF5IG1lbWJlcnNoaXAiCiAgICAgICAgICAgIGNsdXN0ZXJfbWNwR2F0ZXdheSAtPiBjbHVzdGVyT3ZlcmxheSAiU2VydmljZSBpZGVudGl0eSIgIk92ZXJsYXkgbWVtYmVyc2hpcCIKICAgICAgICAgICAgY2x1c3Rlcl9zdGF0aWNPcmlnaW4gLT4gY2x1c3Rlck92ZXJsYXkgIlNlcnZpY2UgaWRlbnRpdHkiICJPdmVybGF5IG1lbWJlcnNoaXAiCiAgICAgICAgICAgIGNsdXN0ZXJfY29vcmRpbmF0aW9uIC0+IGNsdXN0ZXJPdmVybGF5ICJOb2RlIGNvb3JkaW5hdGlvbiIgImFmYWt0IGludGVyZmFjZSIKICAgICAgICAgICAgY2x1c3Rlcl9vdmVybGF5UmVsYXkgLT4gY2x1c3Rlck92ZXJsYXkgIkVuY3J5cHRlZCB0cmFuc3BvcnQiICJSZWxheSBwYXRoIgogICAgICAgICAgICBjbHVzdGVyX2hvc3ROZXR3b3JrIC0+IGNsdXN0ZXJPdmVybGF5ICJIb3N0IGlkZW50aXR5IiAiT3ZlcmxheSBtZW1iZXJzaGlwIgogICAgICAgICAgICBjbHVzdGVyX290aGVySG9zdCAtPiBjbHVzdGVyT3ZlcmxheSAiSG9zdCBpZGVudGl0eSIgIk92ZXJsYXkgbWVtYmVyc2hpcCIKICAgICAgICAgICAgY2x1c3Rlcl93b3JrbG9hZC1wcm94eSAtPiBjbHVzdGVyT3ZlcmxheSAiTGF1bmNoIGlkZW50aXR5IiAiQ29hcnNlIHNlcnZpY2UgYWNjZXNzIgogICAgICAgICAgICBjbHVzdGVyX2Rlc3RpbmF0aW9uLXdvcmtsb2FkLXByb3h5IC0+IGNsdXN0ZXJPdmVybGF5ICJEZXN0aW5hdGlvbiBsYXVuY2ggaWRlbnRpdHkiICJDb2Fyc2Ugc2VydmljZSBhY2Nlc3MiCiAgICAgICAgfQogICAgICAgIGRlcGxveW1lbnRFbnZpcm9ubWVudCAiVG9wb2xvZ3kgaG9zdCIgewogICAgICAgICAgICBob3N0X2FnZW50SG9zdFRydXN0Qm91bmRhcnlOb2RlID0gZGVwbG95bWVudE5vZGUgIldvcmtsb2FkIGhvc3QgdHJ1c3QgYm91bmRhcnkiICJQcml2aWxlZ2VkIGhvc3QgY29udHJvbCByZW1haW5zIG91dHNpZGUgZXZlcnkgZ3Vlc3QuIiAiV29ya2xvYWQgaG9zdCIgewogICAgICAgICAgICAgICAgaG9zdF9kZWRpY2F0ZWRXb3JrZXJVc2VyTm9kZSA9IGRlcGxveW1lbnROb2RlICJEZWRpY2F0ZWQgd29ya2VyIHVzZXIiICJTZXBhcmF0ZSBmcm9tIHRoZSBob3N0LW1vZGUgYWdlbnQgdXNlci4iICJVc2VyIGJvdW5kYXJ5IiB7CiAgICAgICAgICAgICAgICAgICAgaG9zdF9ob3N0V29ya2VyID0gY29udGFpbmVySW5zdGFuY2UgaG9zdFdvcmtlcgogICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgaG9zdF9wcml2aWxlZ2VkU2V0dXBCb3VuZGFyeU5vZGUgPSBkZXBsb3ltZW50Tm9kZSAiUHJpdmlsZWdlZCBzZXR1cCBib3VuZGFyeSIgIkhlbHBlciBhdXRob3JpdHkgYW5kIGNhbGxlciBiaW5kaW5nIHJlbWFpbiB1bmRlY2lkZWQuIiAiUHJpdmlsZWdlIGJvdW5kYXJ5IiB7CiAgICAgICAgICAgICAgICAgICAgaG9zdF9oZWxwZXIgPSBjb250YWluZXJJbnN0YW5jZSBoZWxwZXIKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgIGhvc3RfaG9zdFJlc29sdmVyID0gY29udGFpbmVySW5zdGFuY2UgaG9zdFJlc29sdmVyCiAgICAgICAgICAgICAgICBob3N0X29wZXJhdG9yQWNjZXNzQm91bmRhcnlOb2RlID0gZGVwbG95bWVudE5vZGUgIk9wZXJhdG9yIGFjY2VzcyBib3VuZGFyeSIgIkhvc3QgYWNjZXNzIHJlcXVpcmVzIGF1dGhvcml6YXRpb247IG5hbWUgcmVzb2x1dGlvbiBncmFudHMgbm9uZS4iICJIb3N0IHNlcnZpY2UiIHsKICAgICAgICAgICAgICAgICAgICBob3N0X2xvb3BiYWNrUHJveHkgPSBjb250YWluZXJJbnN0YW5jZSBsb29wYmFja1Byb3h5CiAgICAgICAgICAgICAgICAgICAgaG9zdF9ob3N0TmV0d29yayA9IGNvbnRhaW5lckluc3RhbmNlIGhvc3ROZXR3b3JrCiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICBob3N0X2FnZW50TGF1bmNoQU5vZGUgPSBkZXBsb3ltZW50Tm9kZSAiQWdlbnQgbGF1bmNoIEEiICJJbmRlcGVuZGVudCBkYXRhIHBhdGg7IG1lZGlhdGlvbiBhbmQgbmV0d29yayB1c2VycyB1bmRlY2lkZWQuIiAiTGF1bmNoIGJvdW5kYXJ5IiB7CiAgICAgICAgICAgICAgICAgICAgaG9zdF9ndWVzdEFOb2RlID0gZGVwbG95bWVudE5vZGUgIkd1ZXN0IEEiICJIb3N0IG1vZGUgdXNlcyB0aGUgZGVkaWNhdGVkIGFnZW50IHVzZXIsIHNlcGFyYXRlIGZyb20gdGhlIHdvcmtlci4iICJEZWRpY2F0ZWQgYWdlbnQgdXNlciBpbiBob3N0IG1vZGUiIHsKICAgICAgICAgICAgICAgICAgICAgICAgaG9zdF9ndWVzdCA9IGNvbnRhaW5lckluc3RhbmNlIGd1ZXN0CiAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgICAgIGhvc3RfbWVkaWF0b3JBTm9kZSA9IGRlcGxveW1lbnROb2RlICJNZWRpYXRvciBBIiAiUG9saWN5IGJvdW5kYXJ5OyBubyBpbmRlcGVuZGVudCBuZXR3b3JrLiIgIkxvY2FsIGNvbmZpbmVtZW50OyB1c2VyIHVuZGVjaWRlZCIgewogICAgICAgICAgICAgICAgICAgICAgICBob3N0X21lZGlhdG9yID0gY29udGFpbmVySW5zdGFuY2UgbWVkaWF0b3IKICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgaG9zdF9hZ2VudFByb3h5QU5vZGUgPSBkZXBsb3ltZW50Tm9kZSAiV29ya2xvYWQgcHJveHkgQSIgIk93biBvdmVybGF5IG5vZGUgYW5kIGxhdW5jaCBYLjUwOS1TVklEOyBjYXJyaWVzIHdvcmtsb2FkIHRyYWZmaWMuIiAidHNuZXQgbm9kZTsgdXNlciB1bmRlY2lkZWQiIHsKICAgICAgICAgICAgICAgICAgICAgICAgaG9zdF93b3JrbG9hZC1wcm94eSA9IGNvbnRhaW5lckluc3RhbmNlIHdvcmtsb2FkLXByb3h5CiAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgaG9zdF9hZ2VudExhdW5jaEJOb2RlID0gZGVwbG95bWVudE5vZGUgIkFnZW50IGxhdW5jaCBCIiAiSW5kZXBlbmRlbnQgZGF0YSBwYXRoOyBzYW1lLWhvc3QgdHJhZmZpYyB1c2VzIHRoZSBvdmVybGF5LiIgIkxhdW5jaCBib3VuZGFyeSIgewogICAgICAgICAgICAgICAgICAgIGhvc3RfZ3Vlc3RCTm9kZSA9IGRlcGxveW1lbnROb2RlICJHdWVzdCBCIiAiSG9zdCBtb2RlIHVzZXMgdGhlIGRlZGljYXRlZCBhZ2VudCB1c2VyLCBzZXBhcmF0ZSBmcm9tIHRoZSB3b3JrZXIuIiAiRGVkaWNhdGVkIGFnZW50IHVzZXIgaW4gaG9zdCBtb2RlIiB7CiAgICAgICAgICAgICAgICAgICAgICAgIGhvc3RfZGVzdGluYXRpb25HdWVzdCA9IGNvbnRhaW5lckluc3RhbmNlIGRlc3RpbmF0aW9uR3Vlc3QKICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgaG9zdF9tZWRpYXRvckJOb2RlID0gZGVwbG95bWVudE5vZGUgIk1lZGlhdG9yIEIiICJQb2xpY3kgYm91bmRhcnk7IG5vIGluZGVwZW5kZW50IG5ldHdvcmsuIiAiTG9jYWwgY29uZmluZW1lbnQ7IHVzZXIgdW5kZWNpZGVkIiB7CiAgICAgICAgICAgICAgICAgICAgICAgIGhvc3RfZGVzdGluYXRpb25NZWRpYXRvciA9IGNvbnRhaW5lckluc3RhbmNlIGRlc3RpbmF0aW9uTWVkaWF0b3IKICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgaG9zdF9hZ2VudFByb3h5Qk5vZGUgPSBkZXBsb3ltZW50Tm9kZSAiV29ya2xvYWQgcHJveHkgQiIgIk93biBvdmVybGF5IG5vZGUgYW5kIGxhdW5jaCBYLjUwOS1TVklEOyBjYXJyaWVzIHdvcmtsb2FkIHRyYWZmaWMuIiAidHNuZXQgbm9kZTsgdXNlciB1bmRlY2lkZWQiIHsKICAgICAgICAgICAgICAgICAgICAgICAgaG9zdF9kZXN0aW5hdGlvbi13b3JrbG9hZC1wcm94eSA9IGNvbnRhaW5lckluc3RhbmNlIGRlc3RpbmF0aW9uLXdvcmtsb2FkLXByb3h5CiAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgfQogICAgICAgICAgICB9CiAgICAgICAgfQogICAgICAgIGRlcGxveW1lbnRFbnZpcm9ubWVudCAiVG9wb2xvZ3kgbGF1bmNoIiB7CiAgICAgICAgICAgIGxhdW5jaF9hZ2VudEhvc3RUcnVzdEJvdW5kYXJ5Tm9kZSA9IGRlcGxveW1lbnROb2RlICJXb3JrbG9hZCBob3N0IHRydXN0IGJvdW5kYXJ5IiAiV29ya2VyIHN0YXlzIG91dHNpZGUgdGhpcyBkYXRhIHBhdGg7IHNlcnZpY2UgdXNlcnMgdW5kZWNpZGVkLiIgIldvcmtsb2FkIGhvc3QiIHsKICAgICAgICAgICAgICAgIGxhdW5jaF9hZ2VudExhdW5jaEJvdW5kYXJ5Tm9kZSA9IGRlcGxveW1lbnROb2RlICJBZ2VudCBsYXVuY2ggYm91bmRhcnkiICJMYXVuY2gtYm91bmQgbG9jYWwgY2FycmllcnM7IHByaXZhdGUga2V5cyBzdGF5IG91dHNpZGUgdGhlIGd1ZXN0LiIgIkxhdW5jaCBpc29sYXRpb24iIHsKICAgICAgICAgICAgICAgICAgICBsYXVuY2hfZ3Vlc3RUcnVzdEJvdW5kYXJ5Tm9kZSA9IGRlcGxveW1lbnROb2RlICJHdWVzdCB0cnVzdCBib3VuZGFyeSIgIkd1ZXN0IGhhcyBubyBvdmVybGF5IG5vZGUgb3Igd29ya2xvYWQga2V5LiIgIldvcmtsb2FkIHByb3ZpZGVyIGNvbmZpbmVtZW50IiB7CiAgICAgICAgICAgICAgICAgICAgICAgIGxhdW5jaF9ndWVzdCA9IGNvbnRhaW5lckluc3RhbmNlIGd1ZXN0CiAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgICAgIGxhdW5jaF9tZWRpYXRpb25UcnVzdEJvdW5kYXJ5Tm9kZSA9IGRlcGxveW1lbnROb2RlICJNZWRpYXRpb24gdHJ1c3QgYm91bmRhcnkiICJFbmZvcmNlcyBjb25uZWN0aW9uIGFuZCBtZXNzYWdlIHBvbGljeTsgbm8gaW5kZXBlbmRlbnQgbmV0d29yay4iICJMb2NhbCBjb25maW5lbWVudDsgdXNlciB1bmRlY2lkZWQiIHsKICAgICAgICAgICAgICAgICAgICAgICAgbGF1bmNoX21lZGlhdG9yID0gY29udGFpbmVySW5zdGFuY2UgbWVkaWF0b3IKICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgbGF1bmNoX2FnZW50UHJveHlUcnVzdEJvdW5kYXJ5Tm9kZSA9IGRlcGxveW1lbnROb2RlICJXb3JrbG9hZCBwcm94eSB0cnVzdCBib3VuZGFyeSIgIk9ubHkgbGF1bmNoIGNvbXBvbmVudCBvcGVuaW5nIG9mZi1ob3N0IGNvbm5lY3Rpb25zLiIgInRzbmV0IG5vZGU7IHVzZXIgdW5kZWNpZGVkIiB7CiAgICAgICAgICAgICAgICAgICAgICAgIGxhdW5jaF93b3JrbG9hZC1wcm94eSA9IGNvbnRhaW5lckluc3RhbmNlIHdvcmtsb2FkLXByb3h5CiAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgfQogICAgICAgICAgICB9CiAgICAgICAgICAgIGxhdW5jaF9jb250cm9sUGxhbmVUcnVzdEJvdW5kYXJ5Tm9kZSA9IGRlcGxveW1lbnROb2RlICJDb250cm9sIHBsYW5lIHRydXN0IGJvdW5kYXJ5IiAiU2VydmljZSBpZGVudGl0aWVzIGF1dGhlbnRpY2F0ZSB3b3JrbG9hZCBjb25uZWN0aW9ucy4iICJDbHVzdGVyIG92ZXJsYXkiIHsKCiAgICAgICAgICAgICAgICBsYXVuY2hfYXBpU2VydmljZU5vZGVOb2RlID0gZGVwbG95bWVudE5vZGUgIkFQSSBzZXJ2aWNlIG5vZGUiICJDaGVja3MgbGl2ZSBsYXVuY2ggY2FwYWJpbGl0aWVzIGFuZCBzY29wZXMuIiAidHNuZXQgbm9kZSIgewogICAgICAgICAgICAgICAgICAgIGxhdW5jaF9jb250cm9sQXBpID0gY29udGFpbmVySW5zdGFuY2UgY29udHJvbEFwaQogICAgICAgICAgICAgICAgfQogICAgICAgICAgICB9CiAgICAgICAgICAgIGxhdW5jaF9pbnRlcm5ldEJvdW5kYXJ5Tm9kZSA9IGRlcGxveW1lbnROb2RlICJJbnRlcm5ldCBib3VuZGFyeSIgIkRlc3RpbmF0aW9uIGF1dGhlbnRpY2F0aW9uIGRpZmZlcnMgZnJvbSB3b3JrbG9hZCBpZGVudGl0eS4iICJFeHRlcm5hbCBzZXJ2aWNlcyIgewogICAgICAgICAgICAgICAgbGF1bmNoX2ludGVybmV0ID0gc29mdHdhcmVTeXN0ZW1JbnN0YW5jZSBpbnRlcm5ldAogICAgICAgICAgICB9CiAgICAgICAgfQogICAgfQoKICAgIHZpZXdzIHsKICAgICAgICBwcm9wZXJ0aWVzIHsKICAgICAgICAgICAgcGxhbnR1bWwuc2tpbnBhcmFtcyAibm9kZXNlcD04MCxyYW5rc2VwPTE2MCIKICAgICAgICB9CiAgICAgICAgc3lzdGVtQ29udGV4dCBhZmFrdCAiYWZha3QtY29udGV4dCIgImFmYWt0IGFuZCB0aGUgcGVvcGxlIGFuZCBzeXN0ZW1zIGl0IGludGVyYWN0cyB3aXRoLiIgewogICAgICAgICAgICBpbmNsdWRlICoKICAgICAgICAgICAgZXhjbHVkZSAiZWxlbWVudC50YWc9PVRvcG9sb2d5IgogICAgICAgICAgICBhdXRvTGF5b3V0IGxyCiAgICAgICAgfQogICAgICAgIGNvbnRhaW5lciBhZmFrdCAiYWZha3QtY29udGFpbmVycyIgIlRoZSBhZmFrdCBwcm9jZXNzIGFuZCBpdHMgZXh0ZXJuYWwgZGVwZW5kZW5jaWVzLiIgewogICAgICAgICAgICBpbmNsdWRlICoKICAgICAgICAgICAgZXhjbHVkZSAiZWxlbWVudC50YWc9PVRvcG9sb2d5IgogICAgICAgICAgICBhdXRvTGF5b3V0IGxyCiAgICAgICAgfQogICAgICAgIGNvbXBvbmVudCBydW50aW1lICJhZmFrdC1jb21wb25lbnRzIiAiVGhlIGNvbXBvbmVudHMgaW5zaWRlIHRoZSBjb21iaW5lZCBhZmFrdCBwcm9jZXNzLiIgewogICAgICAgICAgICBpbmNsdWRlICoKICAgICAgICAgICAgZXhjbHVkZSAiZWxlbWVudC50YWc9PVRvcG9sb2d5IgogICAgICAgICAgICBhdXRvTGF5b3V0IGxyCiAgICAgICAgfQoKICAgICAgICBkZXBsb3ltZW50ICogIlRvcG9sb2d5IGNvbnRleHQiICJuZXR3b3JrLWNvbnRleHQiICJPcGVyYXRvciBkZXZpY2VzLCBhdHRhY2hlZCB0YWlsbmV0cywgY2x1c3RlciBhbmQgaW50ZXJuZXQgdHJ1c3QgYm91bmRhcmllcy4iIHsKICAgICAgICAgICAgaW5jbHVkZSAqCiAgICAgICAgICAgIGF1dG9MYXlvdXQgbHIKICAgICAgICB9CiAgICAgICAgZGVwbG95bWVudCAqICJUb3BvbG9neSBjbHVzdGVyIiAibmV0d29yay1jbHVzdGVyIiAiU2VydmljZSBub2RlcyBhbmQgaW5kZXBlbmRlbnQgbGF1bmNoIG5vZGVzIG9uIHRoZSBwcml2YXRlIG92ZXJsYXkuIiB7CiAgICAgICAgICAgIGluY2x1ZGUgKgogICAgICAgICAgICBleGNsdWRlICJyZWxhdGlvbnNoaXAudGFnPT1Ub3BvbG9neUNvbm5lY3Rpb24iCiAgICAgICAgICAgIGF1dG9MYXlvdXQgbHIKICAgICAgICB9CiAgICAgICAgZGVwbG95bWVudCAqICJUb3BvbG9neSBob3N0IiAibmV0d29yay1ob3N0IiAiSG9zdCBtYW5hZ2VtZW50LCBvcGVyYXRvciBhY2Nlc3MgYW5kIGluZGVwZW5kZW50IGxhdW5jaCB0cnVzdCBib3VuZGFyaWVzLiIgewogICAgICAgICAgICBpbmNsdWRlICoKICAgICAgICAgICAgZXhjbHVkZSAicmVsYXRpb25zaGlwLnRhZz09TGlmZWN5Y2xlRGV0YWlsIgogICAgICAgICAgICBleGNsdWRlICJyZWxhdGlvbnNoaXAudGFnPT1SZXR1cm5EZXRhaWwiCiAgICAgICAgICAgIGV4Y2x1ZGUgInJlbGF0aW9uc2hpcC50YWc9PVVuZGVjaWRlZCIKICAgICAgICAgICAgYXV0b0xheW91dCB0YgogICAgICAgIH0KICAgICAgICBkZXBsb3ltZW50ICogIlRvcG9sb2d5IGxhdW5jaCIgIm5ldHdvcmstbGF1bmNoIiAiT25lIGxhdW5jaCBjcm9zc2VzIGd1ZXN0LCBtZWRpYXRpb24sIG5ldHdvcmsgYW5kIHNlcnZpY2UgYm91bmRhcmllcy4iIHsKICAgICAgICAgICAgaW5jbHVkZSAqCiAgICAgICAgICAgIGV4Y2x1ZGUgInJlbGF0aW9uc2hpcC50YWc9PVJldHVybkRldGFpbCIKICAgICAgICAgICAgYXV0b0xheW91dCBscgogICAgICAgIH0KICAgICAgICBkeW5hbWljIGFmYWt0ICJuZXR3b3JrLWZsb3ctaW50ZXJuZXQiICJHdWVzdCBlZ3Jlc3MgdGhyb3VnaCBpdHMgcHJveHkgdW5kZXIgbWVkaWF0b3IgZGVjaXNpb25zLiIgewogICAgICAgICAgICBndWVzdCAtPiB3b3JrbG9hZC1wcm94eSAiVHJhZmZpYyBvbiBwcml2YXRlIHdvcmtsb2FkIGxpbms7IG5vIGd1ZXN0IHdvcmtsb2FkIGtleSIKICAgICAgICAgICAgd29ya2xvYWQtcHJveHkgLT4gbWVkaWF0b3IgIlJlcXVlc3QgZGVzdGluYXRpb24gZGVjaXNpb24iCiAgICAgICAgICAgIG1lZGlhdG9yIC0+IHdvcmtsb2FkLXByb3h5ICJQZXJtaXQgZGVzdGluYXRpb247IGluc3RydWN0IHByb3h5IFRMUyB0ZXJtaW5hdGlvbiB3aGVuIHJlcXVpcmVkIgogICAgICAgICAgICB3b3JrbG9hZC1wcm94eSAtPiBpbnRlcm5ldCAiUGVybWl0dGVkIHJlcXVlc3Q7IGRlc3RpbmF0aW9uIGNyZWRlbnRpYWxzIHdoZW4gYXV0aG9yaXplZCIKICAgICAgICAgICAgYXV0b0xheW91dCBscgogICAgICAgIH0KICAgICAgICBkeW5hbWljIGFmYWt0ICJuZXR3b3JrLWZsb3ctY29udHJvbCIgIkd1ZXN0IHJlcXVlc3QgdG8gdGhlIGNvbnRyb2wgcGxhbmUgQVBJIHNlcnZpY2UuIiB7CiAgICAgICAgICAgIGd1ZXN0IC0+IHdvcmtsb2FkLXByb3h5ICJDb250cm9sIHJlcXVlc3QgYm91bmQgdG8gY3VycmVudCBsYXVuY2giCiAgICAgICAgICAgIHdvcmtsb2FkLXByb3h5IC0+IG1lZGlhdG9yICJSZXF1ZXN0IHBvbGljeSBkZWNpc2lvbiBhbmQgaWRlbnRpdHkgYmluZGluZyIKICAgICAgICAgICAgbWVkaWF0b3IgLT4gd29ya2xvYWQtcHJveHkgIlBvbGljeSBwZXJtaXQgYW5kIHN0YW1wZWQgbGF1bmNoIGlkZW50aXR5IgogICAgICAgICAgICB3b3JrbG9hZC1wcm94eSAtPiBjb250cm9sQXBpICJMYXVuY2ggWC41MDktU1ZJRDsgc2VydmljZSBjaGVja3MgY2FwYWJpbGl0aWVzIGFuZCBzY29wZXMiCiAgICAgICAgICAgIGF1dG9MYXlvdXQgbHIKICAgICAgICB9CiAgICAgICAgZHluYW1pYyBhZmFrdCAibmV0d29yay1mbG93LXByZXZpZXciICJPcGVyYXRvciBicm93c2VyIHJlYWNoZXMgYSBwcmV2aWV3IHRocm91Z2ggdGhlIGhvc3Qgbm9kZS4iIHsKICAgICAgICAgICAgYnJvd3NlciAtPiBob3N0UmVzb2x2ZXIgIlJlc29sdmUgaW50ZXJuYWwgcHJldmlldyBuYW1lIgogICAgICAgICAgICBicm93c2VyIC0+IGxvb3BiYWNrUHJveHkgIkhvc3QgYWNjZXNzIHJlcXVlc3Q7IG1lY2hhbmlzbSB1bmRlY2lkZWQiCiAgICAgICAgICAgIGxvb3BiYWNrUHJveHkgLT4gaG9zdE5ldHdvcmsgIlJlcXVlc3QgdW5kZXIgaG9zdC1sZXZlbCBhdXRob3JpemF0aW9uIgogICAgICAgICAgICBob3N0TmV0d29yayAtPiBwcmV2aWV3U2VydmVyICJIb3N0IHdvcmtsb2FkIGlkZW50aXR5OyBzZXJ2ZWQgYXBwIG1heSByZXF1aXJlIGl0cyBvd24gc2lnbi1pbiIKICAgICAgICAgICAgcHJldmlld1NlcnZlciAtPiB3b3JrbG9hZC1wcm94eSAiRGlyZWN0IG92ZXJsYXkgY29ubmVjdGlvbjsgbXV0dWFsIFNQSUZGRSBhdXRoZW50aWNhdGlvbiIKICAgICAgICAgICAgd29ya2xvYWQtcHJveHkgLT4gbWVkaWF0b3IgIlJlcXVlc3QgZGVjaXNpb24gZm9yIGNhbGxlciBhbmQgcHVibGljYXRpb24iCiAgICAgICAgICAgIG1lZGlhdG9yIC0+IHdvcmtsb2FkLXByb3h5ICJSZXR1cm4gZGVjaXNpb247IHB1YmxpY2F0aW9uIGJpbmRpbmcgcmVtYWlucyBvcGVuIgogICAgICAgICAgICB3b3JrbG9hZC1wcm94eSAtPiBndWVzdCAiUGVybWl0dGVkIGluZ3Jlc3M7IGxpc3RlbmVyIGJpbmRpbmcgb3BlbiAoT1EtUE9SVC0xNCkiCiAgICAgICAgICAgIGF1dG9MYXlvdXQgdGIKICAgICAgICB9CiAgICAgICAgZHluYW1pYyBhZmFrdCAibmV0d29yay1mbG93LXBob25lIiAiUGhvbmUgcmVhY2hlcyB0aGUgZGFzaGJvYXJkIHRocm91Z2ggYW4gYXR0YWNoZWQgdXNlciB0YWlsbmV0LiIgewogICAgICAgICAgICBwaG9uZSAtPiB1c2VyVGFpbG5ldCAiRGV2aWNlIGlkZW50aXR5IGluIHVzZXItb3duZWQgbmV0d29yayIKICAgICAgICAgICAgdXNlclRhaWxuZXQgLT4gZWRnZSAiUHJpdmF0ZSBhcHBsaWNhdGlvbiByZXF1ZXN0OyBhZmFrdCBzaWduLWluIgogICAgICAgICAgICBlZGdlIC0+IGNvbnRyb2xBcGkgIkF1dGhlbnRpY2F0ZWQgdXNlciBjb250ZXh0IHRvIHdlYiBkYXNoYm9hcmQ7IG5vIHBhY2tldCByb3V0aW5nIgogICAgICAgICAgICBhdXRvTGF5b3V0IGxyCiAgICAgICAgfQogICAgICAgIGR5bmFtaWMgYWZha3QgIm5ldHdvcmstZmxvdy1zdGF0aWMiICJBIGJyb3dzZXIgcmVxdWVzdHMgYSBzdGF0aWMgc2l0ZSB0aHJvdWdoIHRoZSBleHRlcm5hbCBpbmdyZXNzIGdhdGV3YXkuIiB7CiAgICAgICAgICAgIGJyb3dzZXIgLT4gZWRnZSAiUHVibGljIHJlcXVlc3QgZm9yIGEgc3RhdGljIHNpdGUgaG9zdG5hbWUiCiAgICAgICAgICAgIGVkZ2UgLT4gc3RhdGljT3JpZ2luICJIb3N0bmFtZSBtYXBwZWQgdG8gdGhlIGFjdGl2ZSBkZXBsb3k7IGdhdGV3YXkgY29tcHJlc3NlcyBhbmQgY2FjaGVzIgogICAgICAgICAgICBhdXRvTGF5b3V0IGxyCiAgICAgICAgfQogICAgICAgIGR5bmFtaWMgYWZha3QgIm5ldHdvcmstZmxvdy1ncmFudCIgIkRpcmVjdCBvdmVybGF5IGNvbm5lY3Rpb24gY2hlY2tlZCBieSBib3RoIG1lZGlhdG9ycy4iIHsKICAgICAgICAgICAgZ3Vlc3QgLT4gd29ya2xvYWQtcHJveHkgIlNvdXJjZSBsYXVuY2ggcmVxdWVzdHMgcHVibGlzaGVkIGRlc3RpbmF0aW9uIgogICAgICAgICAgICB3b3JrbG9hZC1wcm94eSAtPiBtZWRpYXRvciAiUmVxdWVzdCBlZ3Jlc3MgZGVjaXNpb24iCiAgICAgICAgICAgIG1lZGlhdG9yIC0+IHdvcmtsb2FkLXByb3h5ICJTb3VyY2UgcG9saWN5IHBlcm1pdHMgZGVzdGluYXRpb24gbmFtZSBhbmQgcG9ydCIKICAgICAgICAgICAgd29ya2xvYWQtcHJveHkgLT4gZGVzdGluYXRpb24td29ya2xvYWQtcHJveHkgIkRpcmVjdCBvdmVybGF5IGNvbm5lY3Rpb24gd2l0aCBtdXR1YWwgU1BJRkZFIGF1dGhlbnRpY2F0aW9uIgogICAgICAgICAgICBkZXN0aW5hdGlvbi13b3JrbG9hZC1wcm94eSAtPiBkZXN0aW5hdGlvbk1lZGlhdG9yICJBdXRoZW50aWNhdGVkIHNvdXJjZSBsYXVuY2ggYW5kIGRlc3RpbmF0aW9uIGdyYW50IgogICAgICAgICAgICBkZXN0aW5hdGlvbk1lZGlhdG9yIC0+IGRlc3RpbmF0aW9uLXdvcmtsb2FkLXByb3h5ICJSZXR1cm4gaW5ncmVzcyBkZWNpc2lvbiIKICAgICAgICAgICAgZGVzdGluYXRpb24td29ya2xvYWQtcHJveHkgLT4gZGVzdGluYXRpb25HdWVzdCAiUGVybWl0dGVkIGluZ3Jlc3M7IGxpc3RlbmVyIGJpbmRpbmcgb3BlbiAoT1EtUE9SVC0xNCkiCiAgICAgICAgICAgIGF1dG9MYXlvdXQgdGIKICAgICAgICB9CiAgICAgICAgY29udGFpbmVyIGFmYWt0ICJuZXR3b3JrLXNlcnZpY2UtYm91bmRhcmllcyIgIlNlcnZpY2VzIHN1cHBvcnRpbmcgdGhlIGRlcGxveW1lbnQgdG9wb2xvZ3k7IGNvbm5lY3Rpb25zIGFyZSBjb250cm9sIG9yIHRyYW5zcG9ydCBkZXBlbmRlbmNpZXMuIiB7CiAgICAgICAgICAgIGluY2x1ZGUgaG9zdFdvcmtlciBoZWxwZXIgY29udHJvbEFwaSBtY3BHYXRld2F5IGNvb3JkaW5hdGlvbiBvdmVybGF5UmVsYXkKICAgICAgICAgICAgZXhjbHVkZSAicmVsYXRpb25zaGlwLnRhZz09T3ZlcnZpZXdIaWRkZW4iCiAgICAgICAgICAgIGF1dG9MYXlvdXQgdGIKICAgICAgICB9CiAgICAgICAgc3R5bGVzIHsKICAgICAgICAgICAgZWxlbWVudCAiVG9wb2xvZ3kiIHsKICAgICAgICAgICAgICAgIGJhY2tncm91bmQgI2U4ZjFmYQogICAgICAgICAgICAgICAgY29sb3IgIzEyMmI0NAogICAgICAgICAgICAgICAgc3Ryb2tlICMzMTViN2QKICAgICAgICAgICAgfQogICAgICAgICAgICBlbGVtZW50ICJEZXBsb3ltZW50IE5vZGUiIHsKICAgICAgICAgICAgICAgIGJhY2tncm91bmQgI2Y1ZjdmYQogICAgICAgICAgICAgICAgY29sb3IgIzE4MmMzZQogICAgICAgICAgICAgICAgc3Ryb2tlICM1MzZiN2UKICAgICAgICAgICAgfQogICAgICAgICAgICBlbGVtZW50ICJHcm91cCIgewogICAgICAgICAgICAgICAgY29sb3IgIzE4MmMzZQogICAgICAgICAgICAgICAgc3Ryb2tlICM1MzZiN2UKICAgICAgICAgICAgfQogICAgICAgICAgICByZWxhdGlvbnNoaXAgIlVuZGVjaWRlZCIgewogICAgICAgICAgICAgICAgY29sb3IgIzhhNWEwMAogICAgICAgICAgICAgICAgc3R5bGUgZGFzaGVkCiAgICAgICAgICAgIH0KICAgICAgICB9CiAgICB9CgogICAgY29uZmlndXJhdGlvbiB7CiAgICAgICAgc2NvcGUgc29mdHdhcmVzeXN0ZW0KICAgIH0KfQ==",
+    "structurizr.dsl": "d29ya3NwYWNlICJhZmFrdCIgIkFyY2hpdGVjdHVyZSBvZiB0aGUgYWZha3QgbW9kdWxhciBtb25vbGl0aC4iIHsKICAgIHByb3BlcnRpZXMgewogICAgICAgIC8vIERvY3VtZW50YXRpb24gYW5kIGRlY2lzaW9ucyBzdGF5IGluIHRoZSByZXBvc2l0b3J5J3MgZG9jcyBidW5kbGUuCiAgICAgICAgc3RydWN0dXJpenIuaW5zcGVjdGlvbi5tb2RlbC5zb2Z0d2FyZXN5c3RlbS5kb2N1bWVudGF0aW9uIGlnbm9yZQogICAgICAgIHN0cnVjdHVyaXpyLmluc3BlY3Rpb24ubW9kZWwuc29mdHdhcmVzeXN0ZW0uZGVjaXNpb25zIGlnbm9yZQogICAgfQoKICAgIG1vZGVsIHsKICAgICAgICBkZXZlbG9wZXIgPSBwZXJzb24gIkRldmVsb3BlciBvciB0ZXN0ZXIiICJSdW5zIGFmYWt0IGFuZCBpbnNwZWN0cyBpdHMgd29ya2Zsb3dzLiIKICAgICAgICBnaXRodWIgPSBzb2Z0d2FyZVN5c3RlbSAiR2l0SHViIiAiRGVsaXZlcnMgd2ViaG9va3MgYW5kIGV4cG9zZXMgdGhlIEdpdEh1YiBBUEkuIgogICAgICAgIG5hdGl2ZSA9IHNvZnR3YXJlU3lzdGVtICJOYXRpdmUgYXBwcyIgIkNsaWVudHMgb2YgYWZha3QncyBSRVNUIEFQSS4iCiAgICAgICAgYWdlbnRzID0gc29mdHdhcmVTeXN0ZW0gIkFJIGNvZGluZyBhZ2VudHMiICJQZXJmb3JtIGNvZGluZyB3b3JrIHN0YXJ0ZWQgYnkgQWdlbnQgcnVubmVyLiIKICAgICAgICB0ZW1wb3JhbCA9IHNvZnR3YXJlU3lzdGVtICJFeHRlcm5hbCBUZW1wb3JhbCIgIlByb3ZpZGVzIGR1cmFibGUgZXhlY3V0aW9uIHdoZW4gd29ya2VycyB1c2UgYW4gZXh0ZXJuYWwgc2VydmVyLiIKCiAgICAgICAgYWZha3QgPSBzb2Z0d2FyZVN5c3RlbSAiYWZha3QiICJDb29yZGluYXRlcyBjb2Rpbmcgd29yayB0aHJvdWdoIGl0cyBBUEkgYW5kIHdvcmtmbG93cy4iIHsKICAgICAgICAgICAgcnVudGltZSA9IGNvbnRhaW5lciAiYWZha3QgcHJvY2VzcyIgIlJ1bnMgdGhlIHNlbGVjdGVkIHJ1bnRpbWUgc2VydmljZXMgdG9nZXRoZXIgb3Igc2VwYXJhdGVseSBmcm9tIHRoZSBzYW1lIGJpbmFyeS4iICJHbyIgewogICAgICAgICAgICAgICAgY2xpID0gY29tcG9uZW50ICJDb21tYW5kLWxpbmUgaW50ZXJmYWNlIiAiUnVucyBzZXJ2ZXIgc2VydmljZXMgYW5kIGNvbW11bmljYXRlcyB3aXRoIHRoZSBBUEkuIiAiR28iCiAgICAgICAgICAgICAgICBhcGkgPSBjb21wb25lbnQgIkFQSSBzZXJ2ZXIiICJTZXJ2ZXMgdGhlIFJFU1QgQVBJIGFuZCBzdGFydHMgd29ya2Zsb3dzLiIgIkdvIgogICAgICAgICAgICAgICAgd2ViaG9vayA9IGNvbXBvbmVudCAiR2l0SHViIHdlYmhvb2sgcmVjZWl2ZXIiICJBY2NlcHRzIHdlYmhvb2sgZGVsaXZlcmllcyBhbmQgc3RhcnRzIGNvb3JkaW5hdGlvbiB3b3JrLiIgIkdvIgogICAgICAgICAgICAgICAgb3JjaGVzdHJhdG9yID0gY29tcG9uZW50ICJFbWJlZGRlZCB3b3JrZmxvdyBvcmNoZXN0cmF0b3IiICJQcm92aWRlcyBkdXJhYmxlIGV4ZWN1dGlvbiBpbnNpZGUgdGhlIHByb2Nlc3MgZm9yIGRldmVsb3BtZW50IGFuZCB0ZXN0cy4iICJUZW1wb3JhbCIKICAgICAgICAgICAgICAgIHdvcmtmbG93cyA9IGNvbXBvbmVudCAiQ29vcmRpbmF0aW9uIHdvcmtmbG93cyIgIkNvb3JkaW5hdGUgd29yayBvbiB3b3JrZXJzIGluc2lkZSB0aGUgYmluYXJ5IGFuZCBzdGFydCBvdGhlciB3b3JrZmxvd3MuIiAiVGVtcG9yYWwiCiAgICAgICAgICAgICAgICBydW5uZXIgPSBjb21wb25lbnQgIkFnZW50IHJ1bm5lciIgIlJ1bnMgQUkgY29kaW5nIGFnZW50cyBhcyBhIHdvcmtmbG93LiIgIlRlbXBvcmFsIgogICAgICAgICAgICAgICAgdGVtcG9yYWxVSSA9IGNvbXBvbmVudCAiVGVtcG9yYWwgV2ViIFVJIiAiU2hvd3MgdGhlIGVtYmVkZGVkIHNlcnZlcidzIG5hbWVzcGFjZXMsIHdvcmtmbG93cywgYW5kIGhpc3Rvcmllcy4iICJUZW1wb3JhbCIKICAgICAgICAgICAgfQoKICAgICAgICAgICAgZ3JvdXAgIlBsYXRmb3JtIGFzIGEgU2VydmljZSIgewogICAgICAgICAgICAgICAgZGFzaGJvYXJkID0gY29udGFpbmVyICJXZWIgZGFzaGJvYXJkIiAiQSBwbGF0Zm9ybSBhcHA6IGEgc3RhdGljIHNpbmdsZS1wYWdlIGFwcCBvbiB0aGUgc3RhdGljIG9yaWdpbiBhbmQgYSBiYWNrZW5kLWZvci1mcm9udGVuZCBhcHAgd29ya2xvYWQgdGhhdCBob2xkcyB0aGUgdXNlcidzIHNlc3Npb24uIFRoZSBBUEkgb3JpZ2luIHJvdXRlcyAvZGFzaGJvYXJkIHRvIGl0LiIgIlJlYWN0IgogICAgICAgICAgICB9CgogICAgICAgICAgICBncm91cCAiQ29udHJvbCBwbGFuZSBzZXJ2aWNlcyIgewogICAgICAgICAgICAgICAgY29udHJvbEFwaSA9IGNvbnRhaW5lciAiQVBJIHNlcnZlciIgIlNlcnZlcyB3b3JrbG9hZCByZXNvdXJjZXM7IGltYWdlIGFuZCBob3N0LXdvcmtlciBvcGVyYXRpb25zIHJlbWFpbiBvcGVuLiIgIkFwcGxpY2F0aW9uIHNlcnZpY2UiICJUb3BvbG9neSIKICAgICAgICAgICAgICAgIHByZXZpZXdTZXJ2ZXIgPSBjb250YWluZXIgIlByZXZpZXcgc2VydmVyIiAiRGlhbHMgd29ya2xvYWQgcHJveGllcyBvdmVyIHRoZSBvdmVybGF5OyBwdWJsaXNoZWQtcG9ydCBsaXN0ZW5lciBiaW5kaW5nIHJlbWFpbnMgb3Blbi4iICJBcHBsaWNhdGlvbiBzZXJ2aWNlIiAiVG9wb2xvZ3kiCiAgICAgICAgICAgICAgICBtY3BHYXRld2F5ID0gY29udGFpbmVyICJNQ1AgZ2F0ZXdheSIgIkNoZWNrcyBsYXVuY2ggdG9vbCBncmFudHMgYW5kIGtlZXBzIHVwc3RyZWFtIGNyZWRlbnRpYWxzIG91dHNpZGUgZ3Vlc3RzLiIgIkFwcGxpY2F0aW9uIHNlcnZpY2UiICJUb3BvbG9neSIKICAgICAgICAgICAgICAgIHN0YXRpY09yaWdpbiA9IGNvbnRhaW5lciAiU3RhdGljIG9yaWdpbiIgIlNlcnZlcyBzdGF0aWMgc2l0ZSBhbmQgc2luZ2xlLXBhZ2UgYXBwIGRlcGxveXMgZnJvbSBsb2NhbCBjb3BpZXMgb2YgdGhlaXIgZmlsZXM7IGtlZXBzIG5vIGNhY2hlLiIgIkNhZGR5IiAiVG9wb2xvZ3kiCiAgICAgICAgICAgICAgICBjb29yZGluYXRpb24gPSBjb250YWluZXIgIk92ZXJsYXkgY29vcmRpbmF0aW9uIiAiQW4gYWZha3QgaW50ZXJmYWNlIGZyb250cyBpc29sYXRlZCBIZWFkc2NhbGUgY29vcmRpbmF0aW9uOyBjbHVzdGVyIG5vZGVzIHJldGFpbiBhIHN0YXRpYyBtYXAgb2Ygc3RhYmxlIG5vZGVzLiIgIkhlYWRzY2FsZSIgIlRvcG9sb2d5IgogICAgICAgICAgICAgICAgb3ZlcmxheVJlbGF5ID0gY29udGFpbmVyICJPdmVybGF5IHJlbGF5IiAiQ2FycmllcyBlbmNyeXB0ZWQgb3ZlcmxheSB0cmFmZmljIHdoZW4gYSByZWxheSBwYXRoIGlzIG5lZWRlZC4iICJPdmVybGF5IHRyYW5zcG9ydCIgIlRvcG9sb2d5IgogICAgICAgICAgICB9CiAgICAgICAgICAgIGdyb3VwICJFeHRlcm5hbCBpbmdyZXNzIGJvdW5kYXJ5IiB7CiAgICAgICAgICAgICAgICBlZGdlID0gY29udGFpbmVyICJFeHRlcm5hbCBpbmdyZXNzIGdhdGV3YXkiICJBY2NlcHRzIHB1YmxpYyBhbmQgYXR0YWNoZWQtdGFpbG5ldCBhcHBsaWNhdGlvbiByZXF1ZXN0czsgbmV2ZXIgcm91dGVzIHBhY2tldHMgYmV0d2VlbiB0YWlsbmV0cyBhbmQgdGhlIGNsdXN0ZXIuIiAiQXBwbGljYXRpb24gcHJveHkiICJUb3BvbG9neSIKICAgICAgICAgICAgfQogICAgICAgICAgICBncm91cCAiSG9zdCBtYW5hZ2VtZW50IGJvdW5kYXJ5IiB7CiAgICAgICAgICAgICAgICBob3N0V29ya2VyID0gY29udGFpbmVyICJXb3JrbG9hZCBob3N0IHdvcmtlciIgIk9ic2VydmVzIHdvcmtsb2FkIGV4ZWN1dGlvbiBhcyBhIGRlZGljYXRlZCBub24tcm9vdCB1c2VyOyB3b3JrbG9hZCBsaWZlY3ljbGUgb3duZXJzaGlwIHJlbWFpbnMgb3Blbi4iICJIb3N0IHNlcnZpY2UiICJUb3BvbG9neSIKICAgICAgICAgICAgICAgIGhlbHBlciA9IGNvbnRhaW5lciAiUHJpdmlsZWdlZCBoZWxwZXIiICJQZXJmb3JtcyBuYXJyb3dseSBhdXRob3JpemVkIHNldHVwIGFuZCBsYXVuY2ggb3BlcmF0aW9uczsgY2FsbGVyIGJpbmRpbmcgaXMgdW5kZWNpZGVkLiIgIkhvc3QgcHJpdmlsZWdlIGJvdW5kYXJ5IiAiVG9wb2xvZ3kiCiAgICAgICAgICAgICAgICBob3N0UmVzb2x2ZXIgPSBjb250YWluZXIgIkhvc3QgbmFtZSByZXNvbHZlciIgIlJlc29sdmVzIG5hbWVzIHVuZGVyICouYWZha3QuaW50ZXJuYWwgZm9yIGhvc3QgY2xpZW50cy4iICJEb21haW4gTmFtZSBTeXN0ZW0iICJUb3BvbG9neSIKICAgICAgICAgICAgfQogICAgICAgICAgICBncm91cCAiT3BlcmF0b3IgYWNjZXNzIG9uIHRoZSB3b3JrbG9hZCBob3N0IiB7CiAgICAgICAgICAgICAgICBsb29wYmFja1Byb3h5ID0gY29udGFpbmVyICJIb3N0IGFjY2VzcyBib3VuZGFyeSIgIkhvc3QtbGV2ZWwgYXV0aG9yaXphdGlvbiBmb3Igc2VydmljZXMsIHByZXZpZXdzIGFuZCBwb3J0czsgbG9jYWwgY2FsbGVyIGFuZCBjb25uZWN0aW9uIG1lY2hhbmlzbXMgdW5kZWNpZGVkLiIgIkFjY2VzcyBtZWNoYW5pc20gdW5kZWNpZGVkIiAiVG9wb2xvZ3kiCiAgICAgICAgICAgICAgICBob3N0TmV0d29yayA9IGNvbnRhaW5lciAiSG9zdC1sZXZlbCBjb25uZWN0aXZpdHkiICJIb3N0IGF1dGhvcml6YXRpb24gZm9yIGFnZW50IGFuZCBjbHVzdGVyIHNlcnZpY2VzOyBjb25uZWN0aW9uIG1lY2hhbmlzbSB1bmRlY2lkZWQ7IG9wdGlvbmFsIHVzZXIgdGFpbG5ldCBhdHRhY2htZW50LiIgIkhvc3QgY29ubmVjdGl2aXR5IHNlcnZpY2UiICJUb3BvbG9neSIKICAgICAgICAgICAgfQogICAgICAgICAgICBncm91cCAiTGF1bmNoIGd1ZXN0IGJvdW5kYXJ5IiB7CiAgICAgICAgICAgICAgICBndWVzdCA9IGNvbnRhaW5lciAiR3Vlc3QgY29udGV4dCIgIlVudHJ1c3RlZCBoYXJuZXNzLCByZWxheSBhbmQgbG9vcGJhY2sgbGlzdGVuZXJzOyBubyBvdmVybGF5IG1lbWJlcnNoaXAgb3Igd29ya2xvYWQga2V5cy4iICJXb3JrbG9hZCBwcm92aWRlciBjb25maW5lbWVudCIgIlRvcG9sb2d5IgogICAgICAgICAgICB9CiAgICAgICAgICAgIGdyb3VwICJMYXVuY2ggbWVkaWF0aW9uIGJvdW5kYXJ5IiB7CiAgICAgICAgICAgICAgICBtZWRpYXRvciA9IGNvbnRhaW5lciAiV29ya2xvYWQgcHJveHkgbWVkaWF0b3IiICJEZWNpZGVzIGV2ZXJ5IGluYm91bmQgYW5kIG91dGJvdW5kIGNvbm5lY3Rpb24gYW5kIHN0YW1wcyBpZGVudGl0eTsgbmV2ZXIgY2FycmllcyB0cmFmZmljLiIgIkxvY2FsIHBvbGljeSBlbmZvcmNlbWVudCIgIlRvcG9sb2d5IgogICAgICAgICAgICB9CiAgICAgICAgICAgIGdyb3VwICJMYXVuY2ggd29ya2xvYWQgcHJveHkgYm91bmRhcnkiIHsKICAgICAgICAgICAgICAgIHdvcmtsb2FkLXByb3h5ID0gY29udGFpbmVyICJXb3JrbG9hZCBwcm94eSIgIkNhcnJpZXMgd29ya2xvYWQgdHJhZmZpYyBpbiBib3RoIGRpcmVjdGlvbnM7IG93biBvdmVybGF5IG5vZGUgYW5kIGxhdW5jaCBYLjUwOS1TVklEOyBhc2tzIHRoZSBtZWRpYXRvciB0byBkZWNpZGUgZWFjaCBjb25uZWN0aW9uLiIgIk5ldHdvcmsgcHJveHkiICJUb3BvbG9neSIKICAgICAgICAgICAgfQogICAgICAgICAgICBncm91cCAiRGVzdGluYXRpb24gbGF1bmNoIGd1ZXN0IGJvdW5kYXJ5IiB7CiAgICAgICAgICAgICAgICBkZXN0aW5hdGlvbkd1ZXN0ID0gY29udGFpbmVyICJEZXN0aW5hdGlvbiBndWVzdCIgIlVudHJ1c3RlZCBoYXJuZXNzIGFuZCBwdWJsaXNoZWQgbG9vcGJhY2sgbGlzdGVuZXI7IG5vIG92ZXJsYXkgbWVtYmVyc2hpcCBvciB3b3JrbG9hZCBrZXlzLiIgIldvcmtsb2FkIHByb3ZpZGVyIGNvbmZpbmVtZW50IiAiVG9wb2xvZ3kiCiAgICAgICAgICAgIH0KICAgICAgICAgICAgZ3JvdXAgIkRlc3RpbmF0aW9uIGxhdW5jaCBtZWRpYXRpb24gYm91bmRhcnkiIHsKICAgICAgICAgICAgICAgIGRlc3RpbmF0aW9uTWVkaWF0b3IgPSBjb250YWluZXIgIkRlc3RpbmF0aW9uIG1lZGlhdG9yIiAiQ2hlY2tzIHRoZSBzb3VyY2UgZ3JhbnQgYW5kIGN1cnJlbnQgZGVzdGluYXRpb24gbGF1bmNoIGJlZm9yZSBsaXN0ZW5lciBhY2Nlc3M7IG5vIGluZGVwZW5kZW50IG5ldHdvcmsuIiAiTG9jYWwgcG9saWN5IGVuZm9yY2VtZW50IiAiVG9wb2xvZ3kiCiAgICAgICAgICAgIH0KICAgICAgICAgICAgZ3JvdXAgIkRlc3RpbmF0aW9uIGxhdW5jaCBuZXR3b3JrIGJvdW5kYXJ5IiB7CiAgICAgICAgICAgICAgICBkZXN0aW5hdGlvbi13b3JrbG9hZC1wcm94eSA9IGNvbnRhaW5lciAiRGVzdGluYXRpb24gd29ya2xvYWQgcHJveHkiICJDYXJyaWVzIGRlc3RpbmF0aW9uIHdvcmtsb2FkIHRyYWZmaWMgdW5kZXIgbWVkaWF0b3IgZGVjaXNpb25zOyBvd24gb3ZlcmxheSBub2RlIGFuZCBsYXVuY2ggWC41MDktU1ZJRC4iICJOZXR3b3JrIHByb3h5IiAiVG9wb2xvZ3kiCiAgICAgICAgICAgIH0KICAgICAgICB9CgogICAgICAgIGRldmVsb3BlciAtPiBjbGkgIlJ1bnMgY29tbWFuZHMiICJDTEkiCiAgICAgICAgZGV2ZWxvcGVyIC0+IGRhc2hib2FyZCAiVXNlcyB0aGUgZGFzaGJvYXJkIiAiSFRUUCIKICAgICAgICBkZXZlbG9wZXIgLT4gdGVtcG9yYWxVSSAiSW5zcGVjdHMgd29ya2Zsb3dzIiAiSFRUUCIKICAgICAgICBuYXRpdmUgLT4gYXBpICJDYWxscyB0aGUgUkVTVCBBUEkiICJIVFRQIgogICAgICAgIGNsaSAtPiBhcGkgIkNhbGxzIHRoZSBSRVNUIEFQSSIgIkhUVFAiCiAgICAgICAgZGFzaGJvYXJkIC0+IGFwaSAiQ2FsbHMgdGhlIFJFU1QgQVBJIHdpdGggdGhlIHVzZXIncyBhY2Nlc3MgdG9rZW4iICJIVFRQIgogICAgICAgIGdpdGh1YiAtPiB3ZWJob29rICJEZWxpdmVycyB3ZWJob29rcyIgIkhUVFAiCiAgICAgICAgd2ViaG9vayAtPiBhcGkgIkNhbGxzIHRoZSBSRVNUIEFQSSIgIkhUVFAiCiAgICAgICAgd2ViaG9vayAtPiBvcmNoZXN0cmF0b3IgIlN0YXJ0cyB3b3JrZmxvd3MgaW4gZW1iZWRkZWQgbW9kZSIgIlRlbXBvcmFsIgogICAgICAgIHdlYmhvb2sgLT4gdGVtcG9yYWwgIlN0YXJ0cyB3b3JrZmxvd3MgaW4gZXh0ZXJuYWwgbW9kZSIgIlRlbXBvcmFsIgogICAgICAgIGFwaSAtPiBvcmNoZXN0cmF0b3IgIlN0YXJ0cyB3b3JrZmxvd3MgaW4gZW1iZWRkZWQgbW9kZSIgIlRlbXBvcmFsIgogICAgICAgIGFwaSAtPiB0ZW1wb3JhbCAiU3RhcnRzIHdvcmtmbG93cyBpbiBleHRlcm5hbCBtb2RlIiAiVGVtcG9yYWwiCiAgICAgICAgYXBpIC0+IGdpdGh1YiAiQ2FsbHMgdGhlIEdpdEh1YiBBUEkiICJIVFRQIgogICAgICAgIHdvcmtmbG93cyAtPiBhcGkgIkNhbGxzIHRoZSBSRVNUIEFQSSIgIkhUVFAiCiAgICAgICAgd29ya2Zsb3dzIC0+IGdpdGh1YiAiQ2FsbHMgdGhlIEdpdEh1YiBBUEkiICJIVFRQIgogICAgICAgIHdvcmtmbG93cyAtPiBvcmNoZXN0cmF0b3IgIlVzZXMgZHVyYWJsZSBleGVjdXRpb24gaW4gZW1iZWRkZWQgbW9kZSIgIlRlbXBvcmFsIgogICAgICAgIHdvcmtmbG93cyAtPiB0ZW1wb3JhbCAiVXNlcyBkdXJhYmxlIGV4ZWN1dGlvbiBpbiBleHRlcm5hbCBtb2RlIiAiVGVtcG9yYWwiCiAgICAgICAgd29ya2Zsb3dzIC0+IHJ1bm5lciAiU3RhcnRzIGFnZW50IHdvcmsiICJUZW1wb3JhbCIKICAgICAgICBydW5uZXIgLT4gYWdlbnRzICJSdW5zIGNvZGluZyBhZ2VudHMiICJQcm9jZXNzIgogICAgICAgIHRlbXBvcmFsVUkgLT4gb3JjaGVzdHJhdG9yICJSZWFkcyBuYW1lc3BhY2VzIGFuZCB3b3JrZmxvdyBoaXN0b3JpZXMiICJUZW1wb3JhbCIKCiAgICAgICAgLy8gRXhpc3RpbmcgaW1wbGllZCByZWxhdGlvbnNoaXBzIHByZWNlZGUgdGhpcyBwb2ludCBhbmQgcmVtYWluIHVuY2hhbmdlZC4KICAgICAgICAhaW1wbGllZFJlbGF0aW9uc2hpcHMgZmFsc2UKICAgICAgICBncm91cCAiT3BlcmF0b3IgZGV2aWNlcyIgewogICAgICAgICAgICBicm93c2VyID0gc29mdHdhcmVTeXN0ZW0gIk9wZXJhdG9yIGJyb3dzZXIiICJBIGJyb3dzZXIgdW5kZXIgdGhlIG9wZXJhdG9yJ3MgbG9jYWwgdXNlciBpZGVudGl0eS4iICJUb3BvbG9neSIKICAgICAgICAgICAgcGhvbmUgPSBzb2Z0d2FyZVN5c3RlbSAiUGhvbmUgYW5kIG5hdGl2ZSBjbGllbnRzIiAiT3BlcmF0b3IgZGV2aWNlcyB1c2luZyB0aGVpciBhdHRhY2hlZCB1c2VyIHRhaWxuZXQgYW5kIGFmYWt0IHNpZ24taW4uIiAiVG9wb2xvZ3kiCiAgICAgICAgfQogICAgICAgIGdyb3VwICJVc2VyIG5ldHdvcmsgYm91bmRhcnkiIHsKICAgICAgICAgICAgdXNlclRhaWxuZXQgPSBzb2Z0d2FyZVN5c3RlbSAiQXR0YWNoZWQgdXNlciB0YWlsbmV0IiAiVXNlci1jb250cm9sbGVkIHByaXZhdGUgY29ubmVjdGl2aXR5OyBzZXBhcmF0ZSBmcm9tIHRoZSBjbHVzdGVyIG92ZXJsYXkuIiAiVG9wb2xvZ3kiCiAgICAgICAgfQogICAgICAgIGdyb3VwICJFeHRlcm5hbCBzZXJ2aWNlIGJvdW5kYXJ5IiB7CiAgICAgICAgICAgIGludGVybmV0ID0gc29mdHdhcmVTeXN0ZW0gIkludGVybmV0IHNlcnZpY2VzIiAiUGVybWl0dGVkIHVwc3RyZWFtIGRlc3RpbmF0aW9ucyBvdXRzaWRlIHRoZSBjbHVzdGVyIHRydXN0IGRvbWFpbi4iICJUb3BvbG9neSIKICAgICAgICB9CgogICAgICAgIGJyb3dzZXIgLT4gaG9zdFJlc29sdmVyICJSZXNvbHZlcyAqLmFmYWt0LmludGVybmFsIiAiTG9jYWwgbmFtZSBxdWVyeSIgIlRvcG9sb2d5Q29ubmVjdGlvbixPdmVydmlld0hpZGRlbiIKICAgICAgICBicm93c2VyIC0+IGxvb3BiYWNrUHJveHkgIlJlcXVlc3RzIHNlcnZpY2UsIHByZXZpZXcgb3IgcG9ydCIgIkhvc3QgYWNjZXNzIG1lY2hhbmlzbSB1bmRlY2lkZWQiICJUb3BvbG9neUNvbm5lY3Rpb24sT3ZlcnZpZXdIaWRkZW4iCiAgICAgICAgbG9vcGJhY2tQcm94eSAtPiBob3N0TmV0d29yayAiVXNlcyBob3N0LWxldmVsIGF1dGhvcml6YXRpb24iICJDb25uZWN0aW9uIG1lY2hhbmlzbSB1bmRlY2lkZWQiICJUb3BvbG9neUNvbm5lY3Rpb24sT3ZlcnZpZXdIaWRkZW4iCiAgICAgICAgaG9zdE5ldHdvcmsgLT4gcHJldmlld1NlcnZlciAiUmVxdWVzdHMgcHJldmlldyBhcyBob3N0IGlkZW50aXR5IiAiV29ya2xvYWQgbXV0dWFsIFRMUyBvdmVyIG92ZXJsYXkiICJUb3BvbG9neUNvbm5lY3Rpb24sT3ZlcnZpZXdIaWRkZW4iCiAgICAgICAgaG9zdFdvcmtlciAtPiBndWVzdCAiT2JzZXJ2ZXMgd29ya2xvYWQgZXhlY3V0aW9uIGFuZCByZWNsYWltOyBsaWZlY3ljbGUgb3duZXIgdW5kZWNpZGVkIiAiTG9jYWwgb2JzZXJ2YXRpb24iICJMaWZlY3ljbGVEZXRhaWwsVG9wb2xvZ3lDb25uZWN0aW9uLE92ZXJ2aWV3SGlkZGVuIgogICAgICAgIGhvc3RXb3JrZXIgLT4gaGVscGVyICJSZXF1ZXN0cyBhdXRob3JpemVkIHNldHVwIGFuZCBsYXVuY2ggb3BlcmF0aW9ucyIgIkF1dGhlbnRpY2F0ZWQgbG9jYWwgY29udHJvbCIgIlRvcG9sb2d5Q29ubmVjdGlvbiIKICAgICAgICBob3N0V29ya2VyIC0+IGhvc3RSZXNvbHZlciAiUmVxdWlyZXMgaG9zdCBuYW1lIHJlc29sdXRpb24iICJMb2NhbCBjb250cm9sIiAiVG9wb2xvZ3lDb25uZWN0aW9uLE92ZXJ2aWV3SGlkZGVuIgogICAgICAgIGhvc3RXb3JrZXIgLT4gbWVkaWF0b3IgIlN0YXJ0cyBhbmQgbWFuYWdlcyBsYXVuY2g7IG5vIGRhdGEgZm9yd2FyZGluZyIgIkxvY2FsIGxpZmVjeWNsZSBjb250cm9sIiAiTGlmZWN5Y2xlRGV0YWlsLFRvcG9sb2d5Q29ubmVjdGlvbixPdmVydmlld0hpZGRlbiIKICAgICAgICBob3N0V29ya2VyIC0+IGRlc3RpbmF0aW9uTWVkaWF0b3IgIlN0YXJ0cyBhbmQgbWFuYWdlcyBkZXN0aW5hdGlvbiBsYXVuY2g7IG5vIGRhdGEgZm9yd2FyZGluZyIgIkxvY2FsIGxpZmVjeWNsZSBjb250cm9sIiAiTGlmZWN5Y2xlRGV0YWlsLFRvcG9sb2d5Q29ubmVjdGlvbixPdmVydmlld0hpZGRlbiIKICAgICAgICBob3N0V29ya2VyIC0+IGhvc3ROZXR3b3JrICJJbml0aWF0ZXMgY29udHJvbCBjb25uZWN0aW9uczsgcmVxdWVzdHMgZGVzaXJlZCBzdGF0ZSBhbmQgcmVwb3J0cyBvYnNlcnZhdGlvbnMiICJMb2NhbCBjaGFubmVsIiAiVG9wb2xvZ3lDb25uZWN0aW9uIgogICAgICAgIGhvc3ROZXR3b3JrIC0+IGNvbnRyb2xBcGkgIlJlZ2lzdGVycyBob3N0IGFuZCByZXBvcnRzIGNhcGFjaXR5IG92ZXIgaG9zdC1pbml0aWF0ZWQgY29ubmVjdGlvbnMiICJXb3JrbG9hZCBtdXR1YWwgVExTIG92ZXIgb3ZlcmxheSIgIlRvcG9sb2d5Q29ubmVjdGlvbiIKICAgICAgICBwaG9uZSAtPiB1c2VyVGFpbG5ldCAiQ29ubmVjdHMgd2l0aCBkZXZpY2UgaWRlbnRpdHkiICJVc2VyIHRhaWxuZXQiICJUb3BvbG9neUNvbm5lY3Rpb24sT3ZlcnZpZXdIaWRkZW4iCiAgICAgICAgdXNlclRhaWxuZXQgLT4gZWRnZSAiRGVsaXZlcnMgYXBwbGljYXRpb24gcmVxdWVzdHMiICJUcmFuc3BvcnQgTGF5ZXIgU2VjdXJpdHkiICJDbHVzdGVyQXR0YWNobWVudCxPdmVydmlld0hpZGRlbiIKICAgICAgICB1c2VyVGFpbG5ldCAtPiBob3N0TmV0d29yayAiT3B0aW9uYWwgaG9zdCBhdHRhY2htZW50OyBhcHBsaWNhdGlvbiBhY2Nlc3Mgb25seSIgIlVzZXIgdGFpbG5ldCIgIkNsdXN0ZXJBdHRhY2htZW50LE92ZXJ2aWV3SGlkZGVuIgogICAgICAgIGJyb3dzZXIgLT4gZWRnZSAiU2VuZHMgcHVibGljIGFwcGxpY2F0aW9uIHJlcXVlc3RzIGFzIHNpZ25lZC1pbiB1c2VyIiAiVHJhbnNwb3J0IExheWVyIFNlY3VyaXR5IiAiVG9wb2xvZ3lDb25uZWN0aW9uLE92ZXJ2aWV3SGlkZGVuIgogICAgICAgIGVkZ2UgLT4gY29udHJvbEFwaSAiRm9yd2FyZHMgYXV0aGVudGljYXRlZCBBUEkgcmVxdWVzdHMiICJBcHBsaWNhdGlvbiBwcm90b2NvbCBvdmVyIG92ZXJsYXkiICJUb3BvbG9neUNvbm5lY3Rpb24sT3ZlcnZpZXdIaWRkZW4iCiAgICAgICAgZWRnZSAtPiBkYXNoYm9hcmQgIlJvdXRlcyAvZGFzaGJvYXJkIG9uIHRoZSBBUEkgb3JpZ2luOyBhc3NldHMgdG8gdGhlIHN0YXRpYyBvcmlnaW4sIHNlc3Npb24gYW5kIEFQSSByb3V0ZXMgdG8gdGhlIGJhY2tlbmQtZm9yLWZyb250ZW5kIiAiQXBwbGljYXRpb24gcHJvdG9jb2wgb3ZlciBvdmVybGF5IiAiVG9wb2xvZ3lDb25uZWN0aW9uLE92ZXJ2aWV3SGlkZGVuIgogICAgICAgIGRhc2hib2FyZCAtPiBjb250cm9sQXBpICJGb3J3YXJkcyBBUEkgY2FsbHMgd2l0aCB0aGUgdXNlcidzIGFjY2VzcyB0b2tlbiIgIkFwcGxpY2F0aW9uIHByb3RvY29sIG92ZXIgb3ZlcmxheSIgIlRvcG9sb2d5Q29ubmVjdGlvbixPdmVydmlld0hpZGRlbiIKICAgICAgICBlZGdlIC0+IHByZXZpZXdTZXJ2ZXIgIkZvcndhcmRzIHByZXZpZXcgcmVxdWVzdHMgd2l0aCB1c2VyIGNvbnRleHQiICJBcHBsaWNhdGlvbiBwcm90b2NvbCBvdmVyIG92ZXJsYXkiICJUb3BvbG9neUNvbm5lY3Rpb24sT3ZlcnZpZXdIaWRkZW4iCiAgICAgICAgZWRnZSAtPiBzdGF0aWNPcmlnaW4gIkZvcndhcmRzIHN0YXRpYyBzaXRlIHJlcXVlc3RzIGJ5IGhvc3RuYW1lIiAiQXBwbGljYXRpb24gcHJvdG9jb2wgb3ZlciBvdmVybGF5IiAiVG9wb2xvZ3lDb25uZWN0aW9uLE92ZXJ2aWV3SGlkZGVuIgogICAgICAgIGVkZ2UgLT4gd29ya2xvYWQtcHJveHkgIkRpYWxzIHBlcm1pdHRlZCB3b3JrbG9hZCBpbmdyZXNzIGRpcmVjdGx5IiAiU1BJRkZFIG11dHVhbCBUTFMgb3ZlciBvdmVybGF5IiAiVG9wb2xvZ3lDb25uZWN0aW9uLE92ZXJ2aWV3SGlkZGVuIgogICAgICAgIHByZXZpZXdTZXJ2ZXIgLT4gd29ya2xvYWQtcHJveHkgIkRpYWxzIHdvcmtsb2FkIHByb3h5OyBwdWJsaXNoZWQtcG9ydCBiaW5kaW5nIG9wZW4iICJTUElGRkUgbXV0dWFsIFRMUyBvdmVyIG92ZXJsYXkiICJUb3BvbG9neUNvbm5lY3Rpb24sT3ZlcnZpZXdIaWRkZW4iCiAgICAgICAgbWNwR2F0ZXdheSAtPiBjb250cm9sQXBpICJDYWxscyBwZXJtaXR0ZWQgb3BlcmF0aW9ucyB3aXRoIGxhdW5jaCBjb250ZXh0IiAiQXV0aGVudGljYXRlZCBzZXJ2aWNlIGNvbm5lY3Rpb24iICJUb3BvbG9neUNvbm5lY3Rpb24iCiAgICAgICAgZ3Vlc3QgLT4gd29ya2xvYWQtcHJveHkgIlNlbmRzIHdvcmtsb2FkIHRyYWZmaWMgaW5jbHVkaW5nIEROUywgVENQLCBVRFAgYW5kIFFVSUMiICJQcml2YXRlIHdvcmtsb2FkIGxpbmsiICJUb3BvbG9neUNvbm5lY3Rpb24sT3ZlcnZpZXdIaWRkZW4iCiAgICAgICAgbWVkaWF0b3IgLT4gd29ya2xvYWQtcHJveHkgIlJldHVybnMgY29ubmVjdGlvbiBkZWNpc2lvbiBhbmQgc3RhbXBlZCBsYXVuY2ggaWRlbnRpdHkiICJMb2NhbCBjaGFubmVsIiAiVG9wb2xvZ3lDb25uZWN0aW9uLE92ZXJ2aWV3SGlkZGVuIgogICAgICAgIHdvcmtsb2FkLXByb3h5IC0+IGNvbnRyb2xBcGkgIkNhbGxzIGF1dGhvcml6ZWQgb3BlcmF0aW9ucyB3aXRoIGxhdW5jaCBYLjUwOS1TVklEIiAiV29ya2xvYWQgbXV0dWFsIFRMUyBvdmVyIG92ZXJsYXkiICJUb3BvbG9neUNvbm5lY3Rpb24sT3ZlcnZpZXdIaWRkZW4iCiAgICAgICAgd29ya2xvYWQtcHJveHkgLT4gbWNwR2F0ZXdheSAiQ2FsbHMgYWxsb3dlZCB0b29scyB3aXRoIGxhdW5jaCBYLjUwOS1TVklEIiAiV29ya2xvYWQgbXV0dWFsIFRMUyBvdmVyIG92ZXJsYXkiICJUb3BvbG9neUNvbm5lY3Rpb24sT3ZlcnZpZXdIaWRkZW4iCiAgICAgICAgd29ya2xvYWQtcHJveHkgLT4gaW50ZXJuZXQgIk9wZW5zIHBlcm1pdHRlZCBlZ3Jlc3M7IGluc3BlY3Rpb24gd2hlcmUgcmVxdWlyZWQiICJEZXN0aW5hdGlvbiBwcm90b2NvbCIgIlRvcG9sb2d5Q29ubmVjdGlvbixPdmVydmlld0hpZGRlbiIKICAgICAgICB3b3JrbG9hZC1wcm94eSAtPiBtZWRpYXRvciAiQXNrcyBmb3IgaW5ib3VuZCBhbmQgb3V0Ym91bmQgY29ubmVjdGlvbiBkZWNpc2lvbnMiICJMb2NhbCBjaGFubmVsIiAiVG9wb2xvZ3lDb25uZWN0aW9uLFJldHVybkRldGFpbCxPdmVydmlld0hpZGRlbiIKICAgICAgICB3b3JrbG9hZC1wcm94eSAtPiBndWVzdCAiQ2FycmllcyBwZXJtaXR0ZWQgaW5ncmVzczsgcHVibGlzaGVkLXBvcnQgYmluZGluZyBvcGVuIiAiUHJpdmF0ZSB3b3JrbG9hZCBsaW5rIiAiVG9wb2xvZ3lDb25uZWN0aW9uLFJldHVybkRldGFpbCxPdmVydmlld0hpZGRlbiIKICAgICAgICBkZXN0aW5hdGlvbkd1ZXN0IC0+IGRlc3RpbmF0aW9uLXdvcmtsb2FkLXByb3h5ICJTZW5kcyBkZXN0aW5hdGlvbiB3b3JrbG9hZCB0cmFmZmljIiAiUHJpdmF0ZSB3b3JrbG9hZCBsaW5rIiAiVG9wb2xvZ3lDb25uZWN0aW9uLE92ZXJ2aWV3SGlkZGVuIgogICAgICAgIGRlc3RpbmF0aW9uTWVkaWF0b3IgLT4gZGVzdGluYXRpb24td29ya2xvYWQtcHJveHkgIlJldHVybnMgZGVzdGluYXRpb24gY29ubmVjdGlvbiBkZWNpc2lvbiIgIkxvY2FsIGNoYW5uZWwiICJUb3BvbG9neUNvbm5lY3Rpb24sT3ZlcnZpZXdIaWRkZW4iCiAgICAgICAgZGVzdGluYXRpb24td29ya2xvYWQtcHJveHkgLT4gZGVzdGluYXRpb25NZWRpYXRvciAiUmVxdWVzdHMgZGVjaXNpb24gd2l0aCBzb3VyY2UgaWRlbnRpdHkgYW5kIHRhcmdldCBncmFudCIgIkxvY2FsIGNoYW5uZWwiICJUb3BvbG9neUNvbm5lY3Rpb24sUmV0dXJuRGV0YWlsLE92ZXJ2aWV3SGlkZGVuIgogICAgICAgIGRlc3RpbmF0aW9uLXdvcmtsb2FkLXByb3h5IC0+IGRlc3RpbmF0aW9uR3Vlc3QgIkNhcnJpZXMgcGVybWl0dGVkIGluZ3Jlc3M7IHB1Ymxpc2hlZC1wb3J0IGJpbmRpbmcgb3BlbiIgIlByaXZhdGUgd29ya2xvYWQgbGluayIgIlRvcG9sb2d5Q29ubmVjdGlvbixSZXR1cm5EZXRhaWwsT3ZlcnZpZXdIaWRkZW4iCiAgICAgICAgd29ya2xvYWQtcHJveHkgLT4gZGVzdGluYXRpb24td29ya2xvYWQtcHJveHkgIkRpYWxzIGRpcmVjdGx5OyBib3RoIG1lZGlhdG9ycyBjaGVjayB0aGUgY29ubmVjdGlvbiIgIlNQSUZGRSBtdXR1YWwgVExTIG92ZXIgb3ZlcmxheSIgIlRvcG9sb2d5Q29ubmVjdGlvbixPdmVydmlld0hpZGRlbiIKICAgICAgICB3b3JrbG9hZC1wcm94eSAtPiBjb29yZGluYXRpb24gIkVucm9sbHMgaXRzIG93biBub2RlIHdpdGggYW4gU1ZJRDsgbWVtYmVyc2hpcCBncmFudHMgbm8gc2VydmljZSBhY2Nlc3MiICJPdmVybGF5IGNvbnRyb2wiICJUb3BvbG9neUNvbm5lY3Rpb24sT3ZlcnZpZXdIaWRkZW4iCiAgICAgICAgaG9zdE5ldHdvcmsgLT4gY29vcmRpbmF0aW9uICJPYnRhaW5zIG92ZXJsYXkgY29vcmRpbmF0aW9uIHRocm91Z2ggYWZha3QgaW50ZXJmYWNlIiAiT3ZlcmxheSBjb250cm9sIiAiVG9wb2xvZ3lDb25uZWN0aW9uLE92ZXJ2aWV3SGlkZGVuIgogICAgICAgIHdvcmtsb2FkLXByb3h5IC0+IG92ZXJsYXlSZWxheSAiVXNlcyBlbmNyeXB0ZWQgcmVsYXkgdHJhbnNwb3J0IHdoZW4gbmVlZGVkIiAiT3ZlcmxheSB0cmFuc3BvcnQiICJUb3BvbG9neUNvbm5lY3Rpb24sT3ZlcnZpZXdIaWRkZW4iCgogICAgICAgIGRlcGxveW1lbnRFbnZpcm9ubWVudCAiVG9wb2xvZ3kgY29udGV4dCIgewogICAgICAgICAgICBjb250ZXh0X29wZXJhdG9yRGV2aWNlQm91bmRhcnlOb2RlID0gZGVwbG95bWVudE5vZGUgIk9wZXJhdG9yIGRldmljZSBib3VuZGFyeSIgIk9wZXJhdG9yLWNvbnRyb2xsZWQgY2xpZW50cy4iICJDbGllbnQgZGV2aWNlcyIgewogICAgICAgICAgICAgICAgY29udGV4dENsaWVudHMgPSBpbmZyYXN0cnVjdHVyZU5vZGUgIkJyb3dzZXIsIHBob25lLCB0YWJsZXQgYW5kIG5hdGl2ZSBhcHBzIiAiT3BlcmF0b3IgYW5kIGRldmljZSBpZGVudGl0aWVzLiIgIkFwcGxpY2F0aW9uIGNsaWVudHMiCiAgICAgICAgICAgIH0KICAgICAgICAgICAgY29udGV4dF91c2VyVGFpbG5ldEJvdW5kYXJ5Tm9kZSA9IGRlcGxveW1lbnROb2RlICJVc2VyIHRhaWxuZXQgYm91bmRhcnkiICJVc2VyLW93bmVkIG5ldHdvcms7IG5vIGNsdXN0ZXIgcm91dGluZy4iICJVc2VyIG5ldHdvcmsiIHsKICAgICAgICAgICAgICAgIGNvbnRleHRUYWlsbmV0ID0gaW5mcmFzdHJ1Y3R1cmVOb2RlICJBdHRhY2hlZCB1c2VyIHRhaWxuZXRzIiAiUHJpdmF0ZSBhcHBsaWNhdGlvbiBhY2Nlc3MgdG8gYXR0YWNoZWQgZ2F0ZXdheXMuIiAiVGFpbHNjYWxlIgogICAgICAgICAgICB9CiAgICAgICAgICAgIGNvbnRleHRfY2x1c3RlclRydXN0RG9tYWluTm9kZSA9IGRlcGxveW1lbnROb2RlICJDbHVzdGVyIHRydXN0IGRvbWFpbiIgIkNvbnRyb2wgcGxhbmUgYW5kIHdvcmtsb2FkIGhvc3RzIHNoYXJlIGF1dGhlbnRpY2F0ZWQgb3ZlcmxheSByZWFjaGFiaWxpdHkuIiAiUHJpdmF0ZSBjbHVzdGVyIiB7CiAgICAgICAgICAgICAgICBjb250ZXh0X2V4dGVybmFsSW5ncmVzc0JvdW5kYXJ5Tm9kZSA9IGRlcGxveW1lbnROb2RlICJFeHRlcm5hbCBpbmdyZXNzIGJvdW5kYXJ5IiAiQXBwbGljYXRpb24gZW50cnkgb25seS4iICJHYXRld2F5IG5vZGUiIHsKICAgICAgICAgICAgICAgICAgICBjb250ZXh0SW5ncmVzcyA9IGluZnJhc3RydWN0dXJlTm9kZSAiRXh0ZXJuYWwgaW5ncmVzcyBnYXRld2F5IiAiUHVibGljIGFuZCB1c2VyLXRhaWxuZXQgYXBwbGljYXRpb24gdHJhZmZpYzsgbm8gcGFja2V0IHJvdXRpbmcuIiAiQXBwbGljYXRpb24gcHJveHkiCiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICBjb250ZXh0Q2x1c3RlciA9IGluZnJhc3RydWN0dXJlTm9kZSAiQ29udHJvbCBwbGFuZSBhbmQgd29ya2xvYWQgaG9zdHMiICJQZXItc2VydmljZSwgcGVyLWhvc3QgYW5kIHBlci1sYXVuY2ggbm9kZXM7IGd1ZXN0cyBoYXZlIG5vIG92ZXJsYXkgbWVtYmVyc2hpcC4iICJJc29sYXRlZCBIZWFkc2NhbGUgb3ZlcmxheSIKICAgICAgICAgICAgfQogICAgICAgICAgICBjb250ZXh0X2ludGVybmV0Qm91bmRhcnlOb2RlID0gZGVwbG95bWVudE5vZGUgIkludGVybmV0IGJvdW5kYXJ5IiAiVXBzdHJlYW0gZGVzdGluYXRpb25zIG91dHNpZGUgY2x1c3RlciB0cnVzdC4iICJFeHRlcm5hbCBuZXR3b3JrIiB7CiAgICAgICAgICAgICAgICBjb250ZXh0SW50ZXJuZXQgPSBpbmZyYXN0cnVjdHVyZU5vZGUgIkludGVybmV0IHNlcnZpY2VzIiAiT25seSBwZXJtaXR0ZWQgZWdyZXNzIGxlYXZlcyBhIHdvcmtsb2FkIGhvc3QuIiAiRGVzdGluYXRpb24gc2VydmljZXMiCiAgICAgICAgICAgIH0KICAgICAgICAgICAgY29udGV4dENsaWVudHMgLT4gY29udGV4dFRhaWxuZXQgIkRldmljZSBpZGVudGl0eSIgIlVzZXIgdGFpbG5ldCIKICAgICAgICAgICAgY29udGV4dENsaWVudHMgLT4gY29udGV4dEluZ3Jlc3MgIlNpZ25lZC1pbiB1c2VyIiAiUHVibGljIGFwcGxpY2F0aW9uIHJlcXVlc3QiCiAgICAgICAgICAgIGNvbnRleHRUYWlsbmV0IC0+IGNvbnRleHRJbmdyZXNzICJVc2VyIGNvbnRleHQ7IG5vIHBhY2tldCByb3V0aW5nIiAiUHJpdmF0ZSBhcHBsaWNhdGlvbiByZXF1ZXN0IgogICAgICAgICAgICBjb250ZXh0SW5ncmVzcyAtPiBjb250ZXh0Q2x1c3RlciAiQXV0aGVudGljYXRlZCBhcHBsaWNhdGlvbiByZXF1ZXN0IiAiQ2x1c3RlciBvdmVybGF5IgogICAgICAgICAgICBjb250ZXh0Q2x1c3RlciAtPiBjb250ZXh0SW50ZXJuZXQgIlBlcm1pdHRlZCBkZXN0aW5hdGlvbiByZXF1ZXN0IiAiV29ya2xvYWQgcHJveHkgZWdyZXNzIgogICAgICAgIH0KICAgICAgICBkZXBsb3ltZW50RW52aXJvbm1lbnQgIlRvcG9sb2d5IGNsdXN0ZXIiIHsKICAgICAgICAgICAgY2x1c3Rlcl91c2VyVGFpbG5ldEJvdW5kYXJ5Tm9kZSA9IGRlcGxveW1lbnROb2RlICJVc2VyIHRhaWxuZXQgYm91bmRhcnkiICJTZXBhcmF0ZSB1c2VyIG5ldHdvcmsuIiAiVXNlciB0YWlsbmV0IiB7CiAgICAgICAgICAgICAgICBjbHVzdGVyVGFpbG5ldCA9IHNvZnR3YXJlU3lzdGVtSW5zdGFuY2UgdXNlclRhaWxuZXQKICAgICAgICAgICAgfQogICAgICAgICAgICBjbHVzdGVyX2V4dGVybmFsSW5ncmVzc0JvdW5kYXJ5Tm9kZSA9IGRlcGxveW1lbnROb2RlICJFeHRlcm5hbCBpbmdyZXNzIGJvdW5kYXJ5IiAiVXNlci10YWlsbmV0IGF0dGFjaG1lbnRzIGRvIG5vdCByb3V0ZSBjbHVzdGVyIHBhY2tldHMuIiAiR2F0ZXdheSBub2RlIiB7CiAgICAgICAgICAgICAgICBjbHVzdGVyRWRnZSA9IGNvbnRhaW5lckluc3RhbmNlIGVkZ2UKICAgICAgICAgICAgfQogICAgICAgICAgICBjbHVzdGVyX2NsdXN0ZXJPdmVybGF5Qm91bmRhcnlOb2RlID0gZGVwbG95bWVudE5vZGUgIkNsdXN0ZXIgb3ZlcmxheSBib3VuZGFyeSIgIlRhaWxzY2FsZSB0c25ldCBub2RlcyB1c2UgaXNvbGF0ZWQgSGVhZHNjYWxlOyBldmVyeSBub2RlIHJldGFpbnMgYSBzdGF0aWMgc3RhYmxlLW5vZGUgbWFwLiIgIlByaXZhdGUgb3ZlcmxheSIgewogICAgICAgICAgICAgICAgY2x1c3Rlck92ZXJsYXkgPSBpbmZyYXN0cnVjdHVyZU5vZGUgIlByaXZhdGUgb3ZlcmxheSByZWFjaGFiaWxpdHkiICJFYWNoIGNsdXN0ZXIgbm9kZSByZXRhaW5zIGEgc3RhdGljIG1hcCBvZiBzdGFibGUgbm9kZXMuIEluZ3Jlc3MgcnVsZXMgYWRtaXQgb25seSB0aGUgZ2F0ZXdheSBhbmQgbmFtZWQgcGVlcnMuIiAiVGFpbHNjYWxlIHRzbmV0IgogICAgICAgICAgICAgICAgY2x1c3Rlcl9jb250cm9sUGxhbmVCb3VuZGFyeU5vZGUgPSBkZXBsb3ltZW50Tm9kZSAiQ29udHJvbCBwbGFuZSBib3VuZGFyeSIgIk9uZSBvdmVybGF5IG5vZGUgZm9yIGVhY2ggc2VydmljZS4iICJDb250cm9sIHBsYW5lIiB7CgogICAgICAgICAgICAgICAgICAgIGNsdXN0ZXJfYXBpU2VydmljZU5vZGVOb2RlID0gZGVwbG95bWVudE5vZGUgIkFQSSBzZXJ2aWNlIG5vZGUiICJJbmRlcGVuZGVudCBzZXJ2aWNlIGlkZW50aXR5LiIgInRzbmV0IG5vZGUiIHsKICAgICAgICAgICAgICAgICAgICAgICAgY2x1c3Rlcl9jb250cm9sQXBpID0gY29udGFpbmVySW5zdGFuY2UgY29udHJvbEFwaQogICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgICAgICBjbHVzdGVyX3ByZXZpZXdTZXJ2aWNlTm9kZU5vZGUgPSBkZXBsb3ltZW50Tm9kZSAiUHJldmlldyBzZXJ2aWNlIG5vZGUiICJJbmRlcGVuZGVudCBzZXJ2aWNlIGlkZW50aXR5LiIgInRzbmV0IG5vZGUiIHsKICAgICAgICAgICAgICAgICAgICAgICAgY2x1c3Rlcl9wcmV2aWV3U2VydmVyID0gY29udGFpbmVySW5zdGFuY2UgcHJldmlld1NlcnZlcgogICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgICAgICBjbHVzdGVyX21jcFNlcnZpY2VOb2RlTm9kZSA9IGRlcGxveW1lbnROb2RlICJNQ1Agc2VydmljZSBub2RlIiAiSW5kZXBlbmRlbnQgc2VydmljZSBpZGVudGl0eS4iICJ0c25ldCBub2RlIiB7CiAgICAgICAgICAgICAgICAgICAgICAgIGNsdXN0ZXJfbWNwR2F0ZXdheSA9IGNvbnRhaW5lckluc3RhbmNlIG1jcEdhdGV3YXkKICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgY2x1c3Rlcl9zdGF0aWNPcmlnaW5Ob2RlTm9kZSA9IGRlcGxveW1lbnROb2RlICJTdGF0aWMgb3JpZ2luIG5vZGUiICJJbmRlcGVuZGVudCBzZXJ2aWNlIGlkZW50aXR5LiIgInRzbmV0IG5vZGUiIHsKICAgICAgICAgICAgICAgICAgICAgICAgY2x1c3Rlcl9zdGF0aWNPcmlnaW4gPSBjb250YWluZXJJbnN0YW5jZSBzdGF0aWNPcmlnaW4KICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgY2x1c3Rlcl9jb29yZGluYXRpb25Ob2RlTm9kZSA9IGRlcGxveW1lbnROb2RlICJDb29yZGluYXRpb24gbm9kZSIgIklzb2xhdGVkIEhlYWRzY2FsZSBiZWhpbmQgYW4gYWZha3QgaW50ZXJmYWNlOyBpbnN0YW5jZSBjb3VudCB1bmRlY2lkZWQuIiAiQ29vcmRpbmF0aW9uIHNlcnZpY2UiIHsKICAgICAgICAgICAgICAgICAgICAgICAgY2x1c3Rlcl9jb29yZGluYXRpb24gPSBjb250YWluZXJJbnN0YW5jZSBjb29yZGluYXRpb24KICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgY2x1c3Rlcl9yZWxheU5vZGVOb2RlID0gZGVwbG95bWVudE5vZGUgIlJlbGF5IG5vZGUiICJFbmNyeXB0ZWQgb3ZlcmxheSB0cmFuc3BvcnQuIiAiUmVsYXkgc2VydmljZSIgewogICAgICAgICAgICAgICAgICAgICAgICBjbHVzdGVyX292ZXJsYXlSZWxheSA9IGNvbnRhaW5lckluc3RhbmNlIG92ZXJsYXlSZWxheQogICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgIGNsdXN0ZXJfYWdlbnRIb3N0Qm91bmRhcnlOb2RlID0gZGVwbG95bWVudE5vZGUgIldvcmtsb2FkIGhvc3QgYm91bmRhcnkiICJIb3N0IG1hbmFnZW1lbnQgaXMgc2VwYXJhdGUgZnJvbSBsYXVuY2ggdHJhZmZpYy4iICJXb3JrbG9hZCBob3N0IiB7CiAgICAgICAgICAgICAgICAgICAgY2x1c3Rlcl9ob3N0Tm9kZU5vZGUgPSBkZXBsb3ltZW50Tm9kZSAiSG9zdCBub2RlIiAiSG9zdCBpZGVudGl0eTsgb3B0aW9uYWwgdXNlci10YWlsbmV0IGF0dGFjaG1lbnQuIiAidHNuZXQgbm9kZSIgewogICAgICAgICAgICAgICAgICAgICAgICBjbHVzdGVyX2hvc3ROZXR3b3JrID0gY29udGFpbmVySW5zdGFuY2UgaG9zdE5ldHdvcmsKICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgY2x1c3Rlcl9hZ2VudExhdW5jaEJvdW5kYXJ5Tm9kZSA9IGRlcGxveW1lbnROb2RlICJBZ2VudCBsYXVuY2ggYm91bmRhcnkiICJJbmRlcGVuZGVudCBtZWRpYXRvciwgd29ya2xvYWQgcHJveHkgYW5kIGd1ZXN0OyBubyBzaGFyZWQgbGF1bmNoIGRhdGEgcGF0aC4iICJMYXVuY2ggaXNvbGF0aW9uIiB7CiAgICAgICAgICAgICAgICAgICAgICAgIGNsdXN0ZXJfd29ya2xvYWQtcHJveHkgPSBjb250YWluZXJJbnN0YW5jZSB3b3JrbG9hZC1wcm94eQogICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgIGNsdXN0ZXJfYW5vdGhlckFnZW50SG9zdEJvdW5kYXJ5Tm9kZSA9IGRlcGxveW1lbnROb2RlICJBbm90aGVyIHdvcmtsb2FkIGhvc3QgYm91bmRhcnkiICJJbmRlcGVuZGVudCBob3N0IGFuZCBsYXVuY2ggaWRlbnRpdGllcy4iICJXb3JrbG9hZCBob3N0IiB7CiAgICAgICAgICAgICAgICAgICAgY2x1c3Rlcl9hbm90aGVySG9zdE5vZGVOb2RlID0gZGVwbG95bWVudE5vZGUgIkFub3RoZXIgaG9zdCBub2RlIiAiSW5kZXBlbmRlbnQgaG9zdCBpZGVudGl0eTsgb3B0aW9uYWwgYXR0YWNoZWQgdXNlciB0YWlsbmV0LiIgInRzbmV0IG5vZGUiIHsKICAgICAgICAgICAgICAgICAgICAgICAgY2x1c3Rlcl9vdGhlckhvc3QgPSBjb250YWluZXJJbnN0YW5jZSBob3N0TmV0d29yawogICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgICAgICBjbHVzdGVyX2Fub3RoZXJMYXVuY2hCb3VuZGFyeU5vZGUgPSBkZXBsb3ltZW50Tm9kZSAiQW5vdGhlciBsYXVuY2ggYm91bmRhcnkiICJJbmRlcGVuZGVudCBsYXVuY2ggY29ubmVjdGlvbi4iICJMYXVuY2ggaXNvbGF0aW9uIiB7CiAgICAgICAgICAgICAgICAgICAgICAgIGNsdXN0ZXJfZGVzdGluYXRpb24td29ya2xvYWQtcHJveHkgPSBjb250YWluZXJJbnN0YW5jZSBkZXN0aW5hdGlvbi13b3JrbG9hZC1wcm94eQogICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgfQogICAgICAgICAgICBjbHVzdGVyRWRnZSAtPiBjbHVzdGVyT3ZlcmxheSAiQXV0aGVudGljYXRlZCBhcHAgcmVxdWVzdHMiICJPdmVybGF5IGFjY2VzcyIKICAgICAgICAgICAgY2x1c3Rlcl9jb250cm9sQXBpIC0+IGNsdXN0ZXJPdmVybGF5ICJTZXJ2aWNlIGlkZW50aXR5IiAiT3ZlcmxheSBtZW1iZXJzaGlwIgogICAgICAgICAgICBjbHVzdGVyX3ByZXZpZXdTZXJ2ZXIgLT4gY2x1c3Rlck92ZXJsYXkgIlNlcnZpY2UgaWRlbnRpdHkiICJPdmVybGF5IG1lbWJlcnNoaXAiCiAgICAgICAgICAgIGNsdXN0ZXJfbWNwR2F0ZXdheSAtPiBjbHVzdGVyT3ZlcmxheSAiU2VydmljZSBpZGVudGl0eSIgIk92ZXJsYXkgbWVtYmVyc2hpcCIKICAgICAgICAgICAgY2x1c3Rlcl9zdGF0aWNPcmlnaW4gLT4gY2x1c3Rlck92ZXJsYXkgIlNlcnZpY2UgaWRlbnRpdHkiICJPdmVybGF5IG1lbWJlcnNoaXAiCiAgICAgICAgICAgIGNsdXN0ZXJfY29vcmRpbmF0aW9uIC0+IGNsdXN0ZXJPdmVybGF5ICJOb2RlIGNvb3JkaW5hdGlvbiIgImFmYWt0IGludGVyZmFjZSIKICAgICAgICAgICAgY2x1c3Rlcl9vdmVybGF5UmVsYXkgLT4gY2x1c3Rlck92ZXJsYXkgIkVuY3J5cHRlZCB0cmFuc3BvcnQiICJSZWxheSBwYXRoIgogICAgICAgICAgICBjbHVzdGVyX2hvc3ROZXR3b3JrIC0+IGNsdXN0ZXJPdmVybGF5ICJIb3N0IGlkZW50aXR5IiAiT3ZlcmxheSBtZW1iZXJzaGlwIgogICAgICAgICAgICBjbHVzdGVyX290aGVySG9zdCAtPiBjbHVzdGVyT3ZlcmxheSAiSG9zdCBpZGVudGl0eSIgIk92ZXJsYXkgbWVtYmVyc2hpcCIKICAgICAgICAgICAgY2x1c3Rlcl93b3JrbG9hZC1wcm94eSAtPiBjbHVzdGVyT3ZlcmxheSAiTGF1bmNoIGlkZW50aXR5IiAiQ29hcnNlIHNlcnZpY2UgYWNjZXNzIgogICAgICAgICAgICBjbHVzdGVyX2Rlc3RpbmF0aW9uLXdvcmtsb2FkLXByb3h5IC0+IGNsdXN0ZXJPdmVybGF5ICJEZXN0aW5hdGlvbiBsYXVuY2ggaWRlbnRpdHkiICJDb2Fyc2Ugc2VydmljZSBhY2Nlc3MiCiAgICAgICAgfQogICAgICAgIGRlcGxveW1lbnRFbnZpcm9ubWVudCAiVG9wb2xvZ3kgaG9zdCIgewogICAgICAgICAgICBob3N0X2FnZW50SG9zdFRydXN0Qm91bmRhcnlOb2RlID0gZGVwbG95bWVudE5vZGUgIldvcmtsb2FkIGhvc3QgdHJ1c3QgYm91bmRhcnkiICJQcml2aWxlZ2VkIGhvc3QgY29udHJvbCByZW1haW5zIG91dHNpZGUgZXZlcnkgZ3Vlc3QuIiAiV29ya2xvYWQgaG9zdCIgewogICAgICAgICAgICAgICAgaG9zdF9kZWRpY2F0ZWRXb3JrZXJVc2VyTm9kZSA9IGRlcGxveW1lbnROb2RlICJEZWRpY2F0ZWQgd29ya2VyIHVzZXIiICJTZXBhcmF0ZSBmcm9tIHRoZSBob3N0LW1vZGUgYWdlbnQgdXNlci4iICJVc2VyIGJvdW5kYXJ5IiB7CiAgICAgICAgICAgICAgICAgICAgaG9zdF9ob3N0V29ya2VyID0gY29udGFpbmVySW5zdGFuY2UgaG9zdFdvcmtlcgogICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgaG9zdF9wcml2aWxlZ2VkU2V0dXBCb3VuZGFyeU5vZGUgPSBkZXBsb3ltZW50Tm9kZSAiUHJpdmlsZWdlZCBzZXR1cCBib3VuZGFyeSIgIkhlbHBlciBhdXRob3JpdHkgYW5kIGNhbGxlciBiaW5kaW5nIHJlbWFpbiB1bmRlY2lkZWQuIiAiUHJpdmlsZWdlIGJvdW5kYXJ5IiB7CiAgICAgICAgICAgICAgICAgICAgaG9zdF9oZWxwZXIgPSBjb250YWluZXJJbnN0YW5jZSBoZWxwZXIKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgIGhvc3RfaG9zdFJlc29sdmVyID0gY29udGFpbmVySW5zdGFuY2UgaG9zdFJlc29sdmVyCiAgICAgICAgICAgICAgICBob3N0X29wZXJhdG9yQWNjZXNzQm91bmRhcnlOb2RlID0gZGVwbG95bWVudE5vZGUgIk9wZXJhdG9yIGFjY2VzcyBib3VuZGFyeSIgIkhvc3QgYWNjZXNzIHJlcXVpcmVzIGF1dGhvcml6YXRpb247IG5hbWUgcmVzb2x1dGlvbiBncmFudHMgbm9uZS4iICJIb3N0IHNlcnZpY2UiIHsKICAgICAgICAgICAgICAgICAgICBob3N0X2xvb3BiYWNrUHJveHkgPSBjb250YWluZXJJbnN0YW5jZSBsb29wYmFja1Byb3h5CiAgICAgICAgICAgICAgICAgICAgaG9zdF9ob3N0TmV0d29yayA9IGNvbnRhaW5lckluc3RhbmNlIGhvc3ROZXR3b3JrCiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICBob3N0X2FnZW50TGF1bmNoQU5vZGUgPSBkZXBsb3ltZW50Tm9kZSAiQWdlbnQgbGF1bmNoIEEiICJJbmRlcGVuZGVudCBkYXRhIHBhdGg7IG1lZGlhdGlvbiBhbmQgbmV0d29yayB1c2VycyB1bmRlY2lkZWQuIiAiTGF1bmNoIGJvdW5kYXJ5IiB7CiAgICAgICAgICAgICAgICAgICAgaG9zdF9ndWVzdEFOb2RlID0gZGVwbG95bWVudE5vZGUgIkd1ZXN0IEEiICJIb3N0IG1vZGUgdXNlcyB0aGUgZGVkaWNhdGVkIGFnZW50IHVzZXIsIHNlcGFyYXRlIGZyb20gdGhlIHdvcmtlci4iICJEZWRpY2F0ZWQgYWdlbnQgdXNlciBpbiBob3N0IG1vZGUiIHsKICAgICAgICAgICAgICAgICAgICAgICAgaG9zdF9ndWVzdCA9IGNvbnRhaW5lckluc3RhbmNlIGd1ZXN0CiAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgICAgIGhvc3RfbWVkaWF0b3JBTm9kZSA9IGRlcGxveW1lbnROb2RlICJNZWRpYXRvciBBIiAiUG9saWN5IGJvdW5kYXJ5OyBubyBpbmRlcGVuZGVudCBuZXR3b3JrLiIgIkxvY2FsIGNvbmZpbmVtZW50OyB1c2VyIHVuZGVjaWRlZCIgewogICAgICAgICAgICAgICAgICAgICAgICBob3N0X21lZGlhdG9yID0gY29udGFpbmVySW5zdGFuY2UgbWVkaWF0b3IKICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgaG9zdF9hZ2VudFByb3h5QU5vZGUgPSBkZXBsb3ltZW50Tm9kZSAiV29ya2xvYWQgcHJveHkgQSIgIk93biBvdmVybGF5IG5vZGUgYW5kIGxhdW5jaCBYLjUwOS1TVklEOyBjYXJyaWVzIHdvcmtsb2FkIHRyYWZmaWMuIiAidHNuZXQgbm9kZTsgdXNlciB1bmRlY2lkZWQiIHsKICAgICAgICAgICAgICAgICAgICAgICAgaG9zdF93b3JrbG9hZC1wcm94eSA9IGNvbnRhaW5lckluc3RhbmNlIHdvcmtsb2FkLXByb3h5CiAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgaG9zdF9hZ2VudExhdW5jaEJOb2RlID0gZGVwbG95bWVudE5vZGUgIkFnZW50IGxhdW5jaCBCIiAiSW5kZXBlbmRlbnQgZGF0YSBwYXRoOyBzYW1lLWhvc3QgdHJhZmZpYyB1c2VzIHRoZSBvdmVybGF5LiIgIkxhdW5jaCBib3VuZGFyeSIgewogICAgICAgICAgICAgICAgICAgIGhvc3RfZ3Vlc3RCTm9kZSA9IGRlcGxveW1lbnROb2RlICJHdWVzdCBCIiAiSG9zdCBtb2RlIHVzZXMgdGhlIGRlZGljYXRlZCBhZ2VudCB1c2VyLCBzZXBhcmF0ZSBmcm9tIHRoZSB3b3JrZXIuIiAiRGVkaWNhdGVkIGFnZW50IHVzZXIgaW4gaG9zdCBtb2RlIiB7CiAgICAgICAgICAgICAgICAgICAgICAgIGhvc3RfZGVzdGluYXRpb25HdWVzdCA9IGNvbnRhaW5lckluc3RhbmNlIGRlc3RpbmF0aW9uR3Vlc3QKICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgaG9zdF9tZWRpYXRvckJOb2RlID0gZGVwbG95bWVudE5vZGUgIk1lZGlhdG9yIEIiICJQb2xpY3kgYm91bmRhcnk7IG5vIGluZGVwZW5kZW50IG5ldHdvcmsuIiAiTG9jYWwgY29uZmluZW1lbnQ7IHVzZXIgdW5kZWNpZGVkIiB7CiAgICAgICAgICAgICAgICAgICAgICAgIGhvc3RfZGVzdGluYXRpb25NZWRpYXRvciA9IGNvbnRhaW5lckluc3RhbmNlIGRlc3RpbmF0aW9uTWVkaWF0b3IKICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgaG9zdF9hZ2VudFByb3h5Qk5vZGUgPSBkZXBsb3ltZW50Tm9kZSAiV29ya2xvYWQgcHJveHkgQiIgIk93biBvdmVybGF5IG5vZGUgYW5kIGxhdW5jaCBYLjUwOS1TVklEOyBjYXJyaWVzIHdvcmtsb2FkIHRyYWZmaWMuIiAidHNuZXQgbm9kZTsgdXNlciB1bmRlY2lkZWQiIHsKICAgICAgICAgICAgICAgICAgICAgICAgaG9zdF9kZXN0aW5hdGlvbi13b3JrbG9hZC1wcm94eSA9IGNvbnRhaW5lckluc3RhbmNlIGRlc3RpbmF0aW9uLXdvcmtsb2FkLXByb3h5CiAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgfQogICAgICAgICAgICB9CiAgICAgICAgfQogICAgICAgIGRlcGxveW1lbnRFbnZpcm9ubWVudCAiVG9wb2xvZ3kgbGF1bmNoIiB7CiAgICAgICAgICAgIGxhdW5jaF9hZ2VudEhvc3RUcnVzdEJvdW5kYXJ5Tm9kZSA9IGRlcGxveW1lbnROb2RlICJXb3JrbG9hZCBob3N0IHRydXN0IGJvdW5kYXJ5IiAiV29ya2VyIHN0YXlzIG91dHNpZGUgdGhpcyBkYXRhIHBhdGg7IHNlcnZpY2UgdXNlcnMgdW5kZWNpZGVkLiIgIldvcmtsb2FkIGhvc3QiIHsKICAgICAgICAgICAgICAgIGxhdW5jaF9hZ2VudExhdW5jaEJvdW5kYXJ5Tm9kZSA9IGRlcGxveW1lbnROb2RlICJBZ2VudCBsYXVuY2ggYm91bmRhcnkiICJMYXVuY2gtYm91bmQgbG9jYWwgY2FycmllcnM7IHByaXZhdGUga2V5cyBzdGF5IG91dHNpZGUgdGhlIGd1ZXN0LiIgIkxhdW5jaCBpc29sYXRpb24iIHsKICAgICAgICAgICAgICAgICAgICBsYXVuY2hfZ3Vlc3RUcnVzdEJvdW5kYXJ5Tm9kZSA9IGRlcGxveW1lbnROb2RlICJHdWVzdCB0cnVzdCBib3VuZGFyeSIgIkd1ZXN0IGhhcyBubyBvdmVybGF5IG5vZGUgb3Igd29ya2xvYWQga2V5LiIgIldvcmtsb2FkIHByb3ZpZGVyIGNvbmZpbmVtZW50IiB7CiAgICAgICAgICAgICAgICAgICAgICAgIGxhdW5jaF9ndWVzdCA9IGNvbnRhaW5lckluc3RhbmNlIGd1ZXN0CiAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgICAgIGxhdW5jaF9tZWRpYXRpb25UcnVzdEJvdW5kYXJ5Tm9kZSA9IGRlcGxveW1lbnROb2RlICJNZWRpYXRpb24gdHJ1c3QgYm91bmRhcnkiICJFbmZvcmNlcyBjb25uZWN0aW9uIGFuZCBtZXNzYWdlIHBvbGljeTsgbm8gaW5kZXBlbmRlbnQgbmV0d29yay4iICJMb2NhbCBjb25maW5lbWVudDsgdXNlciB1bmRlY2lkZWQiIHsKICAgICAgICAgICAgICAgICAgICAgICAgbGF1bmNoX21lZGlhdG9yID0gY29udGFpbmVySW5zdGFuY2UgbWVkaWF0b3IKICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgbGF1bmNoX2FnZW50UHJveHlUcnVzdEJvdW5kYXJ5Tm9kZSA9IGRlcGxveW1lbnROb2RlICJXb3JrbG9hZCBwcm94eSB0cnVzdCBib3VuZGFyeSIgIk9ubHkgbGF1bmNoIGNvbXBvbmVudCBvcGVuaW5nIG9mZi1ob3N0IGNvbm5lY3Rpb25zLiIgInRzbmV0IG5vZGU7IHVzZXIgdW5kZWNpZGVkIiB7CiAgICAgICAgICAgICAgICAgICAgICAgIGxhdW5jaF93b3JrbG9hZC1wcm94eSA9IGNvbnRhaW5lckluc3RhbmNlIHdvcmtsb2FkLXByb3h5CiAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgfQogICAgICAgICAgICB9CiAgICAgICAgICAgIGxhdW5jaF9jb250cm9sUGxhbmVUcnVzdEJvdW5kYXJ5Tm9kZSA9IGRlcGxveW1lbnROb2RlICJDb250cm9sIHBsYW5lIHRydXN0IGJvdW5kYXJ5IiAiU2VydmljZSBpZGVudGl0aWVzIGF1dGhlbnRpY2F0ZSB3b3JrbG9hZCBjb25uZWN0aW9ucy4iICJDbHVzdGVyIG92ZXJsYXkiIHsKCiAgICAgICAgICAgICAgICBsYXVuY2hfYXBpU2VydmljZU5vZGVOb2RlID0gZGVwbG95bWVudE5vZGUgIkFQSSBzZXJ2aWNlIG5vZGUiICJDaGVja3MgbGl2ZSBsYXVuY2ggY2FwYWJpbGl0aWVzIGFuZCBzY29wZXMuIiAidHNuZXQgbm9kZSIgewogICAgICAgICAgICAgICAgICAgIGxhdW5jaF9jb250cm9sQXBpID0gY29udGFpbmVySW5zdGFuY2UgY29udHJvbEFwaQogICAgICAgICAgICAgICAgfQogICAgICAgICAgICB9CiAgICAgICAgICAgIGxhdW5jaF9pbnRlcm5ldEJvdW5kYXJ5Tm9kZSA9IGRlcGxveW1lbnROb2RlICJJbnRlcm5ldCBib3VuZGFyeSIgIkRlc3RpbmF0aW9uIGF1dGhlbnRpY2F0aW9uIGRpZmZlcnMgZnJvbSB3b3JrbG9hZCBpZGVudGl0eS4iICJFeHRlcm5hbCBzZXJ2aWNlcyIgewogICAgICAgICAgICAgICAgbGF1bmNoX2ludGVybmV0ID0gc29mdHdhcmVTeXN0ZW1JbnN0YW5jZSBpbnRlcm5ldAogICAgICAgICAgICB9CiAgICAgICAgfQogICAgfQoKICAgIHZpZXdzIHsKICAgICAgICBwcm9wZXJ0aWVzIHsKICAgICAgICAgICAgcGxhbnR1bWwuc2tpbnBhcmFtcyAibm9kZXNlcD04MCxyYW5rc2VwPTE2MCIKICAgICAgICB9CiAgICAgICAgc3lzdGVtQ29udGV4dCBhZmFrdCAiYWZha3QtY29udGV4dCIgImFmYWt0IGFuZCB0aGUgcGVvcGxlIGFuZCBzeXN0ZW1zIGl0IGludGVyYWN0cyB3aXRoLiIgewogICAgICAgICAgICBpbmNsdWRlICoKICAgICAgICAgICAgZXhjbHVkZSAiZWxlbWVudC50YWc9PVRvcG9sb2d5IgogICAgICAgICAgICBhdXRvTGF5b3V0IGxyCiAgICAgICAgfQogICAgICAgIGNvbnRhaW5lciBhZmFrdCAiYWZha3QtY29udGFpbmVycyIgIlRoZSBhZmFrdCBwcm9jZXNzIGFuZCBpdHMgZXh0ZXJuYWwgZGVwZW5kZW5jaWVzLiIgewogICAgICAgICAgICBpbmNsdWRlICoKICAgICAgICAgICAgZXhjbHVkZSAiZWxlbWVudC50YWc9PVRvcG9sb2d5IgogICAgICAgICAgICBhdXRvTGF5b3V0IGxyCiAgICAgICAgfQogICAgICAgIGNvbXBvbmVudCBydW50aW1lICJhZmFrdC1jb21wb25lbnRzIiAiVGhlIGNvbXBvbmVudHMgaW5zaWRlIHRoZSBjb21iaW5lZCBhZmFrdCBwcm9jZXNzLiIgewogICAgICAgICAgICBpbmNsdWRlICoKICAgICAgICAgICAgZXhjbHVkZSAiZWxlbWVudC50YWc9PVRvcG9sb2d5IgogICAgICAgICAgICBhdXRvTGF5b3V0IGxyCiAgICAgICAgfQoKICAgICAgICBkZXBsb3ltZW50ICogIlRvcG9sb2d5IGNvbnRleHQiICJuZXR3b3JrLWNvbnRleHQiICJPcGVyYXRvciBkZXZpY2VzLCBhdHRhY2hlZCB0YWlsbmV0cywgY2x1c3RlciBhbmQgaW50ZXJuZXQgdHJ1c3QgYm91bmRhcmllcy4iIHsKICAgICAgICAgICAgaW5jbHVkZSAqCiAgICAgICAgICAgIGF1dG9MYXlvdXQgbHIKICAgICAgICB9CiAgICAgICAgZGVwbG95bWVudCAqICJUb3BvbG9neSBjbHVzdGVyIiAibmV0d29yay1jbHVzdGVyIiAiU2VydmljZSBub2RlcyBhbmQgaW5kZXBlbmRlbnQgbGF1bmNoIG5vZGVzIG9uIHRoZSBwcml2YXRlIG92ZXJsYXkuIiB7CiAgICAgICAgICAgIGluY2x1ZGUgKgogICAgICAgICAgICBleGNsdWRlICJyZWxhdGlvbnNoaXAudGFnPT1Ub3BvbG9neUNvbm5lY3Rpb24iCiAgICAgICAgICAgIGF1dG9MYXlvdXQgbHIKICAgICAgICB9CiAgICAgICAgZGVwbG95bWVudCAqICJUb3BvbG9neSBob3N0IiAibmV0d29yay1ob3N0IiAiSG9zdCBtYW5hZ2VtZW50LCBvcGVyYXRvciBhY2Nlc3MgYW5kIGluZGVwZW5kZW50IGxhdW5jaCB0cnVzdCBib3VuZGFyaWVzLiIgewogICAgICAgICAgICBpbmNsdWRlICoKICAgICAgICAgICAgZXhjbHVkZSAicmVsYXRpb25zaGlwLnRhZz09TGlmZWN5Y2xlRGV0YWlsIgogICAgICAgICAgICBleGNsdWRlICJyZWxhdGlvbnNoaXAudGFnPT1SZXR1cm5EZXRhaWwiCiAgICAgICAgICAgIGV4Y2x1ZGUgInJlbGF0aW9uc2hpcC50YWc9PVVuZGVjaWRlZCIKICAgICAgICAgICAgYXV0b0xheW91dCB0YgogICAgICAgIH0KICAgICAgICBkZXBsb3ltZW50ICogIlRvcG9sb2d5IGxhdW5jaCIgIm5ldHdvcmstbGF1bmNoIiAiT25lIGxhdW5jaCBjcm9zc2VzIGd1ZXN0LCBtZWRpYXRpb24sIG5ldHdvcmsgYW5kIHNlcnZpY2UgYm91bmRhcmllcy4iIHsKICAgICAgICAgICAgaW5jbHVkZSAqCiAgICAgICAgICAgIGV4Y2x1ZGUgInJlbGF0aW9uc2hpcC50YWc9PVJldHVybkRldGFpbCIKICAgICAgICAgICAgYXV0b0xheW91dCBscgogICAgICAgIH0KICAgICAgICBkeW5hbWljIGFmYWt0ICJuZXR3b3JrLWZsb3ctaW50ZXJuZXQiICJHdWVzdCBlZ3Jlc3MgdGhyb3VnaCBpdHMgcHJveHkgdW5kZXIgbWVkaWF0b3IgZGVjaXNpb25zLiIgewogICAgICAgICAgICBndWVzdCAtPiB3b3JrbG9hZC1wcm94eSAiVHJhZmZpYyBvbiBwcml2YXRlIHdvcmtsb2FkIGxpbms7IG5vIGd1ZXN0IHdvcmtsb2FkIGtleSIKICAgICAgICAgICAgd29ya2xvYWQtcHJveHkgLT4gbWVkaWF0b3IgIlJlcXVlc3QgZGVzdGluYXRpb24gZGVjaXNpb24iCiAgICAgICAgICAgIG1lZGlhdG9yIC0+IHdvcmtsb2FkLXByb3h5ICJQZXJtaXQgZGVzdGluYXRpb247IGluc3RydWN0IHByb3h5IFRMUyB0ZXJtaW5hdGlvbiB3aGVuIHJlcXVpcmVkIgogICAgICAgICAgICB3b3JrbG9hZC1wcm94eSAtPiBpbnRlcm5ldCAiUGVybWl0dGVkIHJlcXVlc3Q7IGRlc3RpbmF0aW9uIGNyZWRlbnRpYWxzIHdoZW4gYXV0aG9yaXplZCIKICAgICAgICAgICAgYXV0b0xheW91dCBscgogICAgICAgIH0KICAgICAgICBkeW5hbWljIGFmYWt0ICJuZXR3b3JrLWZsb3ctY29udHJvbCIgIkd1ZXN0IHJlcXVlc3QgdG8gdGhlIGNvbnRyb2wgcGxhbmUgQVBJIHNlcnZpY2UuIiB7CiAgICAgICAgICAgIGd1ZXN0IC0+IHdvcmtsb2FkLXByb3h5ICJDb250cm9sIHJlcXVlc3QgYm91bmQgdG8gY3VycmVudCBsYXVuY2giCiAgICAgICAgICAgIHdvcmtsb2FkLXByb3h5IC0+IG1lZGlhdG9yICJSZXF1ZXN0IHBvbGljeSBkZWNpc2lvbiBhbmQgaWRlbnRpdHkgYmluZGluZyIKICAgICAgICAgICAgbWVkaWF0b3IgLT4gd29ya2xvYWQtcHJveHkgIlBvbGljeSBwZXJtaXQgYW5kIHN0YW1wZWQgbGF1bmNoIGlkZW50aXR5IgogICAgICAgICAgICB3b3JrbG9hZC1wcm94eSAtPiBjb250cm9sQXBpICJMYXVuY2ggWC41MDktU1ZJRDsgc2VydmljZSBjaGVja3MgY2FwYWJpbGl0aWVzIGFuZCBzY29wZXMiCiAgICAgICAgICAgIGF1dG9MYXlvdXQgbHIKICAgICAgICB9CiAgICAgICAgZHluYW1pYyBhZmFrdCAibmV0d29yay1mbG93LXByZXZpZXciICJPcGVyYXRvciBicm93c2VyIHJlYWNoZXMgYSBwcmV2aWV3IHRocm91Z2ggdGhlIGhvc3Qgbm9kZS4iIHsKICAgICAgICAgICAgYnJvd3NlciAtPiBob3N0UmVzb2x2ZXIgIlJlc29sdmUgaW50ZXJuYWwgcHJldmlldyBuYW1lIgogICAgICAgICAgICBicm93c2VyIC0+IGxvb3BiYWNrUHJveHkgIkhvc3QgYWNjZXNzIHJlcXVlc3Q7IG1lY2hhbmlzbSB1bmRlY2lkZWQiCiAgICAgICAgICAgIGxvb3BiYWNrUHJveHkgLT4gaG9zdE5ldHdvcmsgIlJlcXVlc3QgdW5kZXIgaG9zdC1sZXZlbCBhdXRob3JpemF0aW9uIgogICAgICAgICAgICBob3N0TmV0d29yayAtPiBwcmV2aWV3U2VydmVyICJIb3N0IHdvcmtsb2FkIGlkZW50aXR5OyBzZXJ2ZWQgYXBwIG1heSByZXF1aXJlIGl0cyBvd24gc2lnbi1pbiIKICAgICAgICAgICAgcHJldmlld1NlcnZlciAtPiB3b3JrbG9hZC1wcm94eSAiRGlyZWN0IG92ZXJsYXkgY29ubmVjdGlvbjsgbXV0dWFsIFNQSUZGRSBhdXRoZW50aWNhdGlvbiIKICAgICAgICAgICAgd29ya2xvYWQtcHJveHkgLT4gbWVkaWF0b3IgIlJlcXVlc3QgZGVjaXNpb24gZm9yIGNhbGxlciBhbmQgcHVibGljYXRpb24iCiAgICAgICAgICAgIG1lZGlhdG9yIC0+IHdvcmtsb2FkLXByb3h5ICJSZXR1cm4gZGVjaXNpb247IHB1YmxpY2F0aW9uIGJpbmRpbmcgcmVtYWlucyBvcGVuIgogICAgICAgICAgICB3b3JrbG9hZC1wcm94eSAtPiBndWVzdCAiUGVybWl0dGVkIGluZ3Jlc3M7IGxpc3RlbmVyIGJpbmRpbmcgb3BlbiAoT1EtUE9SVC0xNCkiCiAgICAgICAgICAgIGF1dG9MYXlvdXQgdGIKICAgICAgICB9CiAgICAgICAgZHluYW1pYyBhZmFrdCAibmV0d29yay1mbG93LXBob25lIiAiUGhvbmUgcmVhY2hlcyB0aGUgZGFzaGJvYXJkIHRocm91Z2ggYW4gYXR0YWNoZWQgdXNlciB0YWlsbmV0LiIgewogICAgICAgICAgICBwaG9uZSAtPiB1c2VyVGFpbG5ldCAiRGV2aWNlIGlkZW50aXR5IGluIHVzZXItb3duZWQgbmV0d29yayIKICAgICAgICAgICAgdXNlclRhaWxuZXQgLT4gZWRnZSAiUHJpdmF0ZSBhcHBsaWNhdGlvbiByZXF1ZXN0OyBhZmFrdCBzaWduLWluIgogICAgICAgICAgICBlZGdlIC0+IGRhc2hib2FyZCAiQXV0aGVudGljYXRlZCB1c2VyIGNvbnRleHQgdG8gd2ViIGRhc2hib2FyZDsgbm8gcGFja2V0IHJvdXRpbmciCiAgICAgICAgICAgIGRhc2hib2FyZCAtPiBjb250cm9sQXBpICJGb3J3YXJkcyBBUEkgY2FsbHMgd2l0aCB0aGUgdXNlcidzIGFjY2VzcyB0b2tlbiIKICAgICAgICAgICAgYXV0b0xheW91dCBscgogICAgICAgIH0KICAgICAgICBkeW5hbWljIGFmYWt0ICJuZXR3b3JrLWZsb3ctc3RhdGljIiAiQSBicm93c2VyIHJlcXVlc3RzIGEgc3RhdGljIHNpdGUgdGhyb3VnaCB0aGUgZXh0ZXJuYWwgaW5ncmVzcyBnYXRld2F5LiIgewogICAgICAgICAgICBicm93c2VyIC0+IGVkZ2UgIlB1YmxpYyByZXF1ZXN0IGZvciBhIHN0YXRpYyBzaXRlIGhvc3RuYW1lIgogICAgICAgICAgICBlZGdlIC0+IHN0YXRpY09yaWdpbiAiSG9zdG5hbWUgbWFwcGVkIHRvIHRoZSBhY3RpdmUgZGVwbG95OyBnYXRld2F5IGNvbXByZXNzZXMgYW5kIGNhY2hlcyIKICAgICAgICAgICAgYXV0b0xheW91dCBscgogICAgICAgIH0KICAgICAgICBkeW5hbWljIGFmYWt0ICJuZXR3b3JrLWZsb3ctZ3JhbnQiICJEaXJlY3Qgb3ZlcmxheSBjb25uZWN0aW9uIGNoZWNrZWQgYnkgYm90aCBtZWRpYXRvcnMuIiB7CiAgICAgICAgICAgIGd1ZXN0IC0+IHdvcmtsb2FkLXByb3h5ICJTb3VyY2UgbGF1bmNoIHJlcXVlc3RzIHB1Ymxpc2hlZCBkZXN0aW5hdGlvbiIKICAgICAgICAgICAgd29ya2xvYWQtcHJveHkgLT4gbWVkaWF0b3IgIlJlcXVlc3QgZWdyZXNzIGRlY2lzaW9uIgogICAgICAgICAgICBtZWRpYXRvciAtPiB3b3JrbG9hZC1wcm94eSAiU291cmNlIHBvbGljeSBwZXJtaXRzIGRlc3RpbmF0aW9uIG5hbWUgYW5kIHBvcnQiCiAgICAgICAgICAgIHdvcmtsb2FkLXByb3h5IC0+IGRlc3RpbmF0aW9uLXdvcmtsb2FkLXByb3h5ICJEaXJlY3Qgb3ZlcmxheSBjb25uZWN0aW9uIHdpdGggbXV0dWFsIFNQSUZGRSBhdXRoZW50aWNhdGlvbiIKICAgICAgICAgICAgZGVzdGluYXRpb24td29ya2xvYWQtcHJveHkgLT4gZGVzdGluYXRpb25NZWRpYXRvciAiQXV0aGVudGljYXRlZCBzb3VyY2UgbGF1bmNoIGFuZCBkZXN0aW5hdGlvbiBncmFudCIKICAgICAgICAgICAgZGVzdGluYXRpb25NZWRpYXRvciAtPiBkZXN0aW5hdGlvbi13b3JrbG9hZC1wcm94eSAiUmV0dXJuIGluZ3Jlc3MgZGVjaXNpb24iCiAgICAgICAgICAgIGRlc3RpbmF0aW9uLXdvcmtsb2FkLXByb3h5IC0+IGRlc3RpbmF0aW9uR3Vlc3QgIlBlcm1pdHRlZCBpbmdyZXNzOyBsaXN0ZW5lciBiaW5kaW5nIG9wZW4gKE9RLVBPUlQtMTQpIgogICAgICAgICAgICBhdXRvTGF5b3V0IHRiCiAgICAgICAgfQogICAgICAgIGNvbnRhaW5lciBhZmFrdCAibmV0d29yay1zZXJ2aWNlLWJvdW5kYXJpZXMiICJTZXJ2aWNlcyBzdXBwb3J0aW5nIHRoZSBkZXBsb3ltZW50IHRvcG9sb2d5OyBjb25uZWN0aW9ucyBhcmUgY29udHJvbCBvciB0cmFuc3BvcnQgZGVwZW5kZW5jaWVzLiIgewogICAgICAgICAgICBpbmNsdWRlIGhvc3RXb3JrZXIgaGVscGVyIGNvbnRyb2xBcGkgbWNwR2F0ZXdheSBjb29yZGluYXRpb24gb3ZlcmxheVJlbGF5CiAgICAgICAgICAgIGV4Y2x1ZGUgInJlbGF0aW9uc2hpcC50YWc9PU92ZXJ2aWV3SGlkZGVuIgogICAgICAgICAgICBhdXRvTGF5b3V0IHRiCiAgICAgICAgfQogICAgICAgIHN0eWxlcyB7CiAgICAgICAgICAgIGVsZW1lbnQgIlRvcG9sb2d5IiB7CiAgICAgICAgICAgICAgICBiYWNrZ3JvdW5kICNlOGYxZmEKICAgICAgICAgICAgICAgIGNvbG9yICMxMjJiNDQKICAgICAgICAgICAgICAgIHN0cm9rZSAjMzE1YjdkCiAgICAgICAgICAgIH0KICAgICAgICAgICAgZWxlbWVudCAiRGVwbG95bWVudCBOb2RlIiB7CiAgICAgICAgICAgICAgICBiYWNrZ3JvdW5kICNmNWY3ZmEKICAgICAgICAgICAgICAgIGNvbG9yICMxODJjM2UKICAgICAgICAgICAgICAgIHN0cm9rZSAjNTM2YjdlCiAgICAgICAgICAgIH0KICAgICAgICAgICAgZWxlbWVudCAiR3JvdXAiIHsKICAgICAgICAgICAgICAgIGNvbG9yICMxODJjM2UKICAgICAgICAgICAgICAgIHN0cm9rZSAjNTM2YjdlCiAgICAgICAgICAgIH0KICAgICAgICAgICAgcmVsYXRpb25zaGlwICJVbmRlY2lkZWQiIHsKICAgICAgICAgICAgICAgIGNvbG9yICM4YTVhMDAKICAgICAgICAgICAgICAgIHN0eWxlIGRhc2hlZAogICAgICAgICAgICB9CiAgICAgICAgfQogICAgfQoKICAgIGNvbmZpZ3VyYXRpb24gewogICAgICAgIHNjb3BlIHNvZnR3YXJlc3lzdGVtCiAgICB9Cn0=",
     "structurizr.inspection.model.softwaresystem.decisions": "ignore",
     "structurizr.inspection.info": "0",
     "structurizr.inspection.ignore": "2",
@@ -2590,10 +2615,7 @@
             "id": "43"
           },
           {
-            "id": "44"
-          },
-          {
-            "id": "47"
+            "id": "45"
           },
           {
             "id": "48"
@@ -2602,7 +2624,7 @@
             "id": "49"
           },
           {
-            "id": "52"
+            "id": "50"
           },
           {
             "id": "53"
@@ -2611,7 +2633,7 @@
             "id": "54"
           },
           {
-            "id": "57"
+            "id": "55"
           },
           {
             "id": "58"
@@ -2629,7 +2651,10 @@
             "id": "62"
           },
           {
-            "id": "65"
+            "id": "63"
+          },
+          {
+            "id": "66"
           }
         ]
       }
@@ -2708,6 +2733,11 @@
             "id": "7",
             "x": 0,
             "y": 0
+          },
+          {
+            "id": "15",
+            "x": 0,
+            "y": 0
           }
         ],
         "externalSoftwareSystemBoundariesVisible": false,
@@ -2719,19 +2749,25 @@
             "id": "35"
           },
           {
+            "id": "37"
+          },
+          {
             "id": "40"
           },
           {
-            "id": "45"
+            "id": "44"
           },
           {
-            "id": "50"
+            "id": "46"
           },
           {
-            "id": "55"
+            "id": "51"
           },
           {
-            "id": "63"
+            "id": "56"
+          },
+          {
+            "id": "64"
           }
         ],
         "softwareSystemId": "6"
@@ -2783,10 +2819,10 @@
         "order": 14,
         "relationships": [
           {
-            "id": "75"
+            "id": "76"
           },
           {
-            "id": "90"
+            "id": "93"
           }
         ],
         "softwareSystemId": "6"
@@ -2803,21 +2839,6 @@
         },
         "description": "Operator devices, attached tailnets, cluster and internet trust boundaries.",
         "elements": [
-          {
-            "id": "106",
-            "x": 0,
-            "y": 0
-          },
-          {
-            "id": "107",
-            "x": 0,
-            "y": 0
-          },
-          {
-            "id": "108",
-            "x": 0,
-            "y": 0
-          },
           {
             "id": "109",
             "x": 0,
@@ -2852,6 +2873,21 @@
             "id": "115",
             "x": 0,
             "y": 0
+          },
+          {
+            "id": "116",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "117",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "118",
+            "x": 0,
+            "y": 0
           }
         ],
         "environment": "Topology context",
@@ -2860,19 +2896,19 @@
         "order": 4,
         "relationships": [
           {
-            "id": "116"
-          },
-          {
-            "id": "117"
-          },
-          {
-            "id": "118"
-          },
-          {
             "id": "119"
           },
           {
             "id": "120"
+          },
+          {
+            "id": "121"
+          },
+          {
+            "id": "122"
+          },
+          {
+            "id": "123"
           }
         ]
       },
@@ -2887,22 +2923,12 @@
         "description": "Service nodes and independent launch nodes on the private overlay.",
         "elements": [
           {
-            "id": "121",
-            "x": 0,
-            "y": 0
-          },
-          {
-            "id": "122",
-            "x": 0,
-            "y": 0
-          },
-          {
-            "id": "123",
-            "x": 0,
-            "y": 0
-          },
-          {
             "id": "124",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "125",
             "x": 0,
             "y": 0
           },
@@ -2917,17 +2943,17 @@
             "y": 0
           },
           {
-            "id": "128",
-            "x": 0,
-            "y": 0
-          },
-          {
             "id": "129",
             "x": 0,
             "y": 0
           },
           {
             "id": "130",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "131",
             "x": 0,
             "y": 0
           },
@@ -2972,11 +2998,6 @@
             "y": 0
           },
           {
-            "id": "143",
-            "x": 0,
-            "y": 0
-          },
-          {
             "id": "144",
             "x": 0,
             "y": 0
@@ -2997,37 +3018,52 @@
             "y": 0
           },
           {
-            "id": "152",
+            "id": "148",
             "x": 0,
             "y": 0
           },
           {
-            "id": "153",
+            "id": "149",
             "x": 0,
             "y": 0
           },
           {
-            "id": "160",
+            "id": "150",
             "x": 0,
             "y": 0
           },
           {
-            "id": "161",
+            "id": "155",
             "x": 0,
             "y": 0
           },
           {
-            "id": "162",
+            "id": "156",
             "x": 0,
             "y": 0
           },
           {
-            "id": "167",
+            "id": "163",
             "x": 0,
             "y": 0
           },
           {
-            "id": "168",
+            "id": "164",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "165",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "170",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "171",
             "x": 0,
             "y": 0
           }
@@ -3038,22 +3074,13 @@
         "order": 5,
         "relationships": [
           {
-            "id": "125"
+            "id": "128"
           },
           {
-            "id": "148"
+            "id": "151"
           },
           {
-            "id": "163"
-          },
-          {
-            "id": "170"
-          },
-          {
-            "id": "171"
-          },
-          {
-            "id": "172"
+            "id": "166"
           },
           {
             "id": "173"
@@ -3078,6 +3105,15 @@
           },
           {
             "id": "180"
+          },
+          {
+            "id": "181"
+          },
+          {
+            "id": "182"
+          },
+          {
+            "id": "183"
           }
         ]
       },
@@ -3092,21 +3128,6 @@
         "description": "Host management, operator access and independent launch trust boundaries.",
         "elements": [
           {
-            "id": "181",
-            "x": 0,
-            "y": 0
-          },
-          {
-            "id": "182",
-            "x": 0,
-            "y": 0
-          },
-          {
-            "id": "183",
-            "x": 0,
-            "y": 0
-          },
-          {
             "id": "184",
             "x": 0,
             "y": 0
@@ -3117,12 +3138,17 @@
             "y": 0
           },
           {
+            "id": "186",
+            "x": 0,
+            "y": 0
+          },
+          {
             "id": "187",
             "x": 0,
             "y": 0
           },
           {
-            "id": "189",
+            "id": "188",
             "x": 0,
             "y": 0
           },
@@ -3132,7 +3158,12 @@
             "y": 0
           },
           {
-            "id": "191",
+            "id": "192",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "193",
             "x": 0,
             "y": 0
           },
@@ -3142,12 +3173,7 @@
             "y": 0
           },
           {
-            "id": "195",
-            "x": 0,
-            "y": 0
-          },
-          {
-            "id": "196",
+            "id": "197",
             "x": 0,
             "y": 0
           },
@@ -3172,17 +3198,12 @@
             "y": 0
           },
           {
-            "id": "207",
+            "id": "204",
             "x": 0,
             "y": 0
           },
           {
-            "id": "208",
-            "x": 0,
-            "y": 0
-          },
-          {
-            "id": "209",
+            "id": "205",
             "x": 0,
             "y": 0
           },
@@ -3197,12 +3218,27 @@
             "y": 0
           },
           {
+            "id": "212",
+            "x": 0,
+            "y": 0
+          },
+          {
             "id": "213",
             "x": 0,
             "y": 0
           },
           {
             "id": "214",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "216",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "217",
             "x": 0,
             "y": 0
           }
@@ -3213,31 +3249,31 @@
         "order": 6,
         "relationships": [
           {
-            "id": "186"
+            "id": "189"
           },
           {
-            "id": "188"
+            "id": "191"
           },
           {
-            "id": "192"
+            "id": "195"
           },
           {
-            "id": "193"
+            "id": "196"
           },
           {
-            "id": "204"
+            "id": "207"
           },
           {
-            "id": "206"
+            "id": "209"
           },
           {
-            "id": "215"
+            "id": "218"
           },
           {
-            "id": "217"
+            "id": "220"
           },
           {
-            "id": "219"
+            "id": "222"
           }
         ]
       },
@@ -3251,21 +3287,6 @@
         },
         "description": "One launch crosses guest, mediation, network and service boundaries.",
         "elements": [
-          {
-            "id": "220",
-            "x": 0,
-            "y": 0
-          },
-          {
-            "id": "221",
-            "x": 0,
-            "y": 0
-          },
-          {
-            "id": "222",
-            "x": 0,
-            "y": 0
-          },
           {
             "id": "223",
             "x": 0,
@@ -3292,17 +3313,22 @@
             "y": 0
           },
           {
-            "id": "232",
+            "id": "228",
             "x": 0,
             "y": 0
           },
           {
-            "id": "233",
+            "id": "229",
             "x": 0,
             "y": 0
           },
           {
-            "id": "234",
+            "id": "230",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "235",
             "x": 0,
             "y": 0
           },
@@ -3315,6 +3341,16 @@
             "id": "237",
             "x": 0,
             "y": 0
+          },
+          {
+            "id": "239",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "id": "240",
+            "x": 0,
+            "y": 0
           }
         ],
         "environment": "Topology launch",
@@ -3323,16 +3359,16 @@
         "order": 7,
         "relationships": [
           {
-            "id": "229"
+            "id": "232"
           },
           {
-            "id": "231"
-          },
-          {
-            "id": "235"
+            "id": "234"
           },
           {
             "id": "238"
+          },
+          {
+            "id": "241"
           }
         ]
       }
@@ -3365,7 +3401,7 @@
             "y": 0
           },
           {
-            "id": "69",
+            "id": "70",
             "x": 0,
             "y": 0
           }
@@ -3377,25 +3413,25 @@
         "relationships": [
           {
             "description": "Traffic on private workload link; no guest workload key",
-            "id": "91",
+            "id": "94",
             "order": "1",
             "response": false
           },
           {
             "description": "Request destination decision",
-            "id": "96",
+            "id": "99",
             "order": "2",
             "response": false
           },
           {
             "description": "Permit destination; instruct proxy TLS termination when required",
-            "id": "92",
+            "id": "95",
             "order": "3",
             "response": false
           },
           {
             "description": "Permitted request; destination credentials when authorized",
-            "id": "95",
+            "id": "98",
             "order": "4",
             "response": false
           }
@@ -3440,25 +3476,25 @@
         "relationships": [
           {
             "description": "Control request bound to current launch",
-            "id": "91",
+            "id": "94",
             "order": "1",
             "response": false
           },
           {
             "description": "Request policy decision and identity binding",
-            "id": "96",
+            "id": "99",
             "order": "2",
             "response": false
           },
           {
             "description": "Policy permit and stamped launch identity",
-            "id": "92",
+            "id": "95",
             "order": "3",
             "response": false
           },
           {
             "description": "Launch X.509-SVID; service checks capabilities and scopes",
-            "id": "93",
+            "id": "96",
             "order": "4",
             "response": false
           }
@@ -3511,7 +3547,7 @@
             "y": 0
           },
           {
-            "id": "66",
+            "id": "67",
             "x": 0,
             "y": 0
           }
@@ -3523,49 +3559,49 @@
         "relationships": [
           {
             "description": "Resolve internal preview name",
-            "id": "70",
+            "id": "71",
             "order": "1",
             "response": false
           },
           {
             "description": "Host access request; mechanism undecided",
-            "id": "71",
+            "id": "72",
             "order": "2",
             "response": false
           },
           {
             "description": "Request under host-level authorization",
-            "id": "72",
+            "id": "73",
             "order": "3",
             "response": false
           },
           {
             "description": "Host workload identity; served app may require its own sign-in",
-            "id": "73",
+            "id": "74",
             "order": "4",
             "response": false
           },
           {
             "description": "Direct overlay connection; mutual SPIFFE authentication",
-            "id": "89",
+            "id": "92",
             "order": "5",
             "response": false
           },
           {
             "description": "Request decision for caller and publication",
-            "id": "96",
+            "id": "99",
             "order": "6",
             "response": false
           },
           {
             "description": "Return decision; publication binding remains open",
-            "id": "92",
+            "id": "95",
             "order": "7",
             "response": false
           },
           {
             "description": "Permitted ingress; listener binding open (OQ-PORT-14)",
-            "id": "97",
+            "id": "100",
             "order": "8",
             "response": false
           }
@@ -3583,6 +3619,11 @@
         "elementId": "6",
         "elements": [
           {
+            "id": "15",
+            "x": 0,
+            "y": 0
+          },
+          {
             "id": "16",
             "x": 0,
             "y": 0
@@ -3593,12 +3634,12 @@
             "y": 0
           },
           {
-            "id": "67",
+            "id": "68",
             "x": 0,
             "y": 0
           },
           {
-            "id": "68",
+            "id": "69",
             "x": 0,
             "y": 0
           }
@@ -3610,20 +3651,26 @@
         "relationships": [
           {
             "description": "Device identity in user-owned network",
-            "id": "81",
+            "id": "82",
             "order": "1",
             "response": false
           },
           {
             "description": "Private application request; afakt sign-in",
-            "id": "82",
+            "id": "83",
             "order": "2",
             "response": false
           },
           {
             "description": "Authenticated user context to web dashboard; no packet routing",
-            "id": "85",
+            "id": "87",
             "order": "3",
+            "response": false
+          },
+          {
+            "description": "Forwards API calls with the user's access token",
+            "id": "88",
+            "order": "4",
             "response": false
           }
         ]
@@ -3650,7 +3697,7 @@
             "y": 0
           },
           {
-            "id": "66",
+            "id": "67",
             "x": 0,
             "y": 0
           }
@@ -3662,13 +3709,13 @@
         "relationships": [
           {
             "description": "Public request for a static site hostname",
-            "id": "84",
+            "id": "85",
             "order": "1",
             "response": false
           },
           {
             "description": "Hostname mapped to the active deploy; gateway compresses and caches",
-            "id": "87",
+            "id": "90",
             "order": "2",
             "response": false
           }
@@ -3723,43 +3770,43 @@
         "relationships": [
           {
             "description": "Source launch requests published destination",
-            "id": "91",
+            "id": "94",
             "order": "1",
             "response": false
           },
           {
             "description": "Request egress decision",
-            "id": "96",
+            "id": "99",
             "order": "2",
             "response": false
           },
           {
             "description": "Source policy permits destination name and port",
-            "id": "92",
+            "id": "95",
             "order": "3",
             "response": false
           },
           {
             "description": "Direct overlay connection with mutual SPIFFE authentication",
-            "id": "102",
+            "id": "105",
             "order": "4",
             "response": false
           },
           {
             "description": "Authenticated source launch and destination grant",
-            "id": "100",
+            "id": "103",
             "order": "5",
             "response": false
           },
           {
             "description": "Return ingress decision",
-            "id": "99",
+            "id": "102",
             "order": "6",
             "response": false
           },
           {
             "description": "Permitted ingress; listener binding open (OQ-PORT-14)",
-            "id": "101",
+            "id": "104",
             "order": "7",
             "response": false
           }
@@ -3820,16 +3867,16 @@
             "id": "41"
           },
           {
-            "id": "46"
+            "id": "47"
           },
           {
-            "id": "51"
+            "id": "52"
           },
           {
-            "id": "56"
+            "id": "57"
           },
           {
-            "id": "64"
+            "id": "65"
           }
         ],
         "softwareSystemId": "6"

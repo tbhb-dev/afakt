@@ -118,27 +118,27 @@ skinparam {
 </style>
 
 rectangle "afakt\n<size:16>[Software System]</size>" <<Boundary-YWZha3Q=>> {
-  rectangle "Control plane services" <<Group-Q29udHJvbCBwbGFuZSBzZXJ2aWNlcw==>> as group10 {
+  rectangle "Control plane services" <<Group-Q29udHJvbCBwbGFuZSBzZXJ2aWNlcw==>> as group11 {
     rectangle "==Preview server\n<size:16>[Container: Application service]</size>\n\nDials workload proxies over the overlay; published-port listener binding remains open." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Previewserver
   }
 
-  rectangle "Host management boundary" <<Group-SG9zdCBtYW5hZ2VtZW50IGJvdW5kYXJ5>> as group11 {
+  rectangle "Host management boundary" <<Group-SG9zdCBtYW5hZ2VtZW50IGJvdW5kYXJ5>> as group12 {
     rectangle "==Host name resolver\n<size:16>[Container: Domain Name System]</size>\n\nResolves names under *.afakt.internal for host clients." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Hostnameresolver
   }
 
-  rectangle "Launch guest boundary" <<Group-TGF1bmNoIGd1ZXN0IGJvdW5kYXJ5>> as group12 {
+  rectangle "Launch guest boundary" <<Group-TGF1bmNoIGd1ZXN0IGJvdW5kYXJ5>> as group13 {
     rectangle "==Guest context\n<size:16>[Container: Workload provider confinement]</size>\n\nUntrusted harness, relay and loopback listeners; no overlay membership or workload keys." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Guestcontext
   }
 
-  rectangle "Launch mediation boundary" <<Group-TGF1bmNoIG1lZGlhdGlvbiBib3VuZGFyeQ==>> as group13 {
+  rectangle "Launch mediation boundary" <<Group-TGF1bmNoIG1lZGlhdGlvbiBib3VuZGFyeQ==>> as group14 {
     rectangle "==Workload proxy mediator\n<size:16>[Container: Local policy enforcement]</size>\n\nDecides every inbound and outbound connection and stamps identity; never carries traffic." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Workloadproxymediator
   }
 
-  rectangle "Launch workload proxy boundary" <<Group-TGF1bmNoIHdvcmtsb2FkIHByb3h5IGJvdW5kYXJ5>> as group14 {
+  rectangle "Launch workload proxy boundary" <<Group-TGF1bmNoIHdvcmtsb2FkIHByb3h5IGJvdW5kYXJ5>> as group15 {
     rectangle "==Workload proxy\n<size:16>[Container: Network proxy]</size>\n\nCarries workload traffic in both directions; own overlay node and launch X.509-SVID; asks the mediator to decide each connection." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Workloadproxy
   }
 
-  rectangle "Operator access on the workload host" <<Group-T3BlcmF0b3IgYWNjZXNzIG9uIHRoZSB3b3JrbG9hZCBob3N0>> as group15 {
+  rectangle "Operator access on the workload host" <<Group-T3BlcmF0b3IgYWNjZXNzIG9uIHRoZSB3b3JrbG9hZCBob3N0>> as group16 {
     rectangle "==Host access boundary\n<size:16>[Container: Access mechanism undecided]</size>\n\nHost-level authorization for services, previews and ports; local caller and connection mechanisms undecided." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Hostaccessboundary
     rectangle "==Host-level connectivity\n<size:16>[Container: Host connectivity service]</size>\n\nHost authorization for agent and cluster services; connection mechanism undecided; optional user tailnet attachment." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Hostlevelconnectivity
   }

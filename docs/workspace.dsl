@@ -17,15 +17,18 @@ workspace "afakt" "Architecture of the afakt modular monolith." {
                 cli = component "Command-line interface" "Runs server services and communicates with the API." "Go"
                 api = component "API server" "Serves the REST API and starts workflows." "Go"
                 webhook = component "GitHub webhook receiver" "Accepts webhook deliveries and starts coordination work." "Go"
-                dashboard = component "Web dashboard" "Provides the web UI from the API's origin." "React"
                 orchestrator = component "Embedded workflow orchestrator" "Provides durable execution inside the process for development and tests." "Temporal"
                 workflows = component "Coordination workflows" "Coordinate work on workers inside the binary and start other workflows." "Temporal"
                 runner = component "Agent runner" "Runs AI coding agents as a workflow." "Temporal"
                 temporalUI = component "Temporal Web UI" "Shows the embedded server's namespaces, workflows, and histories." "Temporal"
             }
 
+            group "Platform as a Service" {
+                dashboard = container "Web dashboard" "A platform app: a static single-page app on the static origin and a backend-for-frontend app workload that holds the user's session. The API origin routes /dashboard to it." "React"
+            }
+
             group "Control plane services" {
-                controlApi = container "API server and web dashboard" "Serves workload resources and the dashboard; image and host-worker operations remain open." "Application service" "Topology"
+                controlApi = container "API server" "Serves workload resources; image and host-worker operations remain open." "Application service" "Topology"
                 previewServer = container "Preview server" "Dials workload proxies over the overlay; published-port listener binding remains open." "Application service" "Topology"
                 mcpGateway = container "MCP gateway" "Checks launch tool grants and keeps upstream credentials outside guests." "Application service" "Topology"
                 staticOrigin = container "Static origin" "Serves static site and single-page app deploys from local copies of their files; keeps no cache." "Caddy" "Topology"
@@ -69,7 +72,7 @@ workspace "afakt" "Architecture of the afakt modular monolith." {
         developer -> temporalUI "Inspects workflows" "HTTP"
         native -> api "Calls the REST API" "HTTP"
         cli -> api "Calls the REST API" "HTTP"
-        dashboard -> api "Calls the REST API" "HTTP"
+        dashboard -> api "Calls the REST API with the user's access token" "HTTP"
         github -> webhook "Delivers webhooks" "HTTP"
         webhook -> api "Calls the REST API" "HTTP"
         webhook -> orchestrator "Starts workflows in embedded mode" "Temporal"
@@ -113,7 +116,9 @@ workspace "afakt" "Architecture of the afakt modular monolith." {
         userTailnet -> edge "Delivers application requests" "Transport Layer Security" "ClusterAttachment,OverviewHidden"
         userTailnet -> hostNetwork "Optional host attachment; application access only" "User tailnet" "ClusterAttachment,OverviewHidden"
         browser -> edge "Sends public application requests as signed-in user" "Transport Layer Security" "TopologyConnection,OverviewHidden"
-        edge -> controlApi "Forwards authenticated dashboard and API requests" "Application protocol over overlay" "TopologyConnection,OverviewHidden"
+        edge -> controlApi "Forwards authenticated API requests" "Application protocol over overlay" "TopologyConnection,OverviewHidden"
+        edge -> dashboard "Routes /dashboard on the API origin; assets to the static origin, session and API routes to the backend-for-frontend" "Application protocol over overlay" "TopologyConnection,OverviewHidden"
+        dashboard -> controlApi "Forwards API calls with the user's access token" "Application protocol over overlay" "TopologyConnection,OverviewHidden"
         edge -> previewServer "Forwards preview requests with user context" "Application protocol over overlay" "TopologyConnection,OverviewHidden"
         edge -> staticOrigin "Forwards static site requests by hostname" "Application protocol over overlay" "TopologyConnection,OverviewHidden"
         edge -> workload-proxy "Dials permitted workload ingress directly" "SPIFFE mutual TLS over overlay" "TopologyConnection,OverviewHidden"
@@ -168,7 +173,7 @@ workspace "afakt" "Architecture of the afakt modular monolith." {
                 clusterOverlay = infrastructureNode "Private overlay reachability" "Each cluster node retains a static map of stable nodes. Ingress rules admit only the gateway and named peers." "Tailscale tsnet"
                 cluster_controlPlaneBoundaryNode = deploymentNode "Control plane boundary" "One overlay node for each service." "Control plane" {
 
-                    cluster_apiServiceNodeNode = deploymentNode "API service node" "Independent service identity; dashboard shares its origin." "tsnet node" {
+                    cluster_apiServiceNodeNode = deploymentNode "API service node" "Independent service identity." "tsnet node" {
                         cluster_controlApi = containerInstance controlApi
                     }
                     cluster_previewServiceNodeNode = deploymentNode "Preview service node" "Independent service identity." "tsnet node" {
@@ -348,7 +353,8 @@ workspace "afakt" "Architecture of the afakt modular monolith." {
         dynamic afakt "network-flow-phone" "Phone reaches the dashboard through an attached user tailnet." {
             phone -> userTailnet "Device identity in user-owned network"
             userTailnet -> edge "Private application request; afakt sign-in"
-            edge -> controlApi "Authenticated user context to web dashboard; no packet routing"
+            edge -> dashboard "Authenticated user context to web dashboard; no packet routing"
+            dashboard -> controlApi "Forwards API calls with the user's access token"
             autoLayout lr
         }
         dynamic afakt "network-flow-static" "A browser requests a static site through the external ingress gateway." {

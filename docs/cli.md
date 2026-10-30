@@ -334,6 +334,35 @@ See [Memory, skills, and artifacts](agent.md#Memory,%20skills,%20and%20artifacts
 | `afakt artifact serve` | Serve an artifact on the artifact proxy. |
 | `afakt artifact update` | Update an artifact. |
 
+## Auth
+
+See [Web dashboard](components.md#Web%20dashboard) for the browser sign-in that these commands don't cover.
+
+`afakt auth login` signs in with the device code flow against afakt's own OpenID Connect provider. `afakt auth status` shows the caller and its identity. The CLI has no top-level aliases of group commands.
+
+Registering a passkey needs a browser or a native app, so the CLI lists and removes passkeys only. Creating a personal access token (PAT) needs a recent sign-in. Removing a passkey needs step-up authentication.
+
+| Command | Description |
+| --- | --- |
+| `afakt auth` | Authenticate the command-line interface with afakt servers. |
+| `afakt auth login` | Sign in to an afakt account with the device code flow. |
+| `afakt auth logout` | Sign out of an afakt account. |
+| `afakt auth mfa` | Manage multi-factor authentication methods. |
+| `afakt auth mfa list` | List the multi-factor authentication methods of the signed-in user. |
+| `afakt auth mfa remove` | Remove a multi-factor authentication method. |
+| `afakt auth passkey` | Manage passkeys. |
+| `afakt auth passkey list` | List the passkeys of the signed-in user. |
+| `afakt auth passkey remove` | Remove a passkey. Requires step-up authentication. |
+| `afakt auth pat` | Manage fine-grained personal access tokens (PATs). |
+| `afakt auth pat create` | Create a PAT. Requires a recent sign-in. |
+| `afakt auth pat list` | List PATs. |
+| `afakt auth pat revoke` | Revoke a PAT. |
+| `afakt auth pat view` | View details about a PAT. |
+| `afakt auth refresh` | Refresh stored authentication credentials. |
+| `afakt auth status` | Show the active account and authentication state for each known afakt server. |
+| `afakt auth switch` | Switch the active afakt account. |
+| `afakt auth token` | Print the authentication token afakt uses for a host name and account. |
+
 ## Certificate
 
 [Public key infrastructure](pki.md).
@@ -400,7 +429,6 @@ See [Components](components.md).
 | `afakt report` | Produce a report of managed work and usage. |
 | `afakt status` | Show deployment health and service status. |
 | `afakt version` | Show the afakt build version. |
-| `afakt whoami` | Show the authenticated caller and its identity. |
 
 ## GPG key
 
@@ -439,6 +467,17 @@ See [Agent MCP gateway](agent-mcp-gateway.md).
 | `afakt mcp-gateway reconnect` | Reconnect an upstream MCP server. |
 | `afakt mcp-gateway remove` | Remove a deployment MCP server configuration. |
 | `afakt mcp-gateway restart` | Restart a deployment-managed MCP server. |
+
+## Op
+
+The operator queue holds items that wait on a human decision. The CLI reads the queue straight from the API, so it works when notifications are down.
+
+| Command | Description |
+| --- | --- |
+| `afakt op` | Work with the operator queue. |
+| `afakt op decide` | Record one of an item's allowed decisions. Repeating the same decision is safe. |
+| `afakt op list` | List items waiting on a decision. |
+| `afakt op view` | View an item and its allowed decisions. |
 
 ## Organization
 
@@ -647,7 +686,7 @@ See [Architecture](architecture.md).
 
 | Command | Description |
 | --- | --- |
-| `afakt server [--target=<all\|api\|dashboard\|webhook\|worker>] [--temporal-mode=<embedded\|external>] [--temporal-address=<address>]` | Run selected Application Programming Interface (API), dashboard, webhook, and worker services with embedded or external Temporal. |
+| `afakt server [--target=<all\|api\|webhook\|worker>] [--temporal-mode=<embedded\|external>] [--temporal-address=<address>]` | Run selected Application Programming Interface (API), webhook, and worker services with embedded or external Temporal. |
 
 ## SSH host
 

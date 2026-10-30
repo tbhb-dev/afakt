@@ -40,6 +40,17 @@ hide stereotype
     HorizontalAlignment: center;
     Shadowing: 0;
   }
+  // Platform as a Service
+  .Group-UGxhdGZvcm0gYXMgYSBTZXJ2aWNl {
+    BackgroundColor: #ffffff;
+    LineColor: #536b7e;
+    LineStyle: 2-2;
+    LineThickness: 2;
+    FontColor: #182c3e;
+    FontSize: 24;
+    HorizontalAlignment: center;
+    Shadowing: 0;
+  }
   // transparent element for relationships in legend
   .Element-Transparent {
     BackgroundColor: transparent;

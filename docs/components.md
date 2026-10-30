@@ -71,7 +71,7 @@ The host-level network service provides connectivity for workload ports, preview
 
 ## Ingress gateway
 
-The external ingress gateway uses Traefik with afakt authentication middleware to route user-facing traffic to the API server and preview server, and also to workload proxies. Preview origins and listeners are separate from the API and dashboard. It can attach to user tailnets without routing packets into the cluster overlay. See [External ingress gateway](workload-overlay.md#External%20ingress%20gateway) for construction and integration, and [Access and share links](workload-previews.md#Access%20and%20share%20links) for viewer authorization.
+The external ingress gateway uses Traefik with afakt authentication middleware to route user-facing traffic to the API server and preview server, and also to workload proxies. It also routes `/dashboard` on the API origin to the [web dashboard](#Web%20dashboard). Preview origins and listeners are separate from the API and dashboard. It can attach to user tailnets without routing packets into the cluster overlay. See [External ingress gateway](workload-overlay.md#External%20ingress%20gateway) for construction and integration, and [Access and share links](workload-previews.md#Access%20and%20share%20links) for viewer authorization.
 
 ## MCP gateway
 
@@ -111,9 +111,13 @@ The afakt binary includes Cloudflare Tunnel and Tailscale Funnel. Their connecto
 
 ## Web dashboard
 
-The web dashboard provides afakt's web UI.
+The web dashboard, afakt's web UI, runs as a platform app on afakt's Platform as a Service (PaaS) rather than inside the binary, so no `afakt server` target includes it.
 
-The dashboard shares an origin and HTTP listener with the API at the ingress gateway, including when every runtime service runs together. Its routes belong under `/dashboard/`. Readiness requires every selected service to run and fails during startup and shutdown.
+It combines a static single-page app on the static origin with a backend-for-frontend app workload. The [ingress gateway](#Ingress%20gateway) routes `/dashboard` on the API origin to both: assets and the app shell go to the static origin, and session and API-forwarding routes go to the backend-for-frontend.
+
+As an OpenID Connect confidential client of afakt's provider, the backend-for-frontend authenticates with its own workload identity. It stores the user's tokens on the server behind a `__Host-` cookie, which keeps every access and refresh token out of the browser. On the API, only bearer tokens count, and the API ignores the cookie. Acting for the signed-in user, the backend-for-frontend has no standing authority of its own. See [`KS-04`](pki-signing.md#User%20authentication).
+
+When the PaaS is down, the dashboard is down too, and the CLI, the recovery client, covers that time. A fresh install deploys the dashboard onto the PaaS from a release bundle included with the binary.
 
 ## Workflow orchestrator
 

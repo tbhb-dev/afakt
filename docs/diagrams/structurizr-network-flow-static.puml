@@ -74,11 +74,11 @@ skinparam {
 </style>
 
 rectangle "afakt\n<size:16>[Software System]</size>" <<Boundary-YWZha3Q=>> {
-  rectangle "Control plane services" <<Group-Q29udHJvbCBwbGFuZSBzZXJ2aWNlcw==>> as group18 {
+  rectangle "Control plane services" <<Group-Q29udHJvbCBwbGFuZSBzZXJ2aWNlcw==>> as group20 {
     rectangle "==Static origin\n<size:16>[Container: Caddy]</size>\n\nServes static site and single-page app deploys from local copies of their files; keeps no cache." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Staticorigin
   }
 
-  rectangle "External ingress boundary" <<Group-RXh0ZXJuYWwgaW5ncmVzcyBib3VuZGFyeQ==>> as group19 {
+  rectangle "External ingress boundary" <<Group-RXh0ZXJuYWwgaW5ncmVzcyBib3VuZGFyeQ==>> as group21 {
     rectangle "==External ingress gateway\n<size:16>[Container: Application proxy]</size>\n\nAccepts public and attached-tailnet application requests; never routes packets between tailnets and the cluster." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Externalingressgateway
   }
 

@@ -9,15 +9,15 @@ generated: { by: "claude-code:claude-opus-5-5", at: "2026-10-25T11:44:54Z" }
 
 # Architecture
 
-afakt is a modular monolith. One binary contains every component in [Components](components.md), and `afakt server --target=api|webhook|dashboard|worker|all` selects which runtime services a process runs.
+afakt is a modular monolith. One binary contains every component in [Components](components.md), and `afakt server --target=api|webhook|worker|all` selects which runtime services a process runs.
 
-The `all` target combines the API, webhook receiver, dashboard, and worker in one process. The API, webhook receiver, dashboard, and embedded Temporal Web UI share the process's HTTP listener. With embedded Temporal, the combined process runs without external services or an operational store.
+The `all` target combines the API, webhook receiver, and worker in one process. The API, webhook receiver, and embedded Temporal Web UI share the process's HTTP listener. With embedded Temporal, the combined process runs without external services or an operational store.
 
 ![Component architecture](diagrams/component-architecture.svg)
 
 ## Clients and the API
 
-The API server exposes afakt's REST API. The web dashboard, the command-line interface, native apps, and the coordination workflows call it. The binary serves the web dashboard from the same origin as the API. The API server also starts workflows on the workflow orchestrator.
+The API server exposes afakt's REST API to the web dashboard, the command-line interface, native apps, and the coordination workflows. Outside the binary, the dashboard runs as a platform app on afakt's Platform as a Service (PaaS), and the ingress gateway routes `/dashboard` on the API origin to it. See [Web dashboard](components.md#Web%20dashboard). The API server also starts workflows on the workflow orchestrator.
 
 ## GitHub
 

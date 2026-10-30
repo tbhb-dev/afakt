@@ -49,6 +49,17 @@ skinparam {
     HorizontalAlignment: center;
     Shadowing: 0;
   }
+  // Platform as a Service
+  .Group-UGxhdGZvcm0gYXMgYSBTZXJ2aWNl {
+    BackgroundColor: #ffffff;
+    LineColor: #536b7e;
+    LineStyle: 2-2;
+    LineThickness: 2;
+    FontColor: #182c3e;
+    FontSize: 24;
+    HorizontalAlignment: center;
+    Shadowing: 0;
+  }
 </style>
 
 rectangle "==Developer or tester\n<size:16>[Person]</size>\n\nRuns afakt and inspects its workflows." <<Element-RWxlbWVudA==>> as Developerortester
@@ -58,11 +69,17 @@ rectangle "==AI coding agents\n<size:16>[Software System]</size>\n\nPerform codi
 rectangle "==External Temporal\n<size:16>[Software System]</size>\n\nProvides durable execution when workers use an external server." <<Element-RWxlbWVudA==>> as ExternalTemporal
 
 rectangle "afakt\n<size:16>[Software System]</size>" <<Boundary-YWZha3Q=>> {
+  rectangle "Platform as a Service" <<Group-UGxhdGZvcm0gYXMgYSBTZXJ2aWNl>> as group1 {
+    rectangle "==Web dashboard\n<size:16>[Container: React]</size>\n\nA platform app: a static single-page app on the static origin and a backend-for-frontend app workload that holds the user's session. The API origin routes /dashboard to it." <<Element-RWxlbWVudA==>> as afakt.Webdashboard
+  }
+
   rectangle "==afakt process\n<size:16>[Container: Go]</size>\n\nRuns the selected runtime services together or separately from the same binary." <<Element-RWxlbWVudA==>> as afakt.afaktprocess
 }
 
 Developerortester --> afakt.afaktprocess <<Relationship-UmVsYXRpb25zaGlw>> : "Runs commands\n<size:16>[CLI]</size>"
+Developerortester --> afakt.Webdashboard <<Relationship-UmVsYXRpb25zaGlw>> : "Uses the dashboard\n<size:16>[HTTP]</size>"
 Nativeapps --> afakt.afaktprocess <<Relationship-UmVsYXRpb25zaGlw>> : "Calls the REST API\n<size:16>[HTTP]</size>"
+afakt.Webdashboard --> afakt.afaktprocess <<Relationship-UmVsYXRpb25zaGlw>> : "Calls the REST API with the user's access token\n<size:16>[HTTP]</size>"
 GitHub --> afakt.afaktprocess <<Relationship-UmVsYXRpb25zaGlw>> : "Delivers webhooks\n<size:16>[HTTP]</size>"
 afakt.afaktprocess --> ExternalTemporal <<Relationship-UmVsYXRpb25zaGlw>> : "Starts workflows in external mode\n<size:16>[Temporal]</size>"
 afakt.afaktprocess --> GitHub <<Relationship-UmVsYXRpb25zaGlw>> : "Calls the GitHub API\n<size:16>[HTTP]</size>"

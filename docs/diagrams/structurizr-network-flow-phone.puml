@@ -17,6 +17,18 @@ skinparam {
     BackgroundColor: #ffffff;
     FontColor: #444444;
   }
+  // Element
+  .Element-RWxlbWVudA== {
+    BackgroundColor: #ffffff;
+    LineColor: #444444;
+    LineStyle: 0;
+    LineThickness: 2;
+    FontColor: #444444;
+    FontSize: 24;
+    HorizontalAlignment: center;
+    Shadowing: 0;
+    MaximumWidth: 450;
+  }
   // Element,Topology
   .Element-RWxlbWVudCxUb3BvbG9neQ== {
     BackgroundColor: #e8f1fa;
@@ -71,15 +83,30 @@ skinparam {
     HorizontalAlignment: center;
     Shadowing: 0;
   }
+  // Platform as a Service
+  .Group-UGxhdGZvcm0gYXMgYSBTZXJ2aWNl {
+    BackgroundColor: #ffffff;
+    LineColor: #536b7e;
+    LineStyle: 2-2;
+    LineThickness: 2;
+    FontColor: #182c3e;
+    FontSize: 24;
+    HorizontalAlignment: center;
+    Shadowing: 0;
+  }
 </style>
 
 rectangle "afakt\n<size:16>[Software System]</size>" <<Boundary-YWZha3Q=>> {
-  rectangle "Control plane services" <<Group-Q29udHJvbCBwbGFuZSBzZXJ2aWNlcw==>> as group16 {
-    rectangle "==API server and web dashboard\n<size:16>[Container: Application service]</size>\n\nServes workload resources and the dashboard; image and host-worker operations remain open." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.APIserverandwebdashboard
+  rectangle "Control plane services" <<Group-Q29udHJvbCBwbGFuZSBzZXJ2aWNlcw==>> as group17 {
+    rectangle "==API server\n<size:16>[Container: Application service]</size>\n\nServes workload resources; image and host-worker operations remain open." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.APIserver
   }
 
-  rectangle "External ingress boundary" <<Group-RXh0ZXJuYWwgaW5ncmVzcyBib3VuZGFyeQ==>> as group17 {
+  rectangle "External ingress boundary" <<Group-RXh0ZXJuYWwgaW5ncmVzcyBib3VuZGFyeQ==>> as group18 {
     rectangle "==External ingress gateway\n<size:16>[Container: Application proxy]</size>\n\nAccepts public and attached-tailnet application requests; never routes packets between tailnets and the cluster." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Externalingressgateway
+  }
+
+  rectangle "Platform as a Service" <<Group-UGxhdGZvcm0gYXMgYSBTZXJ2aWNl>> as group19 {
+    rectangle "==Web dashboard\n<size:16>[Container: React]</size>\n\nA platform app: a static single-page app on the static origin and a backend-for-frontend app workload that holds the user's session. The API origin routes /dashboard to it." <<Element-RWxlbWVudA==>> as afakt.Webdashboard
   }
 
 }
@@ -89,6 +116,7 @@ rectangle "==Attached user tailnet\n<size:16>[Software System]</size>\n\nUser-co
 
 Phoneandnativeclients --> Attachedusertailnet <<Relationship-UmVsYXRpb25zaGlw>> : "1: Device identity in user-owned network\n<size:16>[User tailnet]</size>"
 Attachedusertailnet --> afakt.Externalingressgateway <<Relationship-UmVsYXRpb25zaGlw>> : "2: Private application request; afakt sign-in\n<size:16>[Transport Layer Security]</size>"
-afakt.Externalingressgateway --> afakt.APIserverandwebdashboard <<Relationship-UmVsYXRpb25zaGlw>> : "3: Authenticated user context to web dashboard; no packet routing\n<size:16>[Application protocol over overlay]</size>"
+afakt.Externalingressgateway --> afakt.Webdashboard <<Relationship-UmVsYXRpb25zaGlw>> : "3: Authenticated user context to web dashboard; no packet routing\n<size:16>[Application protocol over overlay]</size>"
+afakt.Webdashboard --> afakt.APIserver <<Relationship-UmVsYXRpb25zaGlw>> : "4: Forwards API calls with the user's access token\n<size:16>[Application protocol over overlay]</size>"
 
 @enduml

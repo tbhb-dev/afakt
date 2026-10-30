@@ -85,15 +85,15 @@ skinparam {
 </style>
 
 rectangle "afakt\n<size:16>[Software System]</size>" <<Boundary-YWZha3Q=>> {
-  rectangle "Launch guest boundary" <<Group-TGF1bmNoIGd1ZXN0IGJvdW5kYXJ5>> as group3 {
+  rectangle "Launch guest boundary" <<Group-TGF1bmNoIGd1ZXN0IGJvdW5kYXJ5>> as group4 {
     rectangle "==Guest context\n<size:16>[Container: Workload provider confinement]</size>\n\nUntrusted harness, relay and loopback listeners; no overlay membership or workload keys." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Guestcontext
   }
 
-  rectangle "Launch mediation boundary" <<Group-TGF1bmNoIG1lZGlhdGlvbiBib3VuZGFyeQ==>> as group4 {
+  rectangle "Launch mediation boundary" <<Group-TGF1bmNoIG1lZGlhdGlvbiBib3VuZGFyeQ==>> as group5 {
     rectangle "==Workload proxy mediator\n<size:16>[Container: Local policy enforcement]</size>\n\nDecides every inbound and outbound connection and stamps identity; never carries traffic." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Workloadproxymediator
   }
 
-  rectangle "Launch workload proxy boundary" <<Group-TGF1bmNoIHdvcmtsb2FkIHByb3h5IGJvdW5kYXJ5>> as group5 {
+  rectangle "Launch workload proxy boundary" <<Group-TGF1bmNoIHdvcmtsb2FkIHByb3h5IGJvdW5kYXJ5>> as group6 {
     rectangle "==Workload proxy\n<size:16>[Container: Network proxy]</size>\n\nCarries workload traffic in both directions; own overlay node and launch X.509-SVID; asks the mediator to decide each connection." <<Element-RWxlbWVudCxUb3BvbG9neQ==>> as afakt.Workloadproxy
   }
 
