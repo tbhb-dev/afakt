@@ -24,7 +24,8 @@
       "!target",
       "!tmp",
       "!spikes",
-      "!logs"
+      "!logs",
+      "!.obsidian"
     ]
   },
   "formatter": {
