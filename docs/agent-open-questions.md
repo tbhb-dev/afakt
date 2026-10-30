@@ -1103,6 +1103,10 @@ Which conditions must the private guest-to-proxy link meet on every platform? Th
 
 Does the workload host worker or the control plane manage the workload lifecycle, or does a workflow own it? Are `provisioning`, `ready`, `bound`, `draining`, and `terminated` the right states, and which observations permit each transition? How do failure conditions, app and worker readiness, and reclaim completion fit? An agent workload runs one agent launch before afakt destroys it. See [States and transition authority](workload-lifecycle.md#States%20and%20transition%20authority).
 
+### `OQ-SBX-72`
+
+Which virtual machine monitor should the linux-vm provider use to run its Kernel-based Virtual Machine (KVM) guests? See [Linux VM provider](workload-provider-linux-vm.md).
+
 ## Agent MCP gateway
 
 ### `OQ-MCP-1`

@@ -35,7 +35,7 @@ Hosted agent providers include [Claude Managed Agents](workload-provider-claude-
 
 The host modes are the weaker isolation tier.
 
-Every workload guest runs Linux with its own kernel and disks, regardless of the workload host OS. Linux uses a Kernel-based Virtual Machine (KVM) microVM driven by `Cloud Hypervisor`. Windows runs Linux guest VMs directly on Hyper-V. The Hyper-V interface afakt drives remains [`OQ-SBX-60`](agent-open-questions.md#%60OQ-SBX-60%60). macOS uses Virtualization.framework. Whether macOS uses Apple's Containerization framework and its `vminitd` guest init or afakt drives Virtualization.framework directly remains [open](agent-open-questions.md#Agent%20sandbox).
+Every workload guest runs Linux with its own kernel and disks, regardless of the workload host OS. Linux uses a Kernel-based Virtual Machine (KVM) VM. Its virtual machine monitor choice remains [`OQ-SBX-72`](agent-open-questions.md#%60OQ-SBX-72%60). Windows runs Linux guest VMs directly on Hyper-V. The Hyper-V interface afakt drives remains [`OQ-SBX-60`](agent-open-questions.md#%60OQ-SBX-60%60). macOS uses Virtualization.framework. Whether macOS uses Apple's Containerization framework and its `vminitd` guest init or afakt drives Virtualization.framework directly remains [open](agent-open-questions.md#Agent%20sandbox).
 
 ### Runtime privileges
 
