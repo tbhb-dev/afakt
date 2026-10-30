@@ -21,9 +21,17 @@ This contract applies to `linux-host`, `linux-vm`, and `docker-engine` on `linux
 
 At startup, the worker registers its workload host and task queue with the control plane. It reports platform metadata and capacity bounds, then renews its registration lease with capacity observations and the agent launch IDs holding slots. Polling uses its own host task queue. See [Workload host registry](workload-placement.md#Workload%20host%20registry).
 
-Control connections originate at the worker for registration, commands, and observations. The control plane never opens a connection to a host. Worker control traffic uses a separate connection from workload data paths, and the worker forwards no workload traffic, including traffic between workloads on the same machine.
+Control connections originate at the worker for registration, commands, and observations. The control plane never opens a connection to a host. Worker control traffic uses a separate connection from workload data paths, and the worker doesn't forward workload network traffic, including traffic between workloads on the same machine. It forwards supervisor output over the control path described below.
 
 Desired state expresses what afakt requests. Observed state records what the workload provider can establish about execution. Requests don't prove completion. A protocol for registration, desired and observed state, retries, and recovery after either endpoint restarts remains [`OQ-WLD-7`](agent-open-questions.md#%60OQ-WLD-7%60). Lifecycle ownership remains [`OQ-SBX-71`](agent-open-questions.md#%60OQ-SBX-71%60).
+
+## Workload process output
+
+Through the workload's control link, its supervisor sends captured `stdout` and `stderr`, or interactive terminal output, to the host worker. Each chunk includes a stream label, sequence number, and timestamp. A bounded buffer in the workload sandbox stores the output before the worker forwards it to the control-plane log store.
+
+Clients read output from the control plane with a cursor, using `afakt workload logs --follow`. Output remains available after workload destruction. This path preserves the rule that the control plane never opens a connection to a workload host.
+
+Log storage, retention, and control-link transport remain [`OQ-WLD-11`](agent-open-questions.md#%60OQ-WLD-11%60). Under the proposed transport, VM providers use the guest link, while container and host providers use a local socket. Optional `stdin` and signals also need a transport choice under that question.
 
 ## Capacity
 

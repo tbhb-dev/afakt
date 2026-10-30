@@ -126,6 +126,14 @@ stateDiagram-v2
 
 Terminal transitions require [provider observations](workload-lifecycle.md#Workload%20provider%20observations).
 
+## Workload process output
+
+Inside the workload sandbox, the supervisor captures the workload process's `stdout` and `stderr`, or its terminal output for an interactive run. For an agent workload, `afakt-agent` is that supervisor. Its bounded buffer holds chunks tagged with a stream label, sequence number, and timestamp. Output passes through the host worker to the control-plane log store.
+
+Clients read from that store with a cursor through `afakt workload logs --follow`, so output survives workload destruction. Collection doesn't require a connection from the control plane to a host. The supervisor can optionally attach `stdin` and send signals to the workload process.
+
+On VM providers, the proposed control link uses the guest link. Container and host providers would use a local socket. Store selection, retention, and the choice between that link and the overlay for `stdin` and signals remain [`OQ-WLD-11`](agent-open-questions.md#%60OQ-WLD-11%60). See [Workload host worker](workload-host-worker.md#Workload%20process%20output).
+
 ## Startup and readiness
 
 The workload provider observes the execution context and the workload proxy boundary before reporting readiness. Starting a virtual machine (VM) doesn't prove that the agent harness is ready. The readiness observations for each workload type remain [`OQ-SBX-71`](agent-open-questions.md#%60OQ-SBX-71%60). VM lifecycle control stays outside the guest and the Agent Client Protocol (ACP).

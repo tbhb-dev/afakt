@@ -1302,3 +1302,7 @@ What are the methods, paths, permissions, request projections, and completion re
 ### `OQ-WLD-10`
 
 Which problem types, extensions, HTTP status mappings, and retry rules describe workload API failures under RFC 9457? For lists paginated by key, what ordering, encoding, expiry, invalidation, page limits, and behavior under concurrent changes apply? Should list responses use `items` and `next_cursor`, and should problems have a `code` extension? How do cursor validity and authorization changes interact? See [Errors](workload-api.md#Errors) and [Pagination by key](workload-api.md#Pagination%20by%20key).
+
+### `OQ-WLD-11`
+
+Which control-plane log store retains workload process output, and for how long? The workload supervisor sends output through the host worker, and clients read it from the control plane after workload destruction. Which control link carries that output, and do optional `stdin` and signals use it or the overlay? The guest link on VM providers and a local socket on container and host providers remain proposed. See [Workload host worker](workload-host-worker.md) and [Workload lifecycle](workload-lifecycle.md).
