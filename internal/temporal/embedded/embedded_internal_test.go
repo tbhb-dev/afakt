@@ -55,14 +55,14 @@ func (f *fakeServer) Stop(context.Context) error {
 }
 
 // newTestServer returns a server for the default namespace that logs into the buffer.
-func newTestServer(dir string, buf *bytes.Buffer) *Server {
+func newTestServer(dir string, buf *logCapture) *Server {
 	// Real Temporal service shutdown includes its mandatory drain. Clock tests below
 	// separately verify short, exact deadlines without waiting for those drain timers.
 	return New(dir, "default", slog.New(slog.NewTextHandler(buf, nil)), 15*time.Second, (&net.ListenConfig{}).Listen)
 }
 
 // startStop checks that s starts and serves before it stops s.
-func startStop(t *testing.T, s *Server, buf *bytes.Buffer) {
+func startStop(t *testing.T, s *Server, buf *logCapture) {
 	t.Helper()
 	if err := s.Start(t.Context()); err != nil {
 		t.Fatalf("Start() error = %v", err)
@@ -111,7 +111,7 @@ func TestServersShareAProcess(t *testing.T) {
 func startAll(t *testing.T, dirs []string) []*Server {
 	t.Helper()
 	servers := make([]*Server, len(dirs))
-	logs := make([]bytes.Buffer, len(dirs))
+	logs := make([]logCapture, len(dirs))
 	var wg sync.WaitGroup
 	for i, dir := range dirs {
 		servers[i] = newTestServer(dir, &logs[i])
@@ -144,7 +144,7 @@ func TestServerRestartsOnItsFile(t *testing.T) {
 	t.Parallel()
 	dir := t.TempDir()
 	for range 2 {
-		var buf bytes.Buffer
+		var buf logCapture
 		startStop(t, newTestServer(dir, &buf), &buf)
 	}
 }
@@ -196,7 +196,7 @@ type startFailure struct {
 // server stopped.
 func (tc startFailure) check(t *testing.T) {
 	t.Helper()
-	var buf bytes.Buffer
+	var buf logCapture
 	s := newTestServer(tc.dir, &buf)
 	listen := s.listen
 	var listeners []net.Listener
@@ -247,7 +247,7 @@ func TestServerStopFailure(t *testing.T) {
 
 func TestServerBindFailure(t *testing.T) {
 	t.Parallel()
-	var buf bytes.Buffer
+	var buf logCapture
 	s := newTestServer("", &buf)
 	listen := s.listen
 	var acquired net.Listener
@@ -281,7 +281,7 @@ func TestServerHTTPBindFailure(t *testing.T) {
 
 func checkHTTPBindCollision(t *testing.T, collisions int) {
 	t.Helper()
-	var buf bytes.Buffer
+	var buf logCapture
 	s := newTestServer("", &buf)
 	listen := s.listen
 	var listeners []net.Listener
@@ -346,7 +346,7 @@ func TestServerHTTPBindRetryInterrupted(t *testing.T) {
 	for _, cause := range []error{context.Canceled, errStop} {
 		t.Run(cause.Error(), func(t *testing.T) {
 			t.Parallel()
-			var buf bytes.Buffer
+			var buf logCapture
 			s := newTestServer("", &buf)
 			ctx, cancel := context.WithCancel(t.Context())
 			defer cancel()
@@ -396,7 +396,7 @@ func TestConstructionRollback(t *testing.T) {
 
 func checkConstructionRollback(t *testing.T, fail int) {
 	t.Helper()
-	var buf bytes.Buffer
+	var buf logCapture
 	s := newTestServer("", &buf)
 	var acquired, released []int
 	s.newServer = func(ctx context.Context, listeners []net.Listener, opts ...temporal.ServerOption) (runtimeServer, error) {
@@ -438,7 +438,7 @@ func TestOwnedStartupRollback(t *testing.T) {
 	for fail := range 5 {
 		t.Run(strconv.Itoa(fail), func(t *testing.T) {
 			t.Parallel()
-			var buf bytes.Buffer
+			var buf logCapture
 			s := newTestServer("", &buf)
 			s.newServer = func(ctx context.Context, listeners []net.Listener, opts ...temporal.ServerOption) (runtimeServer, error) {
 				next := 0
@@ -489,7 +489,7 @@ func TestOwnedHookStartupRollback(t *testing.T) {
 
 func checkOwnedHookStartupRollback(t *testing.T, start func() error, want error) {
 	t.Helper()
-	var buf bytes.Buffer
+	var buf logCapture
 	s := newTestServer("", &buf)
 	s.createNamespaces = func(*config.SQL, ...*sqliteschema.NamespaceConfig) error { return nil }
 	s.listen = func(context.Context, string, string) (net.Listener, error) { return &clockListener{}, nil }
@@ -566,7 +566,7 @@ func TestOwnedHookCancellation(t *testing.T) {
 
 func TestConstructionCancellation(t *testing.T) {
 	t.Parallel()
-	var buf bytes.Buffer
+	var buf logCapture
 	s := newTestServer("", &buf)
 	ctx, cancel := context.WithCancel(t.Context())
 	defer cancel()
@@ -590,7 +590,7 @@ func TestConstructionCancellation(t *testing.T) {
 
 func TestStartAlreadyCancelled(t *testing.T) {
 	t.Parallel()
-	var buf bytes.Buffer
+	var buf logCapture
 	s := newTestServer("", &buf)
 	s.createNamespaces = func(*config.SQL, ...*sqliteschema.NamespaceConfig) error {
 		t.Error("prepared database after cancellation")
@@ -609,7 +609,7 @@ func TestStartAlreadyCancelled(t *testing.T) {
 func TestStartupCancellationCleanup(t *testing.T) {
 	t.Parallel()
 	synctest.Test(t, func(t *testing.T) {
-		var buf bytes.Buffer
+		var buf logCapture
 		s := newTestServer("", &buf)
 		s.createNamespaces = func(*config.SQL, ...*sqliteschema.NamespaceConfig) error { return nil }
 		s.listen = func(context.Context, string, string) (net.Listener, error) { return &clockListener{}, nil }
@@ -684,7 +684,7 @@ func stalledServer(phase string, entered, release, stopped chan struct{}) newSer
 
 func checkCancellationDeadline(t *testing.T, phase string) {
 	t.Helper()
-	var buf bytes.Buffer
+	var buf logCapture
 	s := newTestServer("", &buf)
 	s.createNamespaces = func(*config.SQL, ...*sqliteschema.NamespaceConfig) error { return nil }
 	// Controlled listeners keep this clock test independent of network I/O.
@@ -744,7 +744,7 @@ func TestStartupSignalsExit(t *testing.T) {
 
 func TestStartupPanicCleanup(t *testing.T) {
 	t.Parallel()
-	var buf bytes.Buffer
+	var buf logCapture
 	s := newTestServer("", &buf)
 	s.newServer = func(context.Context, []net.Listener, ...temporal.ServerOption) (runtimeServer, error) {
 		panic("constructor failed")
@@ -840,7 +840,7 @@ func wantListenersClosed(t *testing.T, listeners []net.Listener) {
 
 func TestLoggerDropsDisabledLevels(t *testing.T) {
 	t.Parallel()
-	var buf bytes.Buffer
+	var buf logCapture
 	l := newLogger(slog.New(slog.NewTextHandler(&buf, nil)))
 	l.Debug("debug")
 	l.Info("info", tag.NewStringTag("key", "value"))
@@ -851,7 +851,7 @@ func TestLoggerDropsDisabledLevels(t *testing.T) {
 
 func TestLogger(t *testing.T) {
 	t.Parallel()
-	var buf bytes.Buffer
+	var buf logCapture
 	l := newLogger(slog.New(slog.NewTextHandler(&buf, &slog.HandlerOptions{Level: slog.LevelDebug})))
 	l.Debug("debug")
 	l.Info("info")
