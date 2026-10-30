@@ -21,7 +21,7 @@ The agent harness shares the macOS kernel with the workload host. Seatbelt confi
 
 ## Process placement and startup
 
-The workload host starts afakt-agent as a host process. afakt-agent starts afakt-sandbox, which applies Seatbelt before starting the harness. The transparent proxy and name proxy run as system extension providers outside harness confinement. Their lifecycle, registration authority, and mapping to a workload proxy mediator remain under [`OQ-SBX-59`](agent-open-questions.md#%60OQ-SBX-59%60).
+The workload host starts afakt-agent as a host process. afakt-agent starts afakt-sandbox, which confines workloads with custom Seatbelt profiles applied through `sandbox-exec` and `sandbox_init` before starting the harness. Apple deprecated both interfaces. The transparent proxy and name proxy run as system extension providers outside harness confinement. Their lifecycle, registration authority, and mapping to a workload proxy mediator remain under [`OQ-SBX-59`](agent-open-questions.md#%60OQ-SBX-59%60).
 
 Commands started by `afakt agent exec` use standalone afakt-sandbox without the runner. afakt-agent is absent. Command placement, inherited environment, launch binding, capture ordering, and descendant lifetime remain under [`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60). That choice also determines command transport. Authority for an unsandboxed command remains under [`OQ-AGT-26`](agent-open-questions.md#%60OQ-AGT-26%60).
 

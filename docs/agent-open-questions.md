@@ -1289,7 +1289,7 @@ How do WorkloadHostWorker and the workload host divide identity, desired configu
 
 ### `OQ-WLD-7`
 
-What protocol carries worker registration, desired state, observations, acknowledgements, and recovery after either endpoint restarts? All control connections originate at the workload host. Reclaim needs persistent execution identity and authority, including for a different workload account. For each Tier 1 cell, how do control endpoints authenticate callers, and how does recovery handle missing inventory or a failed supervisor? Custom Seatbelt profiles aren't a supported isolation mechanism. The host isolation baseline and replacement mechanism remain held under `OQ-SBX-18`. See [Workload host worker](workload-host-worker.md).
+What protocol carries worker registration, desired state, observations, acknowledgements, and recovery after either endpoint restarts? All control connections originate at the workload host. Reclaim needs persistent execution identity and authority, including for a different workload account. For each Tier 1 cell, how do control endpoints authenticate callers, and how does recovery handle missing inventory or a failed supervisor? The `macos-host` provider uses custom Seatbelt profiles through the deprecated `sandbox-exec` and `sandbox_init` API entry points. The host isolation baseline remains held under `OQ-SBX-18`. See [Workload host worker](workload-host-worker.md).
 
 ### `OQ-WLD-8`
 
