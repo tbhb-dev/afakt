@@ -437,7 +437,7 @@ What authorization and isolation rules apply to named tool caches shared across 
 
 ### `OQ-WSP-20`
 
-For each workload provider, where do workspace files, scratch, shared named tool caches, and verified image caches live, and which identities can access their backing storage? How do mounts, ownership, quotas, cleanup, and reuse preserve separation across launches? What workspace disk and capture layout applies to the Windows-native utility virtual machine (VM), separately from the Linux microVM? See [Workload host caches and startup](agent-workspace-image.md#Workload%20host%20caches%20and%20startup) and [Sandbox variables](workload-sandbox.md#Sandbox%20variables).
+For each workload provider, where do workspace files, scratch, shared named tool caches, and verified image caches live, and which identities can access their backing storage? How do mounts, ownership, quotas, cleanup, and reuse preserve separation across launches? How does the Windows workload host back the Linux guest's workspace disk and capture its contents? See [Workload host caches and startup](agent-workspace-image.md#Workload%20host%20caches%20and%20startup) and [Sandbox variables](workload-sandbox.md#Sandbox%20variables).
 
 ### `OQ-WSP-21`
 
@@ -1041,7 +1041,7 @@ How does each host mode and container provider force all harness and workspace-c
 
 ### `OQ-SBX-55`
 
-Which Windows-native mechanism does afakt-sandbox use for process, filesystem, handle, and network confinement in windows-host and the Windows utility VM guest? Which sandbox settings can it enforce, and which settings require rejection? How does it confine the complete descendant process tree? This question doesn't settle the on-hold host isolation baseline. See [Host process sandbox](workload-sandbox.md#Host%20process%20sandbox).
+Which Windows-native mechanism does afakt-sandbox use for process, filesystem, handle, and network confinement in windows-host? Which sandbox settings can it enforce, and which settings require rejection? How does it confine the complete descendant process tree? This question doesn't settle the on-hold host isolation baseline. See [Host process sandbox](workload-sandbox.md#Host%20process%20sandbox).
 
 ### `OQ-SBX-56`
 
@@ -1057,7 +1057,7 @@ For each host mode, what authenticates registration of a launch with its traffic
 
 ### `OQ-SBX-60`
 
-Windows needs management adapters for startup, supervision, capture, and stopping both the Linux microVM inside WSL2 and the Windows-native utility VM. Which adapters and authenticated management calls let a non-administrator worker delegate only the required operations? A successful management response may precede process exit. What independent observations prove that all guest processes stopped after channel failure, and how do outer-environment restart and shared resource accounting affect that proof? See [Cancellation and limits](workload-lifecycle.md#Cancellation%20and%20limits).
+The windows-vm provider runs Linux guest VMs directly on Hyper-V. Which Hyper-V interface does afakt drive for startup, supervision, capture, and stopping its guest? Which adapters and authenticated management calls let a non-administrator worker delegate only the required operations? A successful management response may precede process exit. What independent observations prove that all guest processes stopped after channel failure, and how do Hyper-V restart and shared resource accounting affect that proof? See [Cancellation and limits](workload-lifecycle.md#Cancellation%20and%20limits).
 
 ### `OQ-SBX-61`
 

@@ -69,7 +69,6 @@ The workload provider adds the inspection CA to the sandbox's trusted certificat
 | Guest or confinement environment | Trust installation contract |
 | --- | --- |
 | Linux guest, including a Linux guest on macOS or Windows | Add inspection trust to the guest's public trust bundle and cover runtime-private stores. Exact installation, startup ordering, and reload remain [undecided](agent-open-questions.md#%60OQ-PKI-6%60). |
-| Windows-native guest | Native certificate-store scope, runtime coverage, and reload remain [undecided](agent-open-questions.md#%60OQ-PKI-6%60). The private inspection key stays outside the guest. |
 | macOS host mode | Trust for confined processes, keychain scope, and separation from unrelated host clients remain [undecided](agent-open-questions.md#%60OQ-PKI-6%60). A macOS host doesn't imply a macOS guest. |
 | Linux or Windows host mode | Per-launch trust exposure and runtime coverage remain [undecided](agent-open-questions.md#%60OQ-PKI-6%60). Launch admission doesn't imply machine-wide trust. |
 | Containers and remote sandboxes | Image trust, runtime-private bundles, provider injection, and removal remain [undecided](agent-open-questions.md#%60OQ-PKI-6%60). Remote mediation also depends on [provider integration](agent-open-questions.md#%60OQ-SBX-36%60). |

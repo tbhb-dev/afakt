@@ -17,11 +17,11 @@ The windows-vm workload provider uses the [provider design](workload-provider-wi
 
 [Platforms and privileges](workload-provider-windows-vm.md#Platforms%20and%20privileges) and [Provider isolation](workload-provider-windows-vm.md#Isolation%20boundary) define the platform and its kernel boundary. [Provider startup](workload-provider-windows-vm.md#Process%20placement%20and%20startup) places afakt-agent, afakt-sandbox, and the harness.
 
-STRIDE covers spoofing, tampering, repudiation, information disclosure, denial of service, and elevation of privilege. A virtual machine (VM) supplies a separate guest kernel where the provider uses one. Agent Client Protocol (ACP) transports session messages. Domain Name System (DNS) queries use the workload proxy mediator. A User Identifier (UID) names an operating-system user. An Application Programming Interface (API) provides shared service authority. Windows Subsystem for Linux (WSL2) contains the Linux microVM.
+STRIDE covers spoofing, tampering, repudiation, information disclosure, denial of service, and elevation of privilege. A virtual machine (VM) supplies a separate guest kernel where the provider uses one. Agent Client Protocol (ACP) transports session messages. Domain Name System (DNS) queries use the workload proxy mediator. A User Identifier (UID) names an operating-system user. An Application Programming Interface (API) provides shared service authority. Hyper-V runs the Linux guest VM directly.
 
 ### Workload proxy mediator access
 
-The Linux microVM and Windows-native utility VM have different device and management boundaries. Forced proxy routing and local carrier authentication remain unresolved for both. See [Workload provider mediation](workload-provider-windows-vm.md#Mediator%20connection%20and%20name%20resolution).
+The Linux workload guest has device and management boundaries distinct from its Windows workload host. Forced proxy routing and local carrier authentication remain unresolved. See [Workload provider mediation](workload-provider-windows-vm.md#Mediator%20connection%20and%20name%20resolution).
 
 ### Workspace, scratch, and caches
 
@@ -61,7 +61,7 @@ Commands started by `afakt agent exec` use standalone afakt-sandbox. [Provider s
 | `P-WVM-3` | Host workspace processor | Worker capture and cleanup |
 | `P-WVM-9` | Workload proxy | Outside guest confinement. Launch identity custody |
 | `P-WVM-4` | Workload proxy mediator | Outside launch confinement. Process separation unresolved |
-| `P-WVM-5` | Guest relay | Separate user in the Linux guest. Native Windows mapping unspecified |
+| `P-WVM-5` | Guest relay | Separate user in the Linux guest |
 | `P-WVM-6` | Successor launch | New launch authority |
 | `P-WVM-7` | afakt agent exec command | Execution placement unspecified |
 | `DS-WVM-1` | Agent workspace | Per-launch writable content |
@@ -69,11 +69,11 @@ Commands started by `afakt agent exec` use standalone afakt-sandbox. [Provider s
 | `DS-WVM-3` | Shared named tool cache | Shared across launches. Backing unspecified |
 | `DS-WVM-4` | Verified image cache | Workload host. Distinct from named tool cache |
 | `DS-WVM-5` | Snapshot and checkpoint capture | Retained state. Access controls unresolved |
-| `P-WVM-8` | Windows VM management adapter | Linux microVM control inside WSL2 or Windows-native utility VM control. Authority and stop observations unresolved |
+| `P-WVM-8` | Windows VM management adapter | Linux guest VM control through Hyper-V. Interface, authority, and stop observations unresolved |
 
 ### Level one workload provider flows
 
-The agent harness and storage elements represent either guest variant, not shared state between them. Windows-native workspace and relay placement remain unspecified. Arrows identify exchanges and their return paths. Unspecified carriers and placements remain gaps. The shared named tool cache is outside individual launch confinement and has a separate crossing from another launch. For the verified image cache, the trust relationship differs.
+Inside the Linux workload guest, the agent harness uses storage managed by the Windows workload host. Arrows identify exchanges and their return paths. Unspecified carriers and placements remain gaps. The shared named tool cache is outside individual launch confinement and has a separate crossing from another launch. For the verified image cache, the trust relationship differs.
 
 ```mermaid
 flowchart LR
@@ -148,7 +148,7 @@ flowchart LR
 - **`F-WVM-13`.** Authorized workspace command request. Local placement and credential binding remain unresolved. Crosses `TB-WVM-6`.
 - **`F-WVM-14`.** Command reads and writes in the selected agent workspace. Concurrent access remains unresolved. Crosses `TB-WVM-6`, `TB-WVM-3`.
 - **`F-WVM-15`.** Command traffic requiring launch egress policy. Transport and identity binding remain unresolved. Crosses `TB-WVM-6`, `TB-WVM-2`.
-- **`F-WVM-16`.** Windows worker management calls cross into the Linux microVM controller inside WSL2 or the native utility VM adapter. Authentication and independent stop observations remain under [`OQ-SBX-60`](agent-open-questions.md#%60OQ-SBX-60%60). Crosses `TB-WVM-1`.
+- **`F-WVM-16`.** Windows worker management calls use the Hyper-V interface that controls the Linux guest VM. The interface, authentication, and independent stop observations remain under [`OQ-SBX-60`](agent-open-questions.md#%60OQ-SBX-60%60). Crosses `TB-WVM-1`.
 
 ## Workload proxy
 
@@ -175,10 +175,9 @@ Each table covers the six categories for its listed flows and every participatin
 | `TM-WVM-2` | `F-WVM-1`, `P-WVM-2`, `P-WVM-1`, `F-WVM-16`, `P-WVM-8` | tampering | A launch changes inherited handles, mounts, descriptors, or confinement inputs to reach provider authority. | [Enforcement](workload-sandbox.md#Enforcement). [Platform exposure](#Host%20visibility%20and%20workspace%20commands). Unspecified. [Provider isolation](workload-provider-windows-vm.md#Isolation%20boundary). | depends on an open question ([`OQ-SBX-53`](agent-open-questions.md#%60OQ-SBX-53%60)) |
 | `TM-WVM-21` | `F-WVM-1`, `P-WVM-2`, `P-WVM-1`, `F-WVM-16`, `P-WVM-8` | repudiation | A compromised workload host invents process exits or hides local workspace and command effects. | [Provider observations](workload-lifecycle.md#Workload%20provider%20observations) Independent verification of a compromised host is unspecified. [Provider observations](workload-provider-windows-vm.md#Host%20observations). | gap ([`OQ-SBX-37`](agent-open-questions.md#%60OQ-SBX-37%60)) |
 | `TM-WVM-70` | `F-WVM-1`, `P-WVM-2`, `P-WVM-1`, `F-WVM-16`, `P-WVM-8` | information disclosure | A same-user host process reads mediator memory, local session traffic, or another launch's files. | [Trust boundary](workload-host.md#Trust%20boundary) The design trusts host custody. Same-user process separation remains on hold. [Provider observations](workload-provider-windows-vm.md#Host%20observations). | depends on an open question ([`OQ-SBX-18`](agent-open-questions.md#%60OQ-SBX-18%60)) |
-| `TM-WVM-23` | `F-WVM-1`, `P-WVM-2`, `P-WVM-1`, `F-WVM-16`, `P-WVM-8` | denial of service | A hostile process tree ignores cancellation and continues running. | [Provider teardown](workload-provider-windows-vm.md#Cancellation%20and%20teardown) requires independent stop observations for both guest forms. The management adapters and termination proof remain unresolved. | depends on an open question ([`OQ-SBX-60`](agent-open-questions.md#%60OQ-SBX-60%60)) |
+| `TM-WVM-23` | `F-WVM-1`, `P-WVM-2`, `P-WVM-1`, `F-WVM-16`, `P-WVM-8` | denial of service | A hostile process tree ignores cancellation and continues running. | [Provider teardown](workload-provider-windows-vm.md#Cancellation%20and%20teardown) requires independent stop observations for the Linux workload guest. The management adapters and termination proof remain unresolved. | depends on an open question ([`OQ-SBX-60`](agent-open-questions.md#%60OQ-SBX-60%60)) |
 | `TM-WVM-151` | `F-WVM-1`, `P-WVM-2`, `P-WVM-1`, `F-WVM-16`, `P-WVM-8` | elevation of privilege | A guest exploits a virtual device or the guest hypervisor to gain workload host authority. | [Enforcement](workload-sandbox.md#Enforcement). [Platform exposure](#Host%20visibility%20and%20workspace%20commands). Unspecified. [Provider isolation](workload-provider-windows-vm.md#Isolation%20boundary). | gap ([`OQ-SBX-53`](agent-open-questions.md#%60OQ-SBX-53%60)) |
 | `TM-WVM-154` | `F-WVM-1`, `P-WVM-2`, `P-WVM-1`, `F-WVM-16`, `P-WVM-8` | elevation of privilege | An orphaned process or reused launch user retains local authority after worker failure. | [Restart and recovery](workload-host.md#Restart%20and%20recovery) Durable ownership and safe identity reuse remain unresolved. [Provider teardown](workload-provider-windows-vm.md#Cancellation%20and%20teardown). | depends on an open question ([`OQ-SBX-29`](agent-open-questions.md#%60OQ-SBX-29%60)) |
-| `TM-WVM-46` | `F-WVM-1`, `F-WVM-2`, `F-WVM-5`, `P-WVM-1`, `P-WVM-2`, `P-WVM-5`, `DS-WVM-1`, `F-WVM-16`, `P-WVM-8` | elevation of privilege | Windows-native harness code obtains guest relay authority or accesses files outside its workspace through an unspecified process confinement boundary. | [Host process sandbox](workload-sandbox.md#Host%20process%20sandbox) specifies Linux and macOS mechanisms. Windows-native process enforcement remains unspecified. [Provider isolation](workload-provider-windows-vm.md#Isolation%20boundary). | gap ([`OQ-SBX-55`](agent-open-questions.md#%60OQ-SBX-55%60)) |
 
 ### Local transport and egress
 
@@ -190,7 +189,7 @@ Each table covers the six categories for its listed flows and every participatin
 | `TM-WVM-28` | `F-WVM-2`, `F-WVM-3`, `F-WVM-4`, `P-WVM-1`, `P-WVM-5`, `P-WVM-4` | information disclosure | A control carrier or network view exposes another launch's session or loopback listener. | [Loopback listeners](workload-ports.md#Loopback%20listeners) The design requires separate network views. The workload provider binding remains unresolved. [Provider mediation](workload-provider-windows-vm.md#Mediator%20connection%20and%20name%20resolution). See [Per-launch services](workload-proxy.md#Launch%20boundary). | depends on an open question ([`OQ-SES-5`](agent-open-questions.md#%60OQ-SES-5%60)) |
 | `TM-WVM-29` | `F-WVM-2`, `F-WVM-3`, `F-WVM-4`, `P-WVM-1`, `P-WVM-5`, `P-WVM-4` | denial of service | A launch floods its local control carrier and prevents lifecycle or session progress. | Local carrier bounds and sharing remain unresolved under [mediator overload control](agent-open-questions.md#%60OQ-SBX-14%60). [Provider mediation](workload-provider-windows-vm.md#Mediator%20connection%20and%20name%20resolution). See [Per-launch services](workload-proxy.md#Launch%20boundary). | depends on an open question ([`OQ-SBX-14`](agent-open-questions.md#%60OQ-SBX-14%60)) |
 | `TM-WVM-30` | `F-WVM-2`, `F-WVM-3`, `F-WVM-4`, `P-WVM-1`, `P-WVM-5`, `P-WVM-4` | elevation of privilege | A local process uses an inherited control handle for workload host operations outside its launch authority. | [Guest layout and lifecycle control](workload-sandbox.md#Guest%20layout%20and%20lifecycle%20control) separates relay and harness users. Handle ownership and launch binding remain unresolved. See [common mediator threats](workload-threat-model.md#Admission%20of%20requests%20by%20the%20workload%20proxy%20mediator) for protocol parser attacks. [Provider mediation](workload-provider-windows-vm.md#Mediator%20connection%20and%20name%20resolution). See [Per-launch services](workload-proxy.md#Launch%20boundary). | depends on an open question ([`OQ-SBX-13`](agent-open-questions.md#%60OQ-SBX-13%60)) |
-| `TM-WVM-67` | `F-WVM-2`, `F-WVM-3`, `P-WVM-1`, `P-WVM-5`, `P-WVM-4` | spoofing | A process impersonates the guest relay or reuses a previous launch's control endpoint. | [Guest layout and lifecycle control](workload-sandbox.md#Guest%20layout%20and%20lifecycle%20control) gives the Linux guest relay a separate user. Native Windows endpoint custody and carrier authentication remain unresolved. [Provider mediation](workload-provider-windows-vm.md#Mediator%20connection%20and%20name%20resolution). See [Per-launch services](workload-proxy.md#Launch%20boundary). | depends on an open question ([`OQ-SES-5`](agent-open-questions.md#%60OQ-SES-5%60)) |
+| `TM-WVM-67` | `F-WVM-2`, `F-WVM-3`, `P-WVM-1`, `P-WVM-5`, `P-WVM-4` | spoofing | A process impersonates the guest relay or reuses a previous launch's control endpoint. | [Guest layout and lifecycle control](workload-sandbox.md#Guest%20layout%20and%20lifecycle%20control) gives the Linux guest relay a separate user. Endpoint custody and carrier authentication remain unresolved. [Provider mediation](workload-provider-windows-vm.md#Mediator%20connection%20and%20name%20resolution). See [Per-launch services](workload-proxy.md#Launch%20boundary). | depends on an open question ([`OQ-SES-5`](agent-open-questions.md#%60OQ-SES-5%60)) |
 
 ### Workspace and scratch storage
 
@@ -318,7 +317,6 @@ Host isolation remains on hold. The [common residual risks](workload-threat-mode
 - `TM-WVM-70`. A same-user host process reads mediator memory, local session traffic, or another launch's files. depends on an open question ([`OQ-SBX-18`](agent-open-questions.md#%60OQ-SBX-18%60)).
 - `TM-WVM-151`. A guest exploits a virtual device or the guest hypervisor to gain workload host authority. gap ([`OQ-SBX-53`](agent-open-questions.md#%60OQ-SBX-53%60)).
 - `TM-WVM-154`. An orphaned process or reused launch user retains local authority after worker failure. depends on an open question ([`OQ-SBX-29`](agent-open-questions.md#%60OQ-SBX-29%60)).
-- `TM-WVM-46`. Windows-native harness code obtains guest relay authority or accesses files outside its workspace through an unspecified process confinement boundary. gap ([`OQ-SBX-55`](agent-open-questions.md#%60OQ-SBX-55%60)).
 
 ### Local transport and egress
 
