@@ -15,6 +15,8 @@ generated: { by: "codex:gpt-6", at: "2026-10-28T17:30:00Z" }
 
 The windows-vm provider runs a Linux workload guest directly on Hyper-V. On the Windows workload host, a dedicated non-administrator account runs the workload host worker. The Hyper-V interface afakt drives remains [`OQ-SBX-60`](agent-open-questions.md#%60OQ-SBX-60%60). Setup, supported Windows editions and hardware, and service lifetime remain under [`OQ-SBX-10`](agent-open-questions.md#%60OQ-SBX-10%60), [`OQ-PRQ-7`](agent-open-questions.md#%60OQ-PRQ-7%60), [`OQ-SBX-11`](agent-open-questions.md#%60OQ-SBX-11%60).
 
+afakt supplies the guest image, including its Linux kernel, init, and root disk. Users don't choose it. Each workload records the component digests. Guest format and compatibility remain [`OQ-WLD-6`](agent-open-questions.md#%60OQ-WLD-6%60).
+
 ## Isolation boundary
 
 A private Linux guest kernel separates the Linux harness from the Windows workload host. Hyper-V and host-side virtual devices add trust boundaries whose containment remains under [`OQ-SBX-53`](agent-open-questions.md#%60OQ-SBX-53%60).
@@ -23,7 +25,7 @@ A private Linux guest kernel separates the Linux harness from the Windows worklo
 
 The workload host worker on Windows controls the selected guest. The worker starts the Linux guest directly on Hyper-V. The Hyper-V interface, management channel, delegated permissions, startup authority, and independent supervision remain under [`OQ-SBX-60`](agent-open-questions.md#%60OQ-SBX-60%60). Inside the Linux guest, afakt-agent starts afakt-sandbox and the harness. Linux guest init and its separate relay user follow [Guest layout and lifecycle control](workload-sandbox.md#Guest%20layout%20and%20lifecycle%20control).
 
-Commands started by `afakt agent exec` use standalone afakt-sandbox without the runner. afakt-agent is absent. Command placement, inherited environment, launch binding, capture ordering, and descendant lifetime remain under [`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60). That choice also determines command transport. Authority for an unsandboxed command remains under [`OQ-AGT-26`](agent-open-questions.md#%60OQ-AGT-26%60).
+`afakt workload exec` is a workload provider capability. When it's available, the supervisor starts the command inside a fresh afakt-sandbox by default. Command placement, inherited environment, launch binding, capture ordering, and descendant lifetime remain under [`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60). That choice also determines command transport. Authority for an unsandboxed command remains under [`OQ-AGT-26`](agent-open-questions.md#%60OQ-AGT-26%60).
 
 Local helper authentication and binding to the intended launch remain under [`OQ-SBX-27`](agent-open-questions.md#%60OQ-SBX-27%60). Protection of hooks installed by the workload provider and repository project configuration remain on hold under [`OQ-HOOK-16`](agent-open-questions.md#%60OQ-HOOK-16%60) and [`OQ-HOOK-17`](agent-open-questions.md#%60OQ-HOOK-17%60).
 
@@ -39,7 +41,7 @@ The workload proxy is the only external traffic path, including Domain Name Syst
 
 ## Workspace, scratch, and caches
 
-The Linux guest has separate read-only boot and writable workspace disks. The workload keeps launch-writable state separate from verified image caches owned by the workload host. Windows host and Linux guest storage mappings remain under [`OQ-WSP-20`](agent-open-questions.md#%60OQ-WSP-20%60).
+The Linux guest has separate read-only boot and writable workspace disks. The workload keeps launch-writable state separate from verified workspace image caches owned by the workload host. Windows host and Linux guest storage mappings remain under [`OQ-WSP-20`](agent-open-questions.md#%60OQ-WSP-20%60).
 
 Workload provider storage mappings and capture access remain under [`OQ-WSP-20`](agent-open-questions.md#%60OQ-WSP-20%60). [Sandbox variables](workload-sandbox.md#Sandbox%20variables) defines separate scratch and host-shared named tool caches. Cache authorization, provenance, confidentiality, capacity, and invalidation remain under [`OQ-WSP-19`](agent-open-questions.md#%60OQ-WSP-19%60). Host-side processing of hostile repository metadata needs the isolation in [`OQ-WSP-18`](agent-open-questions.md#%60OQ-WSP-18%60). Worker capture rights and native history path stability remain under [`OQ-WSP-15`](agent-open-questions.md#%60OQ-WSP-15%60) and [`OQ-WSP-16`](agent-open-questions.md#%60OQ-WSP-16%60).
 
@@ -47,7 +49,7 @@ Workload provider storage mappings and capture access remain under [`OQ-WSP-20`]
 
 [Agent workspace lifecycle](agent-workspace-lifecycle.md#Attachment%20and%20workload%20provider%20storage) connects materialization to capture and cleanup.
 
-[Workload host caches and startup](agent-workspace-image.md#Workload%20host%20caches%20and%20startup) governs verified extraction and independent writable materialization. Immutable image caches remain outside launch-writable storage. Agent workspace images contain directory trees. Their format is Open Container Initiative (OCI). Linux materialization places workspace content in a guest disk. Mapping the image tree into Linux guest storage remains under [`OQ-WSP-20`](agent-open-questions.md#%60OQ-WSP-20%60). Linux execution needs Linux-compatible dependency artifacts even when the workload host runs Windows.
+[Workload host caches and startup](agent-workspace-image.md#Workload%20host%20caches%20and%20startup) governs verified extraction and independent writable materialization. Immutable workspace image caches remain outside launch-writable storage. Agent workspace images contain directory trees. Their format is Open Container Initiative (OCI). Linux materialization places workspace content in a guest disk. Mapping the workspace image tree into Linux guest storage remains under [`OQ-WSP-20`](agent-open-questions.md#%60OQ-WSP-20%60). Linux execution needs Linux-compatible dependency artifacts even when the workload host runs Windows.
 
 Native filesystem compatibility, including name aliases, links, and permission translation, remains under [`OQ-IMG-14`](agent-open-questions.md#%60OQ-IMG-14%60).
 

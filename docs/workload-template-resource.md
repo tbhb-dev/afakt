@@ -29,9 +29,9 @@ These proposed keys represent the [Workload resource](workload-resource.md#Speci
 
 | Proposed key | Meaning |
 | --- | --- |
-| `type` | Agent, app, or worker classification. |
+| `type` | `empty` without a workload process, `job` for one process to completion, `agent` for one launch, `app` for a release process, or `worker` for a Temporal worker. |
 | `role` | The workload's Identity and Access Management (IAM) role. |
-| `workload_image` | The [workload image](workload-image-resource.md). |
+| `workload_image` | The [container image selected for the workload process](workload-image-resource.md). Absent for `empty`. |
 | `execution_mode` | Workload provider target. |
 | `shape` | CPU, memory, and disk allocation. |
 | `host` | Workload host selection. |
@@ -57,7 +57,7 @@ metadata:
 spec:
   type: agent
   role: { name: build, revision: "7" }
-  workload_image: example-guest-image
+  workload_image: example-agent-image
   execution_mode: macos-vm
   shape: { cpu: 2, memory: 4Gi, disk: 20Gi }
   host: example-workload-host

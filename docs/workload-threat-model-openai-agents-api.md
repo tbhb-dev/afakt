@@ -15,7 +15,7 @@ generated: { by: "codex:gpt-6", at: "2026-10-28T17:30:00Z" }
 
 The OpenAI Agents Application Programming Interface (API) workload provider follows its [provider design](workload-provider-openai-agents-api.md).
 
-Vendor lifecycle authority, sandbox isolation, workspace and session storage, network paths, and retained state fall within this model, as do commands requested through `afakt agent exec`. The [common workload threat model](workload-threat-model.md) covers shared control plane authorization, credential exchange, session access, registries, and audit storage because their controls don't depend on this vendor.
+Vendor lifecycle authority, sandbox isolation, workspace and session storage, network paths, and retained state fall within this model, as do commands requested through `afakt workload exec`. The [common workload threat model](workload-threat-model.md) covers shared control plane authorization, credential exchange, session access, registries, and audit storage because their controls don't depend on this vendor.
 
 STRIDE covers spoofing, tampering, repudiation, information disclosure, denial of service, and elevation of privilege. A virtual machine (VM) can supply a private kernel. Domain Name System (DNS) queries and Agent Client Protocol (ACP) sessions require the launch's workload proxy mediator. Model Context Protocol (MCP) tools require afakt gateway authorization. The API exposes vendor management operations. Hypertext Transfer Protocol Secure (HTTPS) encrypts web traffic, while Hypertext Transfer Protocol (HTTP) names the underlying request protocol.
 
@@ -53,7 +53,7 @@ STRIDE covers spoofing, tampering, repudiation, information disclosure, denial o
 | `P-OAA-8` | Workspace command | afakt-sandbox placement unresolved |
 | `DS-OAA-1` | Workspace and scratch | Launch data. Remote backing and separation unresolved |
 | `DS-OAA-2` | Shared named tool cache | Cross-launch sharing. Workload provider mapping unresolved |
-| `DS-OAA-3` | Verified image cache | Outside launch-writable storage. Remote mapping unresolved |
+| `DS-OAA-3` | Verified workspace image cache | Outside launch-writable storage. Remote mapping unresolved |
 | `DS-OAA-4` | Retained workspace and session state | Vendor copies or afakt captures. Paired capture unresolved |
 | `DS-OAA-5` | Vendor-held credentials and observations | Vendor custody. Access and retention unresolved |
 
@@ -85,7 +85,7 @@ flowchart LR
         DS-OAA-1["DS-OAA-1: Workspace and scratch"]
     end
     subgraph images["TB-OAA-4 / verified content"]
-        DS-OAA-3["DS-OAA-3: Verified image cache"]
+        DS-OAA-3["DS-OAA-3: Verified workspace image cache"]
     end
     subgraph shared["TB-OAA-5 / shared across launches"]
         DS-OAA-2["DS-OAA-2: Named tool cache"]

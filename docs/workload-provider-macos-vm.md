@@ -23,7 +23,7 @@ Each agent launch has a separate Linux guest kernel. The guest boundary separate
 
 The workload host starts the virtual machine under an independent host supervisor. Guest init starts afakt-agent, which starts afakt-sandbox and then the harness as the agent user. A guest relay runs as a separate guest user and controls the guest control endpoint under [Guest layout and lifecycle control](workload-sandbox.md#Guest%20layout%20and%20lifecycle%20control).
 
-Commands started by `afakt agent exec` use standalone afakt-sandbox without the runner. afakt-agent is absent. Command placement, inherited environment, launch binding, capture ordering, and descendant lifetime remain under [`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60). That choice also determines command transport. Authority for an unsandboxed command remains under [`OQ-AGT-26`](agent-open-questions.md#%60OQ-AGT-26%60).
+`afakt workload exec` is a workload provider capability. When it's available, the supervisor starts the command inside a fresh afakt-sandbox by default. Command placement, inherited environment, launch binding, capture ordering, and descendant lifetime remain under [`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60). That choice also determines command transport. Authority for an unsandboxed command remains under [`OQ-AGT-26`](agent-open-questions.md#%60OQ-AGT-26%60).
 
 Local helper authentication and binding to the intended launch remain under [`OQ-SBX-27`](agent-open-questions.md#%60OQ-SBX-27%60). Protection of hooks installed by the workload provider and repository project configuration remain on hold under [`OQ-HOOK-16`](agent-open-questions.md#%60OQ-HOOK-16%60) and [`OQ-HOOK-17`](agent-open-questions.md#%60OQ-HOOK-17%60).
 
@@ -39,7 +39,7 @@ The workload proxy is the only external traffic path, including Domain Name Syst
 
 ## Workspace, scratch, and caches
 
-The Linux guest has a read-only root disk and a separate writable workspace disk under [Guest layout and lifecycle control](workload-sandbox.md#Guest%20layout%20and%20lifecycle%20control). Through guest confinement, the harness accesses its attached workspace. Backing files and the verified image cache remain under workload host control. macOS backing paths and guest-to-host ownership mappings remain under [`OQ-WSP-20`](agent-open-questions.md#%60OQ-WSP-20%60).
+The Linux guest has a read-only root disk and a separate writable workspace disk under [Guest layout and lifecycle control](workload-sandbox.md#Guest%20layout%20and%20lifecycle%20control). Through guest confinement, the harness accesses its attached workspace. Backing files and the verified workspace image cache remain under workload host control. macOS backing paths and guest-to-host ownership mappings remain under [`OQ-WSP-20`](agent-open-questions.md#%60OQ-WSP-20%60).
 
 Workload provider storage mappings and capture access remain under [`OQ-WSP-20`](agent-open-questions.md#%60OQ-WSP-20%60). [Sandbox variables](workload-sandbox.md#Sandbox%20variables) defines separate scratch and host-shared named tool caches. Cache authorization, provenance, confidentiality, capacity, and invalidation remain under [`OQ-WSP-19`](agent-open-questions.md#%60OQ-WSP-19%60). Host-side processing of hostile repository metadata needs the isolation in [`OQ-WSP-18`](agent-open-questions.md#%60OQ-WSP-18%60). Worker capture rights and native history path stability remain under [`OQ-WSP-15`](agent-open-questions.md#%60OQ-WSP-15%60) and [`OQ-WSP-16`](agent-open-questions.md#%60OQ-WSP-16%60).
 
@@ -47,7 +47,7 @@ Workload provider storage mappings and capture access remain under [`OQ-WSP-20`]
 
 [Agent workspace lifecycle](agent-workspace-lifecycle.md#Attachment%20and%20workload%20provider%20storage) connects materialization to capture and cleanup.
 
-[Workload host caches and startup](agent-workspace-image.md#Workload%20host%20caches%20and%20startup) governs verified extraction and independent writable materialization. Immutable image caches remain outside launch-writable storage. Agent workspace images contain directory trees. Their format is Open Container Initiative (OCI). Guest filesystem content comes from the workspace directory tree, separate from the Linux boot image. The choice of macOS cloning or copying for guest disk backing, storage accounting, and capture access remains under [`OQ-WSP-20`](agent-open-questions.md#%60OQ-WSP-20%60). Linux dependency artifacts remain necessary for Linux execution.
+[Workload host caches and startup](agent-workspace-image.md#Workload%20host%20caches%20and%20startup) governs verified extraction and independent writable materialization. Immutable workspace image caches remain outside launch-writable storage. Agent workspace images contain directory trees. Their format is Open Container Initiative (OCI). Guest filesystem content comes from the workspace directory tree, separate from the Linux guest image. The choice of macOS cloning or copying for guest disk backing, storage accounting, and capture access remains under [`OQ-WSP-20`](agent-open-questions.md#%60OQ-WSP-20%60). Linux dependency artifacts remain necessary for Linux execution.
 
 ## Workload snapshots and agent checkpoints
 

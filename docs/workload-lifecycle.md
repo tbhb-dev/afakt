@@ -9,7 +9,7 @@ generated: { by: "codex:gpt-6", at: "2026-10-28T22:38:36Z" }
 
 # Workload lifecycle
 
-For an agent [workload](workload-resource.md), afakt destroys the execution context after its single launch. Workload state describes that context independently of the launch result. Apps and workers that run user code don't bind an agent. Their replacement and drain rules remain [`OQ-WLD-2`](agent-open-questions.md#%60OQ-WLD-2%60).
+For an agent [workload](workload-resource.md), afakt destroys the execution context after its single launch. Workload state describes that context independently of the launch result. An `empty` workload runs only its supervisor until destruction. A `job` runs one workload process to completion, after which afakt destroys it. Apps and workers that run user code don't bind an agent. Their replacement and drain rules remain [`OQ-WLD-2`](agent-open-questions.md#%60OQ-WLD-2%60).
 
 The contract applies to every Tier 1 cell: `linux-host`, `linux-vm`, and `docker-engine` on `linux/amd64` and `linux/arm64`, `macos-host` and `macos-vm` on `darwin/arm64`, and `windows-host` and `windows-vm` on `windows/amd64`. Provider capabilities determine the available operations, without changing creation-time immutability.
 

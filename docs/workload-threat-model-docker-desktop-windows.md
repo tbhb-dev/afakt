@@ -25,7 +25,7 @@ The engine doesn't select a mandatory mediator path. Internal networks, host ser
 
 ### Workspace, scratch, and caches
 
-[Workload provider storage](workload-provider-docker-desktop-windows.md#Workspace,%20scratch,%20and%20caches) distinguishes launch state, shared named tool caches, and verified image caches. Provider storage mappings, scratch cleanup, shared cache trust, and hostile host-side repository processing remain unresolved. [Provider materialization](workload-provider-docker-desktop-windows.md#Workspace%20image%20materialization) separates verified extraction from later workspace capture.
+[Workload provider storage](workload-provider-docker-desktop-windows.md#Workspace,%20scratch,%20and%20caches) distinguishes launch state, shared named tool caches, and verified workspace image caches. Provider storage mappings, scratch cleanup, shared cache trust, and hostile host-side repository processing remain unresolved. [Provider materialization](workload-provider-docker-desktop-windows.md#Workspace%20image%20materialization) separates verified extraction from later workspace capture.
 
 ### Workload snapshots and agent checkpoints
 
@@ -35,7 +35,7 @@ The engine doesn't select a mandatory mediator path. Internal networks, host ser
 
 Host custody and its limits follow [Workload provider observations](workload-provider-docker-desktop-windows.md#Host%20observations). Termination authority and unresolved descendant cleanup follow [Provider teardown](workload-provider-docker-desktop-windows.md#Cancellation%20and%20teardown). Same-user process separation and the isolation baseline for workload hosts remain on hold under [`OQ-SBX-18`](agent-open-questions.md#%60OQ-SBX-18%60).
 
-Commands started by `afakt agent exec` use standalone afakt-sandbox. [Provider startup](workload-provider-docker-desktop-windows.md#Process%20placement%20and%20startup) leaves command placement, inherited state, and launch authority under [`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60). An unsandboxed invocation remains under [`OQ-AGT-26`](agent-open-questions.md#%60OQ-AGT-26%60).
+Commands started by `afakt workload exec` use standalone afakt-sandbox. [Provider startup](workload-provider-docker-desktop-windows.md#Process%20placement%20and%20startup) leaves command placement, inherited state, and launch authority under [`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60). An unsandboxed invocation remains under [`OQ-AGT-26`](agent-open-questions.md#%60OQ-AGT-26%60).
 
 ## Trust boundaries
 
@@ -64,17 +64,17 @@ Commands started by `afakt agent exec` use standalone afakt-sandbox. [Provider s
 | `P-DDW-4` | Workload proxy mediator | Outside launch confinement. Process separation unresolved |
 | `P-DDW-5` | Local control endpoint | Carrier and placement unspecified |
 | `P-DDW-6` | Successor launch | New launch authority |
-| `P-DDW-7` | afakt agent exec command | Execution placement unspecified |
+| `P-DDW-7` | `afakt workload exec` | Execution placement unspecified |
 | `DS-DDW-1` | Agent workspace | Per-launch writable content |
 | `DS-DDW-2` | Scratch storage | Outside workspace. Backing unspecified |
 | `DS-DDW-3` | Shared named tool cache | Shared across launches. Backing unspecified |
-| `DS-DDW-4` | Verified image cache | Workload host. Distinct from named tool cache |
+| `DS-DDW-4` | Verified workspace image cache | Workload host. Distinct from named tool cache |
 | `DS-DDW-5` | Checkpoint capture | Retained state. Access controls unresolved |
 | `P-DDW-8` | Docker Desktop backend | Shared Linux VM and host integration |
 
 ### Level one workload provider flows
 
-Arrows identify exchanges and their return paths. Unspecified carriers and placements remain gaps. The shared named tool cache is outside individual launch confinement and has a separate crossing from another launch. The verified image cache has a different trust relationship.
+Arrows identify exchanges and their return paths. Unspecified carriers and placements remain gaps. The shared named tool cache is outside individual launch confinement and has a separate crossing from another launch. The verified workspace image cache has a different trust relationship.
 
 ```mermaid
 flowchart LR
@@ -95,7 +95,7 @@ flowchart LR
     subgraph z4["TB-DDW-3 / workload host processing"]
         P-DDW-2["P-DDW-2: Workload host worker and provider lifecycle"]
         P-DDW-3["P-DDW-3: Host workspace processor"]
-        DS-DDW-4["DS-DDW-4: Verified image cache"]
+        DS-DDW-4["DS-DDW-4: Verified workspace image cache"]
     end
     subgraph z5["TB-DDW-4 / shared across launches"]
         DS-DDW-3["DS-DDW-3: Shared named tool cache"]
@@ -113,7 +113,7 @@ flowchart LR
         E-DDW-1["E-DDW-1: Command caller"]
     end
     subgraph z10["TB-DDW-6 / command placement unresolved"]
-        P-DDW-7["P-DDW-7: afakt agent exec command"]
+        P-DDW-7["P-DDW-7: `afakt workload exec`"]
     end
     subgraph z11["TB-DDW-7 / desktop backend"]
         P-DDW-8["P-DDW-8: Docker Desktop backend"]
@@ -144,7 +144,7 @@ flowchart LR
 - **`F-DDW-5`.** Workspace reads and writes under launch confinement. Crosses `TB-DDW-3`.
 - **`F-DDW-6`.** Scratch reads and writes outside the workspace. Allocation and cleanup are unspecified. Crosses `TB-DDW-3`.
 - **`F-DDW-7`.** Host-side capture, metadata interpretation, and cleanup of hostile workspace content. Crosses `TB-DDW-3`.
-- **`F-DDW-8`.** Verified immutable image content used for materialization. Cache ownership is provider-specific. Crosses `TB-DDW-3`.
+- **`F-DDW-8`.** Verified immutable workspace image content used for materialization. Cache ownership is provider-specific. Crosses `TB-DDW-3`.
 - **`F-DDW-9`.** Named cache reads and writes by this launch. Mapping to backing storage is unspecified. Crosses `TB-DDW-4`.
 - **`F-DDW-10`.** Named cache reads and writes by another launch across the same sharing boundary. Crosses `TB-DDW-4`.
 - **`F-DDW-11`.** Capture and restore of harness checkpoint and workspace state. The contract for resuming execution remains unresolved and doesn't include a VM snapshot. Crosses `TB-DDW-5`.

@@ -13,6 +13,8 @@ generated: { by: "codex:gpt-6-astra", at: "2026-10-27T00:00:00Z" }
 
 A workspace image contains a prepared directory tree with repository checkouts and installed dependencies plus build outputs. To start, an agent launch places that tree in its agent workspace. It can then reach its agent without repeating the clone and dependency installation or the build. A warm workload host reuses local content, while a cold host fetches and unpacks the missing layers before the agent starts.
 
+The workspace image never runs and isn't a container image.
+
 ## Image contents
 
 A workspace image is an Open Container Initiative (OCI) image with a manifest, a config blob, and layers. Those layers contain a directory tree and unpack beneath a workspace source's target path. Inside the [workload guest](workload-sandbox.md#Enforcement), the agent uses a writable workspace disk built from these layers. A separate read-only root disk supplies the guest operating system. Workspace image process settings don't determine how afakt starts the agent harness.
@@ -54,7 +56,7 @@ Each build records a fixed copy of its definition, full source commit IDs, the r
 
 ## Registry
 
-afakt needs an OCI distribution registry. It must cache base images on pull. Registry selection and the choice between an embedded service and a supervised child process remain [`OQ-IMG-16`](agent-open-questions.md#%60OQ-IMG-16%60). A supervised child needs startup readiness, failure observation, restart with backoff, and a bounded shutdown period.
+afakt needs an OCI distribution registry. It must cache base workspace images on pull. Registry selection and the choice between an embedded service and a supervised child process remain [`OQ-IMG-16`](agent-open-questions.md#%60OQ-IMG-16%60). A supervised child needs startup readiness, failure observation, restart with backoff, and a bounded shutdown period.
 
 An afakt-owned registry interface covers reference resolution, manifest and blob transfer, tag publication, retention references, and collection. Workers and the image builder depend on that interface rather than vendor-specific calls or storage metadata. Replacing the registry preserves those operations and their authorization and retention rules.
 
@@ -64,7 +66,7 @@ The registry accepts bearer tokens only. After authorizing the worker's request,
 
 On every request, the registry checks the signature against the control plane's published JavaScript Object Notation (JSON) Web Key Set (JWKS), the trusted issuer and registry audience, the validity interval, and the repository and action scopes. It rejects missing or invalid tokens, unknown signing keys, and requests outside those scopes. Knowing a digest alone never authorizes a read. Blob reads, ranged reads, cross-repository blob mounts, tag operations, and deletion all receive the applicable scope check. Push scopes don't grant deletion or registry administration.
 
-For worker-owned pulls, workload hosts use tokens issued to their worker for the required image repositories. Pull ownership remains [`OQ-IMG-8`](agent-open-questions.md#%60OQ-IMG-8%60). A build job pushes through its worker with a token scoped to its destination image repository. Reading a base needs a separate pull grant. Tokens and store credentials stay outside the agent sandbox, images, evidence, and telemetry. Workers renew registry tokens through the control plane when a transfer outlasts their validity. The registry pulls through and caches base images from configured upstream registries. Before fetching upstream content, it authenticates and authorizes a downstream request. It preserves upstream content digests and keeps upstream credentials outside build sandboxes. Its signing key configuration follows the control plane's JWKS rotation without accepting unknown keys.
+For worker-owned pulls, workload hosts use tokens issued to their worker for the required workspace image repositories. Pull ownership remains [`OQ-IMG-8`](agent-open-questions.md#%60OQ-IMG-8%60). A build job pushes through its worker with a token scoped to its destination image repository. Reading a base needs a separate pull grant. Tokens and store credentials stay outside the agent sandbox, images, evidence, and telemetry. Workers renew registry tokens through the control plane when a transfer outlasts their validity. The registry pulls through and caches base images from configured upstream registries. Before fetching upstream content, it authenticates and authorizes a downstream request. It preserves upstream content digests and keeps upstream credentials outside build sandboxes. Its signing key configuration follows the control plane's JWKS rotation without accepting unknown keys.
 
 ## Object store
 
@@ -72,7 +74,7 @@ afakt includes an embedded S3 Application Programming Interface (API) compatible
 
 The storage contract includes object reads and writes, metadata lookup, paginated listing, deletion, multipart uploads and aborting incomplete uploads, byte-range reads, conditional writes with `If-None-Match` and `If-Match`, and lifecycle expiry. Conditional writes reject failed preconditions rather than overwriting an object. afakt explicitly configures path-style addressing, the endpoint, bucket, region, transport security, and credentials.
 
-Lifecycle expiry applies to temporary objects and abandoned upload data. Registry manifests and reachable blobs remain under registry retention and collection. An object-store expiry rule can't remove content that an agent launch protects. Using an external store changes the endpoint and credentials while preserving image semantics and agent launch retention.
+Lifecycle expiry applies to temporary objects and abandoned upload data. Registry manifests and reachable blobs remain under registry retention and collection. An object-store expiry rule can't remove content that an agent launch protects. Using an external store changes the endpoint and credentials while preserving workspace image semantics and agent launch retention.
 
 ## Workload host caches and startup
 

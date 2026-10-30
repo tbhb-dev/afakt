@@ -25,7 +25,7 @@ The only network device in the guest connects to the mediator. Control and previ
 
 ### Workspace, scratch, and caches
 
-[Workload provider storage](workload-provider-macos-vm.md#Workspace,%20scratch,%20and%20caches) distinguishes launch state, shared named tool caches, and verified image caches. Provider storage mappings, scratch cleanup, shared cache trust, and hostile host-side repository processing remain unresolved. [Provider materialization](workload-provider-macos-vm.md#Workspace%20image%20materialization) separates verified extraction from later workspace capture.
+[Workload provider storage](workload-provider-macos-vm.md#Workspace,%20scratch,%20and%20caches) distinguishes launch state, shared named tool caches, and verified workspace image caches. Provider storage mappings, scratch cleanup, shared cache trust, and hostile host-side repository processing remain unresolved. [Provider materialization](workload-provider-macos-vm.md#Workspace%20image%20materialization) separates verified extraction from later workspace capture.
 
 ### Workload snapshots and agent checkpoints
 
@@ -35,7 +35,7 @@ The only network device in the guest connects to the mediator. Control and previ
 
 Host custody and its limits follow [Workload provider observations](workload-provider-macos-vm.md#Host%20observations). Termination authority and unresolved descendant cleanup follow [Provider teardown](workload-provider-macos-vm.md#Cancellation%20and%20teardown). Same-user process separation and the isolation baseline for workload hosts remain on hold under [`OQ-SBX-18`](agent-open-questions.md#%60OQ-SBX-18%60).
 
-Commands started by `afakt agent exec` use standalone afakt-sandbox. [Provider startup](workload-provider-macos-vm.md#Process%20placement%20and%20startup) leaves command placement, inherited state, and launch authority under [`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60). An unsandboxed invocation remains under [`OQ-AGT-26`](agent-open-questions.md#%60OQ-AGT-26%60).
+Commands started by `afakt workload exec` use standalone afakt-sandbox. [Provider startup](workload-provider-macos-vm.md#Process%20placement%20and%20startup) leaves command placement, inherited state, and launch authority under [`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60). An unsandboxed invocation remains under [`OQ-AGT-26`](agent-open-questions.md#%60OQ-AGT-26%60).
 
 ## Trust boundaries
 
@@ -63,16 +63,16 @@ Commands started by `afakt agent exec` use standalone afakt-sandbox. [Provider s
 | `P-MVM-4` | Workload proxy mediator | Outside launch confinement. Process separation unresolved |
 | `P-MVM-5` | Guest relay | Guest relay user |
 | `P-MVM-6` | Successor launch | New launch authority |
-| `P-MVM-7` | afakt agent exec command | Execution placement unspecified |
+| `P-MVM-7` | `afakt workload exec` | Execution placement unspecified |
 | `DS-MVM-1` | Agent workspace | Per-launch writable content |
 | `DS-MVM-2` | Scratch storage | Outside workspace. Backing unspecified |
 | `DS-MVM-3` | Shared named tool cache | Shared across launches. Backing unspecified |
-| `DS-MVM-4` | Verified image cache | Workload host. Distinct from named tool cache |
+| `DS-MVM-4` | Verified workspace image cache | Workload host. Distinct from named tool cache |
 | `DS-MVM-5` | Snapshot and checkpoint capture | Retained state. Access controls unresolved |
 
 ### Level one workload provider flows
 
-Arrows identify exchanges and their return paths. Unspecified carriers and placements remain gaps. The shared named tool cache is outside individual launch confinement and has a separate crossing from another launch. The verified image cache has a different trust relationship.
+Arrows identify exchanges and their return paths. Unspecified carriers and placements remain gaps. The shared named tool cache is outside individual launch confinement and has a separate crossing from another launch. The verified workspace image cache has a different trust relationship.
 
 ```mermaid
 flowchart LR
@@ -93,7 +93,7 @@ flowchart LR
     subgraph z4["TB-MVM-3 / workload host processing"]
         P-MVM-2["P-MVM-2: Workload host worker and provider lifecycle"]
         P-MVM-3["P-MVM-3: Host workspace processor"]
-        DS-MVM-4["DS-MVM-4: Verified image cache"]
+        DS-MVM-4["DS-MVM-4: Verified workspace image cache"]
     end
     subgraph z5["TB-MVM-4 / shared across launches"]
         DS-MVM-3["DS-MVM-3: Shared named tool cache"]
@@ -111,7 +111,7 @@ flowchart LR
         E-MVM-1["E-MVM-1: Command caller"]
     end
     subgraph z10["TB-MVM-6 / command placement unresolved"]
-        P-MVM-7["P-MVM-7: afakt agent exec command"]
+        P-MVM-7["P-MVM-7: `afakt workload exec`"]
     end
     P-MVM-2 -->|"F-MVM-1"| P-MVM-1
     P-MVM-1 -->|"F-MVM-2"| P-MVM-5
@@ -137,7 +137,7 @@ flowchart LR
 - **`F-MVM-5`.** Workspace reads and writes under launch confinement. Crosses `TB-MVM-3`.
 - **`F-MVM-6`.** Scratch reads and writes outside the workspace. Allocation and cleanup are unspecified. Crosses `TB-MVM-3`.
 - **`F-MVM-7`.** Host-side capture, metadata interpretation, and cleanup of hostile workspace content. Crosses `TB-MVM-3`.
-- **`F-MVM-8`.** Verified immutable image content used for materialization. Cache ownership is provider-specific. Crosses `TB-MVM-3`.
+- **`F-MVM-8`.** Verified immutable workspace image content used for materialization. Cache ownership is provider-specific. Crosses `TB-MVM-3`.
 - **`F-MVM-9`.** Named cache reads and writes by this launch. Mapping to backing storage is unspecified. Crosses `TB-MVM-4`.
 - **`F-MVM-10`.** Named cache reads and writes by another launch across the same sharing boundary. Crosses `TB-MVM-4`.
 - **`F-MVM-11`.** Capture and restore of VM state, workspace delta, and harness checkpoint at one idle boundary. Crosses `TB-MVM-5`.

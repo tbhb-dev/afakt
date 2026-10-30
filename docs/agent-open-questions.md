@@ -167,7 +167,7 @@ What stream and signal behavior must `agent exec` and `agent shell` provide acro
 
 ### `OQ-AGT-40`
 
-Where does `afakt agent exec` run for each workload provider, and how does it bind the caller, agent launch, workspace, inherited environment, and egress policy? What prevents concurrent commands from invalidating workspace capture, and which authority stops every command descendant during cancellation, suspension, or teardown? Which command events establish attribution without recording private content? See [Host process sandbox](workload-sandbox.md#Host%20process%20sandbox).
+How should the proposed [exec guarantees](workload-api.md#Commands%20in%20a%20workload) handle shared files, time limits, cancellation, bounded output, and operation IDs? Where does `afakt workload exec` run for each workload provider, and how does it bind the caller, agent launch, workspace, inherited environment, and egress policy? What prevents concurrent commands from invalidating workspace capture, and which authority stops every command descendant during cancellation, suspension, or teardown? Which command events establish attribution without recording private content? See [Host process sandbox](workload-sandbox.md#Host%20process%20sandbox).
 
 ## Workload host
 
@@ -429,7 +429,7 @@ What admission, quota, and cancellation rules apply to agent workspace revision 
 
 ### `OQ-WSP-18`
 
-Which Git metadata may agent workspace imports and image publication preserve, including worktree pointers, alternates, submodules, large-file objects, and executable configuration? A verified private repository with explicit handling of external references is the leading option, at the cost of limiting portability for repositories with external dependencies. Configuration handling depends on the on-hold [repository project configuration scope](agent-open-questions.md#%60OQ-HOOK-17%60). See [Workspace sources](agent-workspace.md#Workspace%20sources).
+Which Git metadata may afakt preserve when importing an agent workspace or publishing a workspace image, including worktree pointers, alternates, submodules, large-file objects, and executable configuration? A verified private repository with explicit handling of external references is the leading option, at the cost of limiting portability for repositories with external dependencies. Configuration handling depends on the on-hold [repository project configuration scope](agent-open-questions.md#%60OQ-HOOK-17%60). See [Workspace sources](agent-workspace.md#Workspace%20sources).
 
 ### `OQ-WSP-19`
 
@@ -437,7 +437,7 @@ What authorization and isolation rules apply to named tool caches shared across 
 
 ### `OQ-WSP-20`
 
-For each workload provider, where do workspace files, scratch, shared named tool caches, and verified image caches live, and which identities can access their backing storage? How do mounts, ownership, quotas, cleanup, and reuse preserve separation across launches? How does the Windows workload host back the Linux guest's workspace disk and capture its contents? See [Workload host caches and startup](agent-workspace-image.md#Workload%20host%20caches%20and%20startup) and [Sandbox variables](workload-sandbox.md#Sandbox%20variables).
+For each workload provider, where do workspace files, scratch, shared named tool caches, and verified workspace image caches live, and which identities can access their backing storage? How do mounts, ownership, quotas, cleanup, and reuse preserve separation across launches? How does the Windows workload host back the Linux guest's workspace disk and capture its contents? See [Workload host caches and startup](agent-workspace-image.md#Workload%20host%20caches%20and%20startup) and [Sandbox variables](workload-sandbox.md#Sandbox%20variables).
 
 ### `OQ-WSP-21`
 
@@ -455,7 +455,7 @@ How should detachment and deletion follow the capture and hook order in [Hook ev
 
 ### `OQ-IMG-1`
 
-Does afakt need the OCI referrers API for image signatures, software bills of materials (SBOMs), or other attached artifacts? Which verification policy would consume them? For the Open Container Initiative (OCI) registry, see [Registry](agent-workspace-image.md#Registry).
+Does afakt need the OCI referrers API for workspace image signatures, software bills of materials (SBOMs), or other attached artifacts? Which verification policy would consume them? For the Open Container Initiative (OCI) registry, see [Registry](agent-workspace-image.md#Registry).
 
 ### `OQ-IMG-2`
 
@@ -467,7 +467,7 @@ How should peer-to-peer layer sharing between workload hosts work at the fleet s
 
 ### `OQ-IMG-4`
 
-How should workspace access density inform the policy for caching and preheating? Fetching complete images in advance preserves the no-lazy-pull rule but transfers content an agent launch may never read. Selecting which images to preheat reduces that transfer at the cost of cold starts. Selective preheating that yields to disk pressure is the leading option. Reusing verified complete content avoids repeated transfer and extraction, but sparse access can leave most bytes fetched in advance unused. Per-digest admission and space reservations bound concurrent preparation. Workload-based thresholds remain open. See [Placement and preheating](agent-workspace-image.md#Placement%20and%20preheating).
+How should workspace access density inform the policy for caching and preheating? Fetching complete workspace images in advance preserves the no-lazy-pull rule but transfers content an agent launch may never read. Selecting which images to preheat reduces that transfer at the cost of cold starts. Selective preheating that yields to disk pressure is the leading option. Reusing verified complete content avoids repeated transfer and extraction, but sparse access can leave most bytes fetched in advance unused. Per-digest admission and space reservations bound concurrent preparation. Workload-based thresholds remain open. See [Placement and preheating](agent-workspace-image.md#Placement%20and%20preheating).
 
 ### `OQ-IMG-5`
 
@@ -475,7 +475,7 @@ Can afakt save a finished agent launch's agent workspace as a workspace image, a
 
 ### `OQ-IMG-6`
 
-How do secrets that a build step needs stay out of every image layer? Brokered network access is the leading option where supported because it keeps credential values outside captured content, but it can't supply every local secret input. Every inherited and intermediate layer remains part of the disclosure boundary. Deleting a secret from the final tree doesn't remove it from earlier layers, and final-tree checks and known-secret scans can't prove secret absence. A separate delivery and capture contract is necessary for local secret inputs. See the [image build rules](agent-workspace-image.md#Image%20builds).
+How do secrets that a build step needs stay out of every workspace image layer? Brokered network access is the leading option where supported because it keeps credential values outside captured content, but it can't supply every local secret input. Every inherited and intermediate layer remains part of the disclosure boundary. Deleting a secret from the final tree doesn't remove it from earlier layers, and final-tree checks and known-secret scans can't prove secret absence. A separate delivery and capture contract is necessary for local secret inputs. See the [image build rules](agent-workspace-image.md#Image%20builds).
 
 ### `OQ-IMG-7`
 
@@ -483,7 +483,7 @@ Should the source rules allow a `repository` source immediately after an `image`
 
 ### `OQ-IMG-8`
 
-Must the worker fetch the image layers before VM boot, or may the guest pull them through its workload proxy mediator? Worker pulls are the leading option because they reuse verified disk bases and resolve preparation failures before session launch. Guest pulls add a mediated preparation phase and guest resource pressure. Whether they provide the same caching, authorization, and verification behavior remains unqualified. Both require complete verified content before hooks or the agent harness start. See [Workload host caches and startup](agent-workspace-image.md#Workload%20host%20caches%20and%20startup).
+Must the worker fetch the workspace image layers before VM boot, or may the guest pull them through its workload proxy mediator? Worker pulls are the leading option because they reuse verified disk bases and resolve preparation failures before session launch. Guest pulls add a mediated preparation phase and guest resource pressure. Whether they provide the same caching, authorization, and verification behavior remains unqualified. Both require complete verified content before hooks or the agent harness start. See [Workload host caches and startup](agent-workspace-image.md#Workload%20host%20caches%20and%20startup).
 
 ### `OQ-IMG-9`
 
@@ -1257,11 +1257,11 @@ What wire keys, required fields, revision identifiers, and concurrency rules rep
 
 ### `OQ-WLD-1`
 
-How do workload creation, claims, and warm preparation relate? What selects the pool key, and when are namespace, type, role, and identities assigned? The pool key could use either the workload template or image, shape, execution mode, and workload host together. See [Workload resource](workload-resource.md#Specification%20keys).
+How do workload creation, claims, and warm preparation relate? What selects the pool key, and when are namespace, type, role, and identities assigned? The pool key could use either the workload template or workload image, shape, execution mode, and workload host together. See [Workload resource](workload-resource.md#Specification%20keys).
 
 ### `OQ-WLD-2`
 
-What are the lifetimes of apps and workers that run user code, restart caps, backoff, replacement rules, and drain observations? The one-agent-launch rule doesn't define them. How does a version of a worker deployment retire without admitting new tasks? See [Workload lifecycle](workload-lifecycle.md).
+What fields does a job specify beyond its workload image, arguments, and environment? Proposed fields include a time limit and an app release reference that pins configuration, add-on attachments, and the IAM role at creation. Build jobs wouldn't borrow an app release under that proposal. Retaining the exit status after destruction and using it to decide whether deployment proceeds also remain proposed. What are the restart caps, backoff, replacement rules, and drain observations for apps and workers that run user code? How does a version of a worker deployment retire without admitting new tasks? See [Workload types](workload.md#Workload%20types) and [Workload lifecycle](workload-lifecycle.md).
 
 ### `OQ-WLD-3`
 
@@ -1281,7 +1281,7 @@ How do workload template versions, edits, parameters, defaults, host constraints
 
 ### `OQ-WLD-6`
 
-What are the workload image formats, payload keys, artifact digests, admission checks, compatibility declarations, and retention rules for each workload provider kind? Guest images need a binding between kernel and disk, with boot and restoration compatibility across Tier 1 cells still open. Does an app release image serve directly as the workload image on some targets? See [Workload image](workload-image.md) and [Workload image resource](workload-image-resource.md).
+What are the payload keys, digest resolution, admission checks, compatibility declarations, and retention rules for the container image a workload selects for its process? How does each workload provider run or materialize it? Separately, what format and binding between the Linux kernel, init, and root disk does a guest image use, and what establishes boot and restoration compatibility? afakt supplies guest images and records each component's digest. Users don't choose them. See [Workload image](workload-image.md) and [Workload image resource](workload-image-resource.md).
 
 ### `OQ-RES-6`
 
@@ -1297,7 +1297,7 @@ Which operations may a workload's own SVID permit for each workload type? Author
 
 ### `OQ-WLD-9`
 
-What are the methods, paths, permissions, request projections, and completion responses for Workload, WorkloadTemplate, WorkloadImage, and WorkloadHostWorker operations? How do workload listing, image routes, and worker operations map to those resource boundaries? How do version selection, concurrent changes, idempotent retries, and observations of teardown fit the resource contracts? User authentication and authorization of role selection also need a contract. Preparation and creation stay under `OQ-WLD-1`. See [Workload API](workload-api.md).
+What are the methods, paths, permissions, request projections, and completion responses for Workload, WorkloadTemplate, WorkloadImage, and WorkloadHostWorker operations? How do workload listing, workload image routes, and worker operations map to those resource boundaries? How do version selection, concurrent changes, idempotent retries, and observations of teardown fit the resource contracts? User authentication and authorization of role selection also need a contract. Preparation and creation stay under `OQ-WLD-1`. See [Workload API](workload-api.md).
 
 ### `OQ-WLD-10`
 

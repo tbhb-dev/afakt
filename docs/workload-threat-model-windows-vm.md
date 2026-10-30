@@ -25,7 +25,7 @@ The Linux workload guest has device and management boundaries distinct from its 
 
 ### Workspace, scratch, and caches
 
-[Workload provider storage](workload-provider-windows-vm.md#Workspace,%20scratch,%20and%20caches) distinguishes launch state, shared named tool caches, and verified image caches. Provider storage mappings, scratch cleanup, shared cache trust, and hostile host-side repository processing remain unresolved. [Provider materialization](workload-provider-windows-vm.md#Workspace%20image%20materialization) separates verified extraction from later workspace capture.
+[Workload provider storage](workload-provider-windows-vm.md#Workspace,%20scratch,%20and%20caches) distinguishes launch state, shared named tool caches, and verified workspace image caches. Provider storage mappings, scratch cleanup, shared cache trust, and hostile host-side repository processing remain unresolved. [Provider materialization](workload-provider-windows-vm.md#Workspace%20image%20materialization) separates verified extraction from later workspace capture.
 
 ### Workload snapshots and agent checkpoints
 
@@ -35,7 +35,7 @@ The Linux workload guest has device and management boundaries distinct from its 
 
 Host custody and its limits follow [Workload provider observations](workload-provider-windows-vm.md#Host%20observations). Termination authority and unresolved descendant cleanup follow [Provider teardown](workload-provider-windows-vm.md#Cancellation%20and%20teardown). Same-user process separation and the isolation baseline for workload hosts remain on hold under [`OQ-SBX-18`](agent-open-questions.md#%60OQ-SBX-18%60).
 
-Commands started by `afakt agent exec` use standalone afakt-sandbox. [Provider startup](workload-provider-windows-vm.md#Process%20placement%20and%20startup) leaves command placement, inherited state, and launch authority under [`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60). An unsandboxed invocation remains under [`OQ-AGT-26`](agent-open-questions.md#%60OQ-AGT-26%60).
+Commands started by `afakt workload exec` use standalone afakt-sandbox. [Provider startup](workload-provider-windows-vm.md#Process%20placement%20and%20startup) leaves command placement, inherited state, and launch authority under [`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60). An unsandboxed invocation remains under [`OQ-AGT-26`](agent-open-questions.md#%60OQ-AGT-26%60).
 
 ## Trust boundaries
 
@@ -63,17 +63,17 @@ Commands started by `afakt agent exec` use standalone afakt-sandbox. [Provider s
 | `P-WVM-4` | Workload proxy mediator | Outside launch confinement. Process separation unresolved |
 | `P-WVM-5` | Guest relay | Separate user in the Linux guest |
 | `P-WVM-6` | Successor launch | New launch authority |
-| `P-WVM-7` | afakt agent exec command | Execution placement unspecified |
+| `P-WVM-7` | `afakt workload exec` | Execution placement unspecified |
 | `DS-WVM-1` | Agent workspace | Per-launch writable content |
 | `DS-WVM-2` | Scratch storage | Outside workspace. Backing unspecified |
 | `DS-WVM-3` | Shared named tool cache | Shared across launches. Backing unspecified |
-| `DS-WVM-4` | Verified image cache | Workload host. Distinct from named tool cache |
+| `DS-WVM-4` | Verified workspace image cache | Workload host. Distinct from named tool cache |
 | `DS-WVM-5` | Snapshot and checkpoint capture | Retained state. Access controls unresolved |
 | `P-WVM-8` | Windows VM management adapter | Linux guest VM control through Hyper-V. Interface, authority, and stop observations unresolved |
 
 ### Level one workload provider flows
 
-Inside the Linux workload guest, the agent harness uses storage managed by the Windows workload host. Arrows identify exchanges and their return paths. Unspecified carriers and placements remain gaps. The shared named tool cache is outside individual launch confinement and has a separate crossing from another launch. For the verified image cache, the trust relationship differs.
+Inside the Linux workload guest, the agent harness uses storage managed by the Windows workload host. Arrows identify exchanges and their return paths. Unspecified carriers and placements remain gaps. The shared named tool cache is outside individual launch confinement and has a separate crossing from another launch. For the verified workspace image cache, the trust relationship differs.
 
 ```mermaid
 flowchart LR
@@ -94,7 +94,7 @@ flowchart LR
     subgraph z4["TB-WVM-3 / workload host processing"]
         P-WVM-2["P-WVM-2: Workload host worker and provider lifecycle"]
         P-WVM-3["P-WVM-3: Host workspace processor"]
-        DS-WVM-4["DS-WVM-4: Verified image cache"]
+        DS-WVM-4["DS-WVM-4: Verified workspace image cache"]
     end
     subgraph z5["TB-WVM-4 / shared across launches"]
         DS-WVM-3["DS-WVM-3: Shared named tool cache"]
@@ -112,7 +112,7 @@ flowchart LR
         E-WVM-1["E-WVM-1: Command caller"]
     end
     subgraph z10["TB-WVM-6 / command placement unresolved"]
-        P-WVM-7["P-WVM-7: afakt agent exec command"]
+        P-WVM-7["P-WVM-7: `afakt workload exec`"]
     end
     P-WVM-8["P-WVM-8: Windows VM management adapter"]
     P-WVM-2 -->|"F-WVM-16"| P-WVM-8
@@ -140,7 +140,7 @@ flowchart LR
 - **`F-WVM-5`.** Workspace reads and writes under launch confinement. Crosses `TB-WVM-3`.
 - **`F-WVM-6`.** Scratch reads and writes outside the workspace. Allocation and cleanup are unspecified. Crosses `TB-WVM-3`.
 - **`F-WVM-7`.** Host-side capture, metadata interpretation, and cleanup of hostile workspace content. Crosses `TB-WVM-3`.
-- **`F-WVM-8`.** Verified immutable image content used for materialization. Cache ownership is provider-specific. Crosses `TB-WVM-3`.
+- **`F-WVM-8`.** Verified immutable workspace image content used for materialization. Cache ownership is provider-specific. Crosses `TB-WVM-3`.
 - **`F-WVM-9`.** Named cache reads and writes by this launch. Mapping to backing storage is unspecified. Crosses `TB-WVM-4`.
 - **`F-WVM-10`.** Named cache reads and writes by another launch across the same sharing boundary. Crosses `TB-WVM-4`.
 - **`F-WVM-11`.** Capture and restore of VM state, workspace delta, and harness checkpoint at one idle boundary. Crosses `TB-WVM-5`.

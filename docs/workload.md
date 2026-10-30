@@ -9,13 +9,25 @@ generated: { by: "codex:gpt-6", at: "2026-10-28T17:30:00Z" }
 
 # Workload
 
-A workload consists of its execution context, the workload proxy mediator, the workload proxy, and `afakt-agent`. On a virtual machine (VM) provider, the execution context is a workload guest. Other workload providers use a host or container context. A workload can exist without an agent launch and without a workspace. In afakt, workload means this boundary. Mediators, gateways, and workers are workloads in the Secure Production Identity Framework for Everyone (SPIFFE) sense, a distinct use of the term.
+A workload is the resource for an execution context together with its workload proxy and workload proxy mediator. Its supervisor starts a workload process when the workload type requires one. For an agent workload, that supervisor is `afakt-agent`. On a virtual machine (VM) provider, the execution context is a workload guest. Other workload providers use a host or container context. A workload can exist without an agent launch and without a workspace. In afakt, workload means this boundary. Mediators, gateways, and workers are workloads in the Secure Production Identity Framework for Everyone (SPIFFE) sense, a distinct use of the term.
 
 ## Creation-time fields
 
-A workload records its type, role, workload image, execution mode, shape, workload host, namespace, and workload template version at creation. The `type` field classifies it as agent, app, or worker. A role groups Identity and Access Management (IAM) policies under a name. The workload gets its role at creation and pins it as an immutable parameter, like an IAM instance profile on an EC2 instance.
+At creation, the [Workload resource](workload-resource.md) records its type, role, workload image, execution mode, shape, workload host, namespace, and workload template version. These fields are immutable. Its `type` classifies it as `empty`, `job`, `agent`, `app`, or `worker`. Its workload image selects the container image for the process. An `empty` workload has neither a workload process nor a workload image. VM providers supply the Linux guest image separately.
 
-The [Workload resource](workload-resource.md) records these immutable fields. A workload template stores the creation-time fields. Workload template commands live under `afakt workload template`. An agent profile supplies the configuration for an agent launch.
+A role groups Identity and Access Management (IAM) policies under a name and binds to the workload at creation, like an IAM instance profile on an EC2 instance. Workload templates store the creation-time fields, with commands under `afakt workload template`. For an agent launch, an agent profile supplies the configuration.
+
+## Workload types
+
+| Type | Process and lifetime |
+| --- | --- |
+| `empty` | Runs the supervisor without a workload process until destruction. |
+| `job` | Runs one process from its workload image to completion, then afakt destroys the workload. |
+| `agent` | Runs one agent launch, then afakt destroys the workload. |
+| `app` | Runs one process of an app release, with supervisor restarts, until replacement or scale-down. |
+| `worker` | Runs a Temporal worker for one deployment version until that version drains. |
+
+A job runs once. Retrying a failed job requires a new workload, so a later run can't inherit files or secrets from the failed process. Detailed lifecycle rules remain open, and the job specification and release configuration fields remain proposed, under [`OQ-WLD-2`](agent-open-questions.md#%60OQ-WLD-2%60).
 
 ## Components
 

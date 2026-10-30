@@ -21,10 +21,10 @@ Resource representations have `apiVersion`, `kind`, `metadata`, `spec`, and `sta
 | --- | --- |
 | [Workload](workload-resource.md) | Inspect identity, immutable creation fields, lifecycle state, and conditions. The proposed deletion operation requests teardown. Reclaim depends on execution observations. Lifecycle ownership remains `OQ-SBX-71`. |
 | [WorkloadTemplate](workload-template-resource.md) | Create and inspect creation settings, list templates, and request instantiation. Version publication, updates, retirement, and selection remain `OQ-WLD-5`. Each workload records the version it uses. |
-| [WorkloadImage](workload-image-resource.md) | Select an execution image by its resource reference. Registration, listing, lookup, admission, and retirement operations remain `OQ-WLD-6` and `OQ-WLD-9`. |
+| [WorkloadImage](workload-image-resource.md) | Select the container image for the workload process through this resource. Registration, listing, lookup, admission, and retirement operations remain `OQ-WLD-6` and `OQ-WLD-9`. |
 | [WorkloadHostWorker](workload-host-worker-resource.md) | Register, renew, report observations, and read desired state over worker-initiated connections. A separate worker resource contract remains `OQ-RES-6` and `OQ-WLD-7`. |
 
-Workload creation fixes type, Identity and Access Management (IAM) role, workload image, execution mode, shape, host, namespace, and workload template version. Changing those fields requires another workload. Wire fields and request projections remain [`OQ-RES-4`](agent-open-questions.md#%60OQ-RES-4%60) and [`OQ-RES-5`](agent-open-questions.md#%60OQ-RES-5%60). A complete resource representation doesn't establish which fields a caller may write. Authorization of role selection remains part of [`OQ-WLD-9`](agent-open-questions.md#%60OQ-WLD-9%60), separately from the workload's own pinned authority.
+Workload creation fixes type, Identity and Access Management (IAM) role, workload image, execution mode, shape, host, namespace, and workload template version. An `empty` workload doesn't select a workload image. Guest images come from afakt, and the workload records their component digests separately. Changing the creation-time fields requires another workload. Wire fields and request projections remain [`OQ-RES-4`](agent-open-questions.md#%60OQ-RES-4%60) and [`OQ-RES-5`](agent-open-questions.md#%60OQ-RES-5%60). A complete resource representation doesn't establish which fields a caller may write. Authorization of role selection remains part of [`OQ-WLD-9`](agent-open-questions.md#%60OQ-WLD-9%60), separately from the workload's own pinned authority.
 
 ## Proposed routes
 
@@ -44,9 +44,28 @@ The proposed HTTP methods, paths, payloads, and response mapping remain [`OQ-WLD
 | `GET` | `/api/v1/agent-hosts/{agent_host_id}` | Inspect that host record. |
 | `POST` | `/api/v1/agent-hosts/{agent_host_id}/renew` | Renew registration with capacity observations. |
 
-Host registration needs reconciliation with WorkloadHostWorker under [`OQ-RES-6`](agent-open-questions.md#%60OQ-RES-6%60). Workload listing, image operations, and a separate worker surface have no route contract. Template version routes, idempotency, concurrent changes, and operation completion also remain [`OQ-WLD-9`](agent-open-questions.md#%60OQ-WLD-9%60).
+Host registration needs reconciliation with WorkloadHostWorker under [`OQ-RES-6`](agent-open-questions.md#%60OQ-RES-6%60). Workload listing, workload image operations, and a separate worker surface have no route contract. Template version routes, idempotency, concurrent changes, and operation completion also remain [`OQ-WLD-9`](agent-open-questions.md#%60OQ-WLD-9%60).
 
 Preparation and claims remain under [`OQ-WLD-1`](agent-open-questions.md#%60OQ-WLD-1%60). Claims are one-shot. After one agent launch, afakt destroys the workload instead of making it reusable through the API. See [Workload lifecycle](workload-lifecycle.md).
+
+## Commands in a workload
+
+`afakt workload exec` and `afakt workload shell` are workload provider capabilities. afakt refuses a command when its provider declares that capability unsupported.
+
+Exec takes an argument list and doesn't assume a shell. Shell runs the shell declared by the workload image and refuses to run when the image doesn't declare one. The supervisor starts each command inside a fresh `afakt-sandbox` by default. Permission to run without that sandbox remains [`OQ-AGT-26`](agent-open-questions.md#%60OQ-AGT-26%60).
+
+### Proposed command transport
+
+The proposed request path passes through the control plane for an IAM check. Command streams would cross the overlay through the workload proxy, with a mediator check. An audit record would include the caller, command, and exit status, excluding output. Placement, launch binding, inherited environment, and capture ordering remain [`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60).
+
+### Proposed exec guarantees
+
+- **Shared files.** Commands in one workload share its working tree. Each sandbox permits writes there and denies writes elsewhere.
+- **Timeout and cancellation.** Each command has a time limit and supports cancellation. Either event sends `SIGTERM`, followed by `SIGKILL` after a grace period, with the cause in the result.
+- **Output and result.** Capture has a limit per exec and reports truncation. An exec always returns a result with its exit status, or with cancellation, timeout, or loss after the supervisor or workload dies.
+- **Operation IDs.** A caller can supply an operation ID. The supervisor retains it for the workload's lifetime. A repeat attaches to the running command or returns its recorded result without starting it again. Workload destruction loses that result. The caller then decides what happens next.
+
+Mapping each script step of a workflow job to an exec in one shared `empty` workload remains proposed. A workflow job is distinct from the `job` workload type, which runs one process to completion.
 
 ## Worker control
 

@@ -25,7 +25,7 @@ The private network namespace and proxy-bound tunnel constrain external traffic.
 
 ### Workspace, scratch, and caches
 
-[Workload provider storage](workload-provider-linux-host.md#Workspace,%20scratch,%20and%20caches) distinguishes launch state, shared named tool caches, and verified image caches. Provider storage mappings, scratch cleanup, shared cache trust, and hostile host-side repository processing remain unresolved. [Provider materialization](workload-provider-linux-host.md#Workspace%20image%20materialization) separates verified extraction from later workspace capture.
+[Workload provider storage](workload-provider-linux-host.md#Workspace,%20scratch,%20and%20caches) distinguishes launch state, shared named tool caches, and verified workspace image caches. Provider storage mappings, scratch cleanup, shared cache trust, and hostile host-side repository processing remain unresolved. [Provider materialization](workload-provider-linux-host.md#Workspace%20image%20materialization) separates verified extraction from later workspace capture.
 
 ### Workload snapshots and agent checkpoints
 
@@ -35,7 +35,7 @@ The private network namespace and proxy-bound tunnel constrain external traffic.
 
 Host custody and its limits follow [Workload provider observations](workload-provider-linux-host.md#Host%20observations). Termination authority and unresolved descendant cleanup follow [Provider teardown](workload-provider-linux-host.md#Cancellation%20and%20teardown). Same-user process separation and the isolation baseline for workload hosts remain on hold under [`OQ-SBX-18`](agent-open-questions.md#%60OQ-SBX-18%60).
 
-Commands started by `afakt agent exec` use standalone afakt-sandbox. [Provider startup](workload-provider-linux-host.md#Process%20placement%20and%20startup) leaves command placement, inherited state, and launch authority under [`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60). An unsandboxed invocation remains under [`OQ-AGT-26`](agent-open-questions.md#%60OQ-AGT-26%60).
+Commands started by `afakt workload exec` use standalone afakt-sandbox. [Provider startup](workload-provider-linux-host.md#Process%20placement%20and%20startup) leaves command placement, inherited state, and launch authority under [`OQ-AGT-40`](agent-open-questions.md#%60OQ-AGT-40%60). An unsandboxed invocation remains under [`OQ-AGT-26`](agent-open-questions.md#%60OQ-AGT-26%60).
 
 ## Trust boundaries
 
@@ -63,17 +63,17 @@ Commands started by `afakt agent exec` use standalone afakt-sandbox. [Provider s
 | `P-LH-4` | Workload proxy mediator | Outside launch confinement. Process separation unresolved |
 | `P-LH-5` | Local control endpoint | Carrier and placement unspecified |
 | `P-LH-6` | Successor launch | New launch authority |
-| `P-LH-7` | afakt agent exec command | Execution placement unspecified |
+| `P-LH-7` | `afakt workload exec` | Execution placement unspecified |
 | `DS-LH-1` | Agent workspace | Per-launch writable content |
 | `DS-LH-2` | Scratch storage | Outside workspace. Backing unspecified |
 | `DS-LH-3` | Shared named tool cache | Shared across launches. Backing unspecified |
-| `DS-LH-4` | Verified image cache | Workload host. Distinct from named tool cache |
+| `DS-LH-4` | Verified workspace image cache | Workload host. Distinct from named tool cache |
 | `DS-LH-5` | Checkpoint capture | Retained state. Access controls unresolved |
 | `P-LH-8` | Namespace and tunnel control | Outside harness confinement. Registration and recovery unresolved |
 
 ### Level one workload provider flows
 
-Arrows identify exchanges and their return paths. Unspecified carriers and placements remain gaps. The shared named tool cache is outside individual launch confinement and has a separate crossing from another launch. The verified image cache has a different trust relationship.
+Arrows identify exchanges and their return paths. Unspecified carriers and placements remain gaps. The shared named tool cache is outside individual launch confinement and has a separate crossing from another launch. The verified workspace image cache has a different trust relationship.
 
 ```mermaid
 flowchart LR
@@ -94,7 +94,7 @@ flowchart LR
     subgraph z4["TB-LH-3 / workload host processing"]
         P-LH-2["P-LH-2: Workload host worker and provider lifecycle"]
         P-LH-3["P-LH-3: Host workspace processor"]
-        DS-LH-4["DS-LH-4: Verified image cache"]
+        DS-LH-4["DS-LH-4: Verified workspace image cache"]
     end
     subgraph z5["TB-LH-4 / shared across launches"]
         DS-LH-3["DS-LH-3: Shared named tool cache"]
@@ -112,7 +112,7 @@ flowchart LR
         E-LH-1["E-LH-1: Command caller"]
     end
     subgraph z10["TB-LH-6 / command placement unresolved"]
-        P-LH-7["P-LH-7: afakt agent exec command"]
+        P-LH-7["P-LH-7: `afakt workload exec`"]
     end
     P-LH-2 -->|"F-LH-1"| P-LH-1
     P-LH-1 -->|"F-LH-2"| P-LH-5
@@ -141,7 +141,7 @@ flowchart LR
 - **`F-LH-5`.** Workspace reads and writes under launch confinement. Crosses `TB-LH-3`.
 - **`F-LH-6`.** Scratch reads and writes outside the workspace. Allocation and cleanup are unspecified. Crosses `TB-LH-3`.
 - **`F-LH-7`.** Host-side capture, metadata interpretation, and cleanup of hostile workspace content. Crosses `TB-LH-3`.
-- **`F-LH-8`.** Verified immutable image content used for materialization. Cache ownership is provider-specific. Crosses `TB-LH-3`.
+- **`F-LH-8`.** Verified immutable workspace image content used for materialization. Cache ownership is provider-specific. Crosses `TB-LH-3`.
 - **`F-LH-9`.** Named cache reads and writes by this launch. Mapping to backing storage is unspecified. Crosses `TB-LH-4`.
 - **`F-LH-10`.** Named cache reads and writes by another launch across the same sharing boundary. Crosses `TB-LH-4`.
 - **`F-LH-11`.** Capture and restore of harness checkpoint and workspace state. The contract for resuming execution remains unresolved and doesn't include a VM snapshot. Crosses `TB-LH-5`.

@@ -15,7 +15,7 @@ generated: { by: "codex:gpt-6", at: "2026-10-28T17:30:00Z" }
 
 The Cloudflare Sandbox Software Development Kit (SDK) workload provider follows its [provider design](workload-provider-cloudflare.md).
 
-Vendor lifecycle authority, remote sandbox isolation, workspace and session storage, network paths, and retained state fall within this model, as do commands requested through `afakt agent exec`. The [common workload threat model](workload-threat-model.md) covers shared control plane authorization, credential exchange, session access, registries, and audit storage because their controls don't depend on this vendor.
+Vendor lifecycle authority, remote sandbox isolation, workspace and session storage, network paths, and retained state fall within this model, as do commands requested through `afakt workload exec`. The [common workload threat model](workload-threat-model.md) covers shared control plane authorization, credential exchange, session access, registries, and audit storage because their controls don't depend on this vendor.
 
 STRIDE covers spoofing, tampering, repudiation, information disclosure, denial of service, and elevation of privilege. A virtual machine (VM) can supply a private kernel. Domain Name System (DNS) queries and Agent Client Protocol (ACP) sessions require the launch's workload proxy mediator. Model Context Protocol (MCP) tools require afakt gateway authorization. An Application Programming Interface (API) exposes vendor management operations. Hypertext Transfer Protocol Secure (HTTPS) encrypts web traffic, while Hypertext Transfer Protocol (HTTP) names the underlying request protocol.
 
@@ -53,7 +53,7 @@ STRIDE covers spoofing, tampering, repudiation, information disclosure, denial o
 | `P-CF-8` | Workspace command | afakt-sandbox placement unresolved |
 | `DS-CF-1` | Workspace and scratch | Launch data. Remote backing and separation unresolved |
 | `DS-CF-2` | Shared named tool cache | Cross-launch sharing. Workload provider mapping unresolved |
-| `DS-CF-3` | Verified image cache | Outside launch-writable storage. Remote mapping unresolved |
+| `DS-CF-3` | Verified workspace image cache | Outside launch-writable storage. Remote mapping unresolved |
 | `DS-CF-4` | Retained workspace and session state | Vendor copies or afakt captures. Paired capture unresolved |
 | `DS-CF-5` | Vendor-held credentials and observations | Vendor custody. Access and retention unresolved |
 
@@ -85,7 +85,7 @@ flowchart LR
         DS-CF-1["DS-CF-1: Workspace and scratch"]
     end
     subgraph images["TB-CF-4 / verified content"]
-        DS-CF-3["DS-CF-3: Verified image cache"]
+        DS-CF-3["DS-CF-3: Verified workspace image cache"]
     end
     subgraph shared["TB-CF-5 / shared across launches"]
         DS-CF-2["DS-CF-2: Named tool cache"]

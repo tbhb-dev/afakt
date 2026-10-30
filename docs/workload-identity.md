@@ -11,7 +11,7 @@ generated: { by: "codex:gpt-6", at: "2026-10-28T23:55:04Z" }
 
 afakt uses Secure Production Identity Framework for Everyone (SPIFFE) for workload identity. Each control plane has one trust domain, without federation between control planes. A SPIFFE Verifiable Identity Document (SVID) proves an identity. The receiver checks authorization separately. See [Workload identity keys](pki-workload.md) and [Service authorization](agent-open-questions.md#%60OQ-SBX-43%60).
 
-SPIFFE's workload includes services, gateways, and host workers. A [Workload resource](workload-resource.md) represents an execution context for an agent, app, or worker running user code. The control plane's own deployments, including its platform Temporal worker, have service identities without becoming Workload resources.
+SPIFFE's workload includes services, gateways, and host workers. A [Workload resource](workload-resource.md) represents an execution context. An `empty` workload runs only its supervisor. A `job` adds one process to completion, an `agent` runs one launch, an `app` runs a release process, and a `worker` runs a Temporal worker. The control plane's own deployments, including its platform Temporal worker, have service identities without becoming Workload resources.
 
 These boundaries apply to `linux-host`, `linux-vm`, and `docker-engine` on `linux/amd64` and `linux/arm64`, `macos-host` and `macos-vm` on `darwin/arm64`, and `windows-host` and `windows-vm` on `windows/amd64`. Host-provider custody depends on the held [`OQ-SBX-18`](agent-open-questions.md#%60OQ-SBX-18%60).
 

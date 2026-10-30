@@ -9,9 +9,9 @@ generated: { by: "codex:gpt-6", at: "2026-10-28T22:38:36Z" }
 
 # Workload resource
 
-The `Workload` resource represents the execution context and its [workload](workload.md) boundary. That boundary includes `afakt-agent` together with the workload proxy and its mediator. Its `type` is `agent`, `app`, or `worker`. The control plane's own deployments, including its platform Temporal worker, aren't workloads. Workers that run user code are workloads. This boundary prevents workload creation from depending on a platform worker that itself needs a workload.
+The `Workload` resource represents the execution context and its [workload](workload.md) boundary. That boundary includes the workload supervisor together with the workload proxy and its mediator. Its `type` is `empty`, `job`, `agent`, `app`, or `worker`. The control plane's own deployments, including its platform Temporal worker, aren't workloads. Workers that run user code are workloads. This boundary prevents workload creation from depending on a platform worker that itself needs a workload.
 
-afakt destroys an agent workload after its single agent launch, while apps and workers never bind an agent. App replacement and worker deployment lifetimes remain [`OQ-WLD-2`](agent-open-questions.md#%60OQ-WLD-2%60).
+An `empty` workload doesn't run a workload process. afakt destroys a `job` after its one process completes, and an `agent` workload after its single launch. Apps and workers never bind an agent. App replacement and worker deployment lifetimes remain [`OQ-WLD-2`](agent-open-questions.md#%60OQ-WLD-2%60).
 
 The contract applies to every Tier 1 cell: `linux-host`, `linux-vm`, and `docker-engine` on `linux/amd64` and `linux/arm64`, `macos-host` and `macos-vm` on `darwin/arm64`, and `windows-host` and `windows-vm` on `windows/amd64`. Provider capabilities determine the available operations, without changing creation-time immutability.
 
@@ -32,10 +32,10 @@ The envelope contains only `apiVersion`, `kind`, `metadata`, `spec`, and `status
 
 | Key | Meaning |
 | --- | --- |
-| `type` | Agent, app, or worker classification. |
+| `type` | `empty` without a workload process, `job` for one process to completion, `agent` for one launch, `app` for a release process, or `worker` for a Temporal worker. |
 | `role` | Pinned Identity and Access Management (IAM) role revision. |
 | `authorization` | Exact revisions of every policy the role references and the policy-language version. |
-| `workload_image` | Workload image reference resolved at creation. |
+| `workload_image` | Container image reference resolved at creation for the workload process. Absent for `empty`. |
 | `execution_mode` | Selected workload provider target. |
 | `shape` | CPU, memory, and disk allocation. |
 | `host` | Selected workload host. |
@@ -75,7 +75,7 @@ spec:
   authorization:
     policies: [{ name: repository-read, revision: "3" }]
     policy_language_version: "1"
-  workload_image: example-guest-image
+  workload_image: example-agent-image
   execution_mode: macos-vm
   shape: { cpu: 2, memory: 4Gi, disk: 20Gi }
   host: example-workload-host

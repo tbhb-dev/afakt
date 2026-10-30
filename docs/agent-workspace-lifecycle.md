@@ -101,7 +101,7 @@ Selection of the registry software remains [undecided](agent-open-questions.md#%
 
 Each workload host worker keeps a local layer cache keyed by content digest and a cache of unpacked layers keyed by the verified layer digest. Cache entries are immutable. Only complete, verified entries become reusable, and the caches stay outside the agent's writable agent workspace, distinct from the profile's named tool caches.
 
-For worker-owned pulls, the worker fetches each image source's manifest and config. Pull ownership remains [`OQ-IMG-8`](agent-open-questions.md#%60OQ-IMG-8%60). It finds the missing layers and fetches them with parallel ranged reads, verifying each assembled blob against its descriptor before admitting it to the layer cache. The worker discards a corrupt entry and fetches it again.
+For worker-owned pulls, the worker fetches each workspace image source's manifest and config. Pull ownership remains [`OQ-IMG-8`](agent-open-questions.md#%60OQ-IMG-8%60). It finds the missing layers and fetches them with parallel ranged reads, verifying each assembled blob against its descriptor before admitting it to the layer cache. The worker discards a corrupt entry and fetches it again.
 
 Unpacked layers become reusable only after extraction and validation finish.
 
@@ -123,7 +123,7 @@ A materialization has one launch's writer authority. At most one launch runs for
 | --- | --- | --- |
 | [Linux VM](workload-provider-linux-vm.md#Workspace,%20scratch,%20and%20caches) and [macOS VM](workload-provider-macos-vm.md#Workspace,%20scratch,%20and%20caches) | A Linux guest sees a writable workspace disk beside a read-only root disk. Host backing and verified caches remain outside guest writes. | Frozen workspace disk with paired VM and native-session capture. |
 | [Windows VM](workload-provider-windows-vm.md#Workspace,%20scratch,%20and%20caches) | The Linux guest uses separate boot and workspace disks. Windows host backing and ownership mappings remain undecided. | The Linux guest is the capture target. |
-| [Docker Engine](workload-provider-docker-engine.md#Workspace,%20scratch,%20and%20caches), [Docker Desktop on macOS](workload-provider-docker-desktop-macos.md#Workspace,%20scratch,%20and%20caches), and [Docker Desktop on Windows](workload-provider-docker-desktop-windows.md#Workspace,%20scratch,%20and%20caches) | A separate workspace tree attaches to the container. Directory, volume, outer-machine storage, and ownership mappings remain undecided. The runtime image and its cache are separate. | No workload snapshot. Pairing workspace content with a harness checkpoint remains undecided. |
+| [Docker Engine](workload-provider-docker-engine.md#Workspace,%20scratch,%20and%20caches), [Docker Desktop on macOS](workload-provider-docker-desktop-macos.md#Workspace,%20scratch,%20and%20caches), and [Docker Desktop on Windows](workload-provider-docker-desktop-windows.md#Workspace,%20scratch,%20and%20caches) | A separate workspace tree attaches to the container. Directory, volume, outer-machine storage, and ownership mappings remain undecided. The container image and its cache are separate. | No workload snapshot. Pairing workspace content with a harness checkpoint remains undecided. |
 | [Linux host](workload-provider-linux-host.md#Workspace,%20scratch,%20and%20caches) | Host directory storage appears through the confined process mount view. Native cloning, copying, and ownership remain undecided. | No workload snapshot. A process-group stop doesn't prove all writers stopped. |
 | [macOS host](workload-provider-macos-host.md#Workspace,%20scratch,%20and%20caches) | Seatbelt rules expose host filesystem paths. No mount namespace hides the other host paths. | Native clone metadata, capture rights, and path stability remain undecided. |
 | [Windows host](workload-provider-windows-host.md#Workspace,%20scratch,%20and%20caches) | Host storage needs native filesystem access mappings, compatible names, and link handling. | Native confinement and capture rights remain undecided. |
@@ -217,7 +217,7 @@ Fetch credentials, registry tokens, broker secrets, signing keys, and material f
 
 Workload identities use the provisional lifetimes and half-life renewal in [Certificate policies](pki.md#Certificate%20policies), subject to [`OQ-HOOK-18`](agent-open-questions.md#%60OQ-HOOK-18%60).
 
-Later deletion leaves earlier image layers intact.
+Later deletion leaves earlier workspace image layers intact.
 
 ## Image builds
 

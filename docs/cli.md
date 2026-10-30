@@ -25,9 +25,16 @@ Client and deployment settings don't override an agent profile's authority bound
 
 An index organizes registered content for retrieval by agents. `afakt index add` registers content for indexing. Its storage, source types, and query interface remain [open](agent-open-questions.md#Command-line%20reference).
 
-## Agent operations
+## Workload commands
 
-Authority to run `afakt agent exec` or `afakt agent shell` outside the agent sandbox remains [`OQ-AGT-26`](agent-open-questions.md#%60OQ-AGT-26%60).
+`afakt workload exec` and `afakt workload shell` are [workload provider capabilities](workload-api.md#Commands%20in%20a%20workload). afakt refuses either command when its provider doesn't support it. Permission to run outside the workload sandbox remains [`OQ-AGT-26`](agent-open-questions.md#%60OQ-AGT-26%60).
+
+| Command | Description |
+| --- | --- |
+| `afakt workload exec` | Run an argument list inside a fresh sandbox in a workload, without assuming a shell. |
+| `afakt workload shell` | Run the shell declared by the workload image. Refuse when it declares none. |
+
+## Agent operations
 
 See [Agents](agent.md).
 
@@ -47,7 +54,6 @@ See [Agents](agent.md).
 | `afakt agent diff` | Inspect changes to an agent's workspace. |
 | `afakt agent env` | List an agent's environment variables. |
 | `afakt agent events` | List or follow an agent's events. |
-| `afakt agent exec` | Run a sandboxed command in an agent's workspace. |
 | `afakt agent export` | Export an agent and its workspace as an Open Container Initiative (OCI) artifact. |
 | `afakt agent history` | Fetch or follow an agent's current and historical transcripts. |
 | `afakt agent import` | Create an agent from an Open Container Initiative (OCI) artifact. |
@@ -68,7 +74,6 @@ See [Agents](agent.md).
 | `afakt agent resume` | Start a suspended agent. |
 | `afakt agent run` | Start an agent, wait for its session to end, and output its final message. |
 | `afakt agent sandbox` | View details about its agent sandbox configuration (use `afakt sandbox` for managing sandbox configuration). |
-| `afakt agent shell` | Start a sandboxed shell in an agent's workspace. |
 | `afakt agent signal` | Send a process signal to an agent. |
 | `afakt agent start` | Create an agent and start the agent harness. |
 | `afakt agent stats` | View an agent's statistics. |

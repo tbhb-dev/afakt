@@ -46,7 +46,7 @@ See [Workload host registry](workload-placement.md#Workload%20host%20registry) a
 | `slot_capacity`, `capacity_change_reason` | Observed launch-slot capacity and its change reason. |
 | `agent_launch_ids` | Agent launches holding slots. |
 | `lease_expires_at` | Registration lease expiry, with duration under `OQ-PLC-1`. |
-| `cached_layer_digests` | Advisory image locality. |
+| `cached_layer_digests` | Advisory workspace image locality. |
 
 Workload observations and their freshness, including app and user code worker allocations, need the contracts in [`OQ-RES-6`](agent-open-questions.md#%60OQ-RES-6%60) and [`OQ-WLD-4`](agent-open-questions.md#%60OQ-WLD-4%60). Even after a lease expires, execution can continue, so capacity release depends on observations under [Restart and reclaim](workload-host-worker.md#Restart%20and%20reclaim).
 
