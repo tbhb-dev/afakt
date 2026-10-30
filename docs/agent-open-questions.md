@@ -131,7 +131,7 @@ Which component controls the combined outcome, retry policy, and cancellation of
 
 ### `OQ-AGT-31`
 
-Which grants permit workload snapshot and agent checkpoint upload, download, restoration, and deletion? How do the snapshot registry and object store bind captured content to its owner and agent launch as well as its compatible workspace? How do they protect its confidentiality and integrity during storage and transfer? See [Workload snapshots and the snapshot registry](agent.md#Workload%20snapshots%20and%20the%20snapshot%20registry).
+Which grants permit workload snapshot restoration and deletion? Which grants permit agent checkpoint upload, download, restoration, and deletion? How do the snapshot registry and object store bind captured content to its owner and agent launch as well as its compatible workspace? How do they protect its confidentiality and integrity during storage and transfer? See [Workload snapshots and the snapshot registry](agent.md#Workload%20snapshots%20and%20the%20snapshot%20registry).
 
 ### `OQ-AGT-32`
 
@@ -1265,7 +1265,7 @@ What fields does a job specify beyond its workload image, arguments, and environ
 
 ### `OQ-WLD-3`
 
-Which capture can restore a follow-up onto a new workload? How do agent snapshots, workload snapshots, paired checkpoints, retention, and compatibility with a workload host interact? Portable agent capture and VM restoration imply different compatibility checks for a follow-up, which the capture contents alone don't settle. See [Suspend and resume](workload-lifecycle.md#Suspend%20and%20resume).
+Which portable capture can restore a follow-up onto a new workload? How do agent snapshots, agent checkpoints, retention, and compatibility with a workload host interact? A workload snapshot that includes VM memory resumes only the workload it captured, so a memory snapshot can't seed that new workload. The restoration contract for portable captures remains open. See [Suspend and resume](workload-lifecycle.md#Suspend%20and%20resume).
 
 ### `OQ-WLD-4`
 

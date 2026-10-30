@@ -84,7 +84,7 @@ Harness checkpoints remain [agent checkpoints](#Agent%20checkpoints).
 
 ## Workload snapshots and the snapshot registry
 
-A workload snapshot captures the memory and disk of the VM an agent sandbox runs in, used to restore it. Workload snapshots exist only where the agent runs in a VM. Host modes and container managers have none. `snapshot create` captures VM state and uploads it to the snapshot registry. The snapshot commands list, inspect, download, upload, tag, label, annotate, delete, and prune workload snapshots. A workload snapshot is separate from an agent checkpoint and a workspace image.
+A workload snapshot captures the memory and disk of the VM an agent sandbox runs in, used to restore it. Workload snapshots exist only where the agent runs in a VM. Host modes and container managers have none. `snapshot create` captures VM state as a workload snapshot in the snapshot registry. The snapshot commands list, inspect, tag, label, annotate, delete, and prune workload snapshots. A workload snapshot that includes VM memory resumes only the workload it captured, on any host that passes the snapshot compatibility check. Users can't upload or download workload snapshots. Moving a workload snapshot between hosts is a control plane operation. [Archive](agent-lifecycle.md#Archive%20and%20restore) keeps a disk-only workload snapshot of a stopped agent, and [restore](agent-lifecycle.md#Archive%20and%20restore) boots the agent's new workload from it. A workload snapshot is separate from an agent checkpoint and a workspace image.
 
 [Archive and restore](agent-lifecycle.md#Archive%20and%20restore).
 

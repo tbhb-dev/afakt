@@ -280,15 +280,13 @@ See [Workload snapshots and the snapshot registry](agent.md#Workload%20snapshots
 | --- | --- |
 | `afakt workload snapshot` | Manage workload snapshots in the snapshot registry. |
 | `afakt workload snapshot annotate` | Update a workload snapshot's annotations. |
-| `afakt workload snapshot create` | Capture the agent sandbox's VM state and upload the workload snapshot to the snapshot registry. |
+| `afakt workload snapshot create` | Capture the workload's VM state as a workload snapshot in the snapshot registry. |
 | `afakt workload snapshot delete` | Delete a workload snapshot. |
-| `afakt workload snapshot download` | Download a workload snapshot. |
 | `afakt workload snapshot info` | View a summary of a workload snapshot. |
 | `afakt workload snapshot label` | Update a workload snapshot's labels. |
 | `afakt workload snapshot list` | List workload snapshots. |
 | `afakt workload snapshot prune` | Delete old workload snapshots. |
 | `afakt workload snapshot tag` | Tag a workload snapshot. |
-| `afakt workload snapshot upload` | Upload a workload snapshot. |
 
 ## Agent subscription
 

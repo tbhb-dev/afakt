@@ -242,7 +242,7 @@ Publication order for overlapping builds and recovery after a lost tag-update ac
 
 ## Operations and telemetry
 
-The command-line interface (CLI) separates one agent's revision history from reusable workspace images and definitions. `afakt agent workspace` provides `commit`, `info`, `pull`, `push`, `reset`, and `tag`. `afakt workspace` manages definitions, builds, import, export, manifests, tags, statistics, and pruning. These operations don't replace Git operations in a source repository. [Workload snapshot commands](cli.md#Workload%20snapshot) manage capture, transfer, metadata, and deletion, while [agent checkpoint commands](cli.md#Agent%20checkpoint) address native session state.
+The command-line interface (CLI) separates one agent's revision history from reusable workspace images and definitions. `afakt agent workspace` provides `commit`, `info`, `pull`, `push`, `reset`, and `tag`. `afakt workspace` manages definitions, builds, import, export, manifests, tags, statistics, and pruning. These operations don't replace Git operations in a source repository. [Workload snapshot commands](cli.md#Workload%20snapshot) manage capture, metadata, and deletion, while [agent checkpoint commands](cli.md#Agent%20checkpoint) address native session state.
 
 The API and workload provider contract expose provision, restore, release, status, cancel, and result. Workspace cleanup runs on the placed host as an activity. Whether it becomes a separate provider operation remains [undecided](agent-open-questions.md#%60OQ-CON-1%60). Dedicated workspace and snapshot API paths, their cancellation results, and lifecycle event names beyond the launch-ended event remain [undecided](agent-open-questions.md#%60OQ-WSP-23%60).
 
