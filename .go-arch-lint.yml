@@ -37,6 +37,7 @@ exclude:
   - vendor
   - testdata
   - tools
+  - tmp
 
 vendors:
   cobra:
