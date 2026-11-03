@@ -32,6 +32,9 @@ coverage.xml
 .vale/config/vocabularies/*
 !.vale/config/vocabularies/project/
 
+# mutation_changes: the changes file for diff-scope mutation runs
+.mutation/
+
 # Linter caches
 .rumdl_cache/
 .cspell/
