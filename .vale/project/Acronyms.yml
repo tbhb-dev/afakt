@@ -79,6 +79,7 @@ exceptions:
   - TBD
   - TCP
   - TODO
+  - TOML
   - UPD
   - URI
   - URL
