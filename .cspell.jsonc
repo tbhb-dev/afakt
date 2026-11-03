@@ -1,0 +1,26 @@
+{
+  "language": "en",
+  "ignorePaths": [
+    ".mise/**/*",
+    ".rumdl_cache/**/*",
+    ".vale/**/*",
+    ".venv/**/*",
+    "bazel-*/**/*",
+    "coverage.xml",
+    "go.sum",
+    "LICENSE",
+    "MODULE.bazel.lock",
+    "mise.lock",
+    "tmp/**/*",
+    "tools/testdata/**/*",
+    "uv.lock"
+  ],
+  "dictionaryDefinitions": [
+    {
+      "name": "afakt",
+      "path": "./.cspell-words.txt",
+      "addWords": true
+    }
+  ],
+  "dictionaries": ["afakt", "golang", "python"]
+}
