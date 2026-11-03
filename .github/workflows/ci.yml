@@ -103,8 +103,8 @@ jobs:
           RELEASE_CONFIG: ${{ matrix.release }}
         run: bazelisk build "--config=${RELEASE_CONFIG}" //cmd/afakt
 
-      # A failed run's test logs, from every workspace, so a failure that does
-      # not recur can still be read.
+      # A failed run's test logs, so a failure that does not recur can still
+      # be read.
       - name: Keep the test logs
         if: failure()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
