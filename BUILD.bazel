@@ -28,7 +28,7 @@ load(
     "zizmor_test",
 )
 load("@tbhb_rules//repo:defs.bzl", "repo_files")
-load("@tbhb_rules_go//:defs.bzl", "go_arch_lint_test", "go_deadcode_test", "go_mod_tidy_test", "gobco_test", "gomutants_test")
+load("@tbhb_rules_go//:defs.bzl", "go_arch_lint_test", "go_deadcode_test", "go_mod_tidy_test", "gobco_test", "gomutants_test", "govulncheck", "govulncheck_test")
 load("//:vale_packages.bzl", "VALE_PACKAGES")
 load("//tools/lint:linters.bzl", "golangci_lint_test")
 
@@ -59,6 +59,7 @@ BUILDIFIER_EXCLUDES = [
     "./.venv/*",
     "./.mise/*",
     "./bazel-*",
+    "./.bazel-*",
     "./node_modules/*",
     "./tmp/*",
 ]
@@ -168,6 +169,26 @@ gobco_test(
     go_mod = "go.mod",
     go_sum = "go.sum",
     tests = ["//internal/buildmeta:buildmeta_test"],
+)
+
+# Known vulnerabilities the module's code can reach. Advisories change without
+# any input changing, so the test is manual and never cached: CI runs
+# `bazel run //:govulncheck`, and `bazel test //:govulncheck_test` runs it by
+# hand.
+govulncheck_test(
+    name = "govulncheck_test",
+    srcs = GO_TARGETS,
+    go_mod = "go.mod",
+    go_sum = "go.sum",
+    proxy = "@go_mod_proxy//:proxy",
+)
+
+govulncheck(
+    name = "govulncheck",
+    srcs = GO_TARGETS,
+    go_mod = "go.mod",
+    go_sum = "go.sum",
+    proxy = "@go_mod_proxy//:proxy",
 )
 
 # The changes file for a diff-scope mutation run: empty, so full scope,
