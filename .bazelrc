@@ -29,4 +29,8 @@ common:windows --enable_runfiles
 # files, and the copies go stale between builds.
 startup --windows_enable_symlinks
 
+# Dot-prefixed convenience symlinks (.bazel-bin, .bazel-testlogs, ...), so
+# editors and file-watchers skip them like other hidden directories.
+common --symlink_prefix=.bazel-
+
 try-import %workspace%/.bazelrc.user
