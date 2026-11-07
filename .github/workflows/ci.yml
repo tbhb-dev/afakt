@@ -65,7 +65,7 @@ jobs:
       # //... is every hermetic gate: the whole-tree lint tests (secrets in
       # the working tree, YAML, TOML, Markdown, prose, EditorConfig,
       # workflows, shell, CODEOWNERS paths), the format check, Starlark
-      # lint, nogo during the build, the Go and Python tests and linters,
+      # lint, nogo during the build, the Go tests and linters,
       # condition coverage, the docs bundle and REUSE checks, the import
       # contracts, and the preset staleness test.
       - name: Test
@@ -90,7 +90,7 @@ jobs:
           include-hidden-files: true
 
   # The repository-level checks, on Linux beside the bazel matrix, so they
-  # don't wait behind the tests. pip_audit sits in tools/, the input's default.
+  # don't wait behind the tests. There are no Python dependencies to audit.
   repo:
     name: repo
     permissions:
@@ -98,6 +98,7 @@ jobs:
     uses: tbhb-dev/rules/.github/workflows/repo-checks.yml@03f1187861480af99871b1df89741569522c2158  # main
     with:
       gazelle-dirs: .
+      pip-audit-target: ""
       module-dirs: .
       govulncheck-target: //:govulncheck
 
