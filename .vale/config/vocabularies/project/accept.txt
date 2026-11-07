@@ -1,5 +1,6 @@
 [Ff]rontmatter
 afakt
+awrel
 Bazel
 prek
 subcommand
