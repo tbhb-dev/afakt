@@ -4,7 +4,7 @@ afakt is a command-line tool written in Go. The repository is at the bootstrap s
 
 ## Development
 
-Bazel pins and runs every gate. [mise](https://mise.jdx.dev) only installs `bazelisk` and `uv`, pinned in `mise.toml` and locked in `mise.lock`. Run `tbhbdev alpha install` once per clone to install the git hooks and the user-level harness hooks. Run every gate with:
+Bazel pins and runs every gate. [mise](https://mise.jdx.dev) only installs `bazelisk` and `uv`, pinned in `mise.toml` and locked in `mise.lock`. Run `tbhbdev alpha install` once per machine to install the user-level harness hooks. Each session start then installs the clone's git hooks. Run every gate with:
 
 ```sh
 bazelisk test //...
