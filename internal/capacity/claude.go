@@ -9,8 +9,9 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	// Embed the IANA database so zone names in the usage pane resolve on hosts
-	// without system zoneinfo, such as Windows.
+
+	// Bundle the time zone database so zone names in the usage pane resolve on
+	// hosts that lack one, such as Windows runners.
 	_ "time/tzdata"
 )
 
