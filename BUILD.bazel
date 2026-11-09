@@ -107,6 +107,7 @@ GO_TARGETS = [
     "//cmd/afakt",
     "//cmd/afakt:afakt_test",
     "//internal/buildmeta:buildmeta_test",
+    "//internal/capacity:capacity_test",
 ]
 
 golangci_lint_test(
@@ -145,12 +146,14 @@ go_mod_tidy_test(
 gomutants_test(
     name = "gomutants_test",
     cpus = 2,
+    data = ["//internal/capacity:fixtures"],
     go_mod = "go.mod",
     go_sum = "go.sum",
     proxy = "@go_mod_proxy//:proxy",
     tests = [
         "//cmd/afakt:afakt_test",
         "//internal/buildmeta:buildmeta_test",
+        "//internal/capacity:capacity_test",
     ],
 )
 
@@ -162,6 +165,14 @@ gobco_test(
     go_sum = "go.sum",
     proxy = "@go_mod_proxy//:proxy",
     tests = ["//cmd/afakt:afakt_test"],
+)
+
+gobco_test(
+    name = "capacity_gobco_test",
+    data = ["//internal/capacity:fixtures"],
+    go_mod = "go.mod",
+    go_sum = "go.sum",
+    tests = ["//internal/capacity:capacity_test"],
 )
 
 gobco_test(

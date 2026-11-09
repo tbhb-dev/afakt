@@ -8,11 +8,15 @@ repo_files()
 
 go_library(
     name = "afakt_lib",
-    srcs = ["main.go"],
+    srcs = [
+        "capacity.go",
+        "main.go",
+    ],
     importpath = "go.tbhb.dev/afakt/cmd/afakt",
     visibility = ["//visibility:private"],
     deps = [
         "//internal/buildmeta",
+        "//internal/capacity",
         "@com_github_spf13_cobra//:cobra",
     ],
 )
@@ -25,7 +29,10 @@ go_binary(
 
 go_test(
     name = "afakt_test",
-    srcs = ["main_internal_test.go"],
+    srcs = [
+        "capacity_internal_test.go",
+        "main_internal_test.go",
+    ],
     embed = [":afakt_lib"],
     # The whole-module Go checks in the root package take the tests too.
     visibility = ["//:__pkg__"],
