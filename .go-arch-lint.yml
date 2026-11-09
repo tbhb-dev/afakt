@@ -14,13 +14,16 @@ allow:
 components:
   cmd: {in: cmd/*}
   buildmeta: {in: internal/buildmeta}
+  capacity: {in: internal/capacity}
 
 vendors:
   cobra: {in: [github.com/spf13/cobra, github.com/spf13/cobra/**]}
 
 deps:
   cmd:
-    mayDependOn: [buildmeta]
+    mayDependOn: [buildmeta, capacity]
     canUse: [cobra]
   buildmeta:
     mayDependOn: [buildmeta]  # a leaf; go-arch-lint rejects an empty list
+  capacity:
+    mayDependOn: [capacity]  # a leaf

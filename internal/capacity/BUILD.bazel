@@ -1,0 +1,34 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright Tony Burns
+
+load("@rules_go//go:def.bzl", "go_library", "go_test")
+load("@tbhb_rules//repo:defs.bzl", "repo_files")
+
+repo_files()
+
+filegroup(
+    name = "fixtures",
+    srcs = glob(["testdata/*.txt"]),
+    visibility = ["//:__pkg__"],
+)
+
+go_library(
+    name = "capacity",
+    srcs = [
+        "claude.go",
+        "json.go",
+        "metrics.go",
+        "reading.go",
+        "source.go",
+    ],
+    importpath = "go.tbhb.dev/afakt/internal/capacity",
+    visibility = ["//:__subpackages__"],
+)
+
+go_test(
+    name = "capacity_test",
+    srcs = ["capacity_internal_test.go"],
+    data = glob(["testdata/*.txt"]),
+    embed = [":capacity"],
+    visibility = ["//:__pkg__"],
+)

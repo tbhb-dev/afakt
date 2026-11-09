@@ -48,6 +48,7 @@ func newRootCmd() *cobra.Command {
 	}
 	root.SetVersionTemplate("afakt {{.Version}}\n")
 	root.AddCommand(newVersionCmd())
+	root.AddCommand(newCapacityCmd())
 
 	return root
 }

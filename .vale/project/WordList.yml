@@ -50,7 +50,8 @@ swap:
   curated roles: predefined roles
   data are: data is
   Developers Console: Google API Console|API Console
-  disabled?: turn off|off
+  # Mutation directives use a fixed keyword. Their reasons remain prose.
+  '(?<!gomutants:)disabled?': turn off|off
   ephemeral IP address: ephemeral external IP address
   fewer data: less data
   file name: filename
