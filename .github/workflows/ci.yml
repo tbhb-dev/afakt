@@ -57,7 +57,7 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Bazel for CI
-        uses: tbhb-dev/rules/.github/actions/setup-bazel-ci@a7fa57bfb1da73cc4ec8dd80208c9a3047f11e0a  # main
+        uses: tbhb-dev/rules/.github/actions/setup-bazel-ci@f7f4c1f893f9dad8975f5cd2b1bbb24819604c12  # main
         with:
           disk-cache: ${{ github.workflow }}-${{ matrix.os }}
           cache-save: ${{ github.event_name != 'pull_request' }}
@@ -95,7 +95,7 @@ jobs:
     name: repo
     permissions:
       contents: read
-    uses: tbhb-dev/rules/.github/workflows/repo-checks.yml@a7fa57bfb1da73cc4ec8dd80208c9a3047f11e0a  # main
+    uses: tbhb-dev/rules/.github/workflows/repo-checks.yml@f7f4c1f893f9dad8975f5cd2b1bbb24819604c12  # main
     with:
       gazelle-dirs: .
       pip-audit-target: ""
@@ -116,6 +116,6 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: Fail if any needed job did not succeed
-        uses: tbhb-dev/rules/.github/actions/ci-conclusion@a7fa57bfb1da73cc4ec8dd80208c9a3047f11e0a  # main
+        uses: tbhb-dev/rules/.github/actions/ci-conclusion@f7f4c1f893f9dad8975f5cd2b1bbb24819604c12  # main
         with:
           needs: ${{ toJSON(needs) }}
